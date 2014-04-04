@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/css/bootstrap.css" type="text/css" media="all">
     <link rel="stylesheet" href="{{ STATIC_URL }}css/application.css" type="text/css" media="all">
     <link rel="stylesheet" href="{{ STATIC_URL }}css/datepicker.css" type="text/css" media="all">
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/jquery.dataTables.css" type="text/css" media="all">
     {% block extra_css %}{% endblock %}
     <!--[if IE 8]>
           <script src="{{ STATIC_URL }}html5shiv/html5shiv.js"></script>
@@ -49,6 +50,7 @@
 <script src="{{ STATIC_URL }}js/jquery-sortable-min.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}bootstrap-datetimepicker/bootstrapdatepicker.js" type="text/javascript"
         charset="utf-8"></script>
+<script src="{{ STATIC_URL }}js/jquery.dataTables.min.js" type="text/javascript" charset="utf-8" ></script>
 <script src="{{ STATIC_URL }}js/application.js" type="text/javascript" charset="utf-8"></script>
 {% if perms.auth.can_edit_questionnaire %}
     <script src="{{ STATIC_URL }}js/admin_only.js" type="text/javascript" charset="utf-8"></script>

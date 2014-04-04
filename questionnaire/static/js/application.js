@@ -19,6 +19,11 @@ $(document).ready(function() {
     $('#first_row').find('input[type=hidden]').each(function(index, element){
         $(element).val(0);
     });
+
+    $('.dataTables_wrapper').dataTable( {
+        "aaSorting": [[ 4, "desc" ]]
+    } );
+
 });
 
 function replaceAttributes($el, index) {

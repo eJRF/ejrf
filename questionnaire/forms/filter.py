@@ -10,6 +10,7 @@ class UserFilterForm(forms.Form):
                                           required=False)
     region = forms.ModelChoiceField(queryset=Region.objects.all(), empty_label="All",
                                     widget=forms.Select(attrs={"class": 'form-control region-select'}), required=False)
+
     role = forms.ModelChoiceField(queryset=Group.objects.order_by('name'), empty_label="All",
                                   widget=forms.Select(attrs={"class": 'form-control region-select'}), required=False)
 
@@ -33,3 +34,11 @@ class ExportFilterForm(forms.Form):
         years_with_questionnaires = set(Questionnaire.objects.all().values_list('year', flat=True))
         choices.extend((year, year) for year in years_with_questionnaires)
         return choices
+
+
+class QuestionFilterForm(forms.Form):
+    theme = forms.ModelChoiceField(queryset=Theme.objects.all().order_by('name'),
+                                   empty_label="All",
+                                   widget=forms.Select(
+                                       attrs={"class": 'form-control', 'id': 'theme_filter_id', 'name': 'theme'}),
+                                   required=False)

@@ -65,5 +65,5 @@ Feature: Questions feature
         And I should see dropdown with themes to filter questions
         When I select a theme from dropdown and click filter
         Then I should see questions under the selected theme filtered
-        When I select None from dropdown
+        When I select All from dropdown
         Then I should see all the questions listed

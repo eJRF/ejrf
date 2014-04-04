@@ -1,4 +1,4 @@
-<form class="form-inline pull-left" role="form" method="post" accept-charset="utf-8">
+<form class="form-inline pull-left" role="form" method="{{ form_method }}" accept-charset="utf-8" id="{{ form_id }}">
     {% csrf_token %}
     {% for field in a_form.visible_fields %}
       <div class="form-group">
@@ -6,5 +6,5 @@
         {{ field }}
       </div>
     {% endfor %}
-    <button id="get-list-btn" type="submit" class="btn btn-default"><span class="cyan"><span class="glyphicon glyphicon-transfer"></span> Get list</span></button>
+    <button id="get-list-btn" type="submit" class="btn btn-default"><span class="cyan"><span class="glyphicon glyphicon-transfer"></span> {{ btn_label }}</span></button>
 </form>

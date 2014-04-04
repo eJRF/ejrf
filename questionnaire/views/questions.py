@@ -4,6 +4,7 @@ from django.core.urlresolvers import reverse, reverse_lazy
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import CreateView, DeleteView, View, UpdateView
+from questionnaire.forms.filter import QuestionFilterForm
 from questionnaire.forms.questions import QuestionForm
 from questionnaire.mixins import DoesNotExistExceptionHandlerMixin, OwnerAndPermissionRequiredMixin
 from questionnaire.models import Question, Questionnaire, Theme
@@ -21,9 +22,12 @@ class QuestionList(PermissionRequiredMixin, View):
         if finalized_questionnaire.exists():
             active_questions = finalized_questionnaire.latest('created').get_all_questions()
 
+        form = QuestionFilterForm(self.request.GET)
         theme = None
-        if self.request.GET.get('theme', None):
-            theme = Theme.objects.get(id = self.request.GET.get('theme'))
+        if form.is_valid():
+            if self.request.GET.get('theme', None):
+                theme = Theme.objects.get(id = self.request.GET.get('theme'))
+                form = QuestionFilterForm(initial={'theme': theme.id})
 
         order_by = self._get_sort_field(self.request.GET.get('sort'))
 
@@ -31,10 +35,7 @@ class QuestionList(PermissionRequiredMixin, View):
         context = {'request': self.request,
                    'questions': questions,
                    'active_questions': active_questions,
-                   'themes': Theme.objects.all()}
-
-        if theme:
-            context.update({'selected_theme': theme.id})
+                   'filter_form': form}
 
         return render(self.request, self.template_name, context)
 

@@ -235,22 +235,20 @@ def then_i_should_see_the_questions_listed(step):
 @step(u'And I should see dropdown with themes to filter questions')
 def and_i_should_see_dropdown_with_themes_to_filter_questions(step):
     assert world.page.is_element_present_by_id('theme_filter_id')
-    assert world.page.is_element_present_by_id('submit_filter_id')
 
 @step(u'When I select a theme from dropdown and click filter')
 def when_i_select_a_theme_from_dropdown_and_click_filter(step):
     world.page.select('theme', world.theme1.id)
-    world.page.click_by_id('submit_filter_id')
 
 @step(u'Then I should see questions under the selected theme filtered')
 def then_i_should_see_questions_under_the_selected_theme_filtered(step):
     world.page.is_text_present(world.question1.export_label)
     world.page.is_text_present(world.question2.export_label)
 
-@step(u'When I select None from dropdown')
+@step(u'When I select All from dropdown')
 def when_i_select_none_from_dropdown(step):
     world.page.select('theme', '')
-    world.page.click_by_id('submit_filter_id')
+    world.page.click_by_id('get-list-btn')
 
 @step(u'Then I should see all the questions listed')
 def then_i_should_see_all_the_questions_listed(step):

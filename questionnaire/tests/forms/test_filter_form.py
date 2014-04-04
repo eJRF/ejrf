@@ -1,7 +1,6 @@
 from datetime import date
 from django.contrib.auth.models import Group
-
-from questionnaire.forms.filter import UserFilterForm, ExportFilterForm
+from questionnaire.forms.filter import UserFilterForm, ExportFilterForm, QuestionFilterForm
 from questionnaire.models import Region, Organization, Country, Theme, Questionnaire
 from questionnaire.tests.base_test import BaseTest
 
@@ -94,3 +93,16 @@ class ExportFilterFormTest(BaseTest):
         self.assertFalse(export_filter.is_valid())
         error_message = "Select a valid choice. %d is not one of the available choices." % selected_year
         self.assertIn(error_message, export_filter.errors['year'])
+
+
+class QuestionFilterFormTest(BaseTest):
+
+    def setUp(self):
+        self.theme = Theme.objects.create(name="Theme1")
+        self.form_data = {
+            'theme': self.theme.id
+        }
+
+    def test_post(self):
+        question_filter=QuestionFilterForm(self.form_data)
+        self.assertTrue(question_filter.is_valid())

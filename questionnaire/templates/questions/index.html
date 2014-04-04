@@ -12,42 +12,24 @@
     <a href="{% url 'new_question_page' %}" class="btn btn-default btn-lg  pull-right" id="id-add-new-question-link">
         <span class="cyan"><i class="glyphicon glyphicon-plus-sign"></i> New Question</span></a>
     <br/>
-    <form class="form-inline" role="form" method="get" id="question-filter-form">
-        <label>Theme</label>
-        <select name="theme" id="theme_filter_id" class="form-control">
-            <option value="">None</option>
-            {% for theme in themes %}
-                <option value="{{ theme.id }}" {% if selected_theme and selected_theme == theme.id %} selected="selected" {% endif %}>{{ theme.name }}</option>
-            {% endfor %}
-        </select>
-        <button class="btn btn-default cyan" id="submit_filter_id" type="submit">Filter</button>
-    </form>
-      <table id="tbl-question-list" class="table table-hover table-bordered">
+
+     {% include 'users/filter_form.html' with a_form=filter_form btn_label='Filter' form_method='get' form_id='question-filter-form'%}
+     <br/>
+     <div>
+        <table id="tbl-question-list" class="table table-hover table-bordered dataTables_wrapper">
           <thead>
           <tr>
             <th>
-                <a href="?sort={{ request.GET.sort|get_reverse_sort_key:'uid' }}">
-                    <span>UID</span>
-                    <span class="glyphicon glyphicon-sort"></span>
-                </a>
+                UID
             </th>
             <th>
-                <a href="?sort={{ request.GET.sort|get_reverse_sort_key:'label' }}">
-                    <span>Export Label (Detail)</span>
-                    <span class="glyphicon glyphicon-sort"></span>
-                </a>
+                Export Label (Detail)
             </th>
             <th>
-                <a href="?sort={{ request.GET.sort|get_reverse_sort_key:'theme' }}">
-                    <span>Theme</span>
-                    <span class="glyphicon glyphicon-sort"></span>
-                </a>
+                Theme
             </th>
             <th>
-                <a href="?sort={{ request.GET.sort|get_reverse_sort_key:'response_type' }}">
-                    <span>Response Type</span>
-                    <span class="glyphicon glyphicon-sort"></span>
-                </a>
+                Response Type
             </th>
             <th>Actions</th>
           </tr>
@@ -70,6 +52,8 @@
             {% endfor %}
           </tbody>
       </table>
+     </div>
+
   {% paginate %}
     </div>
 {% endblock %}
