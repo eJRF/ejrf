@@ -6,13 +6,12 @@ import urllib
 import urlparse
 
 from django.core.files import File
-from django.db import connection
 from django.http import HttpResponse
 from django.views.generic import TemplateView, View
-
 from braces.views import LoginRequiredMixin
+
 from questionnaire.forms.filter import ExportFilterForm
-from questionnaire.models import Questionnaire, Country, Region, Theme
+from questionnaire.models import Questionnaire, Country
 from questionnaire.services.export_data_service import ExportToTextService
 
 

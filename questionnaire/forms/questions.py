@@ -111,7 +111,7 @@ class QuestionForm(ModelForm):
         if options and question.answer_type == Question.MULTICHOICE:
             for grouped_option in options:
                 for option in grouped_option.split(','):
-                    QuestionOption.objects.create(text=option.strip(), question=question)
+                    QuestionOption.objects.get_or_create(text=option.strip(), question=question)
 
     def _set_answer_type_choices(self):
         choices = self.fields['answer_type'].choices
