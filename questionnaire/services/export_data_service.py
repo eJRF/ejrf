@@ -1,4 +1,5 @@
 from questionnaire.models import AnswerGroup, Answer
+from questionnaire.utils.service_utils import filter_empty_values
 
 
 class ExportToTextService:
@@ -16,7 +17,6 @@ class ExportToTextService:
             for subsection in questionnaire.sub_sections():
                 subsection_answers = self._answers(subsection)
                 formatted_response.extend(subsection_answers)
-
         return formatted_response
 
     def _answers(self, subsection):
@@ -27,16 +27,9 @@ class ExportToTextService:
         return formatted_response
 
     def _answer_filter_dict(self, question):
-        filter_dict = {'question': question, 'status': Answer.SUBMITTED_STATUS}
-        if self.version:
-            filter_dict['version'] = self.version
-        if self.countries:
-            filter_dict['country__in'] = self.countries
-
-        if self.themes:
-            filter_dict['question__theme__in'] = self.themes
-
-        return filter_dict
+        filter_dict = {'question': question, 'status': Answer.SUBMITTED_STATUS, 'version': self.version,
+                       'country__in': self.countries, 'question__theme__in': self.themes}
+        return filter_empty_values(filter_dict)
 
     def _answers_in(self, group):
         formatted_response = []
@@ -54,7 +47,8 @@ class ExportToTextService:
                         formatted_response.append(response_row)
         return formatted_response
 
-    def _format_response(self, answer, question, primary_question_uid, group, row):
+    @staticmethod
+    def _format_response(answer, question, primary_question_uid, group, row):
         question_prefix = 'C' if question.is_core else 'R'
         answer_id = "%s_%s_%s_%d" % (question_prefix, primary_question_uid, question.UID, row)
         if question.is_primary:
@@ -67,5 +61,3 @@ class ExportToTextService:
         answer_format = (answer.country.code, answer.country.name, answer.questionnaire.year, answer_id.encode('base64').strip(),
                          question_text_format, str(answer.response))
         return "%s\t%s\t%s\t%s\t%s\t%s" % answer_format
-
-

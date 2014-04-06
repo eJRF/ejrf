@@ -83,6 +83,24 @@ class ExportToTextViewTest(BaseTest):
         contents = "%s\r\n%s\r\n%s" % ("".join(headings), "".join(row1), "".join(row2))
         self.assertEqual(contents, response.content)
 
+    def test_post_export_with_no_filter_parameters(self):
+        form_data = {}
+        file_name = "data-All Questionnaires.txt"
+        response = self.client.post('/extract/', data=form_data)
+        self.assertEquals(200, response.status_code)
+        self.assertEquals(response.get('Content-Type'), 'text/csv')
+        self.assertEquals(response.get('Content-Disposition'), 'attachment; filename="%s"' % file_name)
+
+        question_text1 = "%s | %s | %s" % (self.section_1.title, self.sub_section.title, self.question1.text)
+        question_text_2 = "%s | %s | %s" % (self.section_1.title, self.sub_section.title, self.question2.text)
+        answer_id_1 = "C_%s_%s_1" % (self.question1.UID, self.question1.UID)
+        answer_id_2 = "C_%s_%s_%d" % (self.question1.UID, self.question2.UID, 1)
+        headings = "ISO\tCountry\tYear\tField code\tQuestion text\tValue"
+        row1 = "UGX\t%s\t2013\t%s\t%s\t%s" % (self.country.name, answer_id_1.encode('base64').strip(), question_text1, '23.00')
+        row2 = "UGX\t%s\t2013\t%s\t%s\t%s" % (self.country.name, answer_id_2.encode('base64').strip(), question_text_2, '1.00')
+        contents = "%s\r\n%s\r\n%s" % ("".join(headings), "".join(row1), "".join(row2))
+        self.assertEqual(contents, response.content)
+
 
 class SpecificExportViewTest(BaseTest):
     def setUp(self):

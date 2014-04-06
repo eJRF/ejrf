@@ -13,6 +13,7 @@ from braces.views import LoginRequiredMixin
 from questionnaire.forms.filter import ExportFilterForm
 from questionnaire.models import Questionnaire, Country
 from questionnaire.services.export_data_service import ExportToTextService
+from questionnaire.utils.service_utils import filter_empty_values
 
 
 class ExportToTextView(LoginRequiredMixin, TemplateView):
@@ -35,11 +36,14 @@ class ExportToTextView(LoginRequiredMixin, TemplateView):
         if filter_form.is_valid():
             years = filter_form.cleaned_data['year']
             countries = filter_form.cleaned_data['countries']
+            regions = filter_form.cleaned_data['regions']
             themes = filter_form.cleaned_data['themes']
-            export_filter_params = {'year__in': years, 'region__in': filter_form.cleaned_data['regions']}
 
-            questionnaires = all_questionnaires.filter(**export_filter_params)
-            export_service = ExportToTextService(questionnaires=questionnaires, countries=countries, themes=themes)
+            query_params = {'year__in': years, 'region__countries__in': countries, 'region__in': regions}
+            clean_query_params = filter_empty_values(query_params)
+
+            all_questionnaires = all_questionnaires.filter(**clean_query_params)
+            export_service = ExportToTextService(questionnaires=all_questionnaires, countries=countries, themes=themes)
 
         formatted_responses = export_service.get_formatted_responses()
         response = HttpResponse(content_type='text/csv')
