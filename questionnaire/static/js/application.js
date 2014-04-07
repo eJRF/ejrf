@@ -300,9 +300,9 @@ function getModalWithSubSectionQuestions($element) {
 }
 
 function removeButtons($modal, btnClasses) {
-    btnClasses.forEach(function(btn){
-       $modal.find(btn).remove();
-    });
+    for(var i=0; i < btnClasses.length; i++){
+        $modal.find(btnClasses[i]).remove();
+    }
 }
 
 function highlightOnHover($modal) {
