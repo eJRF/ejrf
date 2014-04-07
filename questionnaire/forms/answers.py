@@ -1,3 +1,4 @@
+import copy
 from django import forms
 from django.forms.util import ErrorDict
 from django.forms import ModelForm, ModelChoiceField
@@ -5,7 +6,7 @@ from django.utils.html import format_html
 from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
 
-from questionnaire.models import NumericalAnswer, TextAnswer, DateAnswer, MultiChoiceAnswer
+from questionnaire.models import NumericalAnswer, TextAnswer, DateAnswer, MultiChoiceAnswer, QuestionOption
 
 
 class AnswerForm(ModelForm):
@@ -100,6 +101,7 @@ class MultiChoiceAnswerSelectWidget(forms.Select):
 
 class MultiChoiceAnswerForm(AnswerForm):
     response = ModelChoiceField(queryset=None, widget=forms.Select(), required=False)
+    specified_option = forms.CharField(max_length=50, widget=forms.HiddenInput(), required=False)
 
     def __init__(self, *args, **kwargs):
         super(MultiChoiceAnswerForm, self).__init__(*args, **kwargs)
@@ -107,9 +109,16 @@ class MultiChoiceAnswerForm(AnswerForm):
         self.fields['response'].widget = self._get_response_widget(query_set)
         self.fields['response'].queryset = query_set
         self.fields['response'].empty_label = self._set_response_label(query_set)
+        self.options = query_set
+        self._set_data()
+
+    def _set_data(self):
+        if self.data:
+            new_data = copy.deepcopy(self.data)
+            self.data = new_data
 
     def _set_response_label(self, query_set):
-        if self.widget_is_radio_button(query_set) or query_set.count()==1:
+        if self.widget_is_radio_button(query_set) or query_set.count() == 1:
             return None
         return "Choose One"
 
@@ -129,8 +138,23 @@ class MultiChoiceAnswerForm(AnswerForm):
     def _get_response_choices(self, kwargs):
         all_options = self.question.options.all()
         if 'option' in self._initial:
-            return all_options.filter(id=self._initial.get('option').id)
-        return all_options
+            return all_options.filter(id=self._initial.get('option').id).order_by('text')
+        return all_options.order_by('text')
+
+    def save(self, commit=True, *args, **kwargs):
+        answer = super(MultiChoiceAnswerForm, self).save(commit=False, *args, **kwargs)
+        self._save_specified_option_to(answer)
+        if commit:
+            answer.save()
+        return answer
+
+    def _save_specified_option_to(self, answer):
+        specified_option = self.cleaned_data.get('specified_option', None)
+        if specified_option:
+            UID = QuestionOption.generate_uid()
+            new_option, _ = self.question.options.get_or_create(text=specified_option, UID=UID)
+            answer.response = new_option
+            self.data[self.add_prefix('response')] = new_option.id
 
     class Meta:
         model = MultiChoiceAnswer

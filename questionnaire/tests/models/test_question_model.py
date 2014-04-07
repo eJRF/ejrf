@@ -269,6 +269,10 @@ class QuestionTest(BaseTest):
 
 class QuestionOptionTest(BaseTest):
 
+    def setUp(self):
+        self.question = Question.objects.create(text='what do you drink?', UID='aa123', answer_type='Text')
+        self.question_option = QuestionOption.objects.create(text='tusker lager', question=self.question, UID='o_uid')
+
     def test_question_option_fields(self):
         question = QuestionOption()
         fields = [str(item.attname) for item in question._meta.fields]
@@ -285,3 +289,8 @@ class QuestionOptionTest(BaseTest):
         self.assertEqual(question, question_option.question)
         self.assertEqual(None, question_option.instructions)
         self.assertEqual(None, question_option.UID)
+
+    def test_option_can_generate_next_uid(self):
+        extra_option = QuestionOption.objects.create(text='tusker malt', question=self.question, UID='uid_2')
+
+        self.assertEqual('uid_3', QuestionOption.generate_uid())

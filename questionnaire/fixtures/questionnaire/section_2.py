@@ -95,6 +95,7 @@ QuestionOption.objects.create(text="YF: Yellow fever vaccine", question=question
 QuestionOption.objects.create(text="Rotavirus: Rotavirus vaccine: No. of valents", question=question1)
 QuestionOption.objects.create(text="HPV: Human papillomavirus  vaccine: No. of valents", question=question1)
 QuestionOption.objects.create(text="Vit A: Vitamin A supplements", question=question1)
+QuestionOption.objects.create(text="other", question=question1)
 
 QuestionOption.objects.create(text="Acellular", question=question1b)
 QuestionOption.objects.create(text="Whole cell", question=question1b)
@@ -105,7 +106,7 @@ QuestionOption.objects.create(text="National", question=question10)
 QuestionOption.objects.create(text="government agency", question=question13)
 QuestionOption.objects.create(text="UNICEF, WHO or PAHO", question=question13)
 QuestionOption.objects.create(text="donating agency", question=question13)
-QuestionOption.objects.create(text="other", question=question13)
+QuestionOption.objects.create(text="Other", question=question13)
 
 
 parent = QuestionGroup.objects.create(subsection=sub_section, order=1, grid=True, allow_multiples=True, hybrid=True)
@@ -143,6 +144,7 @@ question15 = Question.objects.create(text="AD equipment", UID='C00045', answer_t
 QuestionOption.objects.create(text="AD - BCG: AD (auto-disable) syringes for BCG", question=question15)
 QuestionOption.objects.create(text="AD - inj: AD syringes", question=question15)
 QuestionOption.objects.create(text="AD - Rec: AD syringes for reconstitution", question=question15)
+QuestionOption.objects.create(text="Other", question=question15)
 
 question16 = Question.objects.create(text="Which agency procured the Syringes?", export_label='Procurement source',UID='C00046', answer_type='MultiChoice',)
 

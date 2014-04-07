@@ -454,3 +454,7 @@ tr.dragging, tr.dragging * {
     list-style-type: none;
     vertical-align: middle;
 }
+
+.specified_response{
+    margin-top: 5px;
+}

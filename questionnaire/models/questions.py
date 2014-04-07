@@ -107,6 +107,14 @@ class QuestionOption(BaseModel):
     def __unicode__(self):
         return "%s" % self.text
 
+    @classmethod
+    def generate_uid(cls):
+        latest = cls.objects.exclude(UID=None)
+        if latest.exists():
+            latest = latest.latest('modified').UID
+            return '%s%d'%(latest[:-1], int(latest[-1])+1)
+        return None
+
     class Meta:
         ordering = ('modified',)
         app_label = 'questionnaire'

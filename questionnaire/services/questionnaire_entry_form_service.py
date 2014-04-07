@@ -89,7 +89,7 @@ class QuestionnaireEntryFormService(object):
             initial['answer'] = answer
 
     def _get_initial(self, orders, answer_type):
-        initial =[]
+        initial = []
         for order_dict in orders:
             order = order_dict['order']
             group = order.question_group
@@ -106,7 +106,8 @@ class QuestionnaireEntryFormService(object):
 
         return initial
 
-    def _order_in(self, order, group, questions):
+    @staticmethod
+    def _order_in(order, group, questions):
         return order.question_group == group and order.question in questions
 
     def _update(self, row_number, question_orders, initial):
@@ -115,8 +116,8 @@ class QuestionnaireEntryFormService(object):
 
     def get_extra_rows(self, answer_type, group):
         primary_question = group.primary_question()
-        saved_primary_answers = primary_question.answered_options(questionnaire=self.questionnaire, country=self.country,
-                                                    question_group=group, version=self.version)
+        saved_primary_answers = primary_question.answered_options(questionnaire=self.questionnaire, country=self.country
+                                                                  , question_group=group, version=self.version)
         if self.cleaned_data:
             rows = extra_rows(self.cleaned_data, answer_type, group.id)
             posted_primary_answers = primary_answers(self.cleaned_data, rows, primary_question.answer_type, group.id)

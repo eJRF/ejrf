@@ -1,5 +1,5 @@
 from questionnaire.forms.answers import NumericalAnswerForm, TextAnswerForm, DateAnswerForm, MultiChoiceAnswerForm, MultiChoiceAnswerSelectWidget
-from questionnaire.models import Question, Country, QuestionOption, QuestionGroup, Section, Questionnaire, SubSection
+from questionnaire.models import Question, Country, QuestionOption, QuestionGroup, Section, Questionnaire, SubSection, MultiChoiceAnswer
 from questionnaire.tests.base_test import BaseTest
 
 
@@ -168,7 +168,8 @@ class MultiChoiceAnswerFormTest(BaseTest):
             'version': 1,
             'code':'HAHA123',
             'group': self.question_group,
-            'questionnaire': self.questionnaire.id
+            'questionnaire': self.questionnaire,
+            'specified_option': '',
         }
 
     def test_valid(self):
@@ -201,6 +202,17 @@ class MultiChoiceAnswerFormTest(BaseTest):
 
         self.assertEqual("Choose One", answer_form.fields['response'].empty_label)
 
+    def test_new_option_is_created_and_saved_as_response_when_specify_field_is_not_empty(self):
+        form_data = self.form_data.copy()
+        form_data['specified_option'] = 'specified option'
+        answer_form = MultiChoiceAnswerForm(form_data, initial=self.initial)
+        self.assertTrue(answer_form.is_valid())
+        answer_form.save()
+        option = QuestionOption.objects.get(text="specified option", question=self.question)
+        self.failUnless(MultiChoiceAnswer.objects.filter(response=option, question=self.question))
+        as_text = '<input id="id_response" name="response" type="text" value="%d" />' % option.id
+        self.assertEqual(as_text, answer_form.visible_fields()[0].as_text())
+
 
 class MultiChoiceAnswerSelectWidgetTest(BaseTest):
 
@@ -209,7 +221,7 @@ class MultiChoiceAnswerSelectWidgetTest(BaseTest):
         option1 = QuestionOption.objects.create(text='tusker lager', question=question, instructions="yeah yeah")
         option2 = QuestionOption.objects.create(text='club', question=question, instructions="Are you crazy?")
 
-        choices =((option1.id, option1.text), (option2.id, option2.text))
+        choices = ((option1.id, option1.text), (option2.id, option2.text))
 
         widget = MultiChoiceAnswerSelectWidget(choices=choices, question_options=question.options.all())
 

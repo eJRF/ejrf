@@ -24,6 +24,12 @@ $(document).ready(function() {
         "aaSorting": [[ 4, "desc" ]]
     } );
 
+    $('select[name^=MultiChoice]').on('change', function(){
+        var selectedText = $(this).find('option:selected').text();
+       if(selectedText.toLowerCase() === "other"){
+            addSpecifyField($(this));
+       }
+    });
 });
 
 function replaceAttributes($el, index) {
@@ -347,4 +353,14 @@ function activateSortable($modal){
 function getQuestionsInSubsection($element){
     var $subsectionContainer = $element.parents('div .subsection-content');
     return  $subsectionContainer.find('.form-group, .group-hr');
+}
+
+
+function addSpecifyField($element){
+    var parentElementName = $element.attr('name'),
+        newElementName = parentElementName.replace('response', 'specified_option'),
+        $otherField = "<input type='text' id='specified_response' maxlength='100'" +
+            "name='"+ newElementName +"' class='form-control input-sm specified_response'" +
+            "placeholder='Specify'>";
+    $element.after($otherField);
 }
