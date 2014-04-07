@@ -18,7 +18,7 @@ class HomePage(PageObject):
         if type == 'draft':
             assert self.browser.is_element_present_by_id('draft-questionnaire-%s' % questionnaire.id)
         if type == 'submitted':
-            assert self.browser.is_element_present_by_id('submitted-questionnaire-%s' % questionnaire.id)
+            assert self.browser.is_element_present_by_id('view-version-%s' % questionnaire.id)
         if type == 'new':
             assert self.browser.is_element_present_by_id('new-questionnaire-%s' % questionnaire.id)
             

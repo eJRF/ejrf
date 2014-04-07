@@ -176,4 +176,4 @@ def when_i_choose_to_submit_my_modified_responses(step):
 @step(u'Then I should see a new submitted version listed in my Home Page')
 def then_i_should_see_a_new_submitted_version_listed_in_my_home_page(step):
     step.given('When I am viewing the home page')
-    assert world.page.is_element_present_by_id('questionnaire-%s-version-2' % world.questionnaire.id)
+    assert world.page.is_element_present_by_id('view-version-%s' % world.questionnaire.id)

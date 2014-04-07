@@ -19,9 +19,12 @@
                             {% for questionnaire_ in new.keys %}
                                 <li class="list-group-item">
                                     {% with questionnaire_.sections.all|first as first_section %}
-                                        <a id="new-questionnaire-{{ questionnaire_.id }}" href="{% url 'questionnaire_entry_page' questionnaire_.id first_section.id %}">{{ questionnaire_.name }} {{ questionnaire_.year }}</a>
+                                        <a id="new-questionnaire-{{ questionnaire_.id }}"
+                                           href="{% url 'questionnaire_entry_page' questionnaire_.id first_section.id %}">{{ questionnaire_.name }} {{ questionnaire_.year }}</a>
                                         <span class="pull-right">
-                                            <a href="{% url 'questionnaire_entry_page' questionnaire_.id first_section.id %}" class="btn btn-xs btn-default" id="id-edit"><span class="glyphicon glyphicon-pencil"></span> Start</a>
+                                            <a href="{% url 'questionnaire_entry_page' questionnaire_.id first_section.id %}"
+                                               class="btn btn-xs btn-default" id="id-edit"><span
+                                                    class="glyphicon glyphicon-pencil"></span> Start</a>
                                         </span>
                                     {% endwith %}
                                 </li>
@@ -40,27 +43,30 @@
                 </div>
                 <div class="panel-body">
                     <ul class="list-group">
-                    {% if drafts %}
-                        {% for questionnaire_, versions in drafts.items %}
-                            <li class="list-group-item">
-                                {% with questionnaire_.sections.all|first as first_section %}
-                                    <a id="draft-questionnaire-{{ questionnaire_.id }}" href="{% url 'questionnaire_entry_page' questionnaire_.id first_section.id %}">{{ questionnaire_.name }} {{ questionnaire_.year }}</a>
-                                    <span class="pull-right">
-                                        <a href="{% url 'questionnaire_entry_page' questionnaire_.id first_section.id %}" class="btn btn-xs btn-default" id="id-edit"><span class="glyphicon glyphicon-pencil"></span> Edit</a>
+                        {% if drafts %}
+                            {% for questionnaire_, versions in drafts.items %}
+                                <li class="list-group-item">
+                                    {% with questionnaire_.sections.all|first as first_section %}
+                                        <a id="draft-questionnaire-{{ questionnaire_.id }}"
+                                           href="{% url 'questionnaire_entry_page' questionnaire_.id first_section.id %}">{{ questionnaire_.name }} {{ questionnaire_.year }}</a>
+                                        <span class="pull-right">
+                                        <a href="{% url 'questionnaire_entry_page' questionnaire_.id first_section.id %}"
+                                           class="btn btn-xs btn-default" id="id-edit"><span
+                                                class="glyphicon glyphicon-pencil"></span> Edit</a>
                                     </span>
-                                {% endwith %}
-                                <ul>
-                                    {% for version in versions %}
-                                        <li>
-                                            <a href="{% url 'preview_specific_questionnaire' questionnaire_.id %}?country={{ user.user_profile.country.id }}&version={{ version }}&preview=1">
-                                            View Version {{ version }}
-                                            </a>
-                                        </li>
-                                    {% endfor %}
-                                </ul>
-                            </li>
-                        {% endfor %}
-                    {% endif %}
+                                    {% endwith %}
+                                    <ul>
+                                        {% for version in versions %}
+                                            <li>
+                                                <a href="{% url 'preview_specific_questionnaire' questionnaire_.id %}?country={{ user.user_profile.country.id }}&version={{ version }}&preview=1">
+                                                    View Version {{ version }}
+                                                </a>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </li>
+                            {% endfor %}
+                        {% endif %}
                     </ul>
                 </div>
             </div>
@@ -72,26 +78,28 @@
                 </div>
                 <div class="panel-body">
                     <ul class="list-group">
-                    {% if submitted %}
-                        {% for questionnaire_, versions in submitted.items %}
-                            <li class="list-group-item{%if  forloop.counter > 3 %} hide{% endif %}">
-                                {% with questionnaire_.sections.all|first as first_section %}
-                                    <a id="submitted-questionnaire-{{ questionnaire_.id }}" href="{% url 'questionnaire_entry_page' questionnaire_.id first_section.id %}?preview=1">{{ questionnaire_.name }} {{ questionnaire_.year }}</a>
-                                {% endwith %}
-                                <ul>
-                                    {% for version in versions %}
-                                        <li>
-                                            <a id="questionnaire-{{ questionnaire_.id }}-version-{{ version }}" href="{% url 'preview_specific_questionnaire' questionnaire_.id %}?country={{ user.user_profile.country.id }}&version={{ version }}&preview=1">
-                                            View Version {{ version }}
-                                            </a>
-                                        </li>
-                                    {% endfor %}
-                                </ul>
-                            </li>
-                        {% endfor %}
-                    {% endif %}
-                        <li class="list-group-item more-toggle" >
-                                <a href="" id="id-older-jrf">More</a>
+                        {% if submitted %}
+                            {% for questionnaire_, versions in submitted.items %}
+                                <li class="list-group-item{% if  forloop.counter > 3 %} hide{% endif %}">
+
+                                    {{ questionnaire_.name }} {{ questionnaire_.year }}
+                                    <ul>
+                                        {% for version in versions %}
+                                            <li>
+                                                {% with questionnaire_.sections.all|first as first_section %}
+                                                    <a id="view-version-{{ questionnaire_.id }}"
+                                                       href="{% url 'questionnaire_entry_page' questionnaire_.id first_section.id %}?preview=1&version={{ version }}">View
+                                                        Version {{ version }}
+                                                    </a>
+                                                {% endwith %}
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </li>
+                            {% endfor %}
+                        {% endif %}
+                        <li class="list-group-item more-toggle">
+                            <a href="" id="id-older-jrf">More</a>
                         </li>
                     </ul>
                 </div>

@@ -30,7 +30,7 @@ def when_i_open_the_group1_questionnaire_for_editing(step, type):
     if type == 'draft':
         world.page.click_by_id('draft-questionnaire-%s' % world.questionnaire.id)
     if type == 'submitted':
-        world.page.click_by_id('submitted-questionnaire-%s' % world.questionnaire.id)
+        world.page.click_by_id('view-version-%s' % world.questionnaire.id)
     if type == 'new':
         world.page.click_by_id('new-questionnaire-%s' % world.questionnaire.id)
 

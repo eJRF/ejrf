@@ -1,6 +1,6 @@
 <input type=hidden id="redirect_url" name="redirect_url"/>
 {% if not perms.auth.can_edit_questionnaire %}
-    <div class="form-group top-padding ">
+    <div class="form-group top-padding " id="save-options">
         <div class="col-sm-offset-8 col-sm-3 pull-right">
             <a href="{% url 'home_page' %}" class="btn btn-default" name="cancel_button"
                id="cancel_button"> <span
