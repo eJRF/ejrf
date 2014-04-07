@@ -49,3 +49,6 @@ class QuestionnairePage(PageObject):
     def validate_add_new_section_exists(self):
         self._is_text_present('New Section')
         assert self.is_element_present_by_id('new-section')
+
+    def validate_updated_numbering(self, question, question_number):
+        assert self.get_text_of_element_by_id('label-question-%s' % question.id) == '%s%s' % (question_number, question.text)

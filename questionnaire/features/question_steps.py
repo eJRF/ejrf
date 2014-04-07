@@ -1,5 +1,6 @@
 from time import sleep
 from lettuce import step, world
+from questionnaire.features.pages.questionnaires import QuestionnairePage
 from questionnaire.features.pages.questions import QuestionListingPage, CreateQuestionPage
 from questionnaire.models import Question, Theme, Questionnaire, Section, SubSection, QuestionGroup, QuestionGroupOrder, QuestionOption, TextAnswer, Answer, AnswerGroup
 
@@ -255,3 +256,53 @@ def then_i_should_see_all_the_questions_listed(step):
     world.page.is_text_present(world.question1.export_label)
     world.page.is_text_present(world.question2.export_label)
     world.page.is_text_present(world.question3.export_label)
+
+
+@step(u'And I have a Finalised Core Questionnaire with three questions')
+def and_i_have_a_finalised_core_questionnaire_with_three_questions(step):
+    world.core_questionnaire = Questionnaire.objects.create(name="JRF Core", description="Core Questionnaire",
+                                                          status=Questionnaire.FINALIZED)
+    world.section = Section.objects.create(order=1, title="Section Title", description="Section Description",
+                                     questionnaire=world.core_questionnaire, name="Cover page")
+    world.subsection = SubSection.objects.create(order=1, section=world.section, title='Subsection Title')
+
+    world.question1 = Question.objects.create(text='Name of person in Ministry of Health', UID='C0001',
+                                        answer_type='Text')
+    world.question2 = Question.objects.create(text='Question Two', UID='C0002',
+                                        answer_type='Text')
+    world.question3 = Question.objects.create(text='Question Three', UID='C0003',
+                                        answer_type='Text')
+    parent = QuestionGroup.objects.create(subsection=world.subsection, order=1)
+    parent.question.add(world.question1, world.question2, world.question3)
+
+    QuestionGroupOrder.objects.create(question=world.question1, question_group=parent, order=1)
+    QuestionGroupOrder.objects.create(question=world.question2, question_group=parent, order=2)
+    QuestionGroupOrder.objects.create(question=world.question3, question_group=parent, order=3)
+
+@step(u'When I select the option to edit that questionnaire')
+def when_i_select_the_option_to_edit_that_questionnaire(step):
+    world.page.visit_url('/questionnaire/entry/%s/section/%s/' % (world.core_questionnaire.id, world.section.id))
+
+@step(u'And I choose to reorder questions in a subsection')
+def and_i_choose_to_reorder_questions_in_a_subsection(step):
+    world.page.click_by_id('reorder-%s-subsection' % world.subsection.id)
+
+@step(u'Then I should see a reorder questions modal')
+def then_i_should_see_a_reorder_questions_modal(step):
+    world.page.is_text_present('Drag to Reorder the Questions')
+    assert world.page.is_element_present_by_id('reorder-content-table')
+
+@step(u'When I reorder the questions within that modal')
+def when_i_reorder_the_questions_within_that_modal(step):
+    world.page.move_draggable_id_onto_target_id('question-2','question-0')
+
+@step(u'And I save my changes')
+def and_i_save_my_changes(step):
+    world.page.click_by_id('save-reorder-btn')
+
+@step(u'Then I should see the questions with their order and numbering updated')
+def then_i_should_see_the_questions_with_their_order_and_numbering_updated(step):
+    world.page = QuestionnairePage(world.browser, world.section)
+    world.page.validate_updated_numbering(world.question3, '1.1.')
+    world.page.validate_updated_numbering(world.question1, '1.2.')
+    world.page.validate_updated_numbering(world.question2, '1.3.')

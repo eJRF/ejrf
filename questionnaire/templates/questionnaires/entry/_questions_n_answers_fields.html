@@ -22,7 +22,7 @@
     {% endif %}
 {% endif %}
 <div class="form-group">
-    <label class="col-sm-6 control-label">
+    <label id="label-question-{{ order.question.id }}" class="col-sm-6 control-label">
         {% spaceless %}
         <div class="question-number">
             {% if order.question.region %}<span>{{ order.question.region.name }} - </span>{% endif %}

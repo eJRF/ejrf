@@ -122,3 +122,11 @@ class PageObject(object):
     def fill_this_element(self, id, data):
         element = self.browser.find_by_id(id).first
         element.fill(data)
+
+    def move_draggable_id_onto_target_id(self, draggable_id, target_id):
+        draggable = self.browser.find_by_id(draggable_id)
+        target = self.browser.find_by_id(target_id)
+        draggable.drag_and_drop(target)
+
+    def get_text_of_element_by_id(self, id):
+        return self.browser.find_by_id(id).first.text

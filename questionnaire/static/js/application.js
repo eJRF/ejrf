@@ -271,13 +271,13 @@ $('.reorder-subsection').on('click', function(){
 });
 
 
-function getTableRow($questionForm) {
+function getTableRow($questionForm,$index) {
     if($($questionForm).hasClass('group-hr')){
         return "<tr class='group-tr' " +
                "data-group-id='"+ $($questionForm).attr('data-group-id') +"'>" +
                "<td><hr class='group-hr'/></td></tr>";
     }
-    return "<tr class='sortable-tr'><td>" + $($questionForm).html() + "</td></tr>"
+    return "<tr id='question-"+ $index + "' class='sortable-tr'><td>" + $($questionForm).html() + "</td></tr>"
 }
 
 function getModalWithSubSectionQuestions($element) {
@@ -286,7 +286,7 @@ function getModalWithSubSectionQuestions($element) {
         action = $element.attr('data-href'),
         questionFormsAsTableRows = "";
         getQuestionsInSubsection($element).each(function(index, $questionForm){
-            questionFormsAsTableRows += getTableRow($questionForm);
+            questionFormsAsTableRows += getTableRow($questionForm,index)
         });
         $modal.find('#reorder-content-table').html(questionFormsAsTableRows);
         $modal.find('#re-order-questions-form').attr('action', action);

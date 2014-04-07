@@ -56,7 +56,7 @@ Feature: Questions feature
         When I preview the submitted questionnaire where the question was used
         I should see the earlier question display label
 
-        Scenario: Global admin filters
+    Scenario: Global admin filters
         Given I am logged in as a global admin
         And I have two themes
         And I have three questions with two of the questions grouped under one theme and one question under another theme
@@ -67,3 +67,13 @@ Feature: Questions feature
         Then I should see questions under the selected theme filtered
         When I select All from dropdown
         Then I should see all the questions listed
+
+    Scenario: Sequencing Simple Core Questions in Core Questionnaire
+        Given I am logged in as a global admin
+        And I have a Finalised Core Questionnaire with three questions
+        When I select the option to edit that questionnaire
+        And I choose to reorder questions in a subsection
+        Then I should see a reorder questions modal
+        When I reorder the questions within that modal
+        And I save my changes
+        Then I should see the questions with their order and numbering updated
