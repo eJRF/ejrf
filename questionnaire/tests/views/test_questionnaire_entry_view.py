@@ -73,7 +73,7 @@ class QuestionnaireEntrySaveDraftTest(BaseTest):
         self.assertEqual(False, response.context['printable'])
         self.assertEqual(False, response.context['preview'])
         self.assertTrue('documents' in response.context)
-        self.assertIsInstance(response.context['form'], SectionForm)
+        self.assertIsInstance(response.context['section_form'], SectionForm)
         self.assertEqual(response.context['action'], '/questionnaire/entry/%s/section/new/' % self.questionnaire.id)
         self.assertIsInstance(response.context['subsection_form'], SubSectionForm)
         self.assertEqual(response.context['subsection_action'], '/questionnaire/entry/%s/section/%s/subsection/new/' %

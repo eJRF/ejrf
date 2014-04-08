@@ -5,6 +5,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import CreateView, View
 from django.views.static import serve
+from questionnaire.forms.sections import SectionForm
 from questionnaire.forms.support_documents import SupportDocumentUploadForm
 from questionnaire.models import SupportDocument, Questionnaire
 from questionnaire.services.users import UserQuestionnaireService
@@ -35,6 +36,7 @@ class UploadDocument(CreateView):
         context.update({'upload_form': self.form_class(initial=upload_data_initial),
                         'button_label': 'Upload', 'id': 'id-upload-form', 'questionnaire': self.questionnaire,
                         'documents': self.user_questionnaire_service.attachments(),
+                        'section_form': SectionForm(),
                         'ordered_sections': self.questionnaire.sections.order_by('order'),
                         'preview': self.user_questionnaire_service.preview()})
         return context

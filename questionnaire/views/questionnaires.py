@@ -46,7 +46,7 @@ class Entry(AdvancedMultiplePermissionsRequiredMixin, FormView):
                    'section': section, 'printable': printable,
                    'preview': preview, 'formsets': formsets,
                    'ordered_sections': questionnaire.sections.order_by('order'),
-                   'form': SectionForm(initial={'questionnaire': questionnaire}),
+                   'section_form': SectionForm(initial={'questionnaire': questionnaire}),
                    'action': reverse('new_section_page', args=(questionnaire.id, )),
                    'subsection_form': SubSectionForm(),
                    'subsection_action': reverse('new_subsection_page', args=(questionnaire.id, section.id)),
@@ -65,7 +65,7 @@ class Entry(AdvancedMultiplePermissionsRequiredMixin, FormView):
 
         context = {'questionnaire': questionnaire, 'section': section,
                    'formsets': formsets, 'ordered_sections': questionnaire.sections.order_by('order'),
-                   'form': SectionForm(initial={'questionnaire': questionnaire}),
+                   'section_form': SectionForm(initial={'questionnaire': questionnaire}),
                    'action': reverse('new_section_page', args=(questionnaire.id, )),
                    'subsection_form': SubSectionForm(),
                    'subsection_action': reverse('new_subsection_page', args=(questionnaire.id, section.id)),

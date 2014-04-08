@@ -53,6 +53,6 @@
         {% include 'base/modals/_delete.html' with url=section_.id|get_url_with_ids:"delete_section_page" object=section_  action="delete" title="Delete Section"  btn_label="SAVE" confirm="DELETE" object_type='section' %}
     {% endfor %}
 
-    {% include 'base/modals/_create.html' with a_form=form action=action modal_id="new-section-modal" modal_title="New Section" %}
+    {% include 'base/modals/_create.html' with a_form=section_form action=action modal_id="new-section-modal" modal_title="New Section" %}
 {% endif %}
 
