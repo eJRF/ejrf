@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/css/bootstrap.css" type="text/css" media="all">
     <link rel="stylesheet" href="{{ STATIC_URL }}css/application.css" type="text/css" media="all">
     <link rel="stylesheet" href="{{ STATIC_URL }}css/datepicker.css" type="text/css" media="all">
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/jquery.dataTables.css" type="text/css" media="all">
     {% block extra_css %}{% endblock %}
     <!--[if IE 8]>
           <script src="{{ STATIC_URL }}html5shiv/html5shiv.js"></script>
@@ -43,14 +42,14 @@
 
 </div>
 
-<script src="{{ STATIC_URL }}js/jquery-1.10.2.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}js/jquery.validate.min.js"></script>
-<script src="{{ STATIC_URL }}js/jquery.autosize.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}js/lib/jquery-1.10.2.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}js/lib/jquery.validate.min.js"></script>
+<script src="{{ STATIC_URL }}js/lib/jquery.autosize.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}bootstrap/js/bootstrap.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}js/jquery-sortable-min.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}bootstrap-datetimepicker/bootstrapdatepicker.js" type="text/javascript"
-        charset="utf-8"></script>
-<script src="{{ STATIC_URL }}js/jquery.dataTables.min.js" type="text/javascript" charset="utf-8" ></script>
+<script src="{{ STATIC_URL }}bootstrap-datetimepicker/bootstrapdatepicker.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}js/lib/jquery-sortable-min.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}js/lib/jquery.tablesorter.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}js/lib/jquery.tablesorter.widgets.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}js/application.js" type="text/javascript" charset="utf-8"></script>
 {% if perms.auth.can_edit_questionnaire %}
     <script src="{{ STATIC_URL }}js/admin_only.js" type="text/javascript" charset="utf-8"></script>
@@ -68,6 +67,7 @@
 <script src="{{ STATIC_URL }}tinymce/tinymce.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}js/theme.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}js/extract.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}js/question-sorter.js" type="text/javascript" charset="utf-8"></script>
 
 {% block javascripts %}
 {% endblock %}

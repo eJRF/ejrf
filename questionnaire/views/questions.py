@@ -7,7 +7,8 @@ from django.views.generic import CreateView, DeleteView, View, UpdateView
 from questionnaire.forms.filter import QuestionFilterForm
 from questionnaire.forms.questions import QuestionForm
 from questionnaire.mixins import DoesNotExistExceptionHandlerMixin, OwnerAndPermissionRequiredMixin
-from questionnaire.models import Question, Questionnaire, Theme
+from questionnaire.models import Question, Questionnaire
+from questionnaire.utils.service_utils import filter_empty_values
 
 
 class QuestionList(PermissionRequiredMixin, View):
@@ -16,57 +17,24 @@ class QuestionList(PermissionRequiredMixin, View):
     model = Question
 
     def get(self, *args, **kwargs):
+        filter_params = {}
         finalized_questionnaire = Questionnaire.objects.filter(status=Questionnaire.FINALIZED)
         active_questions = None
-
         if finalized_questionnaire.exists():
             active_questions = finalized_questionnaire.latest('created').get_all_questions()
-
         form = QuestionFilterForm(self.request.GET)
-        theme = None
         if form.is_valid():
-            if self.request.GET.get('theme', None):
-                theme = Theme.objects.get(id = self.request.GET.get('theme'))
-                form = QuestionFilterForm(initial={'theme': theme.id})
-
-        order_by = self._get_sort_field(self.request.GET.get('sort'))
-
-        questions = self.get_questions_for_user(theme, order_by).filter(child=None)
+            theme = form.cleaned_data['theme']
+            answer_type = form.cleaned_data['answer_type']
+            filter_params.update({'theme': theme, 'answer_type': answer_type})
+            filter_params = filter_empty_values(filter_params)
+        users_region = self.request.user.user_profile.region
+        questions = self.model.objects.filter(child=None, region=users_region, **filter_params).order_by('created')
         context = {'request': self.request,
                    'questions': questions,
                    'active_questions': active_questions,
                    'filter_form': form}
-
         return render(self.request, self.template_name, context)
-
-    def get_questions_for_user(self, theme=None, order_by='created'):
-        filter = {'region': self.request.user.user_profile.region}
-        if theme:
-            filter.update({'theme': theme})
-
-        if self.request.user.has_perm('auth.can_view_users'):
-            return self.model.objects.filter(**filter).order_by(order_by)
-
-        return self.model.objects.filter(**filter).order_by(order_by)
-
-    def _get_sort_field(self, request_param):
-        sort_req_param_to_field_dict = {
-            'uid':'id',
-            '-uid': '-id',
-            'theme': 'theme__name',
-            '-theme': '-theme__name',
-            'response_type': 'answer_type',
-            '-response_type': '-answer_type',
-            'label' : 'export_label',
-            '-label':'-export_label'
-        }
-
-        if request_param:
-            field = sort_req_param_to_field_dict.get(request_param, None)
-            if field:
-                return field
-
-        return 'created'
 
 
 class CreateQuestion(PermissionRequiredMixin, CreateView):

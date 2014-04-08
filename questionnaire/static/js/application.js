@@ -20,10 +20,6 @@ $(document).ready(function() {
         $(element).val(0);
     });
 
-    $('.dataTables_wrapper').dataTable( {
-        "aaSorting": [[ 4, "desc" ]]
-    } );
-
     $('select[name^=MultiChoice]').on('change', function(){
         var selectedText = $(this).find('option:selected').text();
        if(selectedText.toLowerCase() === "other"){
@@ -31,6 +27,7 @@ $(document).ready(function() {
        }
     });
 });
+
 
 function replaceAttributes($el, index) {
     return {'name': _replace($el, 'name', index),
@@ -272,7 +269,7 @@ $('.reorder-subsection').on('click', function(){
     removeButtons($modal, ['.add-more', '.btn-group', '.unassign-question']);
     highlightOnHover($modal);
     activateSortable($modal);
-    disableInputFields(false)
+    disableInputFields(false);
     $modal.modal('show');
 });
 

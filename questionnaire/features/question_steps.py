@@ -235,7 +235,7 @@ def then_i_should_see_the_questions_listed(step):
 
 @step(u'And I should see dropdown with themes to filter questions')
 def and_i_should_see_dropdown_with_themes_to_filter_questions(step):
-    assert world.page.is_element_present_by_id('theme_filter_id')
+    assert world.page.is_element_present_by_id('id_theme')
 
 @step(u'When I select a theme from dropdown and click filter')
 def when_i_select_a_theme_from_dropdown_and_click_filter(step):
