@@ -20,7 +20,7 @@
 
         <div class="form-content">
             <div class="upload_form_content">
-                {% if perms.auth.can_submit_responses %}
+                {% if perms.auth.can_submit_responses  %}
                     {% include 'questionnaires/entry/_upload_form.html' %}
                 {% endif %}
             </div>

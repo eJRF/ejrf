@@ -55,15 +55,6 @@
                                                 class="glyphicon glyphicon-pencil"></span> Edit</a>
                                     </span>
                                     {% endwith %}
-                                    <ul>
-                                        {% for version in versions %}
-                                            <li>
-                                                <a href="{% url 'preview_specific_questionnaire' questionnaire_.id %}?country={{ user.user_profile.country.id }}&version={{ version }}&preview=1">
-                                                    View Version {{ version }}
-                                                </a>
-                                            </li>
-                                        {% endfor %}
-                                    </ul>
                                 </li>
                             {% endfor %}
                         {% endif %}
