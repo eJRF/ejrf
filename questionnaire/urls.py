@@ -1,6 +1,7 @@
 from django.conf.urls import patterns, url
 from questionnaire.views.assign_questions import AssignQuestion, UnAssignQuestion
 from questionnaire.views.export_to_text import ExportToTextView, ExportSectionPDF, DownloadSectionPDF, SpecificExportView
+from questionnaire.views.grid import CreateGrid
 from questionnaire.views.home import Home
 from questionnaire.views.locations import ListRegions, ListCountries, RegionsForOrganization, CountriesForRegion
 from questionnaire.views.manage import ManageJRF, ManageRegionalJRF, EditQuestionnaireNameView
@@ -46,6 +47,7 @@ urlpatterns = patterns('',
     url(r'^questions/(?P<question_id>\d+)/edit/$', EditQuestion.as_view(), name='edit_question_page'),
     url(r'^questions/(?P<question_id>\d+)/delete/$', DeleteQuestion.as_view(), name='delete_question_page'),
     url(r'^submit/(?P<questionnaire_id>\d+)$', SubmitQuestionnaire.as_view(), name="submit_questionnaire_page"),
+    url(r'^subsection/(?P<subsection_id>\d+)/grid/new/$', CreateGrid.as_view(), name="create_grid_page"),
     url(r'^subsection/(?P<subsection_id>\d+)/assign_questions/$', AssignQuestion.as_view(), name="assign_question_to_subsection_page"),
     url(r'^subsection/(?P<subsection_id>\d+)/question/(?P<question_id>\d+)/unassign/$', UnAssignQuestion.as_view(), name="unassign_question_page"),
     url(r'^subsection/(?P<subsection_id>\d+)/reorder/$', ReOrderQuestions.as_view(), name="reorder_page"),

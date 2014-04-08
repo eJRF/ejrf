@@ -75,6 +75,10 @@ class SubSection(BaseModel):
     def has_at_least_two_groups(self):
         return self.parent_question_groups().count() > 1
 
+    def next_group_order(self):
+        last_group_order = self.question_group.exclude(order=None).order_by('-order')
+        return last_group_order[0].order + 1 if last_group_order.exists() else 0
+
     @classmethod
     def get_next_order(cls, section_id):
         subsections = cls.objects.filter(section__id=section_id)

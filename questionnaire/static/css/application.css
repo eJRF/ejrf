@@ -471,3 +471,7 @@ tr.dragging, tr.dragging * {
 #content{
     padding: 0 20px 0 20px;
 }
+
+select.hide{
+    display: none !important;
+}

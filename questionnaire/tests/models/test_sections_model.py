@@ -198,3 +198,6 @@ class SubSectionTest(BaseTest):
         absolute_url = '/questionnaire/entry/%s/section/%s/' % (self.questionnaire.id, self.sub_section.section.id)
         self.assertEqual(absolute_url, self.sub_section.get_absolute_url())
 
+    def test_subsection_knows_the_order_of_its_next_group(self):
+        group = self.sub_section.question_group.create(order=1)
+        self.assertEqual(2, self.sub_section.next_group_order())

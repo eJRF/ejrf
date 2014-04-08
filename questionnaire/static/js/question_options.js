@@ -3,21 +3,10 @@ jQuery(function($){
     var $form = $("#id-new-question-form"),
         template = $("#question-option-template").html(),
         answerTypeSelect = $('#id_answer_type');
-    function assignOptionNumbers(){
-        $form.find("span.number").each(function(i, element){
-            $(element).text(++i);
-        });
-    }
 
     function addQuestionOption($element){
         $element.before(template);
-        assignOptionNumbers();
-    }
-
-    function removeOptions(){
-        $("div.input-group").each(function(){
-           $(this).remove();
-        });
+        assignOptionNumbers($form)
     }
 
     answerTypeSelect.on('change', function(){
@@ -45,6 +34,18 @@ jQuery(function($){
 
     $form.on("click", ".remove-option", function(){
         $(this).parents("div#option-input-group").remove();
-        assignOptionNumbers();
+        assignOptionNumbers($form)
     });
 });
+
+function assignOptionNumbers($form){
+        $form.find("span.number").each(function(i, element){
+            $(element).text(++i);
+        });
+    }
+
+function removeOptions(){
+        $("div.input-group").each(function(){
+           $(this).remove();
+        });
+    }
