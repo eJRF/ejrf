@@ -13,10 +13,7 @@ class AssignQuestionForm(Form):
         self.fields['questions'].queryset = self._get_questions_query_set()
 
     def _get_questions_query_set(self):
-        query_set = Question.objects.all()
-        if self.region:
-            return query_set.filter(region=self.region)
-        return query_set
+        return Question.objects.filter(region=self.region)
 
     def save(self, commit=True, *args, **kwargs):
         if self.subsection.question_group.count() > 1:

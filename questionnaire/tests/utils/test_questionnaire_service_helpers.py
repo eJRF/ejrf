@@ -1,5 +1,6 @@
 from questionnaire.tests.base_test import BaseTest
-from questionnaire.utils.questionnaire_entry_helpers import extra_rows, clean_list, clean_data_dict, primary_answers
+from questionnaire.utils.questionnaire_entry_helpers import extra_rows, clean_list, clean_data_dict, primary_answers, \
+    _get_primary_answer_in
 
 
 class QuestionnaireServiceHelperTest(BaseTest):
@@ -114,3 +115,10 @@ class QuestionnaireServiceHelperTest(BaseTest):
         data = clean_data_dict(dict(data))
         rows = extra_rows(data, "Number", group_id=1)
         self.assertEqual(['row-0-column-0','row-1-column-0', 'row-2-column-0'], primary_answers(data, rows, 'Text', group_id=1))
+
+    def test_gets_primary_answer_in_a_row(self):
+        data = {'Number-0-response': [u'0,181', u'4', ], 'Number-1-response': [u'0,181', u'2'],
+                'Number-2-response': [u'0,181', u'3'], 'Text-0-response': [u'0,181', u'Haha']}
+        data = clean_data_dict(dict(data))
+        self.assertEqual('4', _get_primary_answer_in('0', ['Number-0-response', 'Number-1-response', 'Number-2-response'], data))
+        self.assertEqual(None, _get_primary_answer_in('4', ['Text-0-response'], data))

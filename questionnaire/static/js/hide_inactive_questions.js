@@ -3,8 +3,7 @@ $(document).on('click', '#hide-assigned-questions', function() {
     if($(this).is(':checked')){
         hideQuestions = "?hide=1";
     }
-
-    var subsection_id = $(this).attr('subsection-id'),
+ var subsection_id = $(this).attr('subsection-id'),
         assign_to_subsection_url = "/subsection/" + subsection_id +"/assign_questions/"+hideQuestions;
     $.get(assign_to_subsection_url, function( data ) {
         var $holder = $('<div></div>').append(String(data));
@@ -16,6 +15,3 @@ $(document).on('click', '#hide-assigned-questions', function() {
         }
     });
 });
-
-
-

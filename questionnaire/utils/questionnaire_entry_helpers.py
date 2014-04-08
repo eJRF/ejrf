@@ -44,6 +44,7 @@ def _get_primary_answer_in(row, related_keys, data):
             return data[key][-1]
     return None
 
+
 def primary_answers(data, rows, primary_answer_type, group_id):
     answers = []
     related_keys = filter(lambda key: same_group_data_keys(key, primary_answer_type, data, group_id), data.keys())

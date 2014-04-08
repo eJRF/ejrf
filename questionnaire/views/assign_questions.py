@@ -17,14 +17,11 @@ class AssignQuestion(RegionAndPermissionRequiredMixin, View):
         region = request.user.user_profile.region
         form = AssignQuestionForm(subsection=subsection, region=region)
         active_questions = subsection.section.questionnaire.get_all_questions()
-
+        questions = form.fields['questions'].queryset.filter(child=None)
         if 'hide' in request.GET:
-            questions = form.fields['questions'].queryset.filter(child=None).exclude(id__in=[question.id for question in active_questions])
-        else:
-            questions = form.fields['questions'].queryset.filter(child=None)
-
+            questions = questions.exclude(id__in=[question.id for question in active_questions])
         context = {'assign_question_form': form, 'active_questions': active_questions,
-                  'btn_label': 'Done', 'questions': questions, 'subsection': subsection}
+                   'btn_label': 'Done', 'questions': questions, 'subsection': subsection}
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
