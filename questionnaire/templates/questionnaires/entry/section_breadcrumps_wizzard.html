@@ -31,20 +31,24 @@
             </li>
         {% endfor %}
         {% if perms.auth.can_edit_questionnaire and user.user_profile.region == questionnaire.region %}
-            <li>
+            <li class='section-list'>
                 <a href="" id="new-section" class="col-md-10" data-toggle="modal" data-target="#new-section-modal">
                     <span class="cyan"><span class="glyphicon glyphicon-plus-sign"></span> New Section</span>
                 </a>
             </li>
         {% endif %}
+
+
+{#    <div class="section-list-title">#}
+    <li class='section-list'>
+        <a class="btn btn-default attachement cyan bold section_tab {% if upload_form %}current{% endif %}"
+           href="{% url 'upload_document' questionnaire.id %}" id="id_attachments">ATTACHMENTS
+            {% if documents %}<span class="badge"><span class="cyan bold">{{ documents.count }}</span></span>{% endif %}
+        </a>
+    </li>
+{#    </div>#}
+
     </ul>
-
-    <a class="btn btn-default attachement cyan bold section_tab {% if upload_form %}current{% endif %}"
-       href="{% url 'upload_document' questionnaire.id %}" id="id_attachments">ATTACHMENTS
-        {% if documents %}<span class="badge"><span class="cyan bold">{{ documents.count }}</span></span>{% endif %}
-    </a>
-
-
 </div>
 {% load generic_tags %}
 {% if perms.auth.can_edit_questionnaire and user.user_profile.region == questionnaire.region %}

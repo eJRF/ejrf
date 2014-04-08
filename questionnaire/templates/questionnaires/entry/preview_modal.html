@@ -9,9 +9,7 @@
                 <h4 class="modal-title cyan" id="preview_modal_label">Preview Questionnaire</h4>
             </div>
             <div class="modal-body">
-                <div id="ajax-content" class="has-spinner"><img src="{{ STATIC_URL }}img/spinner.gif"> Loading, please
-                    wait...
-                </div>
+                {% include 'questionnaires/entry/preview_content.html' %}
             </div>
             {% if perms.auth.can_submit_responses and questionnaire %}
                 <div class="modal-footer">

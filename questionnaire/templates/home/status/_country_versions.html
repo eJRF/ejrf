@@ -1,23 +1,28 @@
 {% for version in country.all_versions %}
     <tr class="version-for-{{ country.id }} hide">
-        <td colspan="3">
-            <a data-href="{% url 'preview_specific_questionnaire' region.latest_questionnaire.id  %}?country={{ country.id }}&version={{ version }}&preview=1"
-               data-toggle="modal" data-target="#preview_modal" class="preview-btn-url"
-               id="preview-version-{{ version }}">
-                {{ country.name }} Version {{ version }}
-            </a>
-        </td>
-        <td>
-            <form method="post" action="{% url 'specific_export_page' country.id version %}" class="form-inline">
-                <a data-href="{% url 'preview_specific_questionnaire' region.latest_questionnaire.id %}?country={{ country.id }}&version={{ version }}&preview=1"
-                        id="view-country-{{ country.id }}-version-{{ version }}" class="btn btn-xs btn-default preview-btn-url">
-                    <span class="glyphicon glyphicon-list-alt"></span> View
+    {% with region.latest_questionnaire as questionnaire %}
+        {% with questionnaire.ordered_sections as ordered_sections %}
+            <td colspan="3">
+                <a data-href="{% url 'preview_specific_questionnaire' region.latest_questionnaire.id  %}?country={{ country.id }}&version={{ version }}&preview=1"
+                   data-toggle="modal" data-target="#preview_modal" class="preview-btn-url"
+                   id="preview-version-{{ version }}">
+                    {{ country.name }} Version {{ version }}
                 </a>
-                {% csrf_token %}
-                <button type=" submit" id="extract-country-{{ country.id }}-version-{{ version }}" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-save"></span>
-                    Extract
-                </button>
-            </form>
-        </td>
+            </td>
+            <td>
+                <form method="post" action="{% url 'specific_export_page' country.id version %}" class="form-inline">
+                    <a data-href="{% url 'questionnaire_entry_page' questionnaire.id ordered_sections.0.id %}?country={{ country.id }}&version={{ version }}&preview=1"
+                            id="view-country-{{ country.id }}-version-{{ version }}" class="btn btn-xs btn-default preview-btn-url">
+                        <span class="glyphicon glyphicon-list-alt"></span> View
+                    </a>
+                    {% csrf_token %}
+                    <button type=" submit" id="extract-country-{{ country.id }}-version-{{ version }}" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-save"></span>
+                        Extract
+                    </button>
+                </form>
+                {% include 'questionnaires/entry/preview_modal.html' %}
+            </td>
+        {% endwith %}
+    {% endwith %}
     </tr>
 {% endfor %}

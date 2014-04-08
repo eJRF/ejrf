@@ -90,3 +90,10 @@ class QuestionnaireTest(BaseTest):
                                                       questionnaire=self.questionnaire, name="Reported Cases")
 
         self.assertTrue(self.questionnaire.has_more_than_one_section())
+
+    def test_questionnaire_knows_its_sections_in_order(self):
+        section_2 = Section.objects.create(title="section2", order=2, questionnaire=self.questionnaire, name="sec2")
+        ordered_sections = self.questionnaire.ordered_sections()
+        self.assertEqual(2, ordered_sections.count())
+        self.assertEqual(self.section_1, ordered_sections[0])
+        self.assertEqual(section_2, ordered_sections[1])

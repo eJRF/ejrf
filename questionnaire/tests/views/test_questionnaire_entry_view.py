@@ -258,6 +258,39 @@ class QuestionnaireEntrySaveDraftTest(BaseTest):
 
         self.assertRedirects(response, data['redirect_url'])
 
+    def test_get_preview_for_version(self):
+        version = 1
+        country = Country.objects.create(name="Kenya")
+        url = '/questionnaire/entry/%s/section/%d/?country=%s&version=%s' % (self.questionnaire.id, self.section_1.id, country.id, version)
+
+        self.initial = {'country': country, 'status': 'Draft', 'version': 1, 'code': 'ABC123', 'questionnaire': self.questionnaire}
+
+        version_1_primary_answer = MultiChoiceAnswer.objects.create(response=self.option1, question=self.question1, **self.initial)
+        version_1_answer_1 = NumericalAnswer.objects.create(response=4, question=self.question2, **self.initial)
+        version_1_answer_2 = NumericalAnswer.objects.create(response=2, question=self.question3, **self.initial)
+
+        answer_group = AnswerGroup.objects.create(grouped_question=self.question_group)
+        answer_group.answer.add(version_1_answer_1, version_1_answer_2, version_1_primary_answer)
+
+        response = self.client.get(url)
+        formsets = response.context['formsets']
+
+        self.assertIsInstance(formsets, QuestionnaireEntryFormService)
+        self.assertEqual(self.section_1, formsets.section)
+        section1_formsets = formsets.formsets
+
+        self.assertEqual(self.question1, section1_formsets['MultiChoice'][0].initial['question'])
+        self.assertEqual(self.question2, section1_formsets['Number'][0].initial['question'])
+        self.assertEqual(self.question3, section1_formsets['Number'][1].initial['question'])
+
+        self.assertEqual(version_1_primary_answer.response, section1_formsets['MultiChoice'][0].initial['response'])
+        self.assertEqual(version_1_answer_1.response, section1_formsets['Number'][0].initial['response'])
+        self.assertEqual(version_1_answer_2.response, section1_formsets['Number'][1].initial['response'])
+
+        self.assertEqual(version_1_answer_1, section1_formsets['Number'][0].initial['answer'])
+        self.assertEqual(version_1_answer_2, section1_formsets['Number'][1].initial['answer'])
+        self.assertEqual(version_1_primary_answer, section1_formsets['MultiChoice'][0].initial['answer'])
+
 
 class SaveGridDraftQuestionGroupEntryTest(BaseTest):
 

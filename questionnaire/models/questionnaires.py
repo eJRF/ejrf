@@ -52,3 +52,6 @@ class Questionnaire(BaseModel):
 
     def has_more_than_one_section(self):
         return self.sections.all().count() > 1
+
+    def ordered_sections(self):
+        return self.sections.order_by('order')

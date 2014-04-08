@@ -9,10 +9,9 @@ $(function(){
     });
 
     $('.preview-btn-url').on('click', function(){
-        var url = $(this).attr('data-href'),
+        var url = $(this).attr('data-href');
             modalId = $('#preview_modal');
-
-        $("#ajax-content").html("<img src=\"/static/img/spinner.gif\"> Loading, please wait...");
+        showLoadingMessage();
         modalId.modal('show');
         modalId.removeData('bs.modal');
 
@@ -25,6 +24,17 @@ $(function(){
         }
     });
     disable_modal_input_fields(editable);
+
+    $('.preview-section-modal-tab-link').on('click', function(){
+        showLoadingMessage();
+        var $el = $(this),
+            url = $el.attr('data-href'),
+            $li = $el.parents('li'),
+            $ul = $el.parents('ul');
+        $ul.find('.active').removeClass('active');
+        $li.addClass('active');
+        fillModalWithAjaxContent(url);
+    });
 
     $('#edit_questionnaire_link').on('click', function(){
         disableInputFields();
@@ -42,11 +52,15 @@ $(function(){
 
 });
 
+function showLoadingMessage(){
+    $("#ajax-section-content").html("<img src=\"/static/img/spinner.gif\"> Loading, please wait...");
+}
+
 function fillModalWithAjaxContent(questionnaire_preview_url){
     $.get(questionnaire_preview_url, function( data ) {
         var $holder = $('<div></div>').append(String(data));
-        var content =  $holder.find("#preview-content").html()
-        $( "#ajax-content" ).html(content);
+        var content =  $holder.find("#section-content").html()
+        $( "#ajax-section-content" ).html(content);
         disable_modal_input_fields(!editable);
     });
     form_has_changed = false;

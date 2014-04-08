@@ -1,0 +1,23 @@
+{% load questionnaire_entry_tags %}
+<div id="preview-content">
+    <div class="row">
+        <div class="col-lg-2">
+            {% include 'questionnaires/entry/_preview_section_breadcrumbs_wizard.html' %}
+        </div>
+        <div class="col-lg-10">
+            <div class="tab-content">
+                {% if perms.auth.can_submit_responses %}
+                    <div class="alert alert-danger"><span class="red bold">Note:</span> You will not be able
+                        to
+                        edit the form after submitting. Any changes thereafter will require submitting a new
+                        version of the form.
+                    </div>
+                {% endif %}
+                <div id="ajax-section-content" class="has-spinner">
+                    <img src="{{ STATIC_URL }}img/spinner.gif"> Loading, please wait...
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

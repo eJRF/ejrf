@@ -12,7 +12,7 @@ from questionnaire.mixins import AdvancedMultiplePermissionsRequiredMixin
 from questionnaire.services.questionnaire_cloner import QuestionnaireClonerService
 from questionnaire.services.questionnaire_finalizer import QuestionnaireFinalizeService
 from questionnaire.services.questionnaire_entry_form_service import QuestionnaireEntryFormService
-from questionnaire.models import Questionnaire, Section, QuestionGroup, Answer, AnswerGroup
+from questionnaire.models import Questionnaire, Section, QuestionGroup, Answer, AnswerGroup, Country
 from questionnaire.forms.answers import NumericalAnswerForm, TextAnswerForm, DateAnswerForm, MultiChoiceAnswerForm
 from questionnaire.services.users import UserQuestionnaireService
 
@@ -32,13 +32,13 @@ class Entry(AdvancedMultiplePermissionsRequiredMixin, FormView):
     def get(self, request, *args, **kwargs):
         questionnaire = Questionnaire.objects.get(id=self.kwargs['questionnaire_id'])
         section = Section.objects.get(id=self.kwargs['section_id'])
-        user_questionnaire_service = UserQuestionnaireService(self.request.user.user_profile.country, questionnaire,request.GET.get("version"))
-        initial = {'status': 'Draft', 'country': self.request.user.user_profile.country,
+        country = request.GET.get('country', None) or self.request.user.user_profile.country
+        user_questionnaire_service = UserQuestionnaireService(country, questionnaire,request.GET.get("version"))
+        initial = {'status': 'Draft', 'country': country,
                    'version': user_questionnaire_service.GET_version, 'questionnaire': questionnaire}
         required_answers = 'show' in request.GET
         formsets = QuestionnaireEntryFormService(section, initial=initial, highlight=required_answers,
                                                  edit_after_submit=user_questionnaire_service.edit_after_submit)
-
         printable = 'printable' in request.GET
         preview = user_questionnaire_service.preview() or 'preview' in request.GET
 
@@ -64,8 +64,8 @@ class Entry(AdvancedMultiplePermissionsRequiredMixin, FormView):
                                                  edit_after_submit=user_questionnaire_service.edit_after_submit)
 
         context = {'questionnaire': questionnaire, 'section': section,
-                   'formsets': formsets, 'ordered_sections': questionnaire.sections.order_by('order'),
-                   'section_form': SectionForm(initial={'questionnaire': questionnaire}),
+                   'formsets': formsets, 'ordered_sections': questionnaire.ordered_sections(),
+                   'form': SectionForm(initial={'questionnaire': questionnaire}),
                    'action': reverse('new_section_page', args=(questionnaire.id, )),
                    'subsection_form': SubSectionForm(),
                    'subsection_action': reverse('new_subsection_page', args=(questionnaire.id, section.id)),

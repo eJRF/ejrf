@@ -132,6 +132,7 @@
 }
 .group-hr{
     border: 1px solid #000;
+    clear: both;
 }
 .multiple-hr{
     border: 1px dashed #000;
@@ -173,9 +174,14 @@ form p select, input[type='text'], input[type='password'] {
 .popover{
     max-width: 650px !important;
 }
-.table-responsive a{
+.table-responsive a.preview-btn-url{
   margin-bottom: 7px;
 }
+
+.table-responsive{
+    overflow-x: auto;
+}
+
 label.error{
   color: red;
   width: 300px;
@@ -454,7 +460,9 @@ tr.dragging, tr.dragging * {
     list-style-type: none;
     vertical-align: middle;
 }
-
+.badge{
+    background: #ffffff;
+}
 .specified_response{
     margin-top: 5px;
 }

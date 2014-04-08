@@ -1,6 +1,12 @@
 {% extends 'base/layout.html' %}
+{% block extra_css %}
+    {% include 'questionnaires/entry/_extra_css.html' %}
+{% endblock %}
+{% block javascripts %}
+    <script src="{{ STATIC_URL }}js/preview.js" type="text/javascript" charset="utf-8"></script>
+    <script src="{{ STATIC_URL }}js/admin_preview_data.js" type="text/javascript" charset="utf-8"></script>
+{% endblock %}
 {% block content %}
-    {% include 'questionnaires/entry/preview_modal.html' %}
     <h3>GLOBAL STATUS</h3>
     <hr/>
     <div class="panel-group" id="accordion">
@@ -20,5 +26,4 @@
         {% endfor %}
     </div>
 
-    {% include 'questionnaires/entry/preview_modal.html' %}
 {% endblock %}
