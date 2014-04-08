@@ -45,8 +45,4 @@ def then_that_questionnaire_should_open_in_group1(step, mode):
 def and_uploading_attachments_should_be_group1(step, status):
     world.page.click_by_id('id_attachments')
     world.page.is_text_present('Attachments List')
-
-    if status == 'allowed':
-        world.page.is_text_present('Upload Support Document')
-    else:
-        world.page.is_text_present('Upload Support Document', status=False)
+    world.page.is_text_present('Upload Support Document')
