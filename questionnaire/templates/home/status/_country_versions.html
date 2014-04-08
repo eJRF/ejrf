@@ -3,7 +3,7 @@
     {% with region.latest_questionnaire as questionnaire %}
         {% with questionnaire.ordered_sections as ordered_sections %}
             <td colspan="3">
-                <a data-href="{% url 'preview_specific_questionnaire' region.latest_questionnaire.id  %}?country={{ country.id }}&version={{ version }}&preview=1"
+                <a data-href="{% url 'questionnaire_entry_page' questionnaire.id ordered_sections.0.id %}?country={{ country.id }}&version={{ version }}&preview=1"
                    data-toggle="modal" data-target="#preview_modal" class="preview-btn-url"
                    id="preview-version-{{ version }}">
                     {{ country.name }} Version {{ version }}
