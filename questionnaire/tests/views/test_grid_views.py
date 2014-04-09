@@ -64,7 +64,8 @@ class CreateGridViewTest(BaseTest):
         self.assertIn(self.question3.id, questions)
         self.assertIn(self.question4.id, questions)
 
-    def test_post_creates_grid_group_and_orders_to_subsection(self):
+
+    def test_post_creates_display_all_grid_group_and_orders_to_subsection(self):
         self.failIf(self.question1.question_group.all())
         self.failIf(self.question2.question_group.all())
         self.failIf(self.question3.question_group.all())
@@ -73,6 +74,33 @@ class CreateGridViewTest(BaseTest):
         response = self.client.post(self.url, data=self.data, **meta)
 
         grid_group = self.question1.question_group.get(subsection=self.sub_section, grid=True, display_all=True, order=0)
+        group_questions = grid_group.question.all()
+        self.assertEqual(3, group_questions.count())
+        self.assertIn(self.question2, group_questions)
+        self.assertIn(self.question3, group_questions)
+
+        group_orders = grid_group.orders.all()
+        self.failUnless(group_orders)
+        self.assertEqual(3, group_orders.count())
+        self.assertEqual(1, group_orders.filter(question=self.question1, order=0).count())
+        self.assertEqual(1, group_orders.filter(question=self.question2, order=1).count())
+        self.assertEqual(1, group_orders.filter(question=self.question3, order=2).count())
+
+    def test_post_creates_add_more_grid_group_and_orders_to_subsection(self):
+        self.failIf(self.question1.question_group.all())
+        self.failIf(self.question2.question_group.all())
+        self.failIf(self.question3.question_group.all())
+        self.data ={
+            'type': 'allow_multiples',
+            'primary_question': str(self.question1.id),
+            'columns': [str(self.question2.id), str(self.question3.id)]
+        }
+
+
+        meta = {'HTTP_REFERER': self.url}
+        response = self.client.post(self.url, data=self.data, **meta)
+
+        grid_group = self.question1.question_group.get(subsection=self.sub_section, grid=True, allow_multiples=True, order=0)
         group_questions = grid_group.question.all()
         self.assertEqual(3, group_questions.count())
         self.assertIn(self.question2, group_questions)

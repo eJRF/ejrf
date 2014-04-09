@@ -8,6 +8,7 @@ jQuery(function($){
             var $holder = $('<div></div>').append(String(data));
             var content =  $holder.find("#create-grid-form-content").html()
             $( "#create-grid-ajax-content-"+subsection_id ).html(content);
+
         });
     });
 
@@ -58,6 +59,20 @@ jQuery(function($){
             $select.remove();
             assignOptionNumbers($form);
         }
+    });
+
+    $('body').on('change', '#id_type', function(){
+        var $el = $(this),
+            $parent = $el.parents('.create-grid-form'),
+            $primary_question = $parent.find('#id_primary_question'),
+            all_primary_questions = $('#all-primary-template').html(),
+            $all_primary_questions = $(all_primary_questions);
+        if ($el.val()!='allow_multiples'){
+            $all_primary_questions.find('option[multichoice!="true"]').each(function(){
+                $(this).remove();
+            });
+        }
+        $primary_question.html($all_primary_questions.html());
     });
 
 

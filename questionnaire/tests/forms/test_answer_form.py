@@ -1,4 +1,5 @@
-from questionnaire.forms.answers import NumericalAnswerForm, TextAnswerForm, DateAnswerForm, MultiChoiceAnswerForm, MultiChoiceAnswerSelectWidget
+from questionnaire.forms.answers import NumericalAnswerForm, TextAnswerForm, DateAnswerForm, MultiChoiceAnswerForm
+from questionnaire.forms.custom_widgets import MultiChoiceAnswerSelectWidget
 from questionnaire.models import Question, Country, QuestionOption, QuestionGroup, Section, Questionnaire, SubSection, MultiChoiceAnswer
 from questionnaire.tests.base_test import BaseTest
 
@@ -212,23 +213,3 @@ class MultiChoiceAnswerFormTest(BaseTest):
         self.failUnless(MultiChoiceAnswer.objects.filter(response=option, question=self.question))
         as_text = '<input id="id_response" name="response" type="text" value="%d" />' % option.id
         self.assertEqual(as_text, answer_form.visible_fields()[0].as_text())
-
-
-class MultiChoiceAnswerSelectWidgetTest(BaseTest):
-
-    def test_option_has_data_attributes_on_top_of_normal_attributes(self):
-        question = Question.objects.create(text='what do you drink?', UID='C_2013', answer_type='MultiChoice')
-        option1 = QuestionOption.objects.create(text='tusker lager', question=question, instructions="yeah yeah")
-        option2 = QuestionOption.objects.create(text='club', question=question, instructions="Are you crazy?")
-
-        choices = ((option1.id, option1.text), (option2.id, option2.text))
-
-        widget = MultiChoiceAnswerSelectWidget(choices=choices, question_options=question.options.all())
-
-        expected_option_1 = '<option value="%d" selected="selected" data-instructions="%s">%s</option>' % (option1.id, option1.instructions, option1.text)
-        expected_option_2 = '<option value="%d" data-instructions="%s">%s</option>' % (option2.id, option2.instructions, option2.text)
-
-        self.assertEqual(expected_option_1,
-                         widget.render_option(selected_choices=[str(option1.id)], option_value=option1.id, option_label=option1.text))
-        self.assertEqual(expected_option_2,
-                         widget.render_option(selected_choices=[str(option1.id)], option_value=option2.id, option_label=option2.text))

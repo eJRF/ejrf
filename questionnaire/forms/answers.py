@@ -2,9 +2,7 @@ import copy
 from django import forms
 from django.forms.util import ErrorDict
 from django.forms import ModelForm, ModelChoiceField
-from django.utils.html import format_html
-from django.utils.encoding import force_text
-from django.utils.safestring import mark_safe
+from questionnaire.forms.custom_widgets import MultiChoiceAnswerSelectWidget
 
 from questionnaire.models import NumericalAnswer, TextAnswer, DateAnswer, MultiChoiceAnswer, QuestionOption
 
@@ -76,27 +74,6 @@ class DateAnswerForm(AnswerForm):
         widgets = {
             'response': forms.DateInput(attrs={'class': 'form-control datetimepicker', 'data-format':'YYYY-MM-DD'})
         }
-
-
-class MultiChoiceAnswerSelectWidget(forms.Select):
-    def __init__(self, attrs=None, choices=(), question_options=None):
-        super(MultiChoiceAnswerSelectWidget, self).__init__(attrs, choices)
-        self.question_options = question_options
-
-    def render_option(self, selected_choices, option_value, option_label):
-        option_value = force_text(option_value)
-        data_instruction = ''
-        if option_value:
-            data_instruction = mark_safe(' data-instructions="%s"' % self.question_options.get(id=int(option_value)).instructions)
-        if option_value in selected_choices:
-            selected_html = mark_safe(' selected="selected"')
-        else:
-            selected_html = ''
-        return format_html('<option value="{0}"{1}{2}>{3}</option>',
-                           option_value,
-                           selected_html,
-                           data_instruction,
-                           force_text(option_label))
 
 
 class MultiChoiceAnswerForm(AnswerForm):
