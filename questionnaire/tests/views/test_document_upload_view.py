@@ -1,5 +1,6 @@
 import os
 from django.core.files import File
+from django.core.urlresolvers import reverse
 from django.test import Client
 from mock import mock_open, patch
 from questionnaire.forms.support_documents import SupportDocumentUploadForm
@@ -40,6 +41,7 @@ class UploadSupportDocumentTest(BaseTest):
         self.assertEqual(self.section2, ordered_sections[1])
         self.assertIsInstance(response.context['upload_form'], SupportDocumentUploadForm)
         self.assertIsNotNone(response.context['preview'])
+        self.assertEqual(reverse("new_section_page", args=(self.questionnaire.id,)), response.context['new_section_action'])
 
     def test_upload_view_has_all_document_for_questionnaire(self):
         document_in = SupportDocument.objects.create(path=File(self.document), country=self.uganda,

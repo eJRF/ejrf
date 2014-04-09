@@ -36,9 +36,10 @@ class UploadDocument(CreateView):
         context.update({'upload_form': self.form_class(initial=upload_data_initial),
                         'button_label': 'Upload', 'id': 'id-upload-form', 'questionnaire': self.questionnaire,
                         'documents': self.user_questionnaire_service.attachments(),
-                        'section_form': SectionForm(),
+                        'section_form': SectionForm(initial={'questionnaire': self.questionnaire}),
                         'ordered_sections': self.questionnaire.sections.order_by('order'),
-                        'preview': self.user_questionnaire_service.preview()})
+                        'preview': self.user_questionnaire_service.preview(),
+                        'new_section_action': reverse("new_section_page", args=(self.questionnaire.id,))})
         return context
 
     def form_valid(self, form):
