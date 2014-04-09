@@ -29,6 +29,7 @@ class UserQuestionnaireService(object):
         for answer in self.answers:
             answer.status = Answer.SUBMITTED_STATUS
             answer.save()
+        self.questionnaire.submissions.create(country=self.country, version=self.version or self.GET_version)
 
     def answer_version(self):
         answers = self.answers_in_questionnaire
@@ -68,9 +69,8 @@ class UserQuestionnaireService(object):
         return questionnaires
 
     def preview(self):
-        if self.answers_in_questionnaire.exists():
-            return self.answers_in_questionnaire.latest('modified').status == Answer.SUBMITTED_STATUS
-        return False
+        version = self.version or self.POST_version
+        return self.questionnaire.submissions.filter(country=self.country, version=version).exists()
 
     def attachments(self):
         return self.questionnaire.support_documents.filter(country=self.country)

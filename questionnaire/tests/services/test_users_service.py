@@ -131,7 +131,8 @@ class UserServiceTest(BaseTest):
         answer_group = AnswerGroup.objects.create(grouped_question=self.question_group)
         answer_group.answer.add(old_primary, old_answer_1, old_answer_2)
 
-        user_service = UserQuestionnaireService(self.user.user_profile.country, self.questionnaire)
+        user_country = self.user.user_profile.country
+        user_service = UserQuestionnaireService(user_country, self.questionnaire)
         user_service.submit()
 
         primary = MultiChoiceAnswer.objects.get(response__id=int(data['MultiChoice-0-response']), question=self.question1)
@@ -149,6 +150,9 @@ class UserServiceTest(BaseTest):
 
         answer_group = AnswerGroup.objects.filter(grouped_question=self.question_group)
         self.assertEqual(1, answer_group.count())
+        submissions = user_country.submissions.all()
+        self.assertEqual(1, submissions.count())
+        self.assertEqual(self.questionnaire, submissions[0].questionnaire)
 
     def test_user_knows_answer_version_of_questionnaire_is_1_if_no_answer_exist_yet(self):
         user_service = UserQuestionnaireService(self.user, self.questionnaire)
@@ -250,17 +254,11 @@ class UserServiceTest(BaseTest):
         answer_group = AnswerGroup.objects.create(grouped_question=self.question_group)
         answer_group.answer.add(old_primary, old_answer_1, old_answer_2)
 
-        user_service = UserQuestionnaireService(self.user.user_profile.country, self.questionnaire)
+        user_country = self.user.user_profile.country
+        user_service = UserQuestionnaireService(user_country, self.questionnaire)
 
         self.assertFalse(user_service.preview())
-
-        old_primary.status="Submitted"
-        old_primary.save()
-        old_answer_1.status="Submitted"
-        old_answer_1.save()
-        old_answer_2.status="Submitted"
-        old_answer_2.save()
-
+        user_service.submit()
         self.assertTrue(user_service.preview())
 
     def test_user_knows_answers_given_questionnaire_and_version(self):
@@ -288,7 +286,7 @@ class UserServiceTest(BaseTest):
         version_1_answer_2.status = Answer.SUBMITTED_STATUS
         version_1_answer_2.save()
         initial = self.initial.copy()
-        del  initial['version']
+        del initial['version']
         version_2_primary = MultiChoiceAnswer.objects.create(response=self.option1, question=self.question1, version=2, **initial)
         version_2_answer_1 = NumericalAnswer.objects.create(response=int(data['Number-0-response']), question=self.question2, version=2, **initial)
         version_2_answer_2 = NumericalAnswer.objects.create(response=int(data['Number-1-response']), question=self.question3, version=2, **initial)

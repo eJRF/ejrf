@@ -2,7 +2,7 @@ from model_utils import Choices
 from model_utils.fields import StatusField
 from questionnaire.models.base import BaseModel
 from django.db import models
-from questionnaire.models import Region
+from questionnaire.models import Region, Country
 from django.core.urlresolvers import reverse
 
 
@@ -55,3 +55,9 @@ class Questionnaire(BaseModel):
 
     def ordered_sections(self):
         return self.sections.order_by('order')
+
+
+class CountryQuestionnaireSubmission(BaseModel):
+        country = models.ForeignKey(Country, blank=False, related_name="submissions")
+        questionnaire = models.ForeignKey('Questionnaire', blank=False, related_name="submissions")
+        version = models.IntegerField(blank=False, default=1)
