@@ -64,7 +64,6 @@ class CreateGridViewTest(BaseTest):
         self.assertIn(self.question3.id, questions)
         self.assertIn(self.question4.id, questions)
 
-
     def test_post_creates_display_all_grid_group_and_orders_to_subsection(self):
         self.failIf(self.question1.question_group.all())
         self.failIf(self.question2.question_group.all())
@@ -96,7 +95,6 @@ class CreateGridViewTest(BaseTest):
             'columns': [str(self.question2.id), str(self.question3.id)]
         }
 
-
         meta = {'HTTP_REFERER': self.url}
         response = self.client.post(self.url, data=self.data, **meta)
 
@@ -112,6 +110,48 @@ class CreateGridViewTest(BaseTest):
         self.assertEqual(1, group_orders.filter(question=self.question1, order=0).count())
         self.assertEqual(1, group_orders.filter(question=self.question2, order=1).count())
         self.assertEqual(1, group_orders.filter(question=self.question3, order=2).count())
+
+    def test_post_creates_hybrid_grid_group_and_orders_to_subsection(self):
+        self.question5 = Question.objects.create(text='question 5', instructions="instruction 5",
+                                                 UID='C00006', answer_type='MultiChoice')
+
+        self.failIf(self.question1.question_group.all())
+        self.failIf(self.question2.question_group.all())
+        self.failIf(self.question3.question_group.all())
+        self.failIf(self.question4.question_group.all())
+        self.failIf(self.question5.question_group.all())
+
+        self.data ={
+            'type': 'hybrid',
+            'primary_question': str(self.question1.id),
+            'columns': [str(self.question2.id), str(self.question4.id), str(self.question5.id), str(self.question3.id)],
+            'subgroup': [str(self.question4.id), str(self.question5.id)]
+        }
+
+        meta = {'HTTP_REFERER': self.url}
+        response = self.client.post(self.url, data=self.data, **meta)
+
+        parent_grid_group = self.question1.question_group.get(subsection=self.sub_section, grid=True,
+                                                       allow_multiples=True, order=0, hybrid=True)
+        group_questions = parent_grid_group.question.all()
+        self.assertEqual(3, group_questions.count())
+        self.assertIn(self.question2, group_questions)
+        self.assertIn(self.question3, group_questions)
+
+        grid_sub_group = self.question4.question_group.get(subsection=self.sub_section, parent=parent_grid_group, grid=True)
+        group_questions = grid_sub_group.question.all()
+        self.assertEqual(2, group_questions.count())
+        self.assertIn(self.question4, group_questions)
+        self.assertIn(self.question5, group_questions)
+
+        group_orders = parent_grid_group.orders.all()
+        self.failUnless(group_orders)
+        self.assertEqual(5, group_orders.count())
+        self.assertEqual(1, group_orders.filter(question=self.question1, order=0).count())
+        self.assertEqual(1, group_orders.filter(question=self.question2, order=1).count())
+        self.assertEqual(1, group_orders.filter(question=self.question4, order=2).count())
+        self.assertEqual(1, group_orders.filter(question=self.question5, order=3).count())
+        self.assertEqual(1, group_orders.filter(question=self.question3, order=4).count())
 
     def test_successful_post_redirect_to_referer_url(self):
         meta = {'HTTP_REFERER': self.url}
