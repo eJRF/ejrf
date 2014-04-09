@@ -23,9 +23,11 @@ class HomePage(PageObject):
             assert self.browser.is_element_present_by_id('new-questionnaire-%s' % questionnaire.id)
             
     def validate_questionnaire_opens_in_correct_mode(self, questionnaire, mode):
-        assert self.browser.is_element_present_by_id('save_draft_button')
-        assert self.browser.is_element_present_by_id('cancel_button')
         if mode == 'edit mode':
+            assert self.browser.is_element_present_by_id('save_draft_button')
+            assert self.browser.is_element_present_by_id('cancel_button')
             assert self.browser.is_element_present_by_id('submit_questionnaire_btn')
+            self.is_element_with_id_enabled('id_Text-0-response')
         else:
             assert self.browser.is_element_present_by_id('edit_questionnaire_link')
+            self.is_element_with_id_disabled('id_Text-0-response')
