@@ -8,8 +8,8 @@ GRID_TYPES = (('display_all', 'Display All'),
 
 class GridForm(forms.Form):
     type = forms.ChoiceField(choices=GRID_TYPES)
-    primary_question = forms.ModelChoiceField(queryset=Question.objects.filter(is_primary=True), empty_label=None)
-    columns = forms.ModelMultipleChoiceField(queryset=Question.objects.exclude(is_primary=True), label=None,
+    primary_question = forms.ModelChoiceField(queryset=Question.objects.filter(is_primary=True, answer_type='MultiChoice'), empty_label=None)
+    columns = forms.ModelMultipleChoiceField(queryset=Question.objects.exclude(is_primary=True),
                                             widget=forms.SelectMultiple(attrs={'class': 'hide'}))
 
     def __init__(self, *args, **kwargs):

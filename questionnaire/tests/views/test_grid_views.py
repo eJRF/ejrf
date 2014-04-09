@@ -56,6 +56,7 @@ class CreateGridViewTest(BaseTest):
         self.assertIsInstance(response.context['grid_form'], GridForm)
         self.assertEqual('Create', response.context['btn_label'])
         self.assertEqual('create_grid_form', response.context['id'])
+        self.assertEqual('create-grid-form', response.context['class'])
         self.assertEqual(self.sub_section, response.context['subsection'])
         questions = response.context['non_primary_questions'].values_list('id', flat=True)
         self.assertEqual(3, questions.count())
@@ -84,9 +85,6 @@ class CreateGridViewTest(BaseTest):
         self.assertEqual(1, group_orders.filter(question=self.question2, order=1).count())
         self.assertEqual(1, group_orders.filter(question=self.question3, order=2).count())
 
-
-
-
     def test_successful_post_redirect_to_referer_url(self):
         meta = {'HTTP_REFERER': self.url}
         response = self.client.post(self.url, data=self.data, **meta)
@@ -110,6 +108,7 @@ class CreateGridViewTest(BaseTest):
         self.assertIn("This field is required.", response.context['grid_form'].errors['type'])
         self.assertEqual('Create', response.context['btn_label'])
         self.assertEqual('create_grid_form', response.context['id'])
+        self.assertEqual('create-grid-form', response.context['class'])
         self.assertEqual(self.sub_section, response.context['subsection'])
         questions = response.context['non_primary_questions'].values_list('id', flat=True)
         self.assertEqual(3, questions.count())

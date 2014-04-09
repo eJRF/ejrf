@@ -50,6 +50,15 @@ class GridFormTest(BaseTest):
         error_message = 'Select a valid choice. That choice is not one of the available choices.'
         self.assertEqual([error_message], grid_form.errors['primary_question'])
 
+    def test_primary_question_can_only_be_multichoice(self):
+        data = self.form_data.copy()
+        non_multichoice_primary_question = Question.objects.create(text="haha", answer_type="Text", is_primary=True)
+        data['primary_question'] = non_multichoice_primary_question.id
+        grid_form = GridForm(data)
+        self.assertFalse(grid_form.is_valid())
+        error_message = 'Select a valid choice. That choice is not one of the available choices.'
+        self.assertEqual([error_message], grid_form.errors['primary_question'])
+
     def test_invalid_column_question(self):
         data = self.form_data.copy()
         primary_question = self.question1

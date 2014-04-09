@@ -6,6 +6,10 @@
     {{ subsection.title | default_if_none:''}}
     {% if perms.auth.can_edit_questionnaire and user.user_profile.region == questionnaire.region and not preview %}
         <div class="btn-group pull-right">
+            <a href="" id="id-create-grid-{{ subsection.id }}" class="btn btn-sm btn-default"
+               data-toggle="modal" data-target="#create-grid-modal-{{ subsection.id }}">
+                <span class="cyan"><span class="glyphicon glyphicon-plus-sign"></span> Grid</span>
+            </a>
             <a href="" id="id-assign-{{ subsection.id }}" class="btn btn-sm btn-default"
                data-toggle="modal" data-target="#assign-question-modal-{{ subsection.id }}">
                 <span class="cyan"><span class="glyphicon glyphicon-plus-sign"></span> Assign Question</span>

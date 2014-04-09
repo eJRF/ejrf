@@ -185,7 +185,7 @@ form p select, input[type='text'], input[type='password'] {
 
 label.error{
   color: red;
-  width: 300px;
+  max-width: 300px;
 }
 
 .form-horizontal select{
@@ -350,7 +350,9 @@ div.pagination{
 .modal-lg{
     min-width: 1000px;
 }
-
+.modal-medium{
+    min-width: 650px;
+}
 li.more-toggle{
     text-align: center;
 }

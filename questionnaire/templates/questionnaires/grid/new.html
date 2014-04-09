@@ -1,35 +1,34 @@
 {% extends 'base/form.html' %}
-{% block javascripts %}
-    <script src="{{ STATIC_URL }}js/grid.js" type="text/javascript" charset="utf-8"></script>
-{% endblock %}
 {% block display_form_fields %}
-    {% include 'base/naked_form.html' with a_form=grid_form %}
-    <div id="columns">
-        {% if grid_form.columns.data %}
-            {% for id in grid_form.columns.data %}
+    <div id="create-grid-form-content">
+        {% include 'base/naked_form.html' with a_form=grid_form %}
+        <div id="columns">
+            {% if grid_form.columns.data %}
+                {% for id in grid_form.columns.data %}
+                    <p class="input-group">
+                        <label class="column-label">Column <span class="number"> {{ forloop.counter }} </span></label>
+                        <select  name="columns" class="required">
+                            {% for question in non_primary_questions %}
+                                <option value="{{ question.id }}" {% if question.id|slugify == id %}selected{% endif %}>{{ question.text }}</option>
+                            {% endfor %}
+                        </select>
+                        <a href="javascript:;" class="input-group-addon btn btn-sm btn-primary add-column"><i class="glyphicon glyphicon-plus"></i></a>
+                        <a href="javascript:;" class="input-group-addon btn btn-sm  btn-primary remove-column"><i class="glyphicon glyphicon-remove"></i></a>
+                    </p>
+                {% endfor %}
+            {% else %}
                 <p class="input-group">
-                    <label class="column-label">Column <span class="number"> {{ forloop.counter }} </span></label>
+                    <label class="column-label">Column <span class="number"> 1 </span></label>
                     <select  name="columns">
+                        <option value=''>Choose One</option>
                         {% for question in non_primary_questions %}
-                            <option value="{{ question.id }}" {% if question.id|slugify == id %}selected{% endif %}>{{ question.text }}</option>
+                            <option value="{{ question.id }}">{{ question.text }}</option>
                         {% endfor %}
                     </select>
                     <a href="javascript:;" class="input-group-addon btn btn-sm btn-primary add-column"><i class="glyphicon glyphicon-plus"></i></a>
                     <a href="javascript:;" class="input-group-addon btn btn-sm  btn-primary remove-column"><i class="glyphicon glyphicon-remove"></i></a>
                 </p>
-            {% endfor %}
-        {% else %}
-            <p class="input-group">
-                <label class="column-label">Column <span class="number"> 1 </span></label>
-                <select  name="columns">
-                    <option value=''>Choose One</option>
-                    {% for question in non_primary_questions %}
-                        <option value="{{ question.id }}">{{ question.text }}</option>
-                    {% endfor %}
-                </select>
-                <a href="javascript:;" class="input-group-addon btn btn-sm btn-primary add-column"><i class="glyphicon glyphicon-plus"></i></a>
-                <a href="javascript:;" class="input-group-addon btn btn-sm  btn-primary remove-column"><i class="glyphicon glyphicon-remove"></i></a>
-            </p>
-        {% endif %}
+            {% endif %}
+        </div>
     </div>
 {% endblock %}
