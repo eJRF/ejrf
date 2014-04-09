@@ -54,7 +54,7 @@ class Country(Location):
         all_answers = Answer.objects.select_subclasses()
         answers = all_answers.filter(country=self, **query_params)
         if questionnaire:
-            answers = all_answers.filter(country=self, questionnaire=questionnaire)
+            answers = all_answers.filter(country=self, questionnaire=questionnaire, status=Answer.SUBMITTED_STATUS)
             return {questionnaire: list(set(answers.values_list('version', flat=True)))}
         questionnaire = Questionnaire.objects.filter(region__countries=self, status='published').latest('modified')
         return list(set(answers.filter(questionnaire=questionnaire, status=Answer.SUBMITTED_STATUS).values_list('version', flat=True)))

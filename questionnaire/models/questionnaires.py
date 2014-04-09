@@ -56,6 +56,11 @@ class Questionnaire(BaseModel):
     def ordered_sections(self):
         return self.sections.order_by('order')
 
+    def current_answer_version(self):
+        answers = self.answers.filter(status='Draft')
+        if answers.exists():
+            return answers.latest('modified').version
+
 
 class CountryQuestionnaireSubmission(BaseModel):
         country = models.ForeignKey(Country, blank=False, related_name="submissions")

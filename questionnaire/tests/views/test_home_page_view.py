@@ -45,7 +45,7 @@ class HomePageViewTest(BaseTest):
         self.assertEqual(200, response.status_code)
         templates = [template.name for template in response.templates]
         self.assertIn('home/submitter/index.html', templates)
-        self.assertEqual({self.questionnaire1: [self.answer.version]}, response.context['drafts'])
+        self.assertEqual({self.questionnaire1}, response.context['drafts'])
         self.assertEqual({self.questionnaire2: []}, response.context['new'])
         self.assertEqual({self.questionnaire3: [self.answer_3_1.version]}, response.context['submitted'])
 

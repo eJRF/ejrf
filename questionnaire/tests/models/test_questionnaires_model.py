@@ -97,3 +97,8 @@ class QuestionnaireTest(BaseTest):
         self.assertEqual(2, ordered_sections.count())
         self.assertEqual(self.section_1, ordered_sections[0])
         self.assertEqual(section_2, ordered_sections[1])
+
+    def test_questionnaire_knows_its_newest_un_submited_answer_version(self):
+        NumericalAnswer.objects.create(question=self.question1, country=self.country,
+                                       status=Answer.DRAFT_STATUS,  response=23, version=2, questionnaire=self.questionnaire)
+        self.assertEqual(2, self.questionnaire.current_answer_version())

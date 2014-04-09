@@ -114,7 +114,7 @@ class CountryTest(BaseTest):
         self.assertEqual('jacinta', uganda.data_submitter())
 
     def test_gets_versions_for_a__list_of_questionnaires(self):
-        answer = NumericalAnswer.objects.create(question=self.question2, country=self.uganda, status=Answer.DRAFT_STATUS,
+        answer = NumericalAnswer.objects.create(question=self.question2, country=self.uganda, status=Answer.SUBMITTED_STATUS,
                                        response=22, questionnaire=self.questionnaire)
         questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013)
         section_1 = Section.objects.create(title="Cover PAge", order=1,

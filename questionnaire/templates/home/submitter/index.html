@@ -44,11 +44,11 @@
                 <div class="panel-body">
                     <ul class="list-group">
                         {% if drafts %}
-                            {% for questionnaire_, versions in drafts.items %}
+                            {% for questionnaire_ in drafts %}
                                 <li class="list-group-item">
                                     {% with questionnaire_.sections.all|first as first_section %}
-                                        <a id="draft-questionnaire-{{ questionnaire_.id }}"
-                                           href="{% url 'questionnaire_entry_page' questionnaire_.id first_section.id %}">{{ questionnaire_.name }} {{ questionnaire_.year }}</a>
+                                        <a id="draft-questionnaire-{{ questionnaire_.id }}" href="{% url 'questionnaire_entry_page' questionnaire_.id first_section.id %}">{{ questionnaire_.name }} {{ questionnaire_.year }}
+                                            </a><i class="label label-success">Version {{ questionnaire_.current_answer_version }}</i>
                                         <span class="pull-right">
                                         <a href="{% url 'questionnaire_entry_page' questionnaire_.id first_section.id %}"
                                            class="btn btn-xs btn-default" id="id-edit"><span

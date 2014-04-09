@@ -31,7 +31,7 @@ class Home(MultiplePermissionsRequiredMixin, View):
     def _render_submitter_view(self):
         country = self.request.user.user_profile.country
         un_answered, submitted, drafts = self._get_questionnaires(country)
-        context = {'drafts': country.get_versions_for(drafts),
+        context = {'drafts': set(drafts),
                    'new': country.get_versions_for(un_answered),
                    'submitted': country.get_versions_for(submitted)}
         return render(self.request, 'home/submitter/index.html', context)
