@@ -3,6 +3,7 @@ from django.core.urlresolvers import reverse
 from django.test import Client
 from questionnaire.models import Questionnaire, Section, Country, Region, Question, SubSection, QuestionGroup
 from questionnaire.models.answers import AnswerStatus, NumericalAnswer, Answer
+from questionnaire.models.questionnaires import CountryQuestionnaireSubmission
 from questionnaire.tests.base_test import BaseTest
 
 
@@ -39,6 +40,7 @@ class HomePageViewTest(BaseTest):
         self.answer_3_1 = NumericalAnswer.objects.create(question=self.question_3_1, country=self.country, status=Answer.SUBMITTED_STATUS, response=22, questionnaire=self.questionnaire3)
 
     def test_get(self):
+        self.questionnaire3.submissions.create(country=self.country, version=1)
         response = self.client.get("/")
         self.assertEqual(200, response.status_code)
         templates = [template.name for template in response.templates]
@@ -47,25 +49,6 @@ class HomePageViewTest(BaseTest):
         self.assertEqual({self.questionnaire2: []}, response.context['new'])
         self.assertEqual({self.questionnaire3: [self.answer_3_1.version]}, response.context['submitted'])
 
-    def test_new_draft_submitter_version_on_submit_changes_status(self):
-        response = self.client.get("/")
-        self.assertEqual(200, response.status_code)
-        templates = [template.name for template in response.templates]
-        self.assertIn('home/submitter/index.html', templates)
-        self.assertIn(self.questionnaire3, response.context['submitted'])
-        self.assertNotIn(self.questionnaire3, response.context['drafts'])
-        self.answer_3_2 = NumericalAnswer.objects.create(question=self.question_3_1, country=self.country, status=Answer.DRAFT_STATUS, response=22, version=2, questionnaire=self.questionnaire3)
-
-        response = self.client.get("/")
-        self.assertIn(self.questionnaire3, response.context['drafts'])
-        self.assertNotIn(self.questionnaire3, response.context['submitted'])
-        self.answer_3_2.status = Answer.SUBMITTED_STATUS
-        self.answer_3_2.save()
-
-        response = self.client.get("/")
-        self.assertIn(self.questionnaire3, response.context['submitted'])
-        self.assertNotIn(self.questionnaire3, response.context['drafts'])
-
     def test_new_questionnaire_with_same_question_on_submit_changes_status(self):
         questionnaire3_2 = Questionnaire.objects.create(name="JRF 2014 Core 3", year=2014, region=self.region, status=Questionnaire.PUBLISHED)
         section_3_2 = Section.objects.create(title="Reported Cases", order=1, questionnaire=questionnaire3_2, name="Reported Cases")
@@ -73,7 +56,7 @@ class HomePageViewTest(BaseTest):
         parent_3_2 = QuestionGroup.objects.create(subsection=sub_section_3_2, order=1)
         parent_3_2.question.add(self.question_3_1)
         answer_3_2 = NumericalAnswer.objects.create(question=self.question_3_1, country=self.country, status=Answer.DRAFT_STATUS, response=22, questionnaire=questionnaire3_2)
-
+        self.questionnaire3.submissions.create(country=self.country, version=1)
         response = self.client.get("/")
         self.assertEqual(200, response.status_code)
         templates = [template.name for template in response.templates]
@@ -83,9 +66,9 @@ class HomePageViewTest(BaseTest):
         self.assertIn(questionnaire3_2, response.context['drafts'])
         self.assertNotIn(questionnaire3_2, response.context['submitted'])
 
+        questionnaire3_2.submissions.create(country=self.country, version=1)
         answer_3_2.status = Answer.SUBMITTED_STATUS
         answer_3_2.save()
-
         response = self.client.get("/")
         self.assertNotIn(questionnaire3_2, response.context['drafts'])
         self.assertIn(questionnaire3_2, response.context['submitted'])

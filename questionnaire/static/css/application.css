@@ -467,3 +467,7 @@ tr.dragging, tr.dragging * {
 .specified_response{
     margin-top: 5px;
 }
+
+#content{
+    padding: 0 20px 0 20px;
+}

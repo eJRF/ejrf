@@ -39,6 +39,8 @@ class Home(MultiplePermissionsRequiredMixin, View):
     def _get_questionnaires(self, country):
         questionnaires = Questionnaire.objects.filter(region__countries=country, status=Questionnaire.PUBLISHED)
         drafts = questionnaires.filter(answers__status=Answer.DRAFT_STATUS, answers__country=country)
-        submitted = questionnaires.filter(answers__status=Answer.SUBMITTED_STATUS).exclude(id__in=drafts.values_list('id', flat=True))
-        un_answered = questionnaires.exclude(Q(id__in=drafts.values_list('id', flat=True)) | Q(id__in=submitted.values_list('id', flat=True)))
+        submissions_all = country.submissions.all()
+        submitted = [submission.questionnaire for submission in submissions_all]
+        submitted_questionnaires = submissions_all.values_list('questionnaire', flat=True)
+        un_answered = questionnaires.exclude(Q(id__in=drafts.values_list('id', flat=True)) | Q(id__in=submitted_questionnaires))
         return un_answered, submitted, drafts

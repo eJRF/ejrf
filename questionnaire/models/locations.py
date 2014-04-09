@@ -56,7 +56,7 @@ class Country(Location):
         if questionnaire:
             answers = all_answers.filter(country=self, questionnaire=questionnaire)
             return {questionnaire: list(set(answers.values_list('version', flat=True)))}
-        questionnaire = Questionnaire.objects.filter(region__countries=self,status='published').latest('modified')
+        questionnaire = Questionnaire.objects.filter(region__countries=self, status='published').latest('modified')
         return list(set(answers.filter(questionnaire=questionnaire, status=Answer.SUBMITTED_STATUS).values_list('version', flat=True)))
 
     def get_versions_for(self, questionnaires):

@@ -68,5 +68,4 @@ def create_regional_questionnaire_with_one_question(region):
     parent.question.add(question1)
     QuestionGroupOrder.objects.create(question=question1, question_group=parent, order=1)
     answer_group = AnswerGroup.objects.create(grouped_question=parent, row=1)
-
     return regional_questionnaire, question1, answer_group

@@ -9,14 +9,15 @@ def and_i_have_a_group1_questionnaire_for_my_region(step, type):
 
     if type == 'draft':
         answer = TextAnswer.objects.create(question=world.question, country=world.uganda,
-                                  questionnaire=world.questionnaire,
-                                  status=Answer.DRAFT_STATUS, response='This Data Submitter')
+                                           questionnaire=world.questionnaire,
+                                           status=Answer.DRAFT_STATUS, response='This Data Submitter')
         world.answer_group.answer.add(answer)
 
     if type == 'submitted':
+        world.questionnaire.submissions.create(country=world.uganda, version=1)
         answer = TextAnswer.objects.create(question=world.question, country=world.uganda,
-                                  questionnaire=world.questionnaire,
-                                  status=Answer.SUBMITTED_STATUS, response='This Data Submitter')
+                                           questionnaire=world.questionnaire,
+                                           status=Answer.SUBMITTED_STATUS, response='This Data Submitter')
         world.answer_group.answer.add(answer)
 
 
