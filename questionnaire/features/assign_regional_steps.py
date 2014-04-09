@@ -105,7 +105,9 @@ def then_i_should_see_the_newly_assigned_regional_questions_in_the_questionnaire
 
 @step(u'Then I should see unassign options for each regional question')
 def then_i_should_see_unassign_options_for_each_regional_question(step):
-    world.page.is_element_present_by_id('unassign-question-%s' % world.not_assigned_question2.id)
+    assert world.page.is_element_present_by_id('unassign-question-%s' % world.question3.id)
+    assert world.page.is_element_present_by_id('unassign-question-%s' % world.question4.id)
+    assert world.page.is_element_present_by_id('unassign-question-%s' % world.question5.id)
 
 
 @step(u'And I should not see unassign options for the core questions')

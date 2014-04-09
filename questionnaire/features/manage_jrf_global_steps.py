@@ -51,8 +51,10 @@ def then_i_should_see_a_list_of_the_three_most_recent_finalised_questionnaires(s
 def and_i_should_see_a_list_of_draft_questionnaires(step):
     world.page.links_present_by_text(["%s %s" % (world.questionnaire5.name, world.questionnaire5.year),
                                       "%s %s" % (world.questionnaire6.name, world.questionnaire6.year)])
-    world.page.is_element_present_by_id('id-edit')
-    world.page.is_element_present_by_id('id-finalize')
+    assert world.page.is_element_present_by_id('id-edit-questionnaire-%s' % world.questionnaire5.id)
+    assert world.page.is_element_present_by_id('id-edit-questionnaire-%s' % world.questionnaire6.id)
+    assert world.page.is_element_present_by_id('id-finalize-%s' % world.questionnaire5.id)
+    assert world.page.is_element_present_by_id('id-finalize-%s' % world.questionnaire6.id)
 
 
 @step(u'I visit the manage JRF page')
@@ -79,8 +81,8 @@ def when_i_choose_to_create_a_new_questionnaire(step):
 def then_i_should_see_options_for_selecting_a_finalized_questionnaire_and_a_reporting_year(step):
     world.page.is_text_present('Finalized Questionnaires')
     world.page.is_text_present('Reporting Year')
-    world.page.is_element_present_by_id('id_questionnaire')
-    world.page.is_element_present_by_id('id_year')
+    assert world.page.is_element_present_by_id('id_questionnaire')
+    assert world.page.is_element_present_by_id('id_year')
 
 
 @step(u'When I select a finalized questionnaire and a reporting year')
@@ -108,7 +110,7 @@ def then_i_should_see_a_message_that_the_questionnaire_was_duplicated_successful
 @step(u'Then I should see the new questionnaire listed')
 def then_i_should_see_the_new_questionnaire_listed(step):
     world.latest_questionnaire = Questionnaire.objects.filter(status=Questionnaire.FINALIZED).latest('created')
-    world.page.is_element_present_by_id("questionnaire-%s" % world.latest_questionnaire.id)
+    assert world.page.is_element_present_by_id("questionnaire-%s" % world.latest_questionnaire.id)
 
 
 @step(u'Then I should a validation error message')

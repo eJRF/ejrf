@@ -104,8 +104,8 @@ def and_i_should_see_the_changes_i_made_to_the_section_in_the_questionnaire(step
 
 @step(u'Then I should see an option to delete each section')
 def then_i_should_see_an_option_to_delete_each_section(step):
-    world.page.is_element_present_by_id('id-delete-section-%s' % world.section_1.id)
-    world.page.is_element_present_by_id('id-delete-section-%s' % world.section_2.id)
+    assert world.page.is_element_present_by_id('id-delete-section-%s' % world.section_1.id)
+    assert world.page.is_element_present_by_id('id-delete-section-%s' % world.section_2.id)
 
 @step(u'Then I should not see an option to delete that section')
 def then_i_should_see_an_option_to_delete_each_section(step):
