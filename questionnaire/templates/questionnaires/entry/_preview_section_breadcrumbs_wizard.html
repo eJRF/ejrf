@@ -1,6 +1,6 @@
 <div class="nav-wizard wizard">
     <ul class="nav nav-pills nav-stacked" id="section_tabs">
-        {% for section_ in ordered_sections %}
+        {% for section_ in questionnaire.ordered_sections %}
             <li class="{% if section.id == section_.id %}active{% endif %}">
                 <a href="#" data-href="{% url 'questionnaire_entry_page' questionnaire.id section_.id %}?country={{ country.id }}&version={{ version }}&preview=1" class="preview-section-modal-tab-link">
                     {% if section_.region %}{{ section_.region.name }} - {% endif %}{{ section_.name }}
@@ -9,10 +9,12 @@
         {% endfor %}
 
         <li>
-            <a href="#" data-href="{% url 'upload_document' questionnaire.id %}" class="attachement preview-section-modal-tab-link">
+        {% if questionnaire %}
+            <a href="#" id="id_preview-attachments" data-href="{% url 'upload_document' questionnaire.id %}?country={{ country.id }}" class="attachement preview-section-modal-tab-link">
                 ATTACHMENTS
                 {% if documents %}<span class="badge"><span class="cyan bold">{{ documents.count }}</span></span>{% endif %}
             </a>
+        {% endif %}
         </li>
     </ul>
 </div>

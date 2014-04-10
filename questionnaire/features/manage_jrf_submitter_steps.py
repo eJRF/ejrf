@@ -42,8 +42,11 @@ def then_that_questionnaire_should_open_in_group1(step, mode):
     world.page.validate_questionnaire_opens_in_correct_mode(world.questionnaire, mode)
 
 
-@step(u'And uploading attachments should be enabled')
-def and_uploading_attachments_should_be_group1(step):
-    world.page.click_by_id('id_attachments')
+@step(u'And uploading attachments should be enabled for "([^"]*)"')
+def and_uploading_attachments_should_be_enabled_for_group1(step, type):
+    if 'submitted' == type:
+        world.page.click_by_id('id_preview-attachments')
+    else:
+        world.page.click_by_id('id_attachments')
     world.page.is_text_present('Attachments List')
     world.page.is_text_present('Upload Support Document')

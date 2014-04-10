@@ -33,7 +33,7 @@ class Entry(AdvancedMultiplePermissionsRequiredMixin, FormView):
         questionnaire = Questionnaire.objects.get(id=self.kwargs['questionnaire_id'])
         section = Section.objects.get(id=self.kwargs['section_id'])
         country = request.GET.get('country', None) or self.request.user.user_profile.country
-        user_questionnaire_service = UserQuestionnaireService(country, questionnaire,request.GET.get("version"))
+        user_questionnaire_service = UserQuestionnaireService(country, questionnaire, request.GET.get("version"))
         initial = {'status': 'Draft', 'country': country,
                    'version': user_questionnaire_service.GET_version, 'questionnaire': questionnaire}
         required_answers = 'show' in request.GET

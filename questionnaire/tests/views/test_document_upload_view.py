@@ -42,6 +42,7 @@ class UploadSupportDocumentTest(BaseTest):
         self.assertIsInstance(response.context['upload_form'], SupportDocumentUploadForm)
         self.assertIsNotNone(response.context['preview'])
         self.assertEqual(reverse("new_section_page", args=(self.questionnaire.id,)), response.context['new_section_action'])
+        self.assertEqual(reverse('upload_document', args=(self.questionnaire.id,)), response.context['action'])
 
     def test_upload_view_has_all_document_for_questionnaire(self):
         document_in = SupportDocument.objects.create(path=File(self.document), country=self.uganda,

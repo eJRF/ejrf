@@ -65,25 +65,34 @@
         <div class="col-md-6">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">Submitted</h3>
+                    <h3 class="panel-title">
+                        Submitted
+                    </h3>
                 </div>
                 <div class="panel-body">
                     <ul class="list-group">
                         {% if submitted %}
-                            {% for questionnaire_, versions in submitted.items %}
+                            {% for questionnaire, versions in submitted.items %}
                                 <li class="list-group-item{% if  forloop.counter > 3 %} hide{% endif %}">
 
-                                    {{ questionnaire_.name }} {{ questionnaire_.year }}
+                                    {{ questionnaire.name }} {{ questionnaire.year }}
+                                    {% if questionnaire not in drafts %}
+                                    <a href="{% url 'questionnaire_entry_page' questionnaire.id questionnaire.sections.all.0.id %}"
+                                           class="btn btn-xs btn-default pull-right" id="id-edit"><span
+                                        class="glyphicon glyphicon-pencil"></span> Edit</a>
+                                    {% endif %}
+
                                     <ul>
                                         {% for version in versions %}
                                             <li>
-                                                {% with questionnaire_.sections.all|first as first_section %}
-                                                    <a id="view-version-{{ questionnaire_.id }}"
-                                                       href="{% url 'questionnaire_entry_page' questionnaire_.id first_section.id %}?preview=1&version={{ version }}">View
+                                                {% with questionnaire.sections.all as ordered_sections %}
+                                                    <a  data-href="{% url 'questionnaire_entry_page' questionnaire.id ordered_sections.0.id %}?preview=1" class="ds-preview-btn" id="view-version-{{ questionnaire.id }}">
+                                                        <i class="glyphicon glyphicon-eye-open"></i>
                                                         Version {{ version }}
                                                     </a>
                                                 {% endwith %}
                                             </li>
+                                            {% include 'questionnaires/entry/preview_modal.html' with country=user.user_profile.country%}
                                         {% endfor %}
                                     </ul>
                                 </li>

@@ -18,13 +18,13 @@
     <div class="form-table">
         {% include 'questionnaires/entry/section_breadcrumps_wizzard.html' %}
 
-        <div class="form-content">
+        <div class="form-content" id="section-content">
             <div class="upload_form_content">
                 {% if perms.auth.can_submit_responses  %}
                     {% include 'questionnaires/entry/_upload_form.html' %}
                 {% endif %}
             </div>
-            <div id="section-content">
+            <div>
                 {% include 'questionnaires/entry/_attachment_list.html' with show_delete_icon=True %}
             </div>
         </div>

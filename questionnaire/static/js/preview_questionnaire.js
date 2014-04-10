@@ -9,12 +9,11 @@ $(function(){
     });
 
     $('.preview-btn-url').on('click', function(){
-        var url = $(this).attr('data-href');
+        var url = $(this).attr('data-href'),
             modalId = $('#preview_modal');
         showLoadingMessage();
         modalId.modal('show');
         modalId.removeData('bs.modal');
-
         if (form_has_changed){
             $.post( location.pathname, $( "#questionnaire_entry" ).serialize(), function(data1){
                 fillModalWithAjaxContent(url);
@@ -23,6 +22,17 @@ $(function(){
             fillModalWithAjaxContent(url);
         }
     });
+
+    $('.ds-preview-btn').on('click', function(){
+        var url = $(this).attr('data-href'),
+            modalId = $('#preview_modal');
+                showLoadingMessage();
+        modalId.modal('show');
+        modalId.removeData('bs.modal');
+        fillModalWithAjaxContent(url);
+        removeButtons(modalId, ['#cancel_button','.alert', '#submit_button']);
+    });
+
     disable_modal_input_fields(editable);
 
     $('.preview-section-modal-tab-link').on('click', function(){
@@ -34,6 +44,7 @@ $(function(){
         $ul.find('.active').removeClass('active');
         $li.addClass('active');
         fillModalWithAjaxContent(url);
+        enableFields();
     });
 
     $('#edit_questionnaire_link').on('click', function(){
@@ -49,8 +60,15 @@ $(function(){
             $( "#assign-question-ajax-content-"+subsection_id ).html(content);
         });
     });
-
 });
+
+function enableFields() {
+    var $body = $('body');
+    $body.find('#id_path').prop('disabled', false);
+    $body.find('#cancel_button').prop('disabled', false);
+    $body.find('#upload-btn').prop('disabled', false);
+}
+
 
 function showLoadingMessage(){
     $("#ajax-section-content").html("<img src=\"/static/img/spinner.gif\"> Loading, please wait...");
@@ -62,6 +80,7 @@ function fillModalWithAjaxContent(questionnaire_preview_url){
         var content =  $holder.find("#section-content").html()
         $( "#ajax-section-content" ).html(content);
         disable_modal_input_fields(!editable);
+        enableFields();
     });
     form_has_changed = false;
 };
