@@ -9,6 +9,7 @@ from questionnaire.forms.sections import SectionForm
 from questionnaire.forms.support_documents import SupportDocumentUploadForm
 from questionnaire.models import SupportDocument, Questionnaire, Country
 from questionnaire.services.users import UserQuestionnaireService
+from questionnaire.utils.view_utils import get_country
 
 
 class UploadDocument(CreateView):
@@ -20,18 +21,18 @@ class UploadDocument(CreateView):
     def get(self, request, *args, **kwargs):
         self.questionnaire = Questionnaire.objects.get(id=kwargs.get('questionnaire_id'))
         self.success_url = reverse('upload_document', args=(self.questionnaire.id, ))
-        self.user_questionnaire_service = UserQuestionnaireService(self.country(), self.questionnaire)
+        self.user_questionnaire_service = UserQuestionnaireService(get_country(self.request), self.questionnaire)
         return super(UploadDocument, self).get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         self.questionnaire = Questionnaire.objects.get(id=kwargs.get('questionnaire_id'))
         self.success_url = reverse('upload_document', args=(self.questionnaire.id, ))
-        self.user_questionnaire_service = UserQuestionnaireService(self.country(), self.questionnaire)
+        self.user_questionnaire_service = UserQuestionnaireService(get_country(self.request), self.questionnaire)
         return super(UploadDocument, self).post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super(UploadDocument, self).get_context_data(**kwargs)
-        upload_data_initial = {'questionnaire': self.questionnaire, 'country': self.country()}
+        upload_data_initial = {'questionnaire': self.questionnaire, 'country': get_country(self.request)}
         attachments = self.user_questionnaire_service.attachments()
         context.update({'upload_form': self.form_class(initial=upload_data_initial),
                         'button_label': 'Upload', 'id': 'id-upload-form', 'questionnaire': self.questionnaire,
@@ -52,12 +53,6 @@ class UploadDocument(CreateView):
                         'button_label': 'Upload', 'id': 'id-upload-form', 'questionnaire': self.questionnaire,
                         'documents': self.user_questionnaire_service.attachments(),
                         'ordered_sections': self.questionnaire.sections.order_by('order')})
-
-    def country(self):
-        country_id = self.request.GET.get('country', None)
-        country = Country.objects.filter(id=country_id)
-        country = country[0] if country.exists() else None
-        return country or self.request.user.user_profile.country
 
 
 class DownloadDocument(View):

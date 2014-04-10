@@ -15,6 +15,7 @@ from questionnaire.services.questionnaire_entry_form_service import Questionnair
 from questionnaire.models import Questionnaire, Section, QuestionGroup, Answer, AnswerGroup, Country
 from questionnaire.forms.answers import NumericalAnswerForm, TextAnswerForm, DateAnswerForm, MultiChoiceAnswerForm
 from questionnaire.services.users import UserQuestionnaireService
+from questionnaire.utils.view_utils import get_country
 
 
 ANSWER_FORM = {'Number': NumericalAnswerForm,
@@ -32,7 +33,7 @@ class Entry(AdvancedMultiplePermissionsRequiredMixin, FormView):
     def get(self, request, *args, **kwargs):
         questionnaire = Questionnaire.objects.get(id=self.kwargs['questionnaire_id'])
         section = Section.objects.get(id=self.kwargs['section_id'])
-        country = request.GET.get('country', None) or self.request.user.user_profile.country
+        country = get_country(self.request)
         user_questionnaire_service = UserQuestionnaireService(country, questionnaire, request.GET.get("version"))
         initial = {'status': 'Draft', 'country': country,
                    'version': user_questionnaire_service.GET_version, 'questionnaire': questionnaire}
