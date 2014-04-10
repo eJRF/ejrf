@@ -77,3 +77,26 @@ Feature: Questions feature
         When I reorder the questions within that modal
         And I save my changes
         Then I should see the questions with their order and numbering updated
+
+      Scenario: Global admin searches for questions in question bank
+        Given I am logged in as a global admin
+        And I have two themes
+        And I have three questions with two of the questions grouped under one theme and one question under another theme
+        When I visit the question listing page
+        Then I should see the questions listed
+        And I should see the filter text fields for both theme and answer type
+        And I should see a clickable filter link
+        When I select default theme and answer type from the filter fields
+        And I click on the filter link
+        Then I should see the default questions displayed
+        When I select a theme from theme filter field
+        And I click on the filter link
+        Then I should see the questions displayed filtered by the theme selected
+        When I select an answer type from answer filter field
+        And I click on the filter link
+        Then I should see questions displayed filtered by answer type
+        When I select a theme from theme and answer type
+        And I click on the filter link
+        Then I should see questions displayed filtered by both the theme and answer type selected
+
+

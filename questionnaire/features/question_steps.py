@@ -221,11 +221,11 @@ def i_should_see_the_earlier_question_display_label(step):
 
 @step(u'And I have three questions with two of the questions grouped under one theme and one question under another theme')
 def and_i_have_three_questions_with_two_of_the_questions_grouped_under_one_theme_and_one_question_under_another_theme(step):
-    world.question1 = Question.objects.create(text='First of three questions', export_label='Question 1',
+    world.question1 = Question.objects.create(text='First of three questions', export_label='First of three questions',
                                               UID='00026', answer_type='Text', theme=world.theme1)
-    world.question2 = Question.objects.create(text='Second of the three questions', export_label='Question 2', UID='00028',
-                                              answer_type='Text', theme=world.theme1)
-    world.question3 = Question.objects.create(text='Third of the three questions', export_label='Question 3', UID='00029',
+    world.question2 = Question.objects.create(text='Second of the three questions', export_label='Second of the three questions', UID='00028',
+                                              answer_type='Number', theme=world.theme1)
+    world.question3 = Question.objects.create(text='Third of the three questions', export_label='Third of the three questions', UID='00029',
                                               answer_type='Text', theme=world.theme2)
 @step(u'Then I should see the questions listed')
 def then_i_should_see_the_questions_listed(step):
@@ -306,3 +306,57 @@ def then_i_should_see_the_questions_with_their_order_and_numbering_updated(step)
     world.page.validate_updated_numbering(world.question3, '1.1.')
     world.page.validate_updated_numbering(world.question1, '1.2.')
     world.page.validate_updated_numbering(world.question2, '1.3.')
+
+@step(u'And I should see the filter text fields for both theme and answer type')
+def and_i_should_see_the_search_text_field(step):
+    assert world.page.is_element_present_by_id("id_theme")
+    assert world.page.is_element_present_by_id("id_answer_type")
+
+
+@step(u'Then I should see the questions displayed filtered by the theme selected')
+def then_i_should_see_the_questions_displayed(step):
+     world.page.is_text_present(world.question1.export_label)
+     world.page.is_text_present(world.question2.export_label)
+
+@step(u'And I should see a clickable filter link')
+def and_i_should_see_a_clickable_filter_link(step):
+    assert world.page.is_element_present_by_id("get-list-btn")
+
+@step(u'When I select default theme and answer type from the filter fields')
+def when_i_select_default_theme_from_the_theme_filter_field(step):
+    world.page.select('theme', '')
+    world.page.select('answer_type', '')
+
+@step(u'And I click on the filter link')
+def and_i_click_on_the_filter_link(step):
+    world.page.click_by_id('get-list-btn')
+
+@step(u'When I select a theme from theme filter field')
+def when_i_select_a_theme_from_theme_filter_field(step):
+    world.page.select('theme', 1)
+    world.page.select('answer_type', '')
+
+@step(u'When I select an answer type from answer filter field')
+def when_i_select_an_answer_type_from_answer_filter_field(step):
+    world.page.select('answer_type', 'Text')
+    world.page.select('theme', '')
+
+@step(u'Then I should see questions displayed filtered by answer type')
+def then_i_should_see_questions_displayed_filtered_by_answer_type(step):
+    world.page.is_text_present(world.question1.export_label)
+    world.page.is_text_present(world.question3.export_label)
+
+@step(u'When I select a theme from theme and answer type')
+def when_i_select_a_theme_from_theme_and_answer_type(step):
+    world.page.select('answer_type', 'Number')
+    world.page.select('theme', '1')
+
+@step(u'Then I should see questions displayed filtered by both the theme and answer type selected')
+def then_i_should_see_questions_displayed_filtered_by_both_the_theme_and_answer_type_selected(step):
+      world.page.is_text_present(world.question2.export_label)
+
+@step(u'Then I should see the default questions displayed')
+def then_i_should_see_the_default_questions_displayed(step):
+    world.page.is_text_present(world.question1.export_label)
+    world.page.is_text_present(world.question2.export_label)
+    world.page.is_text_present(world.question3.export_label)
