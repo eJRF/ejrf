@@ -40,12 +40,14 @@ Feature: User management
 
     Scenario: Create a global admin user
         Given I have a global admin user
+        And And I have one region, in an organization
         And I have 100 other users
         And I logged in the user
         And I visit the user listing page
         And I click an new user button
         And I fill in the user information
         And I select global admin role
+        When I select the organization
         And I click the create button
         Then I should see that the user was successfully created
         And I should see the user listed on the listing page

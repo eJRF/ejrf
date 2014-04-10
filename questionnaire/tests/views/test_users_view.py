@@ -29,7 +29,9 @@ class UsersViewTest(BaseTest):
             'password1': 'kant',
             'password2': 'kant',
             'email': 'raj@ni.kant',
-            'groups': self.global_admin.id}
+            'groups': self.global_admin.id,
+            'organization': self.organization.id,
+            }
 
     def test_get_login(self):
         response = self.client.get('/accounts/login/')
@@ -86,10 +88,10 @@ class UsersViewTest(BaseTest):
         user_profile = UserProfile.objects.create(user=saved_user, region=self.afro, country=self.uganda,
                                                   organization=self.organization)
         self.global_admin.user_set.add(saved_user)
-        self.form_data = {
+        form_data = {
             'username': 'user1tom',
             'email': 'raj@ni.kant',}
-        response = self.client.post('/users/%d/edit/' % saved_user.pk, data=self.form_data)
+        response = self.client.post('/users/%d/edit/' % saved_user.pk, data=form_data)
         self.assertRedirects(response, expected_url='/users/')
 
         user_profile = UserProfile.objects.get(user=saved_user)
@@ -100,9 +102,9 @@ class UsersViewTest(BaseTest):
         self.assertEqual(self.afro, user_profile.region)
         self.assertIn(self.global_admin, saved_user.groups.all())
         self.assertEqual(1, saved_user.groups.all().count())
-        self.failUnless(User.objects.filter(**self.form_data))
+        self.failUnless(User.objects.filter(**form_data))
         self.failIf(User.objects.filter(username='user1', email='emily@gmail.com'))
-        message = "%s was successfully updated" % self.form_data['username']
+        message = "%s was successfully updated" % form_data['username']
         self.assertIn(message, response.cookies['messages'].value)
 
     def test_post_update_with_errors(self):
@@ -110,13 +112,13 @@ class UsersViewTest(BaseTest):
         user_profile = UserProfile.objects.create(user=saved_user, region=self.afro, country=self.uganda,
                                                   organization=self.organization)
         self.global_admin.user_set.add(saved_user)
-        self.form_data = {
+        form_data = {
             'username': 'user1tom hjdhdh',
             'email': 'raj@ni.kant',}
-        response = self.client.post('/users/%d/edit/' % saved_user.pk, data=self.form_data)
+        response = self.client.post('/users/%d/edit/' % saved_user.pk, data=form_data)
         self.assertEqual(200, response.status_code)
         self.failUnless(User.objects.filter(username='user1', email='emily@gmail.com'))
-        self.failIf(User.objects.filter(**self.form_data))
+        self.failIf(User.objects.filter(**form_data))
         message = "User was not updated, see errors below"
         self.assertIn(message, response.content)
         self.assertIsInstance(response.context['form'], EditUserProfileForm)
@@ -128,12 +130,12 @@ class UsersViewTest(BaseTest):
         user_profile = UserProfile.objects.create(user=saved_user, region=self.afro, country=self.uganda,
                                                   organization=self.organization)
         self.global_admin.user_set.add(saved_user)
-        self.form_data = {
+        form_data = {
             'username': 'user1tom'}
-        response = self.client.post('/users/%d/edit/' % saved_user.pk, data=self.form_data)
+        response = self.client.post('/users/%d/edit/' % saved_user.pk, data=form_data)
         self.assertEqual(200, response.status_code)
         self.failUnless(User.objects.filter(username='user1', email='testuser@unicef.org'))
-        self.failIf(User.objects.filter(**self.form_data))
+        self.failIf(User.objects.filter(**form_data))
         message = "User was not updated, see errors below"
         self.assertIn(message, response.content)
         self.assertIsInstance(response.context['form'], EditUserProfileForm)

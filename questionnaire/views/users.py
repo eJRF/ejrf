@@ -67,10 +67,15 @@ class CreateUser(PermissionRequiredMixin, CreateView):
         messages.success(self.request, "%s created successfully." % form.cleaned_data['groups'])
         return super(CreateUser, self).form_valid(form)
 
+    def form_invalid(self, form):
+        return super(CreateUser, self).form_invalid(form)
+
+
     def get_context_data(self, **kwargs):
         context = super(CreateUser, self).get_context_data(**kwargs)
         context_vars = {'btn_label': "CREATE",
                         'title': "Create new user",
+                        'id':'create-user-form',
                         'organizations': Organization.objects.all(),
                         'regions': Region.objects.all(),
                         'countries': Country.objects.all(),

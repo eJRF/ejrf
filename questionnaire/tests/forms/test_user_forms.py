@@ -86,7 +86,9 @@ class UserProfileFormTest(BaseTest):
     def test_groups_required(self):
         form_data = self.form_data.copy()
         form_data['groups'] = ''
+        print form_data
         user_form = UserProfileForm(form_data)
+        print user_form
         self.assertFalse(user_form.is_valid())
         message = "This field is required."
         self.assertEquals(user_form.errors['groups'], [message])

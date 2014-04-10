@@ -6,14 +6,13 @@ from questionnaire.models import Region, Country, UserProfile, Organization
 
 
 class UserProfileForm(UserCreationForm):
-    region = forms.ModelChoiceField(queryset=Region.objects.all(), empty_label=None, required=False,
-                                    widget=forms.HiddenInput())
-    organization = forms.ModelChoiceField(queryset=Organization.objects.all(), empty_label=None, required=False,
-                                          widget=forms.HiddenInput())
-    country = forms.ModelChoiceField(queryset=Country.objects.all(), empty_label=None, required=False,
-                                     widget=forms.HiddenInput())
     groups = forms.ModelChoiceField(queryset=Group.objects.all(), empty_label=None, required=True,
                                     widget=forms.RadioSelect(attrs={'class': 'radio-roles'}), label="Roles")
+    organization = forms.ModelChoiceField(queryset=Organization.objects.all(), empty_label="Choose an Organization", required=False)
+    region = forms.ModelChoiceField(queryset=Region.objects.all(), empty_label="Choose a Region", required=False)
+
+    country = forms.ModelChoiceField(queryset=Country.objects.all(), empty_label="Choose a County", required=False,
+                                     )
 
     def __init__(self, *args, **kwargs):
         super(UserProfileForm, self).__init__(*args, **kwargs)
@@ -36,6 +35,38 @@ class UserProfileForm(UserCreationForm):
             user_profile.organization = self.cleaned_data['organization']
             user_profile.save()
         return user
+
+    def _check_regional_admin(self, message):
+        organization = self.cleaned_data.get('organization', None)
+        region = self.cleaned_data.get('region', None)
+        if not organization:
+            self._errors['organization'] = self.error_class([message])
+        if not region:
+            self._errors['region'] = self.error_class([message])
+
+    def _check_global_admin(self, message):
+        organization = self.cleaned_data.get('organization', None)
+        if not organization:
+            self._errors['organization'] = self.error_class([message])
+
+    def _check_country_admin(self, message):
+        country = self.cleaned_data.get('country', None)
+        if not country:
+            self._errors['country'] = self.error_class([message])
+
+    def clean(self):
+        group = self.cleaned_data.get('groups', None)
+        message = "This field is required."
+        if not group:
+            self._errors['groups'] = self.error_class([message])
+        elif group.name == 'Regional Admin':
+            self._check_regional_admin(message)
+        elif group.name == 'Global Admin':
+            self._check_global_admin(message)
+        else:
+            self._check_country_admin(message)
+        return super(UserProfileForm, self).clean()
+
 
     def clean_email(self):
         email = self.cleaned_data['email']
