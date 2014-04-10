@@ -39,11 +39,15 @@ jQuery(function($){
 });
 
 function assignOptionNumbers($form){
-        $form.find("span.number").each(function(i, element){
+    assignOptionNumbersUsing($form, "span.number");
+    assignOptionNumbersUsing($form, "span.mid-table-number");
+    }
+
+function assignOptionNumbersUsing($form, number_selector){
+        $form.find(number_selector).each(function(i, element){
             $(element).text(++i);
         });
     }
-
 function removeOptions(){
         $("div.input-group").each(function(){
            $(this).remove();

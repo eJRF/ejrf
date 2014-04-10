@@ -351,7 +351,7 @@ div.pagination{
     min-width: 1000px;
 }
 .modal-medium{
-    min-width: 650px;
+    min-width: 655px;
 }
 li.more-toggle{
     text-align: center;
@@ -476,4 +476,18 @@ tr.dragging, tr.dragging * {
 
 select.hide{
     display: none !important;
+}
+
+.mid-row-add-hybrid-grid{
+    border: #0099FF 1px solid;
+    padding-left: 5px;
+    padding-right: 0px;
+    margin-bottom: 10px;
+}
+
+.mid-row-add-hybrid-grid legend{
+    padding: 5px;
+    border: 0;
+    font-size: 14px;
+    width: auto;
 }

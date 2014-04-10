@@ -30,7 +30,7 @@ jQuery(function($){
             if (element.attr("name") == "columns") {
                 $("select[name='columns']:has(option[value='']:selected)").each(function(){
                     var $error_clone = error.clone(true);
-                    $error_clone.insertAfter($(this).next().next());
+                    $error_clone.insertAfter($(this).siblings(':last'));
                 });
             } else {
               error.insertAfter(element);
@@ -63,16 +63,33 @@ jQuery(function($){
 
     $('body').on('change', '#id_type', function(){
         var $el = $(this),
-            $parent = $el.parents('.create-grid-form'),
-            $primary_question = $parent.find('#id_primary_question'),
+            $parent_form = $el.parents('.create-grid-form'),
+            $primary_question = $parent_form.find('#id_primary_question'),
             all_primary_questions = $('#all-primary-template').html(),
-            $all_primary_questions = $(all_primary_questions);
-        if ($el.val()!='allow_multiples'){
-            $all_primary_questions.find('option[multichoice!="true"]').each(function(){
-                $(this).remove();
-            });
+            $all_primary_questions = $(all_primary_questions),
+            $first_columns = $parent_form.find('#columns');
+        if ($el.val() === 'display_all'){
+            removeNonMultiChoiceOptions($all_primary_questions);
+            addTemplate('#addmore-displayall-template', $first_columns);
+
+        }
+        else if ($el.val() ==='hybrid'){
+            removeNonMultiChoiceOptions($all_primary_questions);
+            addTemplate('#hybrid-template', $first_columns);
+        }
+        else if ($el.val() ==='allow_multiples'){
+            addTemplate('#addmore-displayall-template', $first_columns);
+        }
+        else{
+            $first_columns.html('');
         }
         $primary_question.html($all_primary_questions.html());
+
+    });
+
+    $('body').on('change', '.mid-row-add-hybrid-grid select[name=columns]', function(){
+        var $el = $(this);
+        $el.next('input[type=hidden][name=subgroup]').val($el.val());
     });
 
 
@@ -84,4 +101,14 @@ function removeSelectedOptions(newElement, $columns) {
         var val = $(this).val();
         newElement.find('option[value=' + val + ']').remove()
     });
+}
+
+function removeNonMultiChoiceOptions($all_primary_questions){
+    $all_primary_questions.find('option[multichoice!="true"]').each(function(){
+        $(this).remove();
+    });
+}
+function addTemplate(template_selector, $first_columns) {
+    var template = $(template_selector).html();
+    $first_columns.html(template);
 }

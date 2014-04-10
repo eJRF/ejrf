@@ -16,25 +16,16 @@
                         <a href="javascript:;" class="input-group-addon btn btn-sm  btn-primary remove-column"><i class="glyphicon glyphicon-remove"></i></a>
                     </p>
                 {% endfor %}
-            {% else %}
-                <p class="input-group">
-                    <label class="column-label">Column <span class="number"> 1 </span></label>
-                    <select  name="columns">
-                        <option value=''>Choose One</option>
-                        {% for question in non_primary_questions %}
-                            <option value="{{ question.id }}">{{ question.text }}</option>
-                        {% endfor %}
-                    </select>
-                    <a href="javascript:;" class="input-group-addon btn btn-sm btn-primary add-column"><i class="glyphicon glyphicon-plus"></i></a>
-                    <a href="javascript:;" class="input-group-addon btn btn-sm  btn-primary remove-column"><i class="glyphicon glyphicon-remove"></i></a>
-                </p>
             {% endif %}
         </div>
 
-    <script type="text/template" id="all-primary-template">
-        {{ grid_form.primary_question }}
-    </script>
-
+        <script type="text/template" id="all-primary-template">
+            {{ grid_form.primary_question }}
+        </script>
+        <script type="text/template" id="addmore-displayall-template">
+            {% include 'questionnaires/grid/_single_column_with_add_remove_button.hmtl' with column_text="Column" %}
+        </script>
+        {%  include 'questionnaires/grid/_hybrid_templates.html' %}
     </div>
 
 {% endblock %}

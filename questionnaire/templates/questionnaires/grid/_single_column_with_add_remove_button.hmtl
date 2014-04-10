@@ -1,0 +1,11 @@
+<p class="input-group">
+    <label class="column-label"> {{ column_text }} <span class="number"> 1 </span></label>
+    <select  name="columns">
+        <option value=''>Choose One</option>
+        {% for question in non_primary_questions %}
+            <option value="{{ question.id }}">{{ question.text }}</option>
+        {% endfor %}
+    </select>
+    <a href="javascript:;" class="input-group-addon btn btn-sm btn-primary add-column"><i class="glyphicon glyphicon-plus"></i></a>
+    <a href="javascript:;" class="input-group-addon btn btn-sm  btn-primary remove-column"><i class="glyphicon glyphicon-remove"></i></a>
+</p>
