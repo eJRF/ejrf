@@ -73,10 +73,11 @@ class ExportToTextViewTest(BaseTest):
         self.assertEquals(response.get('Content-Type'), 'text/csv')
         self.assertEquals(response.get('Content-Disposition'), 'attachment; filename="%s"' % file_name)
 
-        question_text1 = "%s | %s | %s" % (self.section_1.title, self.sub_section.title, self.question1.text)
-        question_text_2 = "%s | %s | %s" % (self.section_1.title, self.sub_section.title, self.question2.text)
-        answer_id_1 = "C_%s_%s_1" % (self.question1.UID, self.question1.UID)
-        answer_id_2 = "C_%s_%s_%d" % (self.question1.UID, self.question2.UID, 1)
+        question_text1 = "%s | %s" % (self.section_1.name,  self.question1.text)
+        question_text_2 = "%s | %s" % (self.section_1.name, self.question2.text)
+
+        answer_id_1 = "C_%s_%s" % (self.question1.UID, self.question1.UID)
+        answer_id_2 = "C_%s_%s" % (self.question1.UID, self.question2.UID)
         headings = "ISO\tCountry\tYear\tField code\tQuestion text\tValue"
         row1 = "UGX\t%s\t2013\t%s\t%s\t%s" % (self.country.name, answer_id_1.encode('base64').strip(), question_text1, '23.00')
         row2 = "UGX\t%s\t2013\t%s\t%s\t%s" % (self.country.name, answer_id_2.encode('base64').strip(), question_text_2, '1.00')
@@ -91,10 +92,10 @@ class ExportToTextViewTest(BaseTest):
         self.assertEquals(response.get('Content-Type'), 'text/csv')
         self.assertEquals(response.get('Content-Disposition'), 'attachment; filename="%s"' % file_name)
 
-        question_text1 = "%s | %s | %s" % (self.section_1.title, self.sub_section.title, self.question1.text)
-        question_text_2 = "%s | %s | %s" % (self.section_1.title, self.sub_section.title, self.question2.text)
-        answer_id_1 = "C_%s_%s_1" % (self.question1.UID, self.question1.UID)
-        answer_id_2 = "C_%s_%s_%d" % (self.question1.UID, self.question2.UID, 1)
+        question_text1 = "%s | %s" % (self.section_1.name,  self.question1.text)
+        question_text_2 = "%s | %s" % (self.section_1.name, self.question2.text)
+        answer_id_1 = "C_%s_%s" % (self.question1.UID, self.question1.UID)
+        answer_id_2 = "C_%s_%s" % (self.question1.UID, self.question2.UID)
         headings = "ISO\tCountry\tYear\tField code\tQuestion text\tValue"
         row1 = "UGX\t%s\t2013\t%s\t%s\t%s" % (self.country.name, answer_id_1.encode('base64').strip(), question_text1, '23.00')
         row2 = "UGX\t%s\t2013\t%s\t%s\t%s" % (self.country.name, answer_id_2.encode('base64').strip(), question_text_2, '1.00')
@@ -114,8 +115,7 @@ class SpecificExportViewTest(BaseTest):
                                                       questionnaire=self.questionnaire, name="Reported Cases")
 
         self.sub_section = SubSection.objects.create(title="Reported cases for the year 2013", order=1, section=self.section_1)
-        self.primary_question = Question.objects.create(text='Disease', UID='C00003', answer_type='MultiChoice',
-                                                        is_primary=True)
+        self.primary_question = Question.objects.create(text='Disease', UID='C00003', answer_type='MultiChoice')
         self.option = QuestionOption.objects.create(text="Measles", question=self.primary_question, UID="QO1")
         self.option2 = QuestionOption.objects.create(text="TB", question=self.primary_question, UID="QO2")
 
@@ -169,12 +169,12 @@ class SpecificExportViewTest(BaseTest):
         self.assertEquals(response.get('Content-Type'), 'text/csv')
         self.assertEquals(response.get('Content-Disposition'), 'attachment; filename="%s"' % file_name)
 
-        question_text = "%s | %s | %s" % (self.section_1.title, self.sub_section.title, self.primary_question.text)
-        question_text1 = "%s | %s | %s" % (self.section_1.title, self.sub_section.title, self.question1.text)
-        question_text_2 = "%s | %s | %s" % (self.section_1.title, self.sub_section.title, self.question2.text)
+        question_text = "%s | %s" % (self.section_1.name, self.primary_question.text)
+        question_text1 = "%s | %s" % (self.section_1.name, self.question1.text)
+        question_text_2 = "%s | %s" % (self.section_1.name, self.question2.text)
         answer_id = "C_%s_%s_%s" % (self.primary_question.UID, self.primary_question.UID, self.option2.UID)
-        answer_id_1 = "C_%s_%s_2" % (self.primary_question.UID, self.question1.UID)
-        answer_id_2 = "C_%s_%s_2" % (self.primary_question.UID, self.question2.UID)
+        answer_id_1 = "C_%s_%s" % (self.primary_question.UID, self.question1.UID)
+        answer_id_2 = "C_%s_%s" % (self.primary_question.UID, self.question2.UID)
 
         expected_data = [self.headings,
                          "%s\t%s\t2013\t%s\t%s\t%s" % (ghana.code, ghana.name, answer_id.encode('base64').strip(), question_text, self.option2.text),
