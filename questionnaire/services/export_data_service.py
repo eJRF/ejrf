@@ -60,5 +60,5 @@ class ExportToTextService:
         answer_id = "%s_%s_%s%s" % (question_prefix, primary_question.UID, question.UID, primary_answer_id)
         question_text_format = "%s | %s%s" % (section.name, question.text, primary_answer_text)
         answer_format = (answer.country.code, answer.country.name, answer.questionnaire.year, answer_id.encode('base64').strip(),
-                         question_text_format, str(answer.response))
+                         question_text_format, str(answer.format_response()))
         return "%s\t%s\t%s\t%s\t%s\t%s" % answer_format

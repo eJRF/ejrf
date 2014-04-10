@@ -79,8 +79,8 @@ class ExportToTextViewTest(BaseTest):
         answer_id_1 = "C_%s_%s" % (self.question1.UID, self.question1.UID)
         answer_id_2 = "C_%s_%s" % (self.question1.UID, self.question2.UID)
         headings = "ISO\tCountry\tYear\tField code\tQuestion text\tValue"
-        row1 = "UGX\t%s\t2013\t%s\t%s\t%s" % (self.country.name, answer_id_1.encode('base64').strip(), question_text1, '23.00')
-        row2 = "UGX\t%s\t2013\t%s\t%s\t%s" % (self.country.name, answer_id_2.encode('base64').strip(), question_text_2, '1.00')
+        row1 = "UGX\t%s\t2013\t%s\t%s\t%s" % (self.country.name, answer_id_1.encode('base64').strip(), question_text1, '23')
+        row2 = "UGX\t%s\t2013\t%s\t%s\t%s" % (self.country.name, answer_id_2.encode('base64').strip(), question_text_2, '1')
         contents = "%s\r\n%s\r\n%s" % ("".join(headings), "".join(row1), "".join(row2))
         self.assertEqual(contents, response.content)
 
@@ -97,8 +97,8 @@ class ExportToTextViewTest(BaseTest):
         answer_id_1 = "C_%s_%s" % (self.question1.UID, self.question1.UID)
         answer_id_2 = "C_%s_%s" % (self.question1.UID, self.question2.UID)
         headings = "ISO\tCountry\tYear\tField code\tQuestion text\tValue"
-        row1 = "UGX\t%s\t2013\t%s\t%s\t%s" % (self.country.name, answer_id_1.encode('base64').strip(), question_text1, '23.00')
-        row2 = "UGX\t%s\t2013\t%s\t%s\t%s" % (self.country.name, answer_id_2.encode('base64').strip(), question_text_2, '1.00')
+        row1 = "UGX\t%s\t2013\t%s\t%s\t%s" % (self.country.name, answer_id_1.encode('base64').strip(), question_text1, '23')
+        row2 = "UGX\t%s\t2013\t%s\t%s\t%s" % (self.country.name, answer_id_2.encode('base64').strip(), question_text_2, '1')
         contents = "%s\r\n%s\r\n%s" % ("".join(headings), "".join(row1), "".join(row2))
         self.assertEqual(contents, response.content)
 
@@ -178,8 +178,8 @@ class SpecificExportViewTest(BaseTest):
 
         expected_data = [self.headings,
                          "%s\t%s\t2013\t%s\t%s\t%s" % (ghana.code, ghana.name, answer_id.encode('base64').strip(), question_text, self.option2.text),
-                         "%s\t%s\t2013\t%s\t%s\t%s" % (ghana.code, ghana.name, answer_id_1.encode('base64').strip(), question_text1, '4.00'),
-                         "%s\t%s\t2013\t%s\t%s\t%s" % (ghana.code, ghana.name, answer_id_2.encode('base64').strip(), question_text_2, '55.00')]
+                         "%s\t%s\t2013\t%s\t%s\t%s" % (ghana.code, ghana.name, answer_id_1.encode('base64').strip(), question_text1, '4'),
+                         "%s\t%s\t2013\t%s\t%s\t%s" % (ghana.code, ghana.name, answer_id_2.encode('base64').strip(), question_text_2, '55')]
 
         contents = "%s\r\n%s\r\n%s\r\n%s" % ("".join(expected_data[0]), "".join(expected_data[1]),
                                              "".join(expected_data[2]), "".join(expected_data[3]))

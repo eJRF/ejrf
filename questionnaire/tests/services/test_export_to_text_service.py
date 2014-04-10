@@ -62,9 +62,9 @@ class ExportToTextServiceTest(BaseTest):
                          "UGX\t%s\t2013\t%s\t%s\t%s" % (
                          self.country.name, answer_id.encode('base64').strip(), question_text, self.option.text),
                          "UGX\t%s\t2013\t%s\t%s\t%s" % (
-                         self.country.name, answer_id_1.encode('base64').strip(), question_text1, '23.00'),
+                         self.country.name, answer_id_1.encode('base64').strip(), question_text1, '23'),
                          "UGX\t%s\t2013\t%s\t%s\t%s" % (
-                         self.country.name, answer_id_2.encode('base64').strip(), question_text_2, '1.00')]
+                         self.country.name, answer_id_2.encode('base64').strip(), question_text_2, '1')]
 
         export_to_text_service = ExportToTextService([self.questionnaire])
         actual_data = export_to_text_service.get_formatted_responses()
@@ -105,15 +105,15 @@ class ExportToTextServiceTest(BaseTest):
                          "UGX\t%s\t2013\t%s\t%s\t%s" % (
                          self.country.name, answer_id.encode('base64').strip(), question_text, self.option.text),
                          "UGX\t%s\t2013\t%s\t%s\t%s" % (
-                         self.country.name, answer_id_1.encode('base64').strip(), question_text1, '23.00'),
+                         self.country.name, answer_id_1.encode('base64').strip(), question_text1, '23'),
                          "UGX\t%s\t2013\t%s\t%s\t%s" % (
-                         self.country.name, answer_id_2.encode('base64').strip(), question_text_2, '1.00'),
+                         self.country.name, answer_id_2.encode('base64').strip(), question_text_2, '1'),
                          "UGX\t%s\t2013\t%s\t%s\t%s" % (
                          self.country.name, answer_id_10.encode('base64').strip(), question_text, self.option2.text),
                          "UGX\t%s\t2013\t%s\t%s\t%s" % (
-                         self.country.name, answer_id_11.encode('base64').strip(), question_text1, '4.00'),
+                         self.country.name, answer_id_11.encode('base64').strip(), question_text1, '4'),
                          "UGX\t%s\t2013\t%s\t%s\t%s" % (
-                         self.country.name, answer_id_21.encode('base64').strip(), question_text_2, '55.00')]
+                         self.country.name, answer_id_21.encode('base64').strip(), question_text_2, '55')]
 
         export_to_text_service = ExportToTextService([self.questionnaire])
         actual_data = export_to_text_service.get_formatted_responses()
@@ -150,9 +150,9 @@ class ExportToTextServiceTest(BaseTest):
                          "UGX\t%s\t2013\t%s\t%s\t%s" % (
                          self.country.name, answer_id.encode('base64').strip(), question_text, self.option2.text),
                          "UGX\t%s\t2013\t%s\t%s\t%s" % (
-                         self.country.name, answer_id_1.encode('base64').strip(), question_text1, '4.00'),
+                         self.country.name, answer_id_1.encode('base64').strip(), question_text1, '4'),
                          "UGX\t%s\t2013\t%s\t%s\t%s" % (
-                         self.country.name, answer_id_2.encode('base64').strip(), question_text_2, '55.00')]
+                         self.country.name, answer_id_2.encode('base64').strip(), question_text_2, '55')]
 
         export_to_text_service = ExportToTextService([self.questionnaire], version=2)
         actual_data = export_to_text_service.get_formatted_responses()
@@ -189,9 +189,9 @@ class ExportToTextServiceTest(BaseTest):
                          "%s\t%s\t2013\t%s\t%s\t%s" % (
                          ghana.code, ghana.name, answer_id.encode('base64').strip(), question_text, self.option2.text),
                          "%s\t%s\t2013\t%s\t%s\t%s" % (
-                         ghana.code, ghana.name, answer_id_1.encode('base64').strip(), question_text1, '4.00'),
+                         ghana.code, ghana.name, answer_id_1.encode('base64').strip(), question_text1, '4'),
                          "%s\t%s\t2013\t%s\t%s\t%s" % (
-                         ghana.code, ghana.name, answer_id_2.encode('base64').strip(), question_text_2, '55.00')]
+                         ghana.code, ghana.name, answer_id_2.encode('base64').strip(), question_text_2, '55')]
 
         export_to_text_service = ExportToTextService([self.questionnaire], countries=[ghana])
         actual_data = export_to_text_service.get_formatted_responses()
@@ -319,13 +319,13 @@ class GRIDQuestionsExportTest(BaseTest):
         answer_id1_1 = "C_%s_%s_%s" % (self.primary_question.UID, self.question2.UID, self.option2.UID)
         expected_data = [self.headings,
                          "UGX\t%s\t2013\t%s\t%s\t%s" % (
-                         self.country.name, answer_id.encode('base64').strip(), question_text, '23.00'),
+                         self.country.name, answer_id.encode('base64').strip(), question_text, '23'),
                          "UGX\t%s\t2013\t%s\t%s\t%s" % (
-                         self.country.name, answer_id1.encode('base64').strip(), question_text1, '1.00'),
+                         self.country.name, answer_id1.encode('base64').strip(), question_text1, '1'),
                          "UGX\t%s\t2013\t%s\t%s\t%s" % (
-                         self.country.name, answer_id_1.encode('base64').strip(), question_text_1, '3.00'),
+                         self.country.name, answer_id_1.encode('base64').strip(), question_text_1, '3'),
                          "UGX\t%s\t2013\t%s\t%s\t%s" % (
-                         self.country.name, answer_id1_1.encode('base64').strip(), question_text1_1, '12.00')]
+                         self.country.name, answer_id1_1.encode('base64').strip(), question_text1_1, '12')]
 
         export_to_text_service = ExportToTextService([self.questionnaire])
         actual_data = export_to_text_service.get_formatted_responses()
@@ -350,11 +350,12 @@ class MultipleQuestionnaireFilterAndExportToTextServiceTest(BaseTest):
 
         self.theme = Theme.objects.create(name="First theme", description="This is a wonderful decription")
         self.theme1 = Theme.objects.create(name="Second theme", description="This is a second wonderful decription")
-        self.questionnaire, self.section, self.subsection = self.setup_create_questionnaire_and_answers(name="JRF 2013 Core English",
+        self.questionnaire1_data = self.setup_create_questionnaire_and_answers(name="JRF 2013 Core English",
                                                              year=2013, theme=self.theme, country=self.country)
 
-        self.questionnaire2, self.section_2, self.subsection_2 = self.setup_create_questionnaire_and_answers(name="JRF 2014 Core English",
+        self.questionnaire2_data= self.setup_create_questionnaire_and_answers(name="JRF 2014 Core English",
                                                               year=2014, theme=self.theme1, country=self.country_2)
+        self.line_format = "%s\t%s\t%s\t%s\t%s\t%s"
 
     def setup_create_questionnaire_and_answers(self, name, year, theme=None, country=None):
         questionnaire = Questionnaire.objects.create(name=name, description="Description", year=year)
@@ -385,104 +386,115 @@ class MultipleQuestionnaireFilterAndExportToTextServiceTest(BaseTest):
             QuestionGroupOrder.objects.create(question=question3, question_group=question_group, order=1)
             QuestionGroupOrder.objects.create(question=question1, question_group=question_group, order=2)
             QuestionGroupOrder.objects.create(question=question2, question_group=question_group, order=3)
+            return {question1: question1_answer, question2: question2_answer, question3: question3_answer}
 
-        setup_create_answers()
-        return questionnaire, section_1, sub_section
+        answer_dict = setup_create_answers()
+        questionnaire_dict = {'questionnaire': questionnaire, 'section': section_1, 'sub_section':sub_section,
+                              'question_group': question_group, 'primary_question': question3, 'country': country,
+                              'answer_dict': answer_dict, 'questions': [question3, question1, question2],
+                              'year': year}
+        return questionnaire_dict
+
+    def create_export_data_rows(self, question, year, primary_question, country, section, answer_dict, expected_data, **kwargs):
+        question_text = "%s | %s" % (section.name, question.text)
+        answer_id = "C_%s_%s" % (primary_question.UID, question.UID)
+        response = answer_dict[question].response
+        if question == primary_question:
+            answer_id = "C_%s_%s_%s" % (primary_question.UID, question.UID, response.UID)
+        expected_data.append(self.line_format % (country.code, country.name, year, answer_id.encode('base64').strip(), question_text, str(response)))
 
     def test_export_questions_and_answers_for_two_questionnaires(self):
         expected_data = [self.headings]
-        line_format = "UGX\t%s\t2013\t%s\t%s\t%s"
 
-        #questionnaire 1
-        for number in range(0, 3, 1):
-            question = self.subsection.all_questions()[number]
-            question_text = "%s | %s | %s" % (self.section.title, self.subsection.title, question.text)
-            answer_id = "C_%s_%s_1" % (question.UID, question.UID)
-            expected_data.append(line_format % (self.country.name, answer_id.encode('base64').strip(), question_text, '23'))
+        questionnaire1_questions = self.questionnaire1_data['questions']
+        for question in questionnaire1_questions:
+            self.create_export_data_rows(question, expected_data=expected_data, **self.questionnaire1_data)
 
-        # questionnaire 2
-        for number in range(0, 3, 1):
-            question = self.subsection_2.all_questions()[number]
-            question_text = "%s | %s | %s" % (self.section_2.title, self.subsection_2.title, question.text)
-            answer_id = "C_%s_%s_1" % (question.UID, question.UID)
-            expected_data.append(line_format % (self.country.name, answer_id.encode('base64').strip(), question_text, '23'))
+        questionnaire2_questions = self.questionnaire2_data['questions']
+        for question in questionnaire2_questions:
+            self.create_export_data_rows(question, expected_data=expected_data, **self.questionnaire2_data)
 
-        export_to_text_service = ExportToTextService(questionnaires=[self.questionnaire,self.questionnaire2])
+        questionnaires = [self.questionnaire1_data['questionnaire'], self.questionnaire2_data['questionnaire']]
+        export_to_text_service = ExportToTextService(questionnaires=questionnaires)
         actual_data = export_to_text_service.get_formatted_responses()
+
         self.assertEqual(len(expected_data), len(actual_data))
-        self.assertIn(expected_data[0], actual_data)
+        for i in range(len(expected_data)):
+            self.assertIn(expected_data[i], actual_data)
 
     def test_export_questions_and_answers_for_particular_theme(self):
         expected_data = [self.headings]
-        line_format = "UGX\t%s\t2013\t%s\t%s\t%s"
 
-        #questionnaire 1
-        for number in range(0, 3, 1):
-            question = self.subsection.all_questions()[number]
-            question_text = "%s | %s | %s" % (self.section.title, self.subsection.title, question.text)
-            answer_id = "C_%s_%s_1" % (question.UID, question.UID)
-            expected_data.append(line_format % (self.country.name, answer_id.encode('base64').strip(), question_text, '23'))
+        questionnaire1_questions = self.questionnaire1_data['questions']
+        for question in questionnaire1_questions:
+            self.create_export_data_rows(question, expected_data=expected_data, **self.questionnaire1_data)
 
-        export_to_text_service = ExportToTextService(questionnaires=[self.questionnaire,self.questionnaire2], themes=[self.theme])
+        questionnaires = [self.questionnaire1_data['questionnaire'], self.questionnaire2_data['questionnaire']]
+        export_to_text_service = ExportToTextService(questionnaires=questionnaires, themes=[self.theme])
         actual_data = export_to_text_service.get_formatted_responses()
+
         self.assertEqual(len(expected_data), len(actual_data))
-        self.assertIn(expected_data[0], actual_data)
+        for i in range(len(expected_data)):
+            self.assertIn(expected_data[i], actual_data)
 
     def test_export_questions_and_answers_for_particular_country(self):
         expected_data = [self.headings]
-        line_format = "UGX\t%s\t2013\t%s\t%s\t%s"
 
-        #questionnaire 1
-        for number in range(0, 3, 1):
-            question = self.subsection.all_questions()[number]
-            question_text = "%s | %s | %s" % (self.section.title, self.subsection.title, question.text)
-            answer_id = "C_%s_%s_1" % (question.UID, question.UID)
-            expected_data.append(line_format % (self.country.name, answer_id.encode('base64').strip(), question_text, '23'))
+        questionnaire1_questions = self.questionnaire1_data['questions']
+        for question in questionnaire1_questions:
+            self.create_export_data_rows(question, expected_data=expected_data, **self.questionnaire1_data)
 
-        export_to_text_service = ExportToTextService(questionnaires=[self.questionnaire,self.questionnaire2], countries=[self.country])
+        questionnaires = [self.questionnaire1_data['questionnaire'], self.questionnaire2_data['questionnaire']]
+        export_to_text_service = ExportToTextService(questionnaires=questionnaires, countries=[self.country])
         actual_data = export_to_text_service.get_formatted_responses()
+
         self.assertEqual(len(expected_data), len(actual_data))
-        self.assertIn(expected_data[0], actual_data)
+        for i in range(len(expected_data)):
+            self.assertIn(expected_data[i], actual_data)
 
     def test_export_of_question_and_answers_for_theme_and_country(self):
         expected_data = [self.headings]
-        line_format = "UGX\t%s\t2013\t%s\t%s\t%s"
 
-        #questionnaire 1
-        for number in range(0, 3, 1):
-            question = self.subsection.all_questions()[number]
-            question_text = "%s | %s | %s" % (self.section.title, self.subsection.title, question.text)
-            answer_id = "C_%s_%s_1" % (question.UID, question.UID)
-            expected_data.append(line_format % (self.country.name, answer_id.encode('base64').strip(), question_text, '23'))
+        questionnaire1_questions = self.questionnaire1_data['questions']
+        for question in questionnaire1_questions:
+            self.create_export_data_rows(question, expected_data=expected_data, **self.questionnaire1_data)
 
-        export_to_text_service = ExportToTextService(questionnaires=[self.questionnaire,self.questionnaire2], countries=[self.country], themes=[self.theme])
+        questionnaires = [self.questionnaire1_data['questionnaire'], self.questionnaire2_data['questionnaire']]
+        export_to_text_service = ExportToTextService(questionnaires=questionnaires, countries=[self.country], themes=[self.theme])
         actual_data = export_to_text_service.get_formatted_responses()
+
         self.assertEqual(len(expected_data), len(actual_data))
-        self.assertIn(expected_data[0], actual_data)
+        for i in range(len(expected_data)):
+            self.assertIn(expected_data[i], actual_data)
 
     def test_export_of_question_and_answers_for_invalid_theme_and_country(self):
         expected_data = [self.headings]
-        line_format = "UGX\t%s\t2013\t%s\t%s\t%s"
 
-        export_to_text_service = ExportToTextService(questionnaires=[self.questionnaire], countries=[self.country], themes=[self.theme1])
+        questionnaires = [self.questionnaire1_data['questionnaire']]
+        export_to_text_service = ExportToTextService(questionnaires=questionnaires, countries=[self.country], themes=[self.theme1])
         actual_data = export_to_text_service.get_formatted_responses()
+
         self.assertEqual(len(expected_data), len(actual_data))
-        self.assertIn(expected_data[0], actual_data)
+        for i in range(len(expected_data)):
+            self.assertIn(expected_data[i], actual_data)
 
     def test_export_of_question_and_answers_for_theme_and_invalid_country(self):
         expected_data = [self.headings]
-        line_format = "UGX\t%s\t2013\t%s\t%s\t%s"
 
-        export_to_text_service = ExportToTextService(questionnaires=[self.questionnaire], countries=[self.country_2], themes=[self.theme])
+        questionnaires = [self.questionnaire1_data['questionnaire']]
+        export_to_text_service = ExportToTextService(questionnaires=questionnaires, countries=[self.country_2], themes=[self.theme])
         actual_data = export_to_text_service.get_formatted_responses()
+
         self.assertEqual(len(expected_data), len(actual_data))
-        self.assertIn(expected_data[0], actual_data)
+        for i in range(len(expected_data)):
+            self.assertIn(expected_data[i], actual_data)
 
     def test_export_of_question_and_answers_when_no_questionnaires_available(self):
         expected_data = [self.headings]
-        line_format = "UGX\t%s\t2013\t%s\t%s\t%s"
 
         export_to_text_service = ExportToTextService(questionnaires=[])
         actual_data = export_to_text_service.get_formatted_responses()
+
         self.assertEqual(len(expected_data), len(actual_data))
-        self.assertIn(expected_data[0], actual_data)
+        for i in range(len(expected_data)):
+            self.assertIn(expected_data[i], actual_data)
