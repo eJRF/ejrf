@@ -105,7 +105,6 @@ function duplicateRow(selector, $table) {
     prependHiddenColumnFields(newElement);
     $selector.after(newElement);
     assignRowNumbers($table);
-    removeUsedOptions(newElement, $table);
     reIndexFieldNames();
     resetDatePicker(newElement);
     return newElement;
