@@ -105,7 +105,7 @@ class SubmitQuestionnaire(AdvancedMultiplePermissionsRequiredMixin, View):
         user_questionnaire_service.submit()
         referer_url = request.META.get('HTTP_REFERER', None)
         redirect_url = referer_url or reverse('home_page')
-        redirect_url = self._format_redirect_url(redirect_url)
+        redirect_url = self._format_redirect_url(redirect_url, referer_url)
         messages.success(request, 'Questionnaire Submitted.')
         return HttpResponseRedirect(redirect_url)
 
@@ -116,8 +116,10 @@ class SubmitQuestionnaire(AdvancedMultiplePermissionsRequiredMixin, View):
         redirect_url = reverse('questionnaire_entry_page', args=(questionnaire.id, section.id))
         return HttpResponseRedirect('%s?show=errors' % redirect_url)
 
-    def _format_redirect_url(self, redirect_url):
+    def _format_redirect_url(self, redirect_url, referer_url):
         redirect_url = redirect_url.replace('?show=errors', '')
+        if referer_url and referer_url.endswith('?preview=1'):
+            return redirect_url
         return "%s?preview=1" % redirect_url
 
 

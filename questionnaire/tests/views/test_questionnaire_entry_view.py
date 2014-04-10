@@ -629,11 +629,17 @@ class QuestionnaireEntrySubmitTest(BaseTest):
         answer_group = AnswerGroup.objects.filter(grouped_question=other_question_group)
         self.assertEqual(1, answer_group.count())
 
-    def test_submit_on_success_redirect_to_referer_if_given(self):
+    def test_submit_on_success_redirect_to_referer_if_given_and_adds_preview_get_param(self):
         referer_url = '/questionnaire/entry/%d/section/%d/' % (self.questionnaire.id, self.section_1.id)
         meta ={'HTTP_REFERER': referer_url}
         response = self.client.post(self.url, **meta)
         self.assertRedirects(response, referer_url + "?preview=1")
+
+    def test_submit_on_success_redirect_to_referer_if_given(self):
+        referer_url = '/questionnaire/entry/%d/section/%d/?preview=1' % (self.questionnaire.id, self.section_1.id)
+        meta ={'HTTP_REFERER': referer_url}
+        response = self.client.post(self.url, **meta)
+        self.assertRedirects(response, referer_url)
 
     def test_submit_on_success_redirect_to_referer__does_not_highlight_errors_and_shows_preview(self):
         referer_url = '/questionnaire/entry/%d/section/%d/?show=errors' % (self.questionnaire.id, self.section_1.id)
