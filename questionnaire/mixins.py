@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.contrib.auth.views import redirect_to_login
 from django.http import HttpResponseRedirect
 from eJRF.settings import LOGIN_REDIRECT_URL
-from questionnaire.models import Questionnaire, Region, SubSection, Question, Section, Theme
+from questionnaire.models import Questionnaire, Region, SubSection, Question, Section, Theme, QuestionGroup
 
 
 class RegionalPermissionRequired(AccessMixin):
@@ -36,6 +36,8 @@ class RegionAndPermissionRequiredMixin(RegionalPermissionRequired):
         regions = []
         if 'question_id' in kwargs:
             regions.append(Question.objects.get(id=kwargs['question_id']).region)
+        if 'questionGroup_id' in kwargs:
+            regions.append(QuestionGroup.objects.get(id=kwargs['questionGroup_id']).region)
         if 'subsection_id' in kwargs:
             regions.append(SubSection.objects.get(id=kwargs['subsection_id']).section.questionnaire.region)
         if 'section_id' in kwargs:

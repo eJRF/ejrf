@@ -1,7 +1,7 @@
 from urllib import quote
 from questionnaire.forms.assign_question import AssignQuestionForm
 from questionnaire.forms.grid import GridForm
-from questionnaire.models import Questionnaire, Section, SubSection, Question, QuestionOption
+from questionnaire.models import Questionnaire, Section, SubSection, Question, QuestionOption, QuestionGroup
 from questionnaire.tests.base_test import BaseTest
 from django.test import Client
 
@@ -201,3 +201,105 @@ class CreateGridViewTest(BaseTest):
         self.assertRedirects(response, expected_url='/accounts/login/?next=%s' % quote(self.url))
         response = self.client.post(self.url)
         self.assertRedirects(response, expected_url='/accounts/login/?next=%s' % quote(self.url))
+
+
+class RemoveGridViewTest(BaseTest):
+
+    def setUp(self):
+        self.client = Client()
+        self.user, self.country, self.region = self.create_user_with_no_permissions()
+
+        self.assign('can_edit_questionnaire', self.user)
+        self.client.login(username=self.user.username, password='pass')
+
+        self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", region=self.region)
+
+        self.section1 = Section.objects.create(title="Reported Cases of Selected Vaccine", order=1,
+                                               questionnaire=self.questionnaire, name="Reported Cases")
+
+        self.sub_section = SubSection.objects.create(title="subsection 1", order=1, section=self.section1, region=self.region)
+        self.sub_section2 = SubSection.objects.create(title="subsection 2", order=2, section=self.section1)
+
+        self.question1 = Question.objects.create(text='Favorite beer 1', UID='C00001', answer_type='MultiChoice',
+                                                 is_primary=True, region=self.region)
+        self.option1 = QuestionOption.objects.create(text='tusker lager', question=self.question1)
+        self.option2 = QuestionOption.objects.create(text='tusker lager1', question=self.question1)
+        self.option3 = QuestionOption.objects.create(text='tusker lager2', question=self.question1)
+
+        self.question2 = Question.objects.create(text='question 2', instructions="instruction 2",
+                                                 UID='C00002', answer_type='Text', region=self.region)
+
+        self.question3 = Question.objects.create(text='question 3', instructions="instruction 3",
+                                                 UID='C00003', answer_type='Number', region=self.region)
+
+        self.question4 = Question.objects.create(text='question 4', instructions="instruction 2",
+                                                 UID='C00005', answer_type='Date', region=self.region)
+        self.grid = self.question1.question_group.create(subsection=self.sub_section, order=1, grid=True, display_all=True)
+        self.grid.question.add(self.question2, self.question3, self.question4)
+        self.grid.orders.create(question=self.question1, order=1)
+        self.grid.orders.create(question=self.question2, order=2)
+        self.grid.orders.create(question=self.question3, order=3)
+        self.grid.orders.create(question=self.question4, order=4)
+
+        self.url = '/subsection/%d/grid/%d/delete/'%(self.sub_section.id, self.grid.id)
+
+    def test_post_deletes_grid(self):
+        meta = {'HTTP_REFERER': '/questionnaire/entry/%d/section/%d/' % (self.questionnaire.id, self.section1.id)}
+        response = self.client.post(self.url, {}, **meta)
+        self.failIf(QuestionGroup.objects.filter(id=self.grid.id))
+
+    def test_post_deletes_orders(self):
+        meta = {'HTTP_REFERER': '/questionnaire/entry/%d/section/%d/' % (self.questionnaire.id, self.section1.id)}
+        response = self.client.post(self.url, {}, **meta)
+        self.failIf(self.question1.orders.all())
+        self.failIf(self.question2.orders.all())
+        self.failIf(self.question3.orders.all())
+        self.failIf(self.question4.orders.all())
+
+    def test_post_does_not_delete_questions(self):
+        meta = {'HTTP_REFERER': '/questionnaire/entry/%d/section/%d/' % (self.questionnaire.id, self.section1.id)}
+        response = self.client.post(self.url, {}, **meta)
+
+        self.failUnless(Question.objects.filter(id=self.question1.id))
+        self.failUnless(Question.objects.filter(id=self.question2.id))
+        self.failUnless(Question.objects.filter(id=self.question3.id))
+        self.failUnless(Question.objects.filter(id=self.question4.id))
+
+    def test_successful_post_redirect_to_referer_url(self):
+        referer_url = '/questionnaire/entry/%d/section/%d/' % (self.questionnaire.id, self.section1.id)
+        meta = {'HTTP_REFERER': referer_url}
+        response = self.client.post(self.url, data={}, **meta)
+        self.assertRedirects(response, referer_url)
+
+    def test_successful_post_display_success_message(self):
+        referer_url = '/questionnaire/entry/%d/section/%d/'%(self.questionnaire.id, self.section1.id)
+        meta = {'HTTP_REFERER': referer_url}
+        response = self.client.post(self.url, data={}, **meta)
+        message = "Grid successfully removed from questionnaire."
+        self.assertIn(message, response.cookies['messages'].value)
+
+    def test_login_required(self):
+        self.assert_login_required(self.url)
+
+    def test_permission_required_for_create_section(self):
+        self.assert_permission_required(self.url)
+
+        user_not_in_same_region, country, region = self.create_user_with_no_permissions(username="asian_chic",
+                                                                                        country_name="China",
+                                                                                        region_name="ASEAN")
+        self.assign('can_edit_questionnaire', user_not_in_same_region)
+
+        self.client.logout()
+        self.client.login(username='asian_chic', password='pass')
+        response = self.client.post(self.url)
+        self.assertRedirects(response, expected_url='/accounts/login/?next=%s' % quote(self.url))
+
+    def test_permission_denied_if_subsection_belongs_to_a_user_but_grid_to_another_user(self):
+        core_group = QuestionGroup.objects.create(name="core group", order=1, subsection=self.sub_section, grid=True)
+        core_question = Question.objects.create(text='core question -- not in any region',  UID='C00222', answer_type='Text')
+        core_group.question.add(core_question)
+
+        url = '/subsection/%d/grid/%d/delete/'%(self.sub_section.id, core_group.id)
+
+        response = self.client.post(url)
+        self.assertRedirects(response, expected_url='/accounts/login/?next=%s' % quote(url))

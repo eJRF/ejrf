@@ -478,6 +478,10 @@ select.hide{
     display: none !important;
 }
 
+.show-border{
+    border: #0099FF 1px solid;
+}
+
 .mid-row-add-hybrid-grid{
     border: #0099FF 1px solid;
     padding-left: 5px;

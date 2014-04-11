@@ -15,6 +15,13 @@ class QuestionGroup(BaseModel):
     display_all = models.BooleanField(default=False)
     hybrid = models.BooleanField(default=False)
 
+    @property
+    def region(self):
+        questions_with_region = self.all_questions().exclude(region=None)
+        if questions_with_region.exists():
+            return questions_with_region[0].region
+        return None
+
     class Meta:
         ordering = ('order',)
         app_label = 'questionnaire'

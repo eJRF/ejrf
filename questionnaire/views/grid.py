@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.views.generic import View
 from questionnaire.forms.grid import GridForm
 from questionnaire.mixins import RegionAndPermissionRequiredMixin
-from questionnaire.models import SubSection, Question
+from questionnaire.models import SubSection, Question, QuestionGroup
 
 
 class CreateGrid(RegionAndPermissionRequiredMixin, View):
@@ -33,3 +33,13 @@ class CreateGrid(RegionAndPermissionRequiredMixin, View):
         messages.error(request, "Grid NOT created. See errors below.")
         return render(request, self.template_name, context)
 
+
+class DeleteGrid(RegionAndPermissionRequiredMixin, View):
+    permission_required = 'auth.can_edit_questionnaire'
+
+    def post(self, request, *args, **kwargs):
+        referer_url = request.META.get('HTTP_REFERER', None)
+        subsection = SubSection.objects.get(id=kwargs['subsection_id'])
+        QuestionGroup.objects.filter(id=kwargs['questionGroup_id']).delete()
+        messages.success(request, "Grid successfully removed from questionnaire.")
+        return HttpResponseRedirect(referer_url)

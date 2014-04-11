@@ -91,6 +91,12 @@ jQuery(function($){
         $el.next('input[type=hidden][name=subgroup]').val($el.val());
     });
 
+    $('.delete-grid').hover(function(){
+       $(this).parents('.grid-group').addClass('show-border');
+    }, function(){
+        $(this).parents('.grid-group').removeClass('show-border');
+    });
+
 
 });
 

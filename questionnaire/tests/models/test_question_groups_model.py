@@ -1,4 +1,4 @@
-from questionnaire.models import Questionnaire, Section, SubSection, Question, QuestionGroupOrder, QuestionOption
+from questionnaire.models import Questionnaire, Section, SubSection, Question, QuestionGroupOrder, QuestionOption, Region
 from questionnaire.models.question_groups import QuestionGroup
 from questionnaire.tests.base_test import BaseTest
 
@@ -289,3 +289,10 @@ class QuestionGroupTest(BaseTest):
 
         for order in question_group.orders.order_by('order'):
             self.assertEqual([{'option': '', 'order': order}], type_order_mapping[order.question.answer_type])
+
+    def test_question_group_knows_its_region(self):
+        region = Region.objects.create(name="AFR")
+        question2 = Question.objects.create(text='question 2', region=region, UID='C00002', answer_type='Text')
+        self.parent_question_group.question.add(question2)
+
+        self.assertEqual(region, self.parent_question_group.region)

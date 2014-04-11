@@ -1,0 +1,9 @@
+{% if perms.auth.can_edit_questionnaire and  user.user_profile.region == questionnaire.region and user.user_profile.region == group.region and not preview %}
+    <div class="btn-group pull-right">
+        <a href="" class="delete-grid pull-right red" data-toggle="modal"
+           data-target="#delete-grid-modal-{{ group.id }}"
+           id="delete-grid-{{ grid.id }}">
+            <span class="cyan"><span class="glyphicon glyphicon-trash"></span>Delete Grid</span>
+        </a>
+    </div>
+{% endif %}
