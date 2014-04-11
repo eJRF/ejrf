@@ -86,7 +86,7 @@ def when_i_edit_the_question_details_and_click_save(step):
 def and_that_the_questions_are_used_in_a_published_questionnaire(step):
     world.questionnaire_status = Questionnaire.objects.create(name="JRF Regional Status",
                                                               description="Regional Status",
-                                                              status=Questionnaire.PUBLISHED)
+                                                              status=Questionnaire.PUBLISHED, region=world.region)
     world.section_status = Section.objects.create(order=1, title="Section AFRO", description="Description",
                                                   questionnaire=world.questionnaire_status, name="Cover page")
     world.subsection_status1 = SubSection.objects.create(order=1, section=world.section_status, title='AFRO Subsection')
@@ -94,9 +94,8 @@ def and_that_the_questions_are_used_in_a_published_questionnaire(step):
     world.parent.question.add(world.question1)
     QuestionGroupOrder.objects.create(question=world.question1, question_group=world.parent, order=1)
 
-    text_answer = TextAnswer.objects.create(question=world.question1,
-                              questionnaire=world.questionnaire_status,
-                              status=Answer.SUBMITTED_STATUS, response='First Version Response')
+    text_answer = TextAnswer.objects.create(question=world.question1, questionnaire=world.questionnaire_status,
+                                            status=Answer.SUBMITTED_STATUS, response='First Version Response')
     answerGroup = AnswerGroup.objects.create(grouped_question=world.parent)
     answerGroup.answer.add(text_answer)
 

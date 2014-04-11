@@ -4,18 +4,19 @@ from django.contrib import messages
 from django.http import HttpResponseRedirect, HttpResponse
 from django.views.generic import FormView
 from django.views.generic import View
-from braces.views import LoginRequiredMixin, MultiplePermissionsRequiredMixin, PermissionRequiredMixin
-from questionnaire.forms.questionnaires import QuestionnaireFilterForm, PublishQuestionnaireForm
+from braces.views import MultiplePermissionsRequiredMixin, PermissionRequiredMixin
 
+from questionnaire.forms.questionnaires import QuestionnaireFilterForm, PublishQuestionnaireForm
 from questionnaire.forms.sections import SectionForm, SubSectionForm
-from questionnaire.mixins import AdvancedMultiplePermissionsRequiredMixin
+from questionnaire.mixins import AdvancedMultiplePermissionsRequiredMixin, DoesNotExistExceptionHandlerMixin
 from questionnaire.services.questionnaire_cloner import QuestionnaireClonerService
 from questionnaire.services.questionnaire_finalizer import QuestionnaireFinalizeService
 from questionnaire.services.questionnaire_entry_form_service import QuestionnaireEntryFormService
-from questionnaire.models import Questionnaire, Section, QuestionGroup, Answer, AnswerGroup, Country
+from questionnaire.models import Questionnaire, Section, QuestionGroup, Answer
 from questionnaire.forms.answers import NumericalAnswerForm, TextAnswerForm, DateAnswerForm, MultiChoiceAnswerForm
 from questionnaire.services.users import UserQuestionnaireService
-from questionnaire.utils.view_utils import get_country
+from questionnaire.utils.service_utils import filter_empty_values
+from questionnaire.utils.view_utils import get_country, get_questionnaire_status, get_regions
 
 
 ANSWER_FORM = {'Number': NumericalAnswerForm,
@@ -25,13 +26,17 @@ ANSWER_FORM = {'Number': NumericalAnswerForm,
                }
 
 
-class Entry(AdvancedMultiplePermissionsRequiredMixin, FormView):
+class Entry(DoesNotExistExceptionHandlerMixin, AdvancedMultiplePermissionsRequiredMixin, FormView):
     template_name = 'questionnaires/entry/index.html'
+    model = Questionnaire
     GET_permissions = {'any': ('auth.can_submit_responses', 'auth.can_view_users', 'auth.can_edit_questionnaire')}
     POST_permissions = {'any': ('auth.can_submit_responses', )}
 
     def get(self, request, *args, **kwargs):
-        questionnaire = Questionnaire.objects.get(id=self.kwargs['questionnaire_id'])
+        query_params = {'id': self.kwargs['questionnaire_id'],
+                        'region__in': get_regions(request), 'status__in': get_questionnaire_status(request)}
+        query_params = filter_empty_values(query_params)
+        questionnaire = Questionnaire.objects.get(**query_params)
         section = Section.objects.get(id=self.kwargs['section_id'])
         country = get_country(self.request)
         user_questionnaire_service = UserQuestionnaireService(country, questionnaire, request.GET.get("version"))

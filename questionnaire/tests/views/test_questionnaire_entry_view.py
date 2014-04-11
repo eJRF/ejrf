@@ -721,7 +721,7 @@ class QuestionnaireCloneViewTest(BaseTest):
         QuestionGroupOrder.objects.create(order=5, question_group=self.parent12, question=self.question4)
         self.parent10.question.add(self.question3, self.question4, self.question2, self.question1, self.primary_question)
         self.client = Client()
-        self.user, self.country, self.region = self.create_user_with_no_permissions()
+        self.user, self.country, self.region = self.create_user_with_no_permissions(region_name=None)
 
         self.assign('can_view_users', self.user)
         self.client.login(username=self.user.username, password='pass')
@@ -744,7 +744,7 @@ class QuestionnaireCloneViewTest(BaseTest):
         self.assertEqual(8, SubSection.objects.all().count())
         self.assertEqual(4, QuestionGroup.objects.all().count())
         self.assertEqual(5, Question.objects.all().count())
-        questionnaire = Questionnaire.objects.all().exclude(id=self.questionnaire.id)[0]
+        questionnaire = Questionnaire.objects.all().exclude(id=self.questionnaire.id).latest('modified')
         section = questionnaire.sections.all()[0]
         url = '/questionnaire/entry/%d/section/%d/' % (questionnaire.id, section.id)
         self.assertRedirects(response, url)

@@ -1,7 +1,7 @@
 Feature: Grid questions display all
     Background:
         Given I am logged in as a data submitter
-        And I have a questionnaire with sections and subsections
+        And I have a questionnaire published for my region with sections and subsections
         And I have a grid group with all options of the primary question showable
         And I have 3 questions in that group one of which is primary
         And I have a sub group in that group with two questions

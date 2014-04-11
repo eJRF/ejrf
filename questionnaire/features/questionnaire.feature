@@ -1,7 +1,7 @@
 Feature: Questionnaire feature
     Scenario: Show questionnaire form
         Given I am logged in as a data submitter
-        And I have a questionnaire with sections and subsections
+        And I have a questionnaire published for my region with sections and subsections
         And I have a question group and questions in that group
         And I set orders for the questions in the group
         And I visit that questionnaires section page
@@ -12,7 +12,7 @@ Feature: Questionnaire feature
 
     Scenario: Show questionnaire  group and sub-group
         Given I am logged in as a data submitter
-        And I have a questionnaire with sections and subsections
+        And I have a questionnaire published for my region with sections and subsections
         And I have a question group and questions in that group
         And i have a subgroup with questions in that group
         And I set question orders for the group and subgroup
@@ -22,14 +22,14 @@ Feature: Questionnaire feature
 
     Scenario: Section tabs transition
         Given I am logged in as a data submitter
-        And I have a questionnaire with sections and subsections
+        And I have a questionnaire published for my region with sections and subsections
         And I visit that questionnaires section page
         When I click on a different section tab
         Then I should see that section page
 
     Scenario: Display additional sub-section on clicking add-more
         Given I am logged in as a data submitter
-        And I have a questionnaire with sections and subsections
+        And I have a questionnaire published for my region with sections and subsections
         And I have a question group and questions in that group
         And I set orders for the questions in the group
         And I visit that questionnaires section page

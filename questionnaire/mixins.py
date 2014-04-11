@@ -2,6 +2,7 @@ from braces.views import AccessMixin, MultiplePermissionsRequiredMixin
 from django.contrib import messages
 from django.contrib.auth.views import redirect_to_login
 from django.http import HttpResponseRedirect
+from eJRF.settings import LOGIN_REDIRECT_URL
 from questionnaire.models import Questionnaire, Region, SubSection, Question, Section, Theme
 
 
@@ -69,10 +70,10 @@ class AdvancedMultiplePermissionsRequiredMixin(MultiplePermissionsRequiredMixin)
 
 
 class DoesNotExistExceptionHandlerMixin(AccessMixin):
-    error_message = ""
+    error_message = "You are trying to access a resource that does not exist"
     response = None
     model = None
-    does_not_exist_url = ''
+    does_not_exist_url = LOGIN_REDIRECT_URL
 
     def dispatch(self, request, *args, **kwargs):
         try:

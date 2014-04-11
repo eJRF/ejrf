@@ -162,7 +162,7 @@ class DeleteSectionsViewTest(BaseTest):
         self.assign('can_edit_questionnaire', self.user)
         self.client.login(username=self.user.username, password='pass')
 
-        self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013)
+        self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013, region=self.region)
         self.section = Section.objects.create(name="section", questionnaire=self.questionnaire, order=1, region=self.region)
         self.section_1 = Section.objects.create(name="section 2", questionnaire=self.questionnaire, order=2, region=self.region)
         self.url = '/section/%d/delete/' % self.section.id
@@ -278,6 +278,7 @@ class SubSectionsViewTest(BaseTest):
         self.failUnless(subsection)
         self.assertEqual('', subsection[0].title)
 
+
 class EditSubSectionsViewTest(BaseTest):
     def setUp(self):
         self.client = Client()
@@ -286,7 +287,7 @@ class EditSubSectionsViewTest(BaseTest):
         self.assign('can_edit_questionnaire', self.user)
         self.client.login(username=self.user.username, password='pass')
 
-        self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013)
+        self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013, region=self.region)
         self.section = Section.objects.create(questionnaire=self.questionnaire, name="section", order=1)
         self.form_data = {'description': 'funny section',
                           'title': 'some title',

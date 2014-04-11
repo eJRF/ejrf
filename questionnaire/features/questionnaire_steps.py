@@ -128,3 +128,20 @@ def when_i_click_the_delete_row_button(step):
 def then_i_should_not_see_that_row(step):
     world.page.is_name_present('MultiChoice-0-response')
     world.page.is_name_present('MultiChoice-1-response', status=False)
+
+
+@step(u'And I have a questionnaire published for my region with sections and subsections')
+def and_i_have_a_questionnaire_published_for_my_region_with_sections_and_subsections(step):
+    world.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", description="ha", status=Questionnaire.PUBLISHED,
+                                                       region=world.region)
+    world.section_1 = Section.objects.create(title="Section 1 Title Sample", order=1,
+                                             questionnaire=world.questionnaire, name="Section 1 Name Sample",
+                                             description="Section 1 Description")
+    world.section1 = world.section_1
+    world.section_2 = Section.objects.create(title="Section 2 Title Sample", order=2, questionnaire=world.questionnaire,
+                                             name="Section 2 Name Sample",
+                                             description="Section 2 Description")
+    world.section_3 = Section.objects.create(title="Section 3 Title Sample", order=3, questionnaire=world.questionnaire,
+                                             name="Section 3 Name Sample",
+                                             description="Section 3 Description")
+    world.sub_section = SubSection.objects.create(title="Subsection Title Sample", order=1, section=world.section_1)

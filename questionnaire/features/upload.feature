@@ -2,7 +2,7 @@ Feature: Support document upload
 
   Scenario: Upload PDF file
        Given I am logged in as a data submitter
-       And I have a questionnaire for my region with sections and subsections
+       And I have a questionnaire published for my region with sections and subsections
        And I have a pdf document
        And I visit the questionnaire section page
        And I visit the attachments page
@@ -15,7 +15,7 @@ Feature: Support document upload
 
   Scenario: Upload Unacceptable File Extension
         Given I am logged in as a data submitter
-        And I have a questionnaire for my region with sections and subsections
+        And I have a questionnaire published for my region with sections and subsections
         And I have a zip file
         And I visit the questionnaire section page
         And I visit the attachments page
@@ -27,7 +27,7 @@ Feature: Support document upload
 
   Scenario: Delete attachment
         Given I am logged in as a data submitter
-        And I have a questionnaire for my region with sections and subsections
+        And I have a questionnaire published for my region with sections and subsections
         And I have an attached file
         And I visit the questionnaire section page
         And I visit the attachments page
