@@ -419,8 +419,8 @@ class MultipleQuestionnaireFilterAndExportToTextServiceTest(BaseTest):
         actual_data = export_to_text_service.get_formatted_responses()
 
         self.assertEqual(len(expected_data), len(actual_data))
-        for i in range(len(expected_data)):
-            self.assertIn(expected_data[i], actual_data)
+        for expected_row in expected_data:
+            self.assertIn(expected_row, actual_data)
 
     def test_export_questions_and_answers_for_particular_theme(self):
         expected_data = [self.headings]
@@ -434,8 +434,8 @@ class MultipleQuestionnaireFilterAndExportToTextServiceTest(BaseTest):
         actual_data = export_to_text_service.get_formatted_responses()
 
         self.assertEqual(len(expected_data), len(actual_data))
-        for i in range(len(expected_data)):
-            self.assertIn(expected_data[i], actual_data)
+        for expected_row in expected_data:
+            self.assertIn(expected_row, actual_data)
 
     def test_export_questions_and_answers_for_particular_country(self):
         expected_data = [self.headings]
@@ -449,8 +449,8 @@ class MultipleQuestionnaireFilterAndExportToTextServiceTest(BaseTest):
         actual_data = export_to_text_service.get_formatted_responses()
 
         self.assertEqual(len(expected_data), len(actual_data))
-        for i in range(len(expected_data)):
-            self.assertIn(expected_data[i], actual_data)
+        for expected_row in expected_data:
+            self.assertIn(expected_row, actual_data)
 
     def test_export_of_question_and_answers_for_theme_and_country(self):
         expected_data = [self.headings]
@@ -464,8 +464,8 @@ class MultipleQuestionnaireFilterAndExportToTextServiceTest(BaseTest):
         actual_data = export_to_text_service.get_formatted_responses()
 
         self.assertEqual(len(expected_data), len(actual_data))
-        for i in range(len(expected_data)):
-            self.assertIn(expected_data[i], actual_data)
+        for expected_row in expected_data:
+            self.assertIn(expected_row, actual_data)
 
     def test_export_of_question_and_answers_for_invalid_theme_and_country(self):
         expected_data = [self.headings]
@@ -475,8 +475,8 @@ class MultipleQuestionnaireFilterAndExportToTextServiceTest(BaseTest):
         actual_data = export_to_text_service.get_formatted_responses()
 
         self.assertEqual(len(expected_data), len(actual_data))
-        for i in range(len(expected_data)):
-            self.assertIn(expected_data[i], actual_data)
+        for expected_row in expected_data:
+            self.assertIn(expected_row, actual_data)
 
     def test_export_of_question_and_answers_for_theme_and_invalid_country(self):
         expected_data = [self.headings]
@@ -486,8 +486,8 @@ class MultipleQuestionnaireFilterAndExportToTextServiceTest(BaseTest):
         actual_data = export_to_text_service.get_formatted_responses()
 
         self.assertEqual(len(expected_data), len(actual_data))
-        for i in range(len(expected_data)):
-            self.assertIn(expected_data[i], actual_data)
+        for expected_row in expected_data:
+            self.assertIn(expected_row, actual_data)
 
     def test_export_of_question_and_answers_when_no_questionnaires_available(self):
         expected_data = [self.headings]
@@ -496,5 +496,5 @@ class MultipleQuestionnaireFilterAndExportToTextServiceTest(BaseTest):
         actual_data = export_to_text_service.get_formatted_responses()
 
         self.assertEqual(len(expected_data), len(actual_data))
-        for i in range(len(expected_data)):
-            self.assertIn(expected_data[i], actual_data)
+        for expected_row in expected_data:
+            self.assertIn(expected_row, actual_data)

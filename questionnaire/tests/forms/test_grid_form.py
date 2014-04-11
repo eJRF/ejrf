@@ -1,6 +1,57 @@
 from questionnaire.forms.grid import GridForm
-from questionnaire.models import Questionnaire, Section, SubSection, Question, QuestionOption
+from questionnaire.models import Questionnaire, Section, SubSection, Question, QuestionOption, Region
 from questionnaire.tests.base_test import BaseTest
+
+
+class GridFormTest(BaseTest):
+
+    def setUp(self):
+        self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English")
+
+        self.section1 = Section.objects.create(title="Reported Cases of Selected Vaccine", order=1,
+                                               questionnaire=self.questionnaire, name="Reported Cases")
+
+        self.region = Region.objects.create(name="AFR")
+        self.sub_section = SubSection.objects.create(title="subsection 1", order=1, section=self.section1, region=self.region)
+        self.sub_section2 = SubSection.objects.create(title="subsection 2", order=2, section=self.section1)
+
+        self.question1 = Question.objects.create(text='Favorite beer 1', UID='C00001', answer_type='MultiChoice',
+                                                 is_primary=True, region=self.region)
+        self.option1 = QuestionOption.objects.create(text='tusker lager', question=self.question1)
+        self.option2 = QuestionOption.objects.create(text='tusker lager1', question=self.question1)
+        self.option3 = QuestionOption.objects.create(text='tusker lager2', question=self.question1)
+
+        self.question2 = Question.objects.create(text='question 2', instructions="instruction 2",
+                                                 UID='C00002', answer_type='Text', region=self.region)
+
+        self.question3 = Question.objects.create(text='question 3', instructions="instruction 3",
+                                                 UID='C00003', answer_type='Number')
+
+        self.question4 = Question.objects.create(text='question 4', instructions="instruction 2",
+                                                 UID='C00005', answer_type='Date')
+
+
+    def test_only_own_region_questions_are_available(self):
+        grid_form = GridForm(subsection=self.sub_section, region=self.region)
+
+        primary_question_queryset = grid_form.fields['primary_question'].queryset
+        self.assertEqual(1, primary_question_queryset.count())
+        self.assertEqual(self.question1, primary_question_queryset[0])
+
+        columns_queryset = grid_form.fields['columns'].queryset
+        self.assertEqual(1, columns_queryset.count())
+        self.assertEqual(self.question2, columns_queryset[0])
+
+    def test_only_global_stuff_are_available_to_global_admin(self):
+        grid_form = GridForm(subsection=self.sub_section, region=None)
+
+        primary_question_queryset = grid_form.fields['primary_question'].queryset
+        self.assertEqual(0, primary_question_queryset.count())
+
+        columns_queryset = grid_form.fields['columns'].queryset
+        self.assertEqual(2, columns_queryset.count())
+        self.assertIn(self.question3, columns_queryset)
+        self.assertIn(self.question4, columns_queryset)
 
 
 class DisplayAllGridFormTest(BaseTest):

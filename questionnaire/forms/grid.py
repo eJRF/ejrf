@@ -10,16 +10,19 @@ GRID_TYPES = (('', 'Choose One'),
 
 class GridForm(forms.Form):
     type = forms.ChoiceField(choices=GRID_TYPES)
-    primary_question = forms.ModelChoiceField(queryset=Question.objects.filter(is_primary=True), empty_label='Choose One',
-                                              widget=MultiChoiceQuestionSelectWidget())
-    columns = forms.ModelMultipleChoiceField(queryset=Question.objects.exclude(is_primary=True),
-                                            widget=forms.SelectMultiple(attrs={'class': 'hide'}))
-    subgroup = forms.ModelMultipleChoiceField(queryset=Question.objects.exclude(is_primary=True),
-                                            widget=forms.SelectMultiple(attrs={'class': 'hide'}), required=False)
+    primary_question = forms.ModelChoiceField(queryset=None, empty_label='Choose One',widget=MultiChoiceQuestionSelectWidget())
+    columns = forms.ModelMultipleChoiceField(queryset=None, widget=forms.SelectMultiple(attrs={'class': 'hide'}))
+    subgroup = forms.ModelMultipleChoiceField(queryset=None, widget=forms.SelectMultiple(attrs={'class': 'hide'}),
+                                              required=False)
 
     def __init__(self, *args, **kwargs):
         self.subsection = kwargs.pop('subsection', None)
+        self.region = kwargs.pop('region', None)
         super(GridForm, self).__init__(*args, **kwargs)
+        self.fields['primary_question'].queryset = Question.objects.filter(is_primary=True, region=self.region)
+        non_primary_questions = Question.objects.exclude(is_primary=True).filter(region=self.region)
+        self.fields['columns'].queryset = non_primary_questions
+        self.fields['subgroup'].queryset = non_primary_questions
 
     def clean(self):
         cleaned_data = super(GridForm, self).clean()

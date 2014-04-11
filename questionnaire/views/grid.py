@@ -13,7 +13,8 @@ class CreateGrid(RegionAndPermissionRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         subsection = SubSection.objects.select_related('section').get(id=kwargs['subsection_id'])
-        form = GridForm()
+        region = request.user.user_profile.region
+        form = GridForm(subsection=subsection, region=region)
         context = {'grid_form': form, 'non_primary_questions': form.fields['columns'].queryset,
                    'btn_label': 'Create', 'subsection': subsection, 'id': 'create_grid_form', 'class': 'create-grid-form',}
         return render(request, self.template_name, context)
@@ -21,7 +22,8 @@ class CreateGrid(RegionAndPermissionRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         referer_url = request.META.get('HTTP_REFERER', None)
         subsection = SubSection.objects.get(id=kwargs['subsection_id'])
-        form = GridForm(request.POST, subsection=subsection)
+        region = request.user.user_profile.region
+        form = GridForm(request.POST, subsection=subsection, region=region)
         if form.is_valid():
             form.save()
             messages.success(request, "Grid successfully created.")

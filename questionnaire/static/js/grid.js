@@ -71,7 +71,6 @@ jQuery(function($){
         if ($el.val() === 'display_all'){
             removeNonMultiChoiceOptions($all_primary_questions);
             addTemplate('#addmore-displayall-template', $first_columns);
-
         }
         else if ($el.val() ==='hybrid'){
             removeNonMultiChoiceOptions($all_primary_questions);

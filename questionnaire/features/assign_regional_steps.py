@@ -66,11 +66,11 @@ def when_i_open_that_regional_questionnaire_for_editing(step):
 
 @step(u'And I have regional questions that are not assigned to my questionnaire')
 def and_i_have_regional_questions_that_are_not_assigned_to_my_questionnaire(step):
-    world.not_assigned_question1 = Question.objects.create(text='Name of UNICEF contact', export_label='UNICEF Contact',
+    world.not_assigned_question1 = Question.objects.create(text='unassigned 1', export_label='UNICEF Contact',
                                                            UID='0033w', answer_type='Text', region=world.region)
-    world.not_assigned_question2 = Question.objects.create(text='Name of UNICEF contact', export_label='UNICEF Contact',
+    world.not_assigned_question2 = Question.objects.create(text='unassigned 2', export_label='UNICEF Contact',
                                                            UID='00334', answer_type='Text', region=world.region)
-    world.not_assigned_question3 = Question.objects.create(text='Name of WHO contact', export_label='WHO Contact',
+    world.not_assigned_question3 = Question.objects.create(text='unassigned 3', export_label='WHO Contact',
                                                            UID='0023w',
                                                            answer_type='Text', region=world.region)
 

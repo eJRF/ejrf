@@ -24,19 +24,19 @@ class CreateGridViewTest(BaseTest):
         self.sub_section2 = SubSection.objects.create(title="subsection 2", order=2, section=self.section1)
 
         self.question1 = Question.objects.create(text='Favorite beer 1', UID='C00001', answer_type='MultiChoice',
-                                                 is_primary=True)
+                                                 is_primary=True, region=self.region)
         self.option1 = QuestionOption.objects.create(text='tusker lager', question=self.question1)
         self.option2 = QuestionOption.objects.create(text='tusker lager1', question=self.question1)
         self.option3 = QuestionOption.objects.create(text='tusker lager2', question=self.question1)
 
         self.question2 = Question.objects.create(text='question 2', instructions="instruction 2",
-                                                 UID='C00002', answer_type='Text')
+                                                 UID='C00002', answer_type='Text', region=self.region)
 
         self.question3 = Question.objects.create(text='question 3', instructions="instruction 3",
-                                                 UID='C00003', answer_type='Number')
+                                                 UID='C00003', answer_type='Number', region=self.region)
 
         self.question4 = Question.objects.create(text='question 4', instructions="instruction 2",
-                                                 UID='C00005', answer_type='Date')
+                                                 UID='C00005', answer_type='Date', region=self.region)
 
         self.data ={
             'type': 'display_all',
@@ -113,7 +113,7 @@ class CreateGridViewTest(BaseTest):
 
     def test_post_creates_hybrid_grid_group_and_orders_to_subsection(self):
         self.question5 = Question.objects.create(text='question 5', instructions="instruction 5",
-                                                 UID='C00006', answer_type='MultiChoice')
+                                                 UID='C00006', answer_type='MultiChoice', region=self.region)
 
         self.failIf(self.question1.question_group.all())
         self.failIf(self.question2.question_group.all())
