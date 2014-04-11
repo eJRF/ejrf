@@ -70,7 +70,7 @@ Feature: Questions feature
 
     Scenario: Sequencing Simple Core Questions in Core Questionnaire
         Given I am logged in as a global admin
-        And I have a Finalised Core Questionnaire with three questions
+        And I have a draft Core Questionnaire with three questions
         When I select the option to edit that questionnaire
         And I choose to reorder questions in a subsection
         Then I should see a reorder questions modal

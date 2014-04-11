@@ -1,4 +1,5 @@
 import os
+from braces.views import PermissionRequiredMixin, LoginRequiredMixin
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
@@ -7,12 +8,15 @@ from django.views.generic import CreateView, View
 from django.views.static import serve
 from questionnaire.forms.sections import SectionForm
 from questionnaire.forms.support_documents import SupportDocumentUploadForm
+from questionnaire.mixins import DeleteDocumentMixin, AdvancedMultiplePermissionsRequiredMixin
 from questionnaire.models import SupportDocument, Questionnaire, Country
 from questionnaire.services.users import UserQuestionnaireService
 from questionnaire.utils.view_utils import get_country
 
 
-class UploadDocument(CreateView):
+class UploadDocument(AdvancedMultiplePermissionsRequiredMixin, CreateView):
+    GET_permissions = {'any': ('auth.can_submit_responses', 'auth.can_view_users', 'auth.can_edit_questionnaire')}
+    POST_permissions = {'any': ('auth.can_submit_responses', )}
     model = SupportDocument
     template_name = 'questionnaires/entry/upload.html'
     form_class = SupportDocumentUploadForm
@@ -40,9 +44,13 @@ class UploadDocument(CreateView):
                         'documents': attachments,
                         'section_form': SectionForm(initial={'questionnaire': self.questionnaire}),
                         'ordered_sections': self.questionnaire.sections.order_by('order'),
-                        'preview': self.user_questionnaire_service.preview(),
+                        'preview': self._check_preview_mode(),
                         'new_section_action': reverse("new_section_page", args=(self.questionnaire.id,))})
         return context
+
+    def _check_preview_mode(self):
+        return self.user_questionnaire_service.preview() or self.questionnaire.is_finalized() or \
+               self.questionnaire.is_published() or 'preview' in self.request.GET
 
     def form_valid(self, form):
         messages.success(self.request, "File was uploaded successfully")
@@ -55,13 +63,14 @@ class UploadDocument(CreateView):
                         'ordered_sections': self.questionnaire.sections.order_by('order')})
 
 
-class DownloadDocument(View):
+class DownloadDocument(LoginRequiredMixin, View):
     def get(self, *args, **kwargs):
         document = SupportDocument.objects.get(id=kwargs['document_id'], questionnaire=kwargs['questionnaire_id'])
         return serve(self.request, os.path.basename(document.path.url), os.path.dirname(document.path.url))
 
 
-class DeleteDocument(View):
+class DeleteDocument(DeleteDocumentMixin, View):
+    permission_required = 'auth.can_submit_responses'
     model = SupportDocument
 
     def post(self, *args, **kwargs):

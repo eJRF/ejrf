@@ -28,12 +28,12 @@ def and_i_have_assigned_regional_questions(step):
     world.question5 = Question.objects.create(text='question 5', export_label='WHO Contact', UID='000928',
                                               answer_type='Text', region=world.region)
 
-    group = QuestionGroup.objects.create(subsection=world.sub_section, order=1)
-    group.question.add(world.question3, world.question4, world.question5)
+    world.group = QuestionGroup.objects.create(subsection=world.sub_section, order=1)
+    world.group.question.add(world.question3, world.question4, world.question5)
 
-    QuestionGroupOrder.objects.create(question=world.question3, question_group=group, order=1)
-    QuestionGroupOrder.objects.create(question=world.question4, question_group=group, order=2)
-    QuestionGroupOrder.objects.create(question=world.question5, question_group=group, order=3)
+    QuestionGroupOrder.objects.create(question=world.question3, question_group=world.group, order=1)
+    QuestionGroupOrder.objects.create(question=world.question4, question_group=world.group, order=2)
+    QuestionGroupOrder.objects.create(question=world.question5, question_group=world.group, order=3)
 
 
 @step(u'And I have a questionnaire for my region with sections and subsections')
@@ -83,11 +83,11 @@ def and_i_have_core_questions_assigned_to_my_questionnaire(step):
                                               UID='01028',
                                               answer_type='Text')
 
-    group = QuestionGroup.objects.create(subsection=world.sub_section, order=2)
-    group.question.add(world.question7, world.question8)
+    world.group = QuestionGroup.objects.create(subsection=world.sub_section, order=2)
+    world.group.question.add(world.question7, world.question8)
 
-    QuestionGroupOrder.objects.create(question=world.question7, question_group=group, order=1)
-    QuestionGroupOrder.objects.create(question=world.question8, question_group=group, order=2)
+    QuestionGroupOrder.objects.create(question=world.question7, question_group=world.group, order=1)
+    QuestionGroupOrder.objects.create(question=world.question8, question_group=world.group, order=2)
 
 
 @step(u'When I select the regional questions to assign to the questionnaire')
@@ -150,4 +150,5 @@ def and_the_question_numbering_should_be_updated(step):
 @step(u'And the regional question numbers should be prefixed with the region name')
 def and_the_regional_question_numbers_should_be_prefixed_with_the_region_name(step):
     sleep(2)
-    world.page.is_text_present('%s - 0.4.%s' % (world.region.name, world.not_assigned_question1.text))
+    order = world.not_assigned_question1.orders.get(question_group=world.group).order
+    world.page.is_text_present('%s - 0.%d.%s' % (world.region.name, order, world.not_assigned_question1.text))

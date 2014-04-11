@@ -860,3 +860,84 @@ class DeleteAnswerGroupViewTest(BaseTest):
 
     def test_permission_required(self):
         self.assert_permission_required(self.url)
+
+
+class PreviewModeQuestionnaireEntryTest(BaseTest):
+
+    def test_data_submitter_is_not_preview_mode_only_if_requested_from_url(self):
+        self.client = Client()
+        self.user, self.country, self.region = self.create_user_with_no_permissions()
+
+        self.assign('can_submit_responses', self.user)
+        self.client.login(username=self.user.username, password='pass')
+
+        self.questionnaire = Questionnaire.objects.create(name="q", status=Questionnaire.PUBLISHED, region=self.region)
+
+        self.section_1 = Section.objects.create(title="section1", order=1, questionnaire=self.questionnaire, name="section1")
+
+        url = '/questionnaire/entry/%d/section/%d/' % (self.questionnaire.id, self.section_1.id)
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        self.assertFalse(response.context['preview'])
+
+        response = self.client.get(url +'?preview=1')
+        self.assertEqual(200, response.status_code)
+        self.assertTrue(response.context['preview'])
+
+    def test_global_damin_is_on_preview_mode_even_if_not_requested_from_url_when_questionnaire_is_published(self):
+        self.client = Client()
+        self.user, self.country, self.region = self.create_user_with_no_permissions()
+
+        self.assign('can_edit_questionnaire', self.user)
+        self.client.login(username=self.user.username, password='pass')
+
+        self.questionnaire = Questionnaire.objects.create(name="q", status=Questionnaire.PUBLISHED, region=self.region)
+        self.section_1 = Section.objects.create(title="section1", order=1, questionnaire=self.questionnaire, name="section1")
+
+        url = '/questionnaire/entry/%d/section/%d/' % (self.questionnaire.id, self.section_1.id)
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        self.assertTrue(response.context['preview'])
+
+        response = self.client.get(url +'?preview=1')
+        self.assertEqual(200, response.status_code)
+        self.assertTrue(response.context['preview'])
+
+    def test_global_damin_is_on_preview_mode_even_if_not_requested_from_url_when_questionnaire_is_finalized(self):
+        self.client = Client()
+        self.user, self.country, self.region = self.create_user_with_no_permissions()
+
+        self.assign('can_edit_questionnaire', self.user)
+        self.client.login(username=self.user.username, password='pass')
+
+        self.questionnaire = Questionnaire.objects.create(name="q", status=Questionnaire.FINALIZED, region=self.region)
+        self.section_1 = Section.objects.create(title="section1", order=1, questionnaire=self.questionnaire, name="section1")
+
+        url = '/questionnaire/entry/%d/section/%d/' % (self.questionnaire.id, self.section_1.id)
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        self.assertTrue(response.context['preview'])
+
+        response = self.client.get(url +'?preview=1')
+        self.assertEqual(200, response.status_code)
+        self.assertTrue(response.context['preview'])
+
+    def test_global_damin_is_NOT_preview_mode_when_questionnaire_is_draft_unless_requested_from_url(self):
+        self.client = Client()
+        self.user, self.country, self.region = self.create_user_with_no_permissions()
+
+        self.assign('can_edit_questionnaire', self.user)
+        self.client.login(username=self.user.username, password='pass')
+
+        self.questionnaire = Questionnaire.objects.create(name="q", status=Questionnaire.DRAFT, region=self.region)
+        self.section_1 = Section.objects.create(title="section1", order=1, questionnaire=self.questionnaire, name="section1")
+
+        url = '/questionnaire/entry/%d/section/%d/' % (self.questionnaire.id, self.section_1.id)
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        self.assertFalse(response.context['preview'])
+
+        response = self.client.get(url +'?preview=1')
+        self.assertEqual(200, response.status_code)
+        self.assertTrue(response.context['preview'])
+

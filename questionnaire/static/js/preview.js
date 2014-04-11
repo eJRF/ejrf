@@ -16,6 +16,4 @@ function disableInputFields(status) {
         {$save_form_content.show();}
 
     $('.add-more').prop('disabled', status);
-
-
 }

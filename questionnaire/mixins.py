@@ -1,19 +1,27 @@
-from braces.views import AccessMixin, MultiplePermissionsRequiredMixin
+from braces.views import AccessMixin, MultiplePermissionsRequiredMixin, PermissionRequiredMixin
 from django.contrib import messages
 from django.contrib.auth.views import redirect_to_login
 from django.http import HttpResponseRedirect
 from eJRF.settings import LOGIN_REDIRECT_URL
-from questionnaire.models import Questionnaire, Region, SubSection, Question, Section, Theme, QuestionGroup
+from questionnaire.models import Questionnaire, Region, SubSection, Question, Section, Theme, QuestionGroup, SupportDocument
 
 
-class RegionalPermissionRequired(AccessMixin):
+class WithErrorMessageAccessMixin(AccessMixin):
+    error_message = "Operation not allowed. Please login a user with sufficient privileges"
     permission_required = None
 
     def dispatch(self, request, *args, **kwargs):
         has_permission = self.get_permissions_from_request(request, **kwargs)
         if not has_permission:
+            messages.error(request, self.error_message)
             return redirect_to_login(request.get_full_path(), self.get_login_url(), self.get_redirect_field_name())
-        return super(RegionalPermissionRequired, self).dispatch(request, *args, **kwargs)
+        return super(WithErrorMessageAccessMixin, self).dispatch(request, *args, **kwargs)
+
+    def get_permissions_from_request(self, request, **kwargs):
+        pass
+
+
+class RegionalPermissionRequired(WithErrorMessageAccessMixin):
 
     def get_permissions_from_request(self, request, **kwargs):
         user = request.user
@@ -54,6 +62,14 @@ class OwnerAndPermissionRequiredMixin(RegionalPermissionRequired):
         object_ids = filter(lambda key: key.endswith('_id'), kwargs.keys())
         objects = [eval(object_id.replace("_id", "").capitalize()).objects.get(id=kwargs[object_id]) for object_id in object_ids]
         return [object.region for object in objects]
+
+
+class DeleteDocumentMixin(WithErrorMessageAccessMixin):
+
+    def get_permissions_from_request(self, request, **kwargs):
+        user = request.user
+        document = SupportDocument.objects.get(id=kwargs['document_id'])
+        return user.has_perm(self.permission_required) and user.user_profile.country == document.country
 
 
 class AdvancedMultiplePermissionsRequiredMixin(MultiplePermissionsRequiredMixin):

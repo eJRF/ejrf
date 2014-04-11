@@ -39,15 +39,15 @@ class Entry(DoesNotExistExceptionHandlerMixin, AdvancedMultiplePermissionsRequir
         questionnaire = Questionnaire.objects.get(**query_params)
         section = Section.objects.get(id=self.kwargs['section_id'])
         country = get_country(self.request)
-        user_questionnaire_service = UserQuestionnaireService(country, questionnaire, request.GET.get("version"))
+        self.user_questionnaire_service = UserQuestionnaireService(country, questionnaire, request.GET.get("version"))
         initial = {'status': 'Draft', 'country': country,
-                   'version': user_questionnaire_service.GET_version, 'questionnaire': questionnaire}
+                   'version': self.user_questionnaire_service.GET_version, 'questionnaire': questionnaire}
         required_answers = 'show' in request.GET
         formsets = QuestionnaireEntryFormService(section, initial=initial, highlight=required_answers,
-                                                 edit_after_submit=user_questionnaire_service.edit_after_submit)
+                                                 edit_after_submit=self.user_questionnaire_service.edit_after_submit)
         printable = 'printable' in request.GET
         version = request.GET.get('version', None)
-        preview = user_questionnaire_service.preview() or 'preview' in request.GET
+        preview = self._check_preview_mode(questionnaire)
         context = {'questionnaire': questionnaire,
                    'section': section, 'printable': printable,
                    'preview': preview, 'formsets': formsets,
@@ -56,9 +56,16 @@ class Entry(DoesNotExistExceptionHandlerMixin, AdvancedMultiplePermissionsRequir
                    'new_section_action': reverse('new_section_page', args=(questionnaire.id, )),
                    'subsection_form': SubSectionForm(),
                    'subsection_action': reverse('new_subsection_page', args=(questionnaire.id, section.id)),
-                   'documents': user_questionnaire_service.attachments(),
-                   'the_version': version}
+                   'the_version': version,
+                   'documents': self.user_questionnaire_service.attachments()}
         return self.render_to_response(context)
+
+    def _check_preview_mode(self, questionnaire):
+        user = self.request.user
+        perm = None
+        if user.has_perm('auth.can_edit_questionnaire'):
+            perm = questionnaire.is_finalized() or questionnaire.is_published()
+        return perm or self.user_questionnaire_service.preview() or 'preview' in self.request.GET
 
     def post(self, request, *args, **kwargs):
         questionnaire = Questionnaire.objects.get(id=self.kwargs['questionnaire_id'])

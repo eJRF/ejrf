@@ -258,10 +258,10 @@ def then_i_should_see_all_the_questions_listed(step):
     world.page.is_text_present(world.question3.export_label)
 
 
-@step(u'And I have a Finalised Core Questionnaire with three questions')
-def and_i_have_a_finalised_core_questionnaire_with_three_questions(step):
+@step(u'And I have a draft Core Questionnaire with three questions')
+def and_i_have_a_draft_core_questionnaire_with_three_questions(step):
     world.core_questionnaire = Questionnaire.objects.create(name="JRF Core", description="Core Questionnaire",
-                                                          status=Questionnaire.FINALIZED)
+                                                          status=Questionnaire.DRAFT)
     world.section = Section.objects.create(order=1, title="Section Title", description="Section Description",
                                      questionnaire=world.core_questionnaire, name="Cover page")
     world.subsection = SubSection.objects.create(order=1, section=world.section, title='Subsection Title')

@@ -1,4 +1,5 @@
 import os
+from urllib import quote
 from django.core.files import File
 from django.core.urlresolvers import reverse
 from django.test import Client
@@ -13,6 +14,10 @@ class UploadSupportDocumentTest(BaseTest):
     def setUp(self):
         self.client = Client()
         self.user, self.uganda, self.region = self.create_user_with_no_permissions()
+
+        self.assign('can_submit_responses', self.user)
+        self.client.login(username=self.user.username, password='pass')
+
         self.client.login(username='user', password='pass')
         self.filename = 'test_empty_file.pdf'
         self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013)
@@ -82,6 +87,10 @@ class UploadSupportDocumentTest(BaseTest):
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
 
+    def test_assert_login_required(self):
+        url = '/questionnaire/entry/1/documents/2/download/'
+        self.assert_login_required(url)
+
     def test_detach_file_attachment(self):
         _document = SupportDocument.objects.create(path=File(self.document), country=self.uganda,
                                                    questionnaire=self.questionnaire)
@@ -94,6 +103,22 @@ class UploadSupportDocumentTest(BaseTest):
 
         self.assertRaises(SupportDocument.DoesNotExist, SupportDocument.objects.get, id=_document.id)
         self.assertFalse(os.path.exists(_document.path.url))
+
+    def test_permission_required_for_delete_document(self):
+        _document = SupportDocument.objects.create(path=File(self.document), country=self.uganda,
+                                                   questionnaire=self.questionnaire)
+        url = '/questionnaire/document/%s/delete/' % _document.id
+        self.assert_permission_required(url)
+
+        user_not_in_same_country, country, region = self.create_user_with_no_permissions(username="asian_chic",
+                                                                                        country_name="China",
+                                                                                        region_name="ASEAN")
+        self.assign('can_edit_questionnaire', user_not_in_same_country)
+
+        self.client.logout()
+        self.client.login(username='asian_chic', password='pass')
+        response = self.client.post(url)
+        self.assertRedirects(response, expected_url='/accounts/login/?next=%s' % quote(url))
 
     def test_file_uploaded_by_user_cannot_be_seen_by_other_user(self):
         m = mock_open()
@@ -110,6 +135,9 @@ class UploadSupportDocumentTest(BaseTest):
         self.assertEqual(200, response.status_code)
         self.assertNotIn(kenya_document, response.context['documents'])
         self.assertIn(uganda_document, response.context['documents'])
+
+    def test_permission_reguired(self):
+        self.assert_permission_required(self.url)
 
     def tearDown(self):
         os.system("rm -rf %s" % self.filename)

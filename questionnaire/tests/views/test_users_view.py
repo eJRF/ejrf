@@ -73,6 +73,9 @@ class UsersViewTest(BaseTest):
     def test_assert_login_required_for_create_new_user(self):
         self.assert_login_required('/users/new/')
 
+    def test_permission_reguired(self):
+        self.assert_permission_required('/users/new/')
+
     def test_get_edit_user(self):
         response = self.client.get('/users/%d/edit/' % self.user.pk)
         self.assertEqual(200, response.status_code)
@@ -333,6 +336,9 @@ class FilterUsersViewTest(BaseTest):
         self.assertEqual(1, len(response.context['users']))
         self.assertIn(faritha, response.context['users'])
         self.assertNotIn(fatima, response.context['users'])
+
+    def test_permission_reguired(self):
+        self.assert_permission_required('/users/')
 
 
 class GetRegionsForOrganizationTest(BaseTest):
