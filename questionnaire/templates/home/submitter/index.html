@@ -86,7 +86,7 @@
                                         {% for version in versions %}
                                             <li>
                                                 {% with questionnaire.sections.all as ordered_sections %}
-                                                    <a  data-href="{% url 'questionnaire_entry_page' questionnaire.id ordered_sections.0.id %}?preview=1" class="ds-preview-btn" id="view-version-{{ questionnaire.id }}">
+                                                    <a  data-href="{% url 'questionnaire_entry_page' questionnaire.id ordered_sections.0.id %}?preview=1&version={{ version }}" class="ds-preview-btn" id="view-version-{{ questionnaire.id }}">
                                                         <i class="glyphicon glyphicon-eye-open"></i>
                                                         Version {{ version }}
                                                     </a>

@@ -46,8 +46,8 @@ class Entry(DoesNotExistExceptionHandlerMixin, AdvancedMultiplePermissionsRequir
         formsets = QuestionnaireEntryFormService(section, initial=initial, highlight=required_answers,
                                                  edit_after_submit=user_questionnaire_service.edit_after_submit)
         printable = 'printable' in request.GET
+        version = request.GET.get('version', None)
         preview = user_questionnaire_service.preview() or 'preview' in request.GET
-
         context = {'questionnaire': questionnaire,
                    'section': section, 'printable': printable,
                    'preview': preview, 'formsets': formsets,
@@ -56,8 +56,8 @@ class Entry(DoesNotExistExceptionHandlerMixin, AdvancedMultiplePermissionsRequir
                    'new_section_action': reverse('new_section_page', args=(questionnaire.id, )),
                    'subsection_form': SubSectionForm(),
                    'subsection_action': reverse('new_subsection_page', args=(questionnaire.id, section.id)),
-                   'documents': user_questionnaire_service.attachments()}
-
+                   'documents': user_questionnaire_service.attachments(),
+                   'the_version': version}
         return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):

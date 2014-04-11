@@ -36,13 +36,17 @@ $(function(){
     disable_modal_input_fields(editable);
 
     $('.preview-section-modal-tab-link').on('click', function(){
-        showLoadingMessage();
         var $el = $(this),
             url = $el.attr('data-href'),
             $li = $el.parents('li'),
-            $ul = $el.parents('ul');
+            $ul = $el.parents('ul'),
+            version = $('body').find('#version-holder').val();
+        showLoadingMessage();
         $ul.find('.active').removeClass('active');
         $li.addClass('active');
+        if(typeof version != 'undefined'){
+            url += "&version=" + version
+        }
         fillModalWithAjaxContent(url);
         enableFields();
     });
@@ -77,7 +81,7 @@ function showLoadingMessage(){
 function fillModalWithAjaxContent(questionnaire_preview_url){
     $.get(questionnaire_preview_url, function( data ) {
         var $holder = $('<div></div>').append(String(data));
-        var content =  $holder.find("#section-content").html()
+        var content =  $holder.find(".form-content").html();
         $( "#ajax-section-content" ).html(content);
         disable_modal_input_fields(!editable);
         enableFields();
