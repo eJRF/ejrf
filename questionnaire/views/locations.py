@@ -38,6 +38,6 @@ class CountriesForRegion(LoginRequiredMixin, DetailView):
 
     def get(self, request, *args, **kwargs):
         regions = Region.objects.filter(id__in=request.GET.getlist('regions'))
-        countries = Country.objects.filter(regions__in=regions).values('id', 'name')
+        countries = Country.objects.filter(regions__in=regions).distinct().order_by('name').values('id', 'name')
         json_dump = json.dumps(list(countries), cls=DjangoJSONEncoder)
         return HttpResponse(json_dump, mimetype='application/json')
