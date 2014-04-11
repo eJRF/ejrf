@@ -79,6 +79,14 @@ class QuestionnaireEntrySaveDraftTest(BaseTest):
         self.assertEqual(response.context['subsection_action'], '/questionnaire/entry/%s/section/%s/subsection/new/' %
                                                                 (self.questionnaire.id, self.section_1.id))
 
+    def test_gets_version_if_in_get_params(self):
+        response = self.client.get(self.url)
+        self.assertEqual(None, response.context['the_version'])
+        url = '/questionnaire/entry/%d/section/%d/?version=1' % (self.questionnaire.id, self.section_1.id)
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual('1', response.context['the_version'])
+
     def test_gets_ordered_sections_for_only_the_questionnaire_in_get_params(self):
         questionnaire_2 = Questionnaire.objects.create(name="JRF 2013 Core English", status=Questionnaire.FINALIZED,
                                                        description="From dropbox as given by Rouslan")
