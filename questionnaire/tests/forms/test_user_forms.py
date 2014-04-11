@@ -9,6 +9,9 @@ class UserProfileFormTest(BaseTest):
         self.region = Region.objects.create(name="Afro")
         self.uganda = Country.objects.create(name="uganda", code="UGX")
         self.global_admin = Group.objects.create(name='Global Admin')
+        self.data_submitter = Group.objects.create(name="Data Submitter")
+        self.regional_admin = Group.objects.create(name='Regional Admin')
+        self.country_admin = Group.objects.create(name='Country Admin')
         self.organization = Organization.objects.create(name="UNICEF")
 
         self.region.countries.add(self.uganda)
@@ -38,6 +41,14 @@ class UserProfileFormTest(BaseTest):
         self.assertEqual(user_profile[0].country, self.uganda)
         self.assertEqual(user_profile[0].organization, self.organization)
 
+    def test_clean_when_no_groups_given(self):
+        form_data = self.form_data
+        form_data['groups'] = ""
+        user_form = UserProfileForm(form_data)
+        self.assertFalse(user_form.is_valid())
+        message = "This field is required."
+        self.assertEquals(user_form.errors['groups'], [message])
+
     def test_email_already_used(self):
         form_data = self.form_data
         User.objects.create(email=form_data['email'])
@@ -46,6 +57,51 @@ class UserProfileFormTest(BaseTest):
         self.assertFalse(user_form.is_valid())
         message = "%s is already associated to a different user." % form_data['email']
         self.assertEquals(user_form.errors['email'], [message])
+
+    def test_clean_when_regional_admin_is_selected_with_no_organization(self):
+        form_data = self.form_data
+        form_data['groups'] = self.regional_admin.id
+        form_data['organization'] = ""
+        user_form = UserProfileForm(form_data)
+        self.assertFalse(user_form.is_valid())
+        message = "This field is required."
+        self.assertEquals(user_form.errors['organization'], [message])
+
+    def test_clean_when_regional_admin_is_selected_with_no_region(self):
+        form_data = self.form_data
+        form_data['groups'] = self.regional_admin.id
+        form_data['region'] = ""
+        user_form = UserProfileForm(form_data)
+        self.assertFalse(user_form.is_valid())
+        message = "This field is required."
+        self.assertEquals(user_form.errors['region'], [message])
+
+    def test_clean_when_global_admin_is_selected_with_no_organization(self):
+        form_data = self.form_data
+        form_data['groups'] = self.global_admin.id
+        form_data['organization'] = ""
+        user_form = UserProfileForm(form_data)
+        self.assertFalse(user_form.is_valid())
+        message = "This field is required."
+        self.assertEquals(user_form.errors['organization'], [message])
+
+    def test_clean_when_data_submitter_is_selected_with_no_country(self):
+        form_data = self.form_data
+        form_data['groups'] = self.data_submitter.id
+        form_data['country'] = ""
+        user_form = UserProfileForm(form_data)
+        self.assertFalse(user_form.is_valid())
+        message = "This field is required."
+        self.assertEquals(user_form.errors['country'], [message])
+
+    def test_clean_when_country_admin_is_selected_with_no_country(self):
+        form_data = self.form_data
+        form_data['groups'] = self.country_admin.id
+        form_data['country'] = ""
+        user_form = UserProfileForm(form_data)
+        self.assertFalse(user_form.is_valid())
+        message = "This field is required."
+        self.assertEquals(user_form.errors['country'], [message])
 
     def test_clean_username_no_duplicates_on_create(self):
         form_data = self.form_data
@@ -103,7 +159,7 @@ class EditUserProfileFormTest(BaseTest):
 
         self.saved_user = User.objects.create(username='user1', email='test@unicef.com')
         self.user_profile = UserProfile.objects.create(user=self.saved_user, region=self.region, country=self.uganda,
-                                                  organization=self.organization)
+                                                       organization=self.organization)
         self.global_admin.user_set.add(self.saved_user)
 
         self.region.countries.add(self.uganda)
@@ -134,7 +190,7 @@ class EditUserProfileFormTest(BaseTest):
 
         form_data = {
             'username': 'another_user',
-            'email': 'test@unicef.com' }
+            'email': 'test@unicef.com'}
         edit_user_profile_form = EditUserProfileForm(instance=self.saved_user, data=form_data)
         self.assertFalse(edit_user_profile_form.is_valid())
         message = "%s is already associated to a different user." % form_data['username']
@@ -148,7 +204,7 @@ class EditUserProfileFormTest(BaseTest):
 
         form_data = {
             'username': 'user1',
-            'email': 'another_user@unicef.com' }
+            'email': 'another_user@unicef.com'}
         edit_user_profile_form = EditUserProfileForm(instance=self.saved_user, data=form_data)
         self.assertFalse(edit_user_profile_form.is_valid())
         message = "%s is already associated to a different user." % form_data['email']
