@@ -30,8 +30,8 @@ class QuestionForm(ModelForm):
         fields = ('text', 'export_label', 'instructions', 'answer_type', 'options', 'theme', 'is_primary')
         widgets = {'text':  forms.Textarea(attrs={"rows": 6, "cols": 50}),
                    'instructions':  forms.Textarea(attrs={"rows": 6, "cols": 50}),
-                   'answer_type': forms.Select(attrs={'class': 'form-control'}),
-                   'theme': forms.Select(attrs={'class': 'form-control'}),
+                   'answer_type': forms.Select(),
+                   'theme': forms.Select(),
                    'export_label': forms.Textarea(attrs={"rows": 2, "cols": 50})}
 
     def clean(self):
