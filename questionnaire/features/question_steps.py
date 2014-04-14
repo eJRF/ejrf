@@ -294,7 +294,8 @@ def then_i_should_see_a_reorder_questions_modal(step):
 
 @step(u'When I reorder the questions within that modal')
 def when_i_reorder_the_questions_within_that_modal(step):
-    world.page.move_draggable_id_onto_target_id('question-2','question-0')
+    world.page.move_draggable_id_by_this_number_of_steps('question-2', -1)
+    sleep(1)
 
 @step(u'And I save my changes')
 def and_i_save_my_changes(step):
@@ -303,8 +304,8 @@ def and_i_save_my_changes(step):
 @step(u'Then I should see the questions with their order and numbering updated')
 def then_i_should_see_the_questions_with_their_order_and_numbering_updated(step):
     world.page = QuestionnairePage(world.browser, world.section)
-    world.page.validate_updated_numbering(world.question3, '1.1.')
-    world.page.validate_updated_numbering(world.question1, '1.2.')
+    world.page.validate_updated_numbering(world.question1, '1.1.')
+    world.page.validate_updated_numbering(world.question3, '1.2.')
     world.page.validate_updated_numbering(world.question2, '1.3.')
 
 @step(u'And I should see the filter text fields for both theme and answer type')

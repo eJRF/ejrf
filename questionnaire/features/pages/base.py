@@ -123,10 +123,9 @@ class PageObject(object):
         element = self.browser.find_by_id(id).first
         element.fill(data)
 
-    def move_draggable_id_onto_target_id(self, draggable_id, target_id):
-        draggable = self.browser.find_by_id(draggable_id)
-        target = self.browser.find_by_id(target_id)
-        draggable.drag_and_drop(target)
+    def move_draggable_id_by_this_number_of_steps(self, draggable_id, steps):
+        script = "$.getScript('/static/js/lib/jquery.simulate.drag-sortable.js', function() {$('#%s').simulateDragSortable({move: %s});});" % (draggable_id, steps)
+        self.browser.execute_script(script)
 
     def get_text_of_element_by_id(self, id):
         return self.browser.find_by_id(id).first.text
