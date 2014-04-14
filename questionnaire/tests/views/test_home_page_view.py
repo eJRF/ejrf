@@ -10,7 +10,7 @@ class HomePageViewTest(BaseTest):
 
     def setUp(self):
         self.client = Client()
-        self.user = self.create_user(group=self.DATA_SUMBITTER, country="Uganda", region="AFRO")
+        self.user = self.create_user(group=self.DATA_SUBMITTER, country="Uganda", region="AFRO")
         self.region = self.user.user_profile.country.regions.all()[0]
         self.country = self.user.user_profile.country
         self.assign('can_submit_responses', self.user)
@@ -82,11 +82,12 @@ class HomePageViewTest(BaseTest):
     def test_homepage_redirects_to_manage_regional_jrf_when_logged_in_as_regional_admin(self):
         User.objects.all().delete()
         self.client.logout()
-        user, self.country, self.region = self.create_user_with_no_permissions()
+        user = self.create_user(group=self.REGIONAL_ADMIN, region="AFRO", org="WHO")
+        region = user.user_profile.region
         self.assign('can_edit_questionnaire', user)
         self.client.login(username=user.username, password='pass')
         response = self.client.get("/")
-        self.assertRedirects(response, expected_url=reverse('manage_regional_jrf_page', args=(self.region.id,)))
+        self.assertRedirects(response, expected_url=reverse('manage_regional_jrf_page', args=(region.id,)))
 
 
 class GlobalAdminHomePageViewTest(BaseTest):

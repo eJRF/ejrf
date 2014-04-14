@@ -38,9 +38,7 @@ class ManageJRFViewTest(BaseTest):
     def test_permission_required_for_create_section(self):
         self.assert_permission_required(self.url)
 
-        user_not_in_same_region, country, region = self.create_user_with_no_permissions(username="asian_chic",
-                                                                                        country_name="China",
-                                                                                        region_name="ASEAN")
+        user_not_in_same_region = self.create_user(username="asian_chic", group=self.REGIONAL_ADMIN, region="ASEAN", org="WHO")
         self.assign('can_edit_questionnaire', user_not_in_same_region)
 
         self.client.logout()

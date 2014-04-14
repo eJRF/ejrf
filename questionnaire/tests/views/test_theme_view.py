@@ -91,7 +91,8 @@ class EditThemeViewTest(BaseTest):
 class DeleteThemeViewTest(BaseTest):
     def setUp(self):
         self.client = Client()
-        self.user, self.country, self.region = self.create_user_with_no_permissions(region_name=None)
+        self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
+        self.region = None
         self.assign('can_edit_questionnaire', self.user)
         self.client.login(username=self.user.username, password='pass')
 

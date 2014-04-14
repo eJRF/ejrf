@@ -56,9 +56,7 @@ class SectionsViewTest(BaseTest):
     def test_permission_required_for_create_section(self):
         self.assert_permission_required(self.url)
 
-        user_not_in_same_region, country, region = self.create_user_with_no_permissions(username="asian_chic",
-                                                                                        country_name="China",
-                                                                                        region_name="ASEAN")
+        user_not_in_same_region = self.create_user(username="asian_chic", group=self.REGIONAL_ADMIN, region="ASEAN", org="WHO")
         self.assign('can_edit_questionnaire', user_not_in_same_region)
 
         self.client.logout()
@@ -126,9 +124,7 @@ class EditSectionsViewTest(BaseTest):
     def test_permission_required_for_create_section(self):
         self.assert_permission_required(self.url)
 
-        user_not_in_same_region, country, region = self.create_user_with_no_permissions(username="asian_chic",
-                                                                                        country_name="China",
-                                                                                        region_name="ASEAN")
+        user_not_in_same_region = self.create_user(username="asian_chic", group=self.REGIONAL_ADMIN, region="ASEAN", org="WHO")
         self.assign('can_edit_questionnaire', user_not_in_same_region)
 
         self.client.logout()
@@ -266,9 +262,7 @@ class SubSectionsViewTest(BaseTest):
     def test_permission_required_for_create_section(self):
         self.assert_permission_required(self.url)
 
-        user_not_in_same_region, country, region = self.create_user_with_no_permissions(username="asian_chic",
-                                                                                        country_name="China",
-                                                                                        region_name="ASEAN")
+        user_not_in_same_region = self.create_user(username="asian_chic", group=self.REGIONAL_ADMIN, region="ASEAN", org="WHO")
         self.assign('can_edit_questionnaire', user_not_in_same_region)
 
         self.client.logout()
@@ -412,7 +406,9 @@ class RegionalSectionsViewTest(BaseTest):
 
     def setUp(self):
         self.client = Client()
-        self.user, self.country, self.region = self.create_user_with_no_permissions()
+        self.user = self.create_user(group=self.REGIONAL_ADMIN, org="WHO", region="AFRO")
+        self.region = self.user.user_profile.region
+        self.assign('can_edit_questionnaire', self.user)
         self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013, region=self.region)
         self.section = Section.objects.create(name="section", questionnaire=self.questionnaire, order=1, region=self.region)
         self.section1 = Section.objects.create(name="section1", questionnaire=self.questionnaire, order=2, region=self.region)
@@ -430,9 +426,8 @@ class RegionalSectionsViewTest(BaseTest):
 
     def test_post_delete_section_spares_section_thats_not_for_your_region(self):
         client = Client()
-        user_not_in_same_region, country, region = self.create_user_with_no_permissions(username="asian_chic",
-                                                  country_name="China", region_name="ASEAN")
-        self.assign('can_edit_questionnaire', self.user)
+        user_not_in_same_region = self.create_user(username="asian_chic", group=self.REGIONAL_ADMIN, region="ASEAN", org="WHO")
+        self.assign('can_edit_questionnaire', user_not_in_same_region)
         client.login(username=user_not_in_same_region.username, password='pass')
 
         paho = Region.objects.create(name="paho")
@@ -449,7 +444,8 @@ class RegionalSectionsViewTest(BaseTest):
 class RegionalSubSectionsViewTest(BaseTest):
 
     def setUp(self):
-        self.user, self.country, self.region = self.create_user_with_no_permissions()
+        self.user = self.create_user(group=self.REGIONAL_ADMIN, org="WHO", region="AFRO")
+        self.region = self.user.user_profile.region
         self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013, region=self.region)
         self.section = Section.objects.create(name="section", questionnaire=self.questionnaire, order=1, region=self.region)
         self.section1 = Section.objects.create(name="section1", questionnaire=self.questionnaire, order=2, region=self.region)
@@ -467,8 +463,8 @@ class RegionalSubSectionsViewTest(BaseTest):
 
     def test_post_delete_section_spares_section_thats_not_for_your_region(self):
         client = Client()
-        user_not_in_same_region, country, region = self.create_user_with_no_permissions(username="asian_chic",
-                                                  country_name="China", region_name="ASEAN")
+        user_not_in_same_region = self.create_user(username="asian_chic", group=self.REGIONAL_ADMIN, region="ASEAN", org="WHO")
+        self.assign('can_edit_questionnaire', user_not_in_same_region)
         self.assign('can_edit_questionnaire', self.user)
         client.login(username=user_not_in_same_region.username, password='pass')
 

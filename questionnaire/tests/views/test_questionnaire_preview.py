@@ -10,7 +10,7 @@ from questionnaire.tests.base_test import BaseTest
 
 class QuestionnairePreviewTest(BaseTest):
     def setUp(self):
-        self.user = self.create_user(group=self.DATA_SUMBITTER, country="Uganda", region="AFRO")
+        self.user = self.create_user(group=self.DATA_SUBMITTER, country="Uganda", region="AFRO")
         self.country = self.user.user_profile.country
         self.region = self.user.user_profile.country.regions.all()[0]
         self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", status=Questionnaire.PUBLISHED,

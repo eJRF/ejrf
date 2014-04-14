@@ -278,9 +278,8 @@ class RegionalQuestionsViewTest(BaseTest):
         self.assertIn(message, response.cookies['messages'].value)
 
     def test_delete_question_question_not_belonging_to_their_region_shows_error(self):
-        user_not_in_same_region, country, region = self.create_user_with_no_permissions(username="asian_chic",
-                                                                                        country_name="China",
-                                                                                        region_name="ASEAN")
+        user_not_in_same_region = self.create_user(username="asian_chic", group=self.REGIONAL_ADMIN, region="ASEAN", org="WHO")
+        self.assign('can_edit_questionnaire', user_not_in_same_region)
         data = {'text': 'B. Number of cases tested',
                 'instructions': "Enter the total number of cases",
                 'UID': '00001', 'answer_type': 'Number',
@@ -302,8 +301,8 @@ class RegionalQuestionsViewTest(BaseTest):
 class DoesNotExistExceptionViewTest(BaseTest):
     def setUp(self):
         self.client = Client()
-        self.user, self.country, self.region = self.create_user_with_no_permissions()
-
+        self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
+        self.region = Region.objects.create(name="AFRO")
         self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013, region=self.region)
         self.section = Section.objects.create(name="section", questionnaire=self.questionnaire, order=1, region=self.region)
         self.subsection = SubSection.objects.create(title="subsection 1", section=self.section, order=1, region=self.region)
@@ -331,7 +330,8 @@ class EditQuestionViewTest(BaseTest):
 
     def setUp(self):
         self.client = Client()
-        self.user, self.country, self.region = self.create_user_with_no_permissions(region_name=None)
+        self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
+        self.region = Region.objects.create(name="AFRO")
 
         self.assign('can_edit_questionnaire', self.user)
         self.client.login(username=self.user.username, password='pass')

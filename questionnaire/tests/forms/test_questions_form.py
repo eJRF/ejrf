@@ -16,7 +16,6 @@ class QuestionsFormTest(BaseTest):
                           'options': ['', ],
                           'theme': self.theme.id}
 
-
     def test_valid(self):
         section_form = QuestionForm(data=self.form_data)
         self.assertTrue(section_form.is_valid())
@@ -88,7 +87,7 @@ class QuestionsFormTest(BaseTest):
         [self.assertIn(question_option.text, ['Yes', 'No', 'Maybe']) for question_option in question_options]
 
     def test_assigns_region_on_save_if_region_is_given(self):
-        global_admin, country, region = self.create_user_with_no_permissions()
+        region = Region.objects.create(name="ASEAN")
         form = {'text': 'How many kids were immunised this year?',
                 'instructions': 'Some instructions',
                 'short_instruction': 'short version',

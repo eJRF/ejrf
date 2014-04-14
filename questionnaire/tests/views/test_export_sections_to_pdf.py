@@ -12,7 +12,7 @@ from questionnaire.tests.base_test import BaseTest
 class ExportSectionToPDFViewTest(BaseTest):
     def setUp(self):
         self.client = Client()
-        self.user = self.create_user(group=self.DATA_SUMBITTER, country="Uganda", region="AFRO")
+        self.user = self.create_user(group=self.DATA_SUBMITTER, country="Uganda", region="AFRO")
         self.login_user()
 
         self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English",
@@ -53,7 +53,7 @@ class ExportSectionToPDFViewTest(BaseTest):
 class DownloadSectionPDFViewTest(BaseTest):
     def setUp(self):
         self.client = Client()
-        self.user, self.country, self.region = self.create_user_with_no_permissions()
+        self.user = self.create_user(group=self.DATA_SUBMITTER, country="Uganda", region="WHO")
         self.login_user()
 
     def test_get(self):

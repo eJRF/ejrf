@@ -108,7 +108,8 @@ class PublishQuestionnaireToRegionsViewTest(BaseTest):
 
     def setUp(self):
         self.client = Client()
-        self.user, self.country, self.region = self.create_user_with_no_permissions()
+        self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
+        self.region = Region.objects.create(name="AFRO")
         self.assign('can_view_users', self.user)
         self.client.login(username=self.user.username, password='pass')
 
@@ -165,7 +166,8 @@ class ApproveQuestionnaireToDataSubmittersViewTest(BaseTest):
 
     def setUp(self):
         self.client = Client()
-        self.user, self.country, self.region = self.create_user_with_no_permissions()
+        self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
+        self.region = Region.objects.create(name="AFRO")
         self.assign('can_view_users', self.user)
         self.client.login(username=self.user.username, password='pass')
 

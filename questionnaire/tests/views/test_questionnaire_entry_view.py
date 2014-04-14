@@ -1,7 +1,8 @@
 from django.core.urlresolvers import reverse
 from django.test import Client
 from questionnaire.forms.sections import SectionForm, SubSectionForm
-from questionnaire.models import Questionnaire, Section, SubSection, Question, QuestionGroup, QuestionOption, MultiChoiceAnswer, NumericalAnswer, QuestionGroupOrder, AnswerGroup, Answer, Country, TextAnswer, DateAnswer
+from questionnaire.models import Questionnaire, Section, SubSection, Question, QuestionGroup, QuestionOption, MultiChoiceAnswer, NumericalAnswer, QuestionGroupOrder, AnswerGroup, Answer, Country, TextAnswer, DateAnswer, \
+    Region
 from questionnaire.services.questionnaire_entry_form_service import QuestionnaireEntryFormService
 from questionnaire.tests.base_test import BaseTest
 from urllib import quote
@@ -10,7 +11,7 @@ from urllib import quote
 class QuestionnaireEntrySaveDraftTest(BaseTest):
     def setUp(self):
         self.client = Client()
-        self.user = self.create_user(group=self.DATA_SUMBITTER, country="Uganda", region="AFRO")
+        self.user = self.create_user(group=self.DATA_SUBMITTER, country="Uganda", region="AFRO")
         self.country = self.user.user_profile.country
         self.region = self.user.user_profile.country.regions.all()[0]
 
@@ -112,8 +113,9 @@ class QuestionnaireEntrySaveDraftTest(BaseTest):
         self.assert_permission_required('/questionnaire/entry/%d/section/%d/' % (self.questionnaire.id, self.section_1.id))
 
     def test_POST_is_restricted_to_data_submitters_only(self):
-        global_admin, country, region = self.create_user_with_no_permissions(username="ga", country_name="GA", region_name=None)
-        self.assign('can_edit_questionnaire', global_admin)
+        user = self.create_user(username="Global", group=self.GLOBAL_ADMIN, org="WHO")
+        self.region = Region.objects.create(name="AFRO")
+        self.assign('can_edit_questionnaire', user)
 
         self.client.logout()
         self.client.login(username='ga', password='pass')
@@ -346,7 +348,7 @@ class SaveGridDraftQuestionGroupEntryTest(BaseTest):
                      }
         self.url = '/questionnaire/entry/%d/section/%d/' % (self.questionnaire.id, self.section1.id)
         self.client = Client()
-        self.user = self.create_user(group=self.DATA_SUMBITTER, country="Uganda", region="AFRO")
+        self.user = self.create_user(group=self.DATA_SUBMITTER, country="Uganda", region="AFRO")
         self.country = self.user.user_profile.country
         self.region = self.user.user_profile.country.regions.all()[0]
 
@@ -549,7 +551,7 @@ class SaveGridDraftQuestionGroupEntryTest(BaseTest):
 class QuestionnaireEntrySubmitTest(BaseTest):
     def setUp(self):
         self.client = Client()
-        self.user = self.create_user(group=self.DATA_SUMBITTER, country="Uganda", region="AFRO")
+        self.user = self.create_user(group=self.DATA_SUBMITTER, country="Uganda", region="AFRO")
         self.country = self.user.user_profile.country
         self.region = self.user.user_profile.country.regions.all()[0]
 
@@ -599,7 +601,8 @@ class QuestionnaireEntrySubmitTest(BaseTest):
         self.assert_permission_required(self.url)
 
     def test_POST_is_restricted_to_data_submitters_only(self):
-        global_admin, country, region = self.create_user_with_no_permissions(username="ga", country_name="GA", region_name=None)
+        global_admin = self.create_user(username="new user", group=self.GLOBAL_ADMIN, org="WHO")
+        self.region = Region.objects.create(name="AFRO")
         self.assign('can_edit_questionnaire', global_admin)
 
         client = Client()
@@ -813,7 +816,7 @@ class DeleteAnswerGroupViewTest(BaseTest):
         self.parent10.question.add(self.question2, self.question1, self.primary_question)
 
         self.client = Client()
-        self.user = self.create_user(group=self.DATA_SUMBITTER, country="Uganda", region="AFRO")
+        self.user = self.create_user(group=self.DATA_SUBMITTER, country="Uganda", region="AFRO")
         self.country = self.user.user_profile.country
         self.region = self.user.user_profile.country.regions.all()[0]
         self.assign('can_submit_responses', self.user)
@@ -881,7 +884,7 @@ class PreviewModeQuestionnaireEntryTest(BaseTest):
 
     def test_data_submitter_is_not_preview_mode_only_if_requested_from_url(self):
         self.client = Client()
-        self.user = self.create_user(group=self.DATA_SUMBITTER, country="Uganda", region="AFRO")
+        self.user = self.create_user(group=self.DATA_SUBMITTER, country="Uganda", region="AFRO")
         self.country = self.user.user_profile.country
         self.region = self.user.user_profile.country.regions.all()[0]
 
@@ -903,7 +906,8 @@ class PreviewModeQuestionnaireEntryTest(BaseTest):
 
     def test_global_damin_is_on_preview_mode_even_if_not_requested_from_url_when_questionnaire_is_published(self):
         self.client = Client()
-        self.user, self.country, self.region = self.create_user_with_no_permissions()
+        self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
+        self.region = Region.objects.create(name="AFRO")
 
         self.assign('can_edit_questionnaire', self.user)
         self.client.login(username=self.user.username, password='pass')
@@ -922,7 +926,8 @@ class PreviewModeQuestionnaireEntryTest(BaseTest):
 
     def test_global_damin_is_on_preview_mode_even_if_not_requested_from_url_when_questionnaire_is_finalized(self):
         self.client = Client()
-        self.user, self.country, self.region = self.create_user_with_no_permissions()
+        self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
+        self.region = Region.objects.create(name="AFRO")
 
         self.assign('can_edit_questionnaire', self.user)
         self.client.login(username=self.user.username, password='pass')
@@ -941,8 +946,8 @@ class PreviewModeQuestionnaireEntryTest(BaseTest):
 
     def test_global_damin_is_NOT_preview_mode_when_questionnaire_is_draft_unless_requested_from_url(self):
         self.client = Client()
-        self.user, self.country, self.region = self.create_user_with_no_permissions()
-
+        self.user = self.create_user(group=self.REGIONAL_ADMIN, org="WHO", region="AFRO")
+        self.region = self.user.user_profile.region
         self.assign('can_edit_questionnaire', self.user)
         self.client.login(username=self.user.username, password='pass')
 

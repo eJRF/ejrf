@@ -7,7 +7,9 @@ from questionnaire.utils.view_utils import get_country, get_questionnaire_status
 
 class ViewUtilTest(BaseTest):
     def setUp(self):
-        self.user, self.uganda, self.region = self.create_user_with_no_permissions()
+        self.user = self.create_user(group=self.DATA_SUBMITTER, country="Uganda", region="AFRO")
+        self.uganda = self.user.user_profile.country
+        self.region = self.user.user_profile.country.regions.all()[0]
         self.factory = RequestFactory()
 
     def test_gets_country_from_request(self):
@@ -32,7 +34,7 @@ class ViewUtilTest(BaseTest):
         [self.assertIn(status, questionnaire_status)for status in [Questionnaire.PUBLISHED, Questionnaire.DRAFT, Questionnaire.FINALIZED]]
 
     def test_gets_questionnaire_status_for_data_submitter_user(self):
-        user, self.uganda, self.region = self.create_user_with_no_permissions(username="uganda user")
+        user = self.create_user(username="Ugandauser", group=self.GLOBAL_ADMIN, org="WHO")
         self.assign('can_submit_responses', user)
         request = self.factory.get('/')
         request.user = user

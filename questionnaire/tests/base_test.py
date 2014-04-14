@@ -9,13 +9,13 @@ from questionnaire.models import Country, UserProfile, Region, Organization
 
 class BaseTest(TestCase):
 
-    DATA_SUMBITTER = 'DATA_SUBMITTER'
+    DATA_SUBMITTER = 'DATA_SUBMITTER'
     REGIONAL_ADMIN = 'REGIONAL_ADMIN'
     GLOBAL_ADMIN = 'GLOBAL_ADMIN'
 
     ROLE_BASED_ATTRIBUTES = {GLOBAL_ADMIN: '_global_admin_attributes',
                              REGIONAL_ADMIN: '_regional_admin_attributes',
-                             DATA_SUMBITTER: '_data_submitter_attributes'}
+                             DATA_SUBMITTER: '_data_submitter_attributes'}
 
     def write_to_csv(self, mode, data, csvfilename='test.csv'):
         with open(csvfilename, mode) as fp:
@@ -46,19 +46,6 @@ class BaseTest(TestCase):
         organization = Organization.objects.create(name=org)
         region = Region.objects.create(name=region)
         return {'organization': organization, 'region': region}
-
-    def create_user_with_no_permissions(self, username=None, country_name="Uganda", region_name="Afro", organization=None):
-        username = username if username else "user"
-        user = User.objects.create(username=username, email="user@mail.com")
-        uganda = Country.objects.create(name=country_name)
-        region = None
-        if region_name:
-            region = Region.objects.create(name=region_name)
-            region.countries.add(uganda)
-        UserProfile.objects.create(user=user, country=uganda, region=region)
-        user.set_password("pass")
-        user.save()
-        return user, uganda, region
 
     def login_user(self):
         self.client.login(username='user', password='pass')
