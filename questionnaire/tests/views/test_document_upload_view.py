@@ -13,11 +13,12 @@ from questionnaire.models import Questionnaire, Country, SupportDocument, Sectio
 class UploadSupportDocumentTest(BaseTest):
     def setUp(self):
         self.client = Client()
-        self.user, self.uganda, self.region = self.create_user_with_no_permissions()
+        self.user = self.create_user(group=self.DATA_SUMBITTER, country="Uganda", region="AFRO")
 
         self.assign('can_submit_responses', self.user)
         self.client.login(username=self.user.username, password='pass')
 
+        self.uganda = self.user.user_profile.country
         self.client.login(username='user', password='pass')
         self.filename = 'test_empty_file.pdf'
         self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013)

@@ -32,8 +32,10 @@ class BaseTest(TestCase):
         user.save()
         return user
 
-    def _data_submitter_attributes(self, country):
-        country = Organization.objects.create(name=country)
+    def _data_submitter_attributes(self, country, region):
+        region = Region.objects.create(name=region)
+        country = Country.objects.create(name=country)
+        region.countries.add(country)
         return {'country': country}
 
     def _global_admin_attributes(self, org):
