@@ -40,32 +40,37 @@ function _replace($el, attr, index){
 
 function reIndexFieldNames() {
     var fieldTypes = ['MultiChoice', 'Date', 'Number', 'Text'];
-    fieldTypes.forEach(function(type){
-        var total = -1;
-        var previous_name = '';
-        $('#questionnaire_entry').find(":input[name^=" + type + "][type!=hidden]").each(function(index, el){
-            var $el = $(el),
-                name = $el.attr('name'),
-                type = $el.attr('type');
-            if (!(previous_name == name && type == 'radio')){
-                total = total +1;
-            }
-            var attributeMap = replaceAttributes($el, total);
-            $el.attr({'name': attributeMap.name, 'id': attributeMap.id});
-            var $hidden = $el.prev("input[name="+ name +"]");
-            $hidden.attr({'name': attributeMap.name, 'id': attributeMap.id});
-            if(previous_name !=name && type == 'radio'){
-                var $radio_extra_hidden = $el.prev().prev("input[name="+ name +"]");
-                $radio_extra_hidden.attr({'name': attributeMap.name, 'id': attributeMap.id});
-            }
-            var $label = $el.parents("label");
-            $label.attr('for', attributeMap.id);
-            previous_name = name;
-        });
-        $('#id_' + type + '-MAX_NUM_FORMS').val(total+1);
-        $('#id_' + type + '-INITIAL_FORMS').val(total+1);
-        $('#id_' + type + '-TOTAL_FORMS').val(total+1);
-    });
+
+    for (var i = 0; i < fieldTypes.length; i++) {
+        (function (i) {
+            type = fieldTypes[i];
+
+            var total = -1;
+            var previous_name = '';
+            $('#questionnaire_entry').find(":input[name^=" + type + "][type!=hidden]").each(function (index, el) {
+                var $el = $(el),
+                    name = $el.attr('name'),
+                    type = $el.attr('type');
+                if (!(previous_name == name && type == 'radio')) {
+                    total = total + 1;
+                }
+                var attributeMap = replaceAttributes($el, total);
+                $el.attr({'name': attributeMap.name, 'id': attributeMap.id});
+                var $hidden = $el.prev("input[name=" + name + "]");
+                $hidden.attr({'name': attributeMap.name, 'id': attributeMap.id});
+                if (previous_name != name && type == 'radio') {
+                    var $radio_extra_hidden = $el.prev().prev("input[name=" + name + "]");
+                    $radio_extra_hidden.attr({'name': attributeMap.name, 'id': attributeMap.id});
+                }
+                var $label = $el.parents("label");
+                $label.attr('for', attributeMap.id);
+                previous_name = name;
+            });
+            $('#id_' + type + '-MAX_NUM_FORMS').val(total + 1);
+            $('#id_' + type + '-INITIAL_FORMS').val(total + 1);
+            $('#id_' + type + '-TOTAL_FORMS').val(total + 1);
+        }(i));
+    }
 }
 
 function removeUsedOptions(new_row, $table) {
