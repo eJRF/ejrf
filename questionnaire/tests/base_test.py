@@ -4,10 +4,18 @@ from django.contrib.contenttypes.models import ContentType
 from django.http.request import QueryDict
 from django.test import TestCase
 from urllib import quote
-from questionnaire.models import Country, UserProfile, Region
+from questionnaire.models import Country, UserProfile, Region, Organization
 
 
 class BaseTest(TestCase):
+
+    DATA_SUMBITTER = 'DATA_SUBMITTER'
+    REGIONAL_ADMIN = 'REGIONAL_ADMIN'
+    GLOBAL_ADMIN = 'GLOBAL_ADMIN'
+
+    ROLE_BASED_ATTRIBUTES = {GLOBAL_ADMIN: '_global_admin_attributes',
+                             REGIONAL_ADMIN: '_regional_admin_attributes',
+                             DATA_SUMBITTER: '_data_submitter_attributes'}
 
     def write_to_csv(self, mode, data, csvfilename='test.csv'):
         with open(csvfilename, mode) as fp:
@@ -15,7 +23,29 @@ class BaseTest(TestCase):
             _file.writerows(data)
             fp.close()
 
-    def create_user_with_no_permissions(self, username=None, country_name="Uganda", region_name="Afro"):
+    def create_user(self, username=None, group=GLOBAL_ADMIN, **kwargs):
+        username = username if username else "user"
+        user = User.objects.create(username=username, email="user@mail.com")
+        attributes_creator_method = getattr(self, self.ROLE_BASED_ATTRIBUTES[group])
+        UserProfile.objects.create(user=user, **attributes_creator_method(**kwargs))
+        user.set_password("pass")
+        user.save()
+        return user
+
+    def _data_submitter_attributes(self, country):
+        country = Organization.objects.create(name=country)
+        return {'country': country}
+
+    def _global_admin_attributes(self, org):
+        organization = Organization.objects.create(name=org)
+        return {'organization': organization}
+
+    def _regional_admin_attributes(self, region, org):
+        organization = Organization.objects.create(name=org)
+        region = Region.objects.create(name=region)
+        return {'organization': organization, 'region': region}
+
+    def create_user_with_no_permissions(self, username=None, country_name="Uganda", region_name="Afro", organization=None):
         username = username if username else "user"
         user = User.objects.create(username=username, email="user@mail.com")
         uganda = Country.objects.create(name=country_name)

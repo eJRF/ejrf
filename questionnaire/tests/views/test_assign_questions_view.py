@@ -1,6 +1,6 @@
 from urllib import quote
 from questionnaire.forms.assign_question import AssignQuestionForm
-from questionnaire.models import Questionnaire, Section, SubSection, Question
+from questionnaire.models import Questionnaire, Section, SubSection, Question, Region
 from questionnaire.tests.base_test import BaseTest
 from django.test import Client
 
@@ -9,7 +9,8 @@ class AssignQuestionViewTest(BaseTest):
 
     def setUp(self):
         self.client = Client()
-        self.user, self.country, self.region = self.create_user_with_no_permissions()
+        self.user = self.create_user(org="WHO")
+        self.region = None
 
         self.assign('can_edit_questionnaire', self.user)
         self.client.login(username=self.user.username, password='pass')
@@ -30,15 +31,16 @@ class AssignQuestionViewTest(BaseTest):
         self.assertIn('questionnaires/assign_questions.html', templates)
 
     def test_gets_assign_questions_form_and_subsection_in_context(self):
-        question_not_in_region = Question.objects.create(text='not in Region Q', UID='C000R3', answer_type='Number')
-
+        afro = Region.objects.create(name="Afro")
+        question_in_region = Question.objects.create(text='not in Region Q', UID='C000R3', answer_type='Number',
+                                                     region=afro)
         response = self.client.get(self.url)
         self.assertIsInstance(response.context['assign_question_form'], AssignQuestionForm)
         self.assertEqual(2, response.context['questions'].count())
         questions_texts = [question.text for question in list(response.context['questions'])]
         self.assertIn(self.question1.text, questions_texts)
         self.assertIn(self.question2.text, questions_texts)
-        self.assertNotIn(question_not_in_region.text, questions_texts)
+        self.assertNotIn(question_in_region.text, questions_texts)
         self.assertEqual('Done', response.context['btn_label'])
 
     def test_GET_puts_list_of_already_used_questions_in_context(self):
@@ -143,17 +145,17 @@ class UnAssignQuestionViewTest(BaseTest):
 
     def setUp(self):
         self.client = Client()
-        self.user, self.country, self.region = self.create_user_with_no_permissions()
+        self.user = self.create_user(org="WHO")
 
         self.assign('can_edit_questionnaire', self.user)
         self.client.login(username=self.user.username, password='pass')
 
-        self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013, region=self.region)
+        self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013, region=None)
         self.section = Section.objects.create(name="section", questionnaire=self.questionnaire, order=1)
 
         self.subsection = SubSection.objects.create(title="subsection 1", section=self.section, order=1)
-        self.question1 = Question.objects.create(text='Q1', UID='C00003', answer_type='Number', region=self.region)
-        self.question2 = Question.objects.create(text='Q2', UID='C00002', answer_type='Number', region=self.region)
+        self.question1 = Question.objects.create(text='Q1', UID='C00003', answer_type='Number', region=None)
+        self.question2 = Question.objects.create(text='Q2', UID='C00002', answer_type='Number', region=None)
         self.question_group = self.question1.question_group.create(subsection=self.subsection)
         self.question1.orders.create(question_group=self.question_group, order=1)
         self.question_group.question.add(self.question2)
@@ -199,10 +201,11 @@ class UnAssignQuestionViewTest(BaseTest):
         self.assertRedirects(response, expected_url='/accounts/login/?next=%s' % quote(self.url))
 
     def test_permission_denied_if_subsection_belongs_to_a_user_but_question_to_another_user(self):
-        core_question = Question.objects.create(text='core Q', UID='C000C2', answer_type='Number', region=None)
+        afro = Region.objects.create(name="Afro")
+        core_question = Question.objects.create(text='core Q', UID='C000C2', answer_type='Number', region=afro)
         self.question_group.question.add(core_question)
 
-        url = '/subsection/%d/question/%d/unassign/'%(self.subsection.id, core_question.id)
+        url = '/subsection/%d/question/%d/unassign/' % (self.subsection.id, core_question.id)
 
         response = self.client.post(url)
         self.assertRedirects(response, expected_url='/accounts/login/?next=%s' % quote(url))
