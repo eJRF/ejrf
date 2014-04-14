@@ -8,27 +8,34 @@ class RegionViewTest(BaseTest):
 
     def setUp(self):
         self.client = Client()
-        self.user, self.country, self.region = self.create_user_with_no_permissions(region_name="Afro")
+        self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
+        self.assign('can_edit_questionnaire', self.user)
         self.login_user()
 
     def test_get_region_list(self):
-        region = Region.objects.create(name="AFRO")
+        region1 = Region.objects.create(name="AFRO")
+        region2 = Region.objects.create(name="SEAR")
         response = self.client.get('/locations/region/')
         self.assertEqual(200, response.status_code)
         templates = [template.name for template in response.templates]
         self.assertIn('locations/region/index.html', templates)
         self.assertEqual(2, len(response.context['region_list']))
-        self.assertIn(region, response.context['region_list'])
+        self.assertIn(region1, response.context['region_list'])
+        self.assertIn(region2, response.context['region_list'])
 
     def test_login_required(self):
         self.assert_login_required('/locations/region/')
+
+    def test_perms_required(self):
+        self.assert_permission_required('/locations/region/')
 
 
 class CountryViewTest(BaseTest):
 
     def setUp(self):
         self.client = Client()
-        self.user, self.country, self.region = self.create_user_with_no_permissions()
+        self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
+        self.assign('can_edit_questionnaire', self.user)
         self.login_user()
 
     def test_get_region_list(self):

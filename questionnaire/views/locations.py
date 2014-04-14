@@ -1,18 +1,20 @@
 import json
+from braces.views import PermissionRequiredMixin, LoginRequiredMixin
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import HttpResponse
 from django.views.generic import ListView, DetailView
 from questionnaire.models import Region, Country, Organization
-from braces.views import LoginRequiredMixin
 
 
-class ListRegions(LoginRequiredMixin, ListView):
+class ListRegions(PermissionRequiredMixin, ListView):
     model = Region
+    permission_required = 'auth.can_edit_questionnaire'
     template_name = 'locations/region/index.html'
 
 
-class ListCountries(LoginRequiredMixin, ListView):
+class ListCountries(PermissionRequiredMixin, ListView):
     model = Country
+    permission_required = 'auth.can_edit_questionnaire'
     template_name = 'locations/country/index.html'
 
     def get(self, request, *args, **kwargs):
@@ -23,8 +25,9 @@ class ListCountries(LoginRequiredMixin, ListView):
         return self.region.countries.all()
 
 
-class RegionsForOrganization(LoginRequiredMixin, DetailView):
+class RegionsForOrganization(PermissionRequiredMixin, DetailView):
     model = Organization
+    permission_required = 'auth.can_edit_questionnaire'
 
     def get(self, request, *args, **kwargs):
         json_dump = json.dumps(list(self.get_object().regions.all().values('id', 'name')), cls=DjangoJSONEncoder)

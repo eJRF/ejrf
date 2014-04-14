@@ -344,7 +344,8 @@ class FilterUsersViewTest(BaseTest):
 class GetRegionsForOrganizationTest(BaseTest):
     def setUp(self):
         self.client = Client()
-        self.user, self.country, self.region = self.create_user_with_no_permissions()
+        self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
+        self.assign('can_edit_questionnaire', self.user)
         self.login_user()
         self.unicef = Organization.objects.create(name="UNICEF")
         self.who = Organization.objects.create(name="WHO")

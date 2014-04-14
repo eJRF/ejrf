@@ -9,8 +9,8 @@ class ManageJRFViewTest(BaseTest):
 
     def setUp(self):
         self.client = Client()
-        self.user, self.country, self.region = self.create_user_with_no_permissions()
-        self.who = Organization.objects.create(name="WHO")
+        self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
+        self.who = self.user.user_profile.organization
         self.unicef = Organization.objects.create(name="UNICEF")
         self.paho = Region.objects.create(name="The Paho", organization=self.who)
         self.pacific = Region.objects.create(name="haha", organization=self.who)
@@ -59,17 +59,21 @@ class FinalizeQuestionnaireViewTest(BaseTest):
 
     def setUp(self):
         self.client = Client()
-        self.user, self.country, self.region = self.create_user_with_no_permissions()
+        self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
+        self.who = self.user.user_profile.organization
         self.assign('can_view_users', self.user)
+        self.region = Region.objects.create(name="SEAR")
 
         self.client.login(username=self.user.username, password='pass')
 
-        self.questionnaire = Questionnaire.objects.create(name="JRF Brazil", description="bla", year=2013, status=Questionnaire.DRAFT)
-        Section.objects.create(title="Cured Cases of Measles", order=1, questionnaire=self.questionnaire, name="Cured Cases")
+        self.questionnaire = Questionnaire.objects.create(name="JRF Brazil", description="bla", year=2013,
+                                                          status=Questionnaire.DRAFT)
+        Section.objects.create(title="Cured Cases of Measles", order=1, questionnaire=self.questionnaire,
+                               name="Cured Cases")
         self.url = '/questionnaire/%d/finalize/' % self.questionnaire.id
 
     def test_post_finalizes_questionnaire(self):
-        referer_url = reverse('manage_regional_jrf_page', args=(self.region.id,))
+        referer_url = reverse('manage_jrf_page')
         self.assign('can_edit_questionnaire', self.user)
         response = self.client.post(self.url, HTTP_REFERER=referer_url)
         self.assertNotIn(self.questionnaire, Questionnaire.objects.filter(status=Questionnaire.DRAFT).all())
@@ -77,7 +81,7 @@ class FinalizeQuestionnaireViewTest(BaseTest):
         self.assertRedirects(response, referer_url)
 
     def test_post_unfinalizes_questionnaire(self):
-        referer_url = reverse('manage_regional_jrf_page', args=(self.region.id,))
+        referer_url = reverse('manage_jrf_page')
         self.assign('can_edit_questionnaire', self.user)
         questionnaire = Questionnaire.objects.create(name="JRF Brazil", description="bla", year=2013, status=Questionnaire.FINALIZED)
         section = Section.objects.create(name="haha", questionnaire=questionnaire, order=1)

@@ -8,7 +8,10 @@ from questionnaire.tests.base_test import BaseTest
 class ManageJRFViewTest(BaseTest):
     def setUp(self):
         self.client = Client()
-        self.user, self.country, self.region = self.create_user_with_no_permissions()
+        self.user = self.create_user(group=self.REGIONAL_ADMIN, region="AFRO", org="WHO")
+        self.region = self.user.user_profile.region
+        self.assign('can_edit_questionnaire', self.user)
+
         self.who = Organization.objects.create(name="WHO")
         self.assign('can_edit_questionnaire', self.user)
         self.client.login(username=self.user.username, password='pass')
@@ -50,7 +53,10 @@ class ManageJRFViewTest(BaseTest):
 class EditQuestionnaireNameViewTest(BaseTest):
     def setUp(self):
         self.client = Client()
-        self.user, self.country, self.region = self.create_user_with_no_permissions()
+        self.user = self.create_user(group=self.REGIONAL_ADMIN, region="AFRO", org="WHO")
+        self.region = self.user.user_profile.region
+        self.assign('can_edit_questionnaire', self.user)
+
         self.who = Organization.objects.create(name="WHO")
         self.assign('can_edit_questionnaire', self.user)
         self.assign('can_view_users', self.user)
@@ -71,7 +77,8 @@ class EditQuestionnaireNameViewTest(BaseTest):
 class FinalizeRegionalQuestionnaireViewTest(BaseTest):
     def setUp(self):
         self.client = Client()
-        self.user, self.country, self.region = self.create_user_with_no_permissions()
+        self.user = self.create_user(group=self.REGIONAL_ADMIN, region="AFRO", org="WHO")
+        self.region = self.user.user_profile.region
         self.assign('can_view_users', self.user)
 
         self.client.login(username=self.user.username, password='pass')
@@ -115,5 +122,3 @@ class FinalizeRegionalQuestionnaireViewTest(BaseTest):
         self.assertRedirects(response, referer_url)
         message = "The questionnaire could not be unlocked because its published."
         self.assertIn(message, response.cookies['messages'].value)
-
-

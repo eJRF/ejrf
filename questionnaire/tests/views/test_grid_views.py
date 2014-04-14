@@ -1,16 +1,16 @@
 from urllib import quote
-from questionnaire.forms.assign_question import AssignQuestionForm
-from questionnaire.forms.grid import GridForm
-from questionnaire.models import Questionnaire, Section, SubSection, Question, QuestionOption, QuestionGroup
-from questionnaire.tests.base_test import BaseTest
 from django.test import Client
+from questionnaire.forms.grid import GridForm
+from questionnaire.models import Questionnaire, Section, SubSection, Question, QuestionOption, QuestionGroup, Region
+from questionnaire.tests.base_test import BaseTest
 
 
 class CreateGridViewTest(BaseTest):
 
     def setUp(self):
         self.client = Client()
-        self.user, self.country, self.region = self.create_user_with_no_permissions()
+        self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
+        self.region = None
 
         self.assign('can_edit_questionnaire', self.user)
         self.client.login(username=self.user.username, password='pass')
@@ -20,7 +20,8 @@ class CreateGridViewTest(BaseTest):
         self.section1 = Section.objects.create(title="Reported Cases of Selected Vaccine", order=1,
                                                questionnaire=self.questionnaire, name="Reported Cases")
 
-        self.sub_section = SubSection.objects.create(title="subsection 1", order=1, section=self.section1, region=self.region)
+        self.sub_section = SubSection.objects.create(title="subsection 1", order=1, section=self.section1,
+                                                     region=self.region)
         self.sub_section2 = SubSection.objects.create(title="subsection 2", order=2, section=self.section1)
 
         self.question1 = Question.objects.create(text='Favorite beer 1', UID='C00001', answer_type='MultiChoice',
@@ -38,7 +39,7 @@ class CreateGridViewTest(BaseTest):
         self.question4 = Question.objects.create(text='question 4', instructions="instruction 2",
                                                  UID='C00005', answer_type='Date', region=self.region)
 
-        self.data ={
+        self.data = {
             'type': 'display_all',
             'primary_question':self.question1.id,
             'columns': [self.question2.id, self.question3.id]
@@ -132,7 +133,7 @@ class CreateGridViewTest(BaseTest):
         response = self.client.post(self.url, data=self.data, **meta)
 
         parent_grid_group = self.question1.question_group.get(subsection=self.sub_section, grid=True,
-                                                       allow_multiples=True, order=0, hybrid=True)
+                                                              allow_multiples=True, order=0, hybrid=True)
         group_questions = parent_grid_group.question.all()
         self.assertEqual(3, group_questions.count())
         self.assertIn(self.question2, group_questions)
@@ -207,7 +208,8 @@ class RemoveGridViewTest(BaseTest):
 
     def setUp(self):
         self.client = Client()
-        self.user, self.country, self.region = self.create_user_with_no_permissions()
+        self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
+        self.region = None
 
         self.assign('can_edit_questionnaire', self.user)
         self.client.login(username=self.user.username, password='pass')
@@ -295,8 +297,9 @@ class RemoveGridViewTest(BaseTest):
         self.assertRedirects(response, expected_url='/accounts/login/?next=%s' % quote(self.url))
 
     def test_permission_denied_if_subsection_belongs_to_a_user_but_grid_to_another_user(self):
+        region = Region.objects.create(name="SEAR")
         core_group = QuestionGroup.objects.create(name="core group", order=1, subsection=self.sub_section, grid=True)
-        core_question = Question.objects.create(text='core question -- not in any region',  UID='C00222', answer_type='Text')
+        core_question = Question.objects.create(text='core question -- not in any region',  UID='C00222', answer_type='Text', region=region)
         core_group.question.add(core_question)
 
         url = '/subsection/%d/grid/%d/delete/'%(self.sub_section.id, core_group.id)

@@ -156,7 +156,7 @@ class DuplicateQuestionnaire(MultiplePermissionsRequiredMixin, View):
 
 
 class FinalizeQuestionnaire(MultiplePermissionsRequiredMixin, View):
-    permissions = {'any': ('auth.can_view_users','auth.can_edit_questionnaire')}
+    permissions = {'any': ('auth.can_view_users', 'auth.can_edit_questionnaire')}
 
     def post(self, request, *args, **kwargs):
         questionnaire = Questionnaire.objects.get(id=kwargs['questionnaire_id'])
