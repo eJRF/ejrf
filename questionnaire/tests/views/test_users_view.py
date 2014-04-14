@@ -12,7 +12,7 @@ from questionnaire.tests.base_test import BaseTest
 class UsersViewTest(BaseTest):
     def setUp(self):
         self.client = Client()
-        self.user, self.country, self.region = self.create_user_with_no_permissions()
+        self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
         self.assign('can_view_users', self.user)
         self.login_user()
         self.global_admin = Group.objects.create(name='Global Admin')
@@ -146,11 +146,11 @@ class UsersViewTest(BaseTest):
         self.assertIn('Edit User', response.context['title'])
 
 
-
 class FilterUsersViewTest(BaseTest):
     def setUp(self):
         self.client = Client()
-        self.user, self.country, self.region = self.create_user_with_no_permissions()
+        self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
+        self.assign('can_edit_questionnaire', self.user)
         self.assign('can_view_users', self.user)
         self.login_user()
         self.organization = Organization.objects.create(name="UNICEF")

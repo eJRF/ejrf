@@ -1,9 +1,11 @@
 from urllib import quote
+
 from django.core.urlresolvers import reverse
 from django.test import Client
+
 from questionnaire.forms.questions import QuestionForm
 from questionnaire.models import Question, Questionnaire, Section, SubSection, Country, Answer, Region, QuestionGroup, \
-    Theme, QuestionOption
+    Theme
 from questionnaire.tests.base_test import BaseTest
 
 
@@ -11,8 +13,7 @@ class QuestionViewTest(BaseTest):
 
     def setUp(self):
         self.client = Client()
-        self.user, self.country, self.region = self.create_user_with_no_permissions(region_name=None)
-
+        self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
         self.assign('can_edit_questionnaire', self.user)
         self.client.login(username=self.user.username, password='pass')
 
@@ -225,8 +226,8 @@ class RegionalQuestionsViewTest(BaseTest):
     def setUp(self):
 
         self.client = Client()
-        self.user, self.country, self.region = self.create_user_with_no_permissions()
-
+        self.user = self.create_user(group=self.REGIONAL_ADMIN, org="WHO", region="AFRO")
+        self.region = self.user.user_profile.region
         self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013, region=self.region)
         self.section = Section.objects.create(name="section", questionnaire=self.questionnaire, order=1, region=self.region)
         self.subsection = SubSection.objects.create(title="subsection 1", section=self.section, order=1, region=self.region)

@@ -1,6 +1,6 @@
 Feature: Location types
     Background:
-      Given I am logged in as a data submitter
+      Given I am a logged-in Global Admin
 
     Scenario: List Regions
       And I have two regions

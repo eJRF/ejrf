@@ -10,7 +10,9 @@ from urllib import quote
 class QuestionnaireEntrySaveDraftTest(BaseTest):
     def setUp(self):
         self.client = Client()
-        self.user, self.country, self.region = self.create_user_with_no_permissions()
+        self.user = self.create_user(group=self.DATA_SUMBITTER, country="Uganda", region="AFRO")
+        self.country = self.user.user_profile.country
+        self.region = self.user.user_profile.country.regions.all()[0]
 
         self.assign('can_submit_responses', self.user)
         self.client.login(username=self.user.username, password='pass')
@@ -344,7 +346,9 @@ class SaveGridDraftQuestionGroupEntryTest(BaseTest):
                      }
         self.url = '/questionnaire/entry/%d/section/%d/' % (self.questionnaire.id, self.section1.id)
         self.client = Client()
-        self.user, self.country, self.region = self.create_user_with_no_permissions()
+        self.user = self.create_user(group=self.DATA_SUMBITTER, country="Uganda", region="AFRO")
+        self.country = self.user.user_profile.country
+        self.region = self.user.user_profile.country.regions.all()[0]
 
         self.assign('can_submit_responses', self.user)
         self.client.login(username=self.user.username, password='pass')
@@ -545,7 +549,9 @@ class SaveGridDraftQuestionGroupEntryTest(BaseTest):
 class QuestionnaireEntrySubmitTest(BaseTest):
     def setUp(self):
         self.client = Client()
-        self.user, self.country, self.region = self.create_user_with_no_permissions()
+        self.user = self.create_user(group=self.DATA_SUMBITTER, country="Uganda", region="AFRO")
+        self.country = self.user.user_profile.country
+        self.region = self.user.user_profile.country.regions.all()[0]
 
         self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", status=Questionnaire.PUBLISHED,
                                                           description="From dropbox as given by Rouslan", region=self.region)
@@ -577,7 +583,7 @@ class QuestionnaireEntrySubmitTest(BaseTest):
         QuestionGroupOrder.objects.create(question_group=self.question_group, question=self.question2, order=2)
         QuestionGroupOrder.objects.create(question_group=self.question_group, question=self.question3, order=3)
 
-        self.url = '/submit/%d' %self.questionnaire.id
+        self.url = '/submit/%d' % self.questionnaire.id
         self.assign('can_submit_responses', self.user)
         self.client.login(username=self.user.username, password='pass')
 
@@ -729,7 +735,7 @@ class QuestionnaireCloneViewTest(BaseTest):
         QuestionGroupOrder.objects.create(order=5, question_group=self.parent12, question=self.question4)
         self.parent10.question.add(self.question3, self.question4, self.question2, self.question1, self.primary_question)
         self.client = Client()
-        self.user, self.country, self.region = self.create_user_with_no_permissions(region_name=None)
+        self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
 
         self.assign('can_view_users', self.user)
         self.client.login(username=self.user.username, password='pass')
@@ -804,11 +810,12 @@ class DeleteAnswerGroupViewTest(BaseTest):
         QuestionGroupOrder.objects.create(order=1, question_group=self.parent10, question=self.primary_question)
         QuestionGroupOrder.objects.create(order=2, question_group=self.parent10, question=self.question1)
         QuestionGroupOrder.objects.create(order=3, question_group=self.parent10, question=self.question2)
-        self.parent10.question.add( self.question2, self.question1, self.primary_question)
+        self.parent10.question.add(self.question2, self.question1, self.primary_question)
 
         self.client = Client()
-        self.user, self.country, self.region = self.create_user_with_no_permissions()
-
+        self.user = self.create_user(group=self.DATA_SUMBITTER, country="Uganda", region="AFRO")
+        self.country = self.user.user_profile.country
+        self.region = self.user.user_profile.country.regions.all()[0]
         self.assign('can_submit_responses', self.user)
         self.client.login(username=self.user.username, password='pass')
 
@@ -874,7 +881,9 @@ class PreviewModeQuestionnaireEntryTest(BaseTest):
 
     def test_data_submitter_is_not_preview_mode_only_if_requested_from_url(self):
         self.client = Client()
-        self.user, self.country, self.region = self.create_user_with_no_permissions()
+        self.user = self.create_user(group=self.DATA_SUMBITTER, country="Uganda", region="AFRO")
+        self.country = self.user.user_profile.country
+        self.region = self.user.user_profile.country.regions.all()[0]
 
         self.assign('can_submit_responses', self.user)
         self.client.login(username=self.user.username, password='pass')
@@ -948,4 +957,3 @@ class PreviewModeQuestionnaireEntryTest(BaseTest):
         response = self.client.get(url +'?preview=1')
         self.assertEqual(200, response.status_code)
         self.assertTrue(response.context['preview'])
-

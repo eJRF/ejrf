@@ -11,7 +11,8 @@ from questionnaire.tests.base_test import BaseTest
 class SectionsViewTest(BaseTest):
     def setUp(self):
         self.client = Client()
-        self.user, self.country, self.region = self.create_user_with_no_permissions()
+        self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
+        self.region = None
 
         self.assign('can_edit_questionnaire', self.user)
         self.client.login(username=self.user.username, password='pass')
@@ -83,7 +84,8 @@ class SectionsViewTest(BaseTest):
 class EditSectionsViewTest(BaseTest):
     def setUp(self):
         self.client = Client()
-        self.user, self.country, self.region = self.create_user_with_no_permissions()
+        self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
+        self.region = None
 
         self.assign('can_edit_questionnaire', self.user)
         self.client.login(username=self.user.username, password='pass')
@@ -147,24 +149,29 @@ class EditSectionsViewTest(BaseTest):
         self.assertEqual("SAVE", response.context['btn_label'])
 
     def test_sections_owned_by_others_cannot_be_edited(self):
-        self.section.region = None
-        self.section.save()
-        response = self.client.get(self.url)
-        self.assertRedirects(response, expected_url='/accounts/login/?next=%s'%self.url)
-        response = self.client.post(self.url)
-        self.assertRedirects(response, expected_url='/accounts/login/?next=%s'%self.url)
+        region = Region.objects.create(name="SEAR")
+        section = Section.objects.create(name="section", questionnaire=self.questionnaire, order=1, region=region)
+        url = '/section/%d/edit/' % section.id
+        response = self.client.get(url)
+        self.assertRedirects(response, expected_url='/accounts/login/?next=%s' % url)
+        response = self.client.post(url)
+        self.assertRedirects(response, expected_url='/accounts/login/?next=%s' % url)
 
 
 class DeleteSectionsViewTest(BaseTest):
     def setUp(self):
         self.client = Client()
-        self.user, self.country, self.region = self.create_user_with_no_permissions()
+        self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
+        self.region = None
         self.assign('can_edit_questionnaire', self.user)
         self.client.login(username=self.user.username, password='pass')
 
-        self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013, region=self.region)
-        self.section = Section.objects.create(name="section", questionnaire=self.questionnaire, order=1, region=self.region)
-        self.section_1 = Section.objects.create(name="section 2", questionnaire=self.questionnaire, order=2, region=self.region)
+        self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013,
+                                                          region=self.region)
+        self.section = Section.objects.create(name="section", questionnaire=self.questionnaire, order=1,
+                                              region=self.region)
+        self.section_1 = Section.objects.create(name="section 2", questionnaire=self.questionnaire, order=2
+                                                , region=self.region)
         self.url = '/section/%d/delete/' % self.section.id
 
     def test_post_deletes_section(self):
@@ -199,18 +206,20 @@ class DeleteSectionsViewTest(BaseTest):
         self.assertEqual([0, 1, 2], list(Section.objects.values_list('order', flat=True)))
 
     def test_sections_owned_by_others_cannot_be_deleted(self):
-        self.section.region = None
-        self.section.save()
-        response = self.client.get(self.url)
-        self.assertRedirects(response, expected_url='/accounts/login/?next=%s'%self.url)
-        response = self.client.post(self.url)
-        self.assertRedirects(response, expected_url='/accounts/login/?next=%s'%self.url)
+        region = Region.objects.create(name="SEAR")
+        section = Section.objects.create(name="section", questionnaire=self.questionnaire, order=1, region=region)
+        url = '/section/%d/delete/' % section.id
+        response = self.client.get(url)
+        self.assertRedirects(response, expected_url='/accounts/login/?next=%s' % url)
+        response = self.client.post(url)
+        self.assertRedirects(response, expected_url='/accounts/login/?next=%s' % url)
 
 
 class SubSectionsViewTest(BaseTest):
     def setUp(self):
         self.client = Client()
-        self.user, self.country, self.region = self.create_user_with_no_permissions()
+        self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
+        self.region = None
 
         self.assign('can_edit_questionnaire', self.user)
         self.client.login(username=self.user.username, password='pass')
@@ -282,7 +291,8 @@ class SubSectionsViewTest(BaseTest):
 class EditSubSectionsViewTest(BaseTest):
     def setUp(self):
         self.client = Client()
-        self.user, self.country, self.region = self.create_user_with_no_permissions()
+        self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
+        self.region = None
 
         self.assign('can_edit_questionnaire', self.user)
         self.client.login(username=self.user.username, password='pass')
@@ -324,12 +334,14 @@ class EditSubSectionsViewTest(BaseTest):
         self.assert_permission_required(self.url)
 
     def test_subsections_owned_by_others_cannot_be_edited(self):
-        self.subsection.region = None
-        self.subsection.save()
-        response = self.client.get(self.url)
-        self.assertRedirects(response, expected_url='/accounts/login/?next=%s'%self.url)
-        response = self.client.post(self.url)
-        self.assertRedirects(response, expected_url='/accounts/login/?next=%s'%self.url)
+        region = Region.objects.create(name="SEAN")
+        sub_section = SubSection.objects.create(title="Cured Cases of Measles 3", order=3, section=self.section,
+                                                region=region)
+        url = '/subsection/%d/delete/' % sub_section.id
+        response = self.client.get(url)
+        self.assertRedirects(response, expected_url='/accounts/login/?next=%s' % url)
+        response = self.client.post(url)
+        self.assertRedirects(response, expected_url='/accounts/login/?next=%s' % url)
 
     def test_post_invalid(self):
         form_data = self.form_data.copy()
@@ -344,7 +356,8 @@ class EditSubSectionsViewTest(BaseTest):
 class DeleteSubSectionsViewTest(BaseTest):
     def setUp(self):
         self.client = Client()
-        self.user, self.country, self.region = self.create_user_with_no_permissions()
+        self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
+        self.region = None
 
         self.assign('can_edit_questionnaire', self.user)
         self.client.login(username=self.user.username, password='pass')
@@ -385,12 +398,14 @@ class DeleteSubSectionsViewTest(BaseTest):
         self.assertEqual([0, 1, 2], list(SubSection.objects.values_list('order', flat=True)))
 
     def test_subsections_owned_by_others_cannot_be_deleted(self):
-        self.subsection.region = None
-        self.subsection.save()
-        response = self.client.get(self.url)
-        self.assertRedirects(response, expected_url='/accounts/login/?next=%s'%self.url)
-        response = self.client.post(self.url)
-        self.assertRedirects(response, expected_url='/accounts/login/?next=%s'%self.url)
+        region = Region.objects.create(name="SEAN")
+        sub_section = SubSection.objects.create(title="Cured Cases of Measles 3", order=3, section=self.section,
+                                                region=region)
+        url = '/subsection/%d/delete/' % sub_section.id
+        response = self.client.get(url)
+        self.assertRedirects(response, expected_url='/accounts/login/?next=%s' % url)
+        response = self.client.post(url)
+        self.assertRedirects(response, expected_url='/accounts/login/?next=%s' % url)
 
 
 class RegionalSectionsViewTest(BaseTest):

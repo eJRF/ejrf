@@ -9,7 +9,7 @@ from questionnaire.tests.base_test import BaseTest
 class GlobalAdminThemeViewTest(BaseTest):
     def setUp(self):
         self.client = Client()
-        self.user, self.country, self.region = self.create_user_with_no_permissions(region_name=None)
+        self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
         self.assign('can_edit_questionnaire', self.user)
         self.client.login(username=self.user.username, password='pass')
 
@@ -55,7 +55,7 @@ class GlobalAdminThemeViewTest(BaseTest):
 class EditThemeViewTest(BaseTest):
     def setUp(self):
         self.client = Client()
-        self.user, self.country, self.region = self.create_user_with_no_permissions(region_name=None)
+        self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
         self.assign('can_edit_questionnaire', self.user)
         self.client.login(username=self.user.username, password='pass')
 
@@ -130,7 +130,7 @@ class DeleteThemeViewTest(BaseTest):
 class RegionalAdminThemeViewTest(BaseTest):
     def setUp(self):
         self.client = Client()
-        self.user, self.country, self.region = self.create_user_with_no_permissions()
+        self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
         self.assign('can_edit_questionnaire', self.user)
         self.client.login(username=self.user.username, password='pass')
         self.theme = Theme.objects.create(name="Regional theme", description="some description")
@@ -152,7 +152,9 @@ class RegionalAdminThemeViewTest(BaseTest):
 class RegionalAdminEditThemeViewTest(BaseTest):
     def setUp(self):
         self.client = Client()
-        self.user, self.country, self.region = self.create_user_with_no_permissions()
+        self.user = self.create_user(group=self.REGIONAL_ADMIN, org="WHO", region="SEAR")
+        self.region = self.user.user_profile.region
+
         self.assign('can_edit_questionnaire', self.user)
         self.client.login(username=self.user.username, password='pass')
 
@@ -178,10 +180,12 @@ class RegionalAdminEditThemeViewTest(BaseTest):
         self.assertRedirects(response, reverse("login_page") + "?next=" + self.url)
         self.failUnless(Theme.objects.filter(name=getattr(self.theme, 'name'), description=getattr(self.theme, 'description'), region=getattr(self.theme, 'region')))
 
+
 class RegionalAdminDeleteThemeViewTest(BaseTest):
     def setUp(self):
         self.client = Client()
-        self.user, self.country, self.region = self.create_user_with_no_permissions()
+        self.user = self.create_user(group=self.REGIONAL_ADMIN, org="WHO", region="SEAR")
+        self.region = self.user.user_profile.region
         self.assign('can_edit_questionnaire', self.user)
         self.client.login(username=self.user.username, password='pass')
 
@@ -203,5 +207,3 @@ class RegionalAdminDeleteThemeViewTest(BaseTest):
         response = self.client.post(self.url,  {})
         self.assertRedirects(response, reverse("login_page") + "?next=" + self.url)
         self.failUnless(Theme.objects.filter(name=getattr(self.theme, 'name'), description=getattr(self.theme, 'description'), region=getattr(self.theme, 'region')))
-
-
