@@ -14,7 +14,7 @@ function getRegionsFor(organization, region) {
         region_select = $(region);
     $.get(url, function (data) {
         region_select.html(' ');
-        region_select.html('<option value="">Choose a Region </option>');
+        region_select.html('<option value=" ">Choose a Region </option>');
         for (var i = 0; i < data.length; i++) {
             region_select.append('<option value=' + data[i].id + '>' + data[i].name + '</option>')
         }
@@ -30,30 +30,34 @@ function loadCountryOrRegionTemplate(template) {
 }
 
 function hideElements(elements) {
-    for (index = 0; index < elements.length; ++index) {
+    for (var  index = 0; index < elements.length; ++index) {
         $(elements[index]).hide();
     }
 }
 
 function showElements(elements) {
-    for (index = 0; index < elements.length; ++index) {
+    for (var  index = 0; index < elements.length; ++index) {
         $(elements[index]).show();
     }
 }
 
 function resetElementValue(elements) {
-    for (index = 0; index < elements.length; ++index) {
+    for (var  index = 0; index < elements.length; ++index) {
         $(elements[index]).val('');
     }
 }
 
 function addRequiredValidationRule(elements) {
-    for (index = 0; index < elements.length; ++index) {
+    for (var index = 0; index < elements.length; ++index) {
         if ($(elements[index]).length <= 0)
             continue;
 
         $(elements[index]).rules("add", {required: true});
     }
+}
+
+function disableFields(selector) {
+    $('body').find(selector).prop('disabled', true);
 }
 
 function groupRolesBootstrap() {
@@ -72,11 +76,12 @@ function groupRolesBootstrap() {
         $('#id_password2'), $('#id_email'), $('input[name="groups"]')]);
 
     $('.radio-roles').on('change', function () {
-        var $selected_role = $.trim($(this).parents('label').text()),
-            select_element = $(this).parents('form').find('select');
+        var $selected_role = $.trim($(this).parents('label').text());
         if ($selected_role === "Global Admin") {
+            disableFields('#create-user-form #id_region');
+            disableFields('#create-user-form #id_country');
             hideElements([$region_element.parent(), $country_element.parent()]);
-            resetElementValue([$region_element, $country_element])
+            resetElementValue([$region_element, $country_element]);
             showElements([$organization_element.parent()]);
             addRequiredValidationRule($organization_element);
         } else if ($selected_role == "Regional Admin") {
@@ -85,6 +90,7 @@ function groupRolesBootstrap() {
             hideElements([$country_element.parent()]);
             addRequiredValidationRule([$organization_element, $region_element]);
         } else if ($selected_role == "Country Admin" || $selected_role == "Data Submitter") {
+            disableFields('#create-user-form #id_region');
             showElements([$country_element.parent()]);
             hideElements([$organization_element.parent(), $region_element.parent()]);
             resetElementValue([$organization_element, $region_element]);
@@ -95,10 +101,4 @@ function groupRolesBootstrap() {
     $('.radio-roles:checked').each(function () {
         $(this).trigger("change")
     });
-}
-
-function removeHiddenFields() {
-    $('#id_organization').remove();
-    $('#id_region').remove();
-    $('#id_country').remove();
 }

@@ -67,7 +67,6 @@ class UserProfileForm(UserCreationForm):
             self._check_country_admin(message)
         return super(UserProfileForm, self).clean()
 
-
     def clean_email(self):
         email = self.cleaned_data['email']
         return self._clean_attribute(User, email=email)
