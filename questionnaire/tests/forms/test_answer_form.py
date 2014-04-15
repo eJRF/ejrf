@@ -145,14 +145,14 @@ class MultiChoiceAnswerFormTest(BaseTest):
     def setUp(self):
         self.country = Country.objects.create(name="Peru")
         self.question = Question.objects.create(text='C. Number of cases positive',
-                                            instructions="Include only those cases found positive for the infectious agent.",
-                                            UID='C00001', answer_type='MultiChoice')
+                                                instructions="Include only those cases found positive for the infectious agent.",
+                                                UID='C00001', answer_type='MultiChoice')
         self.question_option_one = QuestionOption.objects.create(text='Option One', question=self.question)
 
         self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", description="From dropbox as given by Rouslan")
 
-        self.section = Section.objects.create(title="Reported Cases of Selected Vaccine Preventable Diseases (VPDs)", order=1,
-                                                      questionnaire=self.questionnaire, name="Reported Cases")
+        self.section = Section.objects.create(title="Reported Cases of Selected Vaccine Preventable Diseases (VPDs)",
+                                              order=1, questionnaire=self.questionnaire, name="Reported Cases")
 
         self.sub_section = SubSection.objects.create(title="Reported cases for the year 2013", order=1, section=self.section)
         self.question_group = QuestionGroup.objects.create(subsection=self.sub_section, order=1, allow_multiples=True)
@@ -167,7 +167,7 @@ class MultiChoiceAnswerFormTest(BaseTest):
             'country': self.country,
             'status': 'DRAFT',
             'version': 1,
-            'code':'HAHA123',
+            'code': 'HAHA123',
             'group': self.question_group,
             'questionnaire': self.questionnaire,
             'specified_option': '',
