@@ -16,7 +16,10 @@
             </div>
         </td>
         {% for field in order.question|get_form:formsets %}
-            <td>{{ field }}</td>
+            <td>{{ field }}
+                {{ option.text }}
+            </td>
+
         {% endfor %}
         {% for question in a_group.all_non_primary_questions %}
             {% for field in question|get_form:formsets %}

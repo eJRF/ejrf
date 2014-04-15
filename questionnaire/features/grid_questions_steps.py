@@ -48,7 +48,6 @@ def _create_correct_responses(world):
     data ={ }
     counter =0
     for index, option in enumerate(world.question1.options.all()):
-        data['MultiChoice-%d-response' % index] = option.id
         for i in range(4):
             data['Number-%d-response' % counter] = str(counter)
             counter += 1

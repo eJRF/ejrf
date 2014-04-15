@@ -1,3 +1,4 @@
+from django.forms import Select
 from questionnaire.forms.answers import NumericalAnswerForm, TextAnswerForm, DateAnswerForm, MultiChoiceAnswerForm
 from questionnaire.forms.custom_widgets import MultiChoiceAnswerSelectWidget
 from questionnaire.models import Question, Country, QuestionOption, QuestionGroup, Section, Questionnaire, SubSection, MultiChoiceAnswer
@@ -146,7 +147,7 @@ class MultiChoiceAnswerFormTest(BaseTest):
         self.country = Country.objects.create(name="Peru")
         self.question = Question.objects.create(text='C. Number of cases positive',
                                                 instructions="Include only those cases found positive for the infectious agent.",
-                                                UID='C00001', answer_type='MultiChoice')
+                                                UID='C00001', answer_type='MultiChoice', is_primary=True)
         self.question_option_one = QuestionOption.objects.create(text='Option One', question=self.question)
 
         self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", description="From dropbox as given by Rouslan")
@@ -213,3 +214,11 @@ class MultiChoiceAnswerFormTest(BaseTest):
         self.failUnless(MultiChoiceAnswer.objects.filter(response=option, question=self.question))
         as_text = '<input id="id_response" name="response" type="text" value="%d" />' % option.id
         self.assertEqual(as_text, answer_form.visible_fields()[0].as_text())
+
+    def test_input_readonly_widget_if_primary_question_and_group_is_grid_and_display_all(self):
+        initial = self.initial.copy()
+        option = QuestionOption.objects.create(question=self.question, text="Option1")
+        initial['option'] = option
+        answer_form = MultiChoiceAnswerForm(initial=initial)
+        self.assertIsInstance(answer_form.fields['response'].widget, Select)
+        self.assertEqual(answer_form.fields['response'].widget.attrs, {'class': 'hide'})

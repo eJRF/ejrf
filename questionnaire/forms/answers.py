@@ -106,6 +106,8 @@ class MultiChoiceAnswerForm(AnswerForm):
         return query_set.count() == 2 or query_set.filter(text='Yes').exists() or query_set.filter(text='Male').exists()
 
     def _get_response_widget(self, query_set):
+        if 'option' in self.initial.keys() and self.initial['question'].is_primary:
+            return forms.Select(attrs={'class': 'hide'})
         if self.widget_is_radio_button(query_set):
             return forms.RadioSelect()
         if query_set.exclude(instructions=None).exists():
