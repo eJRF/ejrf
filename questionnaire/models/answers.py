@@ -30,6 +30,9 @@ class Answer(BaseModel):
         answer_ids = map(lambda ans: ans.id, answer)
         return answers.filter(id__in=answer_ids).distinct()
 
+    def can_be_deleted(self, group, country):
+        return group.grid and self.country == country
+
 
 class NumericalAnswer(Answer):
     response = models.DecimalField(max_digits=9, decimal_places=2, null=True)

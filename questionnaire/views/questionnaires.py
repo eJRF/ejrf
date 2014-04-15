@@ -183,7 +183,7 @@ class PublishQuestionnaire(PermissionRequiredMixin, View):
     template_name = 'questionnaires/_publish.html'
 
     def get(self, *args, **kwargs):
-        questionnaire = Questionnaire.objects.get(id=self.kwargs['questionnaire_id'])
+        questionnaire = Questionnaire.objects.get(id=kwargs['questionnaire_id'])
         form = PublishQuestionnaireForm(initial={'questionnaire': questionnaire})
         context = {'questionnaire': questionnaire,
                    'publish_form': form, 'btn_label': "Publish",
@@ -191,11 +191,12 @@ class PublishQuestionnaire(PermissionRequiredMixin, View):
         return render(self.request, self.template_name, context)
 
     def post(self, *args, **kwargs):
-        questionnaire = Questionnaire.objects.get(id=self.kwargs['questionnaire_id'])
+        questionnaire = Questionnaire.objects.get(id=kwargs['questionnaire_id'])
         form = PublishQuestionnaireForm(initial={'questionnaire': questionnaire}, data=self.request.POST)
         if form.is_valid():
             form.save()
-            message = "The questionnaire has been published to %s" % ", ".join([region.name for region in form.cleaned_data['regions']])
+            regions = map(lambda _region: _region.name, form.cleaned_data['regions'])
+            message = "The questionnaire has been published to %s" % ", ".join([region for region in sorted(regions)])
             messages.success(self.request, message)
             return HttpResponseRedirect(reverse('manage_jrf_page'))
         else:
@@ -211,7 +212,7 @@ class ApproveQuestionnaire(MultiplePermissionsRequiredMixin, View):
     template_name = 'base/modals/_confirm.html'
 
     def get(self, *args, **kwargs):
-        questionnaire = Questionnaire.objects.get(id=self.kwargs['questionnaire_id'])
+        questionnaire = Questionnaire.objects.get(id=kwargs['questionnaire_id'])
         context = {'questionnaire': questionnaire, 'btn_label': "Approve",
                    'cancel_url': reverse('manage_jrf_page')}
         return render(self.request, self.template_name, context)
@@ -232,14 +233,12 @@ class DeleteAnswerRow(PermissionRequiredMixin, View):
         primary_answer_id = request.POST.get('primary_answer')
         primary_answer = Answer.objects.filter(id=primary_answer_id).select_subclasses()
         country = self.request.user.user_profile.country
-        if self._can_be_deleted(primary_answer, group, country):
+        if primary_answer[0].can_be_deleted(group, country):
             self._delete_answer_row(primary_answer, group)
         return HttpResponse()
 
-    def _delete_answer_row(self, primary_answer, group):
+    @staticmethod
+    def _delete_answer_row(primary_answer, group):
         answergroup_filter = primary_answer[0].answergroup.filter(grouped_question=group)
         answergroup_filter[0].answer.all().delete()
         answergroup_filter.delete()
-
-    def _can_be_deleted(self, primary_answer, group, country):
-        return primary_answer and group.grid and country == primary_answer[0].country

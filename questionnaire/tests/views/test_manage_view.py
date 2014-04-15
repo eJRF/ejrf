@@ -122,19 +122,19 @@ class PublishQuestionnaireToRegionsViewTest(BaseTest):
         self.australia = Region.objects.create(name="Australia", organization=self.who)
 
     def test_post_publishes_questionnaire(self):
-        afro = Region.objects.create(name="The Afro", organization=self.who)
-        paho = Region.objects.create(name="The Paho", organization=self.who)
-        pacific = Region.objects.create(name="haha", organization=self.who)
-        asia = Region.objects.create(name="hehe", organization=self.who)
+        afro = Region.objects.create(name="Afro", organization=self.who)
+        paho = Region.objects.create(name="Paho", organization=self.who)
+        pacific = Region.objects.create(name="Pacific", organization=self.who)
+        asia = Region.objects.create(name="Asia", organization=self.who)
         questionnaire = Questionnaire.objects.create(name="JRF Brazil", description="bla", year=2013, status=Questionnaire.FINALIZED, region=afro)
         Section.objects.create(title="Cured Cases of Measles", order=1, questionnaire=questionnaire, name="Cured Cases")
         Region.objects.create(name="UNICEF ASIA", organization=self.unicef)
 
-        data = {'regions': [paho.id, pacific.id, asia.id,]}
+        data = {'regions': [paho.id, pacific.id, asia.id]}
 
         response = self.client.post(self.url, data=data)
         self.assertRedirects(response, reverse('manage_jrf_page'))
-        message = "The questionnaire has been published to %s, %s, %s" % (paho.name, pacific.name, asia.name)
+        message = "The questionnaire has been published to %s, %s, %s" % (asia.name, pacific.name, paho.name)
         self.assertIn(message, response.cookies['messages'].value)
         questionnaires = Questionnaire.objects.filter(year=self.questionnaire.year)
         self.assertEqual(5, questionnaires.count())

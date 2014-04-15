@@ -131,7 +131,7 @@ class DeleteThemeViewTest(BaseTest):
 class RegionalAdminThemeViewTest(BaseTest):
     def setUp(self):
         self.client = Client()
-        self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
+        self.user = self.create_user(group=self.REGIONAL_ADMIN, org="WHO", region="SEAR")
         self.assign('can_edit_questionnaire', self.user)
         self.client.login(username=self.user.username, password='pass')
         self.theme = Theme.objects.create(name="Regional theme", description="some description")

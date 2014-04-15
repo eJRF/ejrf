@@ -1,3 +1,4 @@
+from braces.views import PermissionRequiredMixin
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
@@ -166,7 +167,8 @@ class DeleteSubSection(OwnerAndPermissionRequiredMixin, DeleteView):
         return response
 
 
-class ReOrderQuestions(View):
+class ReOrderQuestions(PermissionRequiredMixin, View):
+    permission_required = 'auth.can_edit_questionnaire'
 
     def post(self, *args, **kwargs):
         sub_section = SubSection.objects.get(id=kwargs.get('subsection_id'))
