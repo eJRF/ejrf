@@ -376,6 +376,7 @@ table span.th-instructions{
     font-style: italic;
 }
 table td input[type='text'], table td textarea, table td select{
+    min-width: 80px;
     width: 100%;
 }
 
