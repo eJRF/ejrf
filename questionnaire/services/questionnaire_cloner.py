@@ -33,14 +33,14 @@ class QuestionnaireClonerService(object):
     def _clone_sections(self):
         sections = self.original_questionnaire.sections.all()
         fields = ['name', 'title', 'description', 'order']
-        return create_copies(sections, fields, questionnaire=self.questionnaire)
+        return create_copies(sections, self.region, fields, questionnaire=self.questionnaire)
 
     def _clone_sub_sections(self):
         sub_sections_map = {}
         fields = ['title', 'description', 'order']
         for old_section, new_section in self.sections.items():
             sub_sections = old_section.sub_sections.all()
-            sub_sections_map.update(create_copies(sub_sections, fields, section=new_section))
+            sub_sections_map.update(create_copies(sub_sections, self.region, fields, section=new_section))
         return sub_sections_map
 
     def _clone_question_groups(self):
@@ -48,7 +48,7 @@ class QuestionnaireClonerService(object):
         fields = ['name', 'instructions', 'parent', 'order', 'allow_multiples', 'grid', 'display_all', 'hybrid']
         for old_sub_section, new_sub_section in self.sub_sections.items():
             question_groups = old_sub_section.all_question_groups()
-            question_groups_map.update(create_copies(question_groups, fields, subsection=new_sub_section))
+            question_groups_map.update(create_copies(question_groups, self.region, fields, subsection=new_sub_section))
         return question_groups_map
 
     def _assign_sub_groups(self):

@@ -1,7 +1,7 @@
 from django.core.urlresolvers import reverse
 from django.test import Client
 from questionnaire.forms.questionnaires import QuestionnaireFilterForm, PublishQuestionnaireForm
-from questionnaire.models import Questionnaire, Section, Organization, Region
+from questionnaire.models import Questionnaire, Section, Organization, Region, SubSection
 from questionnaire.tests.base_test import BaseTest
 
 
@@ -114,7 +114,9 @@ class PublishQuestionnaireToRegionsViewTest(BaseTest):
         self.client.login(username=self.user.username, password='pass')
 
         self.questionnaire = Questionnaire.objects.create(name="JRF Brazil", description="bla", year=2013, status=Questionnaire.FINALIZED)
-        Section.objects.create(title="Cured Cases of Measles", order=1, questionnaire=self.questionnaire, name="Cured Cases")
+        self.section = Section.objects.create(title="Cured Cases of Measles", order=1, questionnaire=self.questionnaire, name="Cured Cases")
+        self.subsection = SubSection.objects.create(title="Cured Cases of Measles", order=1, section=self.section)
+
 
         self.url = '/questionnaire/%d/publish/' % self.questionnaire.id
         self.who = Organization.objects.create(name="WHO")
@@ -140,6 +142,10 @@ class PublishQuestionnaireToRegionsViewTest(BaseTest):
         self.assertEqual(5, questionnaires.count())
         [self.assertEqual(1, region.questionnaire.all().count()) for region in [paho, pacific, asia]]
         self.assertEqual(1, afro.questionnaire.all().count())
+        [self.assertIn(self.section.name, region.sections.values_list('name', flat=True)) for region in [paho, pacific, asia]]
+        [self.assertIn(self.subsection.title, region.sub_sections.values_list('title', flat=True)) for region in [paho, pacific, asia]]
+        [self.assertEqual(1, region.sub_sections.count()) for region in [paho, pacific, asia]]
+        [self.assertEqual(1, region.sections.count()) for region in [paho, pacific, asia]]
 
     def test_post_publishes_questionnaire_with_errors(self):
         data = {'regions': []}
