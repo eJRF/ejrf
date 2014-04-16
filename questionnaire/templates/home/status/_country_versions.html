@@ -1,5 +1,5 @@
 {% for version in country.all_versions %}
-    <tr class="version-for-{{ country.id }} hide">
+    <tr class="version-for-{{ region.id }}-{{ country.id }} hide">
     {% with region.latest_questionnaire as questionnaire %}
         {% with questionnaire.ordered_sections as ordered_sections %}
             <td colspan="3">

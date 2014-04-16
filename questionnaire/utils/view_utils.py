@@ -6,10 +6,12 @@ PERMS_STATUS_MAP = {'auth.can_edit_questionnaire': [Questionnaire.PUBLISHED, Que
 
 
 def get_country(request):
-    country_id = request.GET.get('country', None)
-    country_ = Country.objects.filter(id=country_id)
-    country_ = country_[0] if country_.exists() else None
-    return country_ or request.user.user_profile.country
+    country_id = request.GET.get('country', '')
+    if country_id.isdigit():
+        return Country.objects.get(id=country_id)
+    if request.user.user_profile.country:
+        return request.user.user_profile.country
+    return None
 
 
 def get_regions(request):

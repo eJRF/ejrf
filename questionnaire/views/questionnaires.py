@@ -40,8 +40,9 @@ class Entry(DoesNotExistExceptionHandlerMixin, AdvancedMultiplePermissionsRequir
         section = Section.objects.get(id=self.kwargs['section_id'])
         country = get_country(self.request)
         self.user_questionnaire_service = UserQuestionnaireService(country, questionnaire, request.GET.get("version"))
+        get_version = self.user_questionnaire_service.GET_version
         initial = {'status': 'Draft', 'country': country,
-                   'version': self.user_questionnaire_service.GET_version, 'questionnaire': questionnaire}
+                   'version': get_version, 'questionnaire': questionnaire}
         required_answers = 'show' in request.GET
         formsets = QuestionnaireEntryFormService(section, initial=initial, highlight=required_answers,
                                                  edit_after_submit=self.user_questionnaire_service.edit_after_submit)
@@ -56,7 +57,8 @@ class Entry(DoesNotExistExceptionHandlerMixin, AdvancedMultiplePermissionsRequir
                    'new_section_action': reverse('new_section_page', args=(questionnaire.id, )),
                    'subsection_form': SubSectionForm(),
                    'subsection_action': reverse('new_subsection_page', args=(questionnaire.id, section.id)),
-                   'the_version': version,
+                   'the_version': version or get_version,
+                   'country': country,
                    'documents': self.user_questionnaire_service.attachments()}
         return self.render_to_response(context)
 

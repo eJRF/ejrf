@@ -81,8 +81,10 @@ function showLoadingMessage(){
 function fillModalWithAjaxContent(questionnaire_preview_url){
     $.get(questionnaire_preview_url, function( data ) {
         var $holder = $('<div></div>').append(String(data));
-        var content =  $holder.find(".form-content").html();
-        $( "#ajax-section-content" ).html(content);
+        var section_title =  $holder.find("#section-title").html();
+        var section_content =  $holder.find("#section-content").html();
+        var content = section_title + section_content;
+        $("#ajax-section-content").html(content);
         disable_modal_input_fields(!editable);
         enableFields();
     });

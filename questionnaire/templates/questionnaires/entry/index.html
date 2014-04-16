@@ -15,8 +15,9 @@
         {% include 'questionnaires/entry/section_breadcrumps_wizzard.html' %}
 
         <div class="form-content">
-            {% include 'questionnaires/entry/_section_title.html' %}
-
+            <div id="section-title">
+                {% include 'questionnaires/entry/_section_title.html' %}
+            </div>
             <form class="form-horizontal" id="questionnaire_entry" role="form" method="post">
                 <input type="hidden" value="{{ the_version }}" id="version-holder" class="hide"/>
                 {% if preview %}
