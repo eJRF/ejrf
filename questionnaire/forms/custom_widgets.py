@@ -27,29 +27,31 @@ class MultiChoiceAnswerSelectWidget(forms.Select):
 
 
 class MultiChoiceQuestionSelectWidget(forms.Select):
-    def __init__(self, attrs=None, choices=(), question_options=None):
+    def __init__(self, attrs=None, choices=()):
         super(MultiChoiceQuestionSelectWidget, self).__init__(attrs, choices)
-        self.question_options = question_options
 
     def render_option(self, selected_choices, option_value, option_label):
         option_value = force_text(option_value)
+        question = self._question(option_value)
         multichoice = ''
-        if self._is_multichoice(option_value):
-            multichoice = mark_safe(' multichoice="true"')
+        theme = ''
+        if question:
+            if question[0].is_multichoice():
+                multichoice = mark_safe(' multichoice="true"')
+            if question[0].theme:
+                theme = mark_safe(' theme="%d"'% question[0].theme.id)
         if option_value in selected_choices:
             selected_html = mark_safe(' selected="selected"')
         else:
             selected_html = ''
-        return format_html('<option value="{0}"{1}{2}>{3}</option>',
+        return format_html('<option value="{0}"{1}{2}{3}>{4}</option>',
                            option_value,
                            selected_html,
                            multichoice,
+                           theme,
                            force_text(option_label))
 
-    def _is_multichoice(self, option_value):
+    def _question(self, option_value):
         if not option_value.isdigit():
-            return False
-        question = Question.objects.filter(id=option_value)
-        if question.exists():
-            return question[0].is_multichoice()
-        return False
+            return None
+        return Question.objects.filter(id=option_value)

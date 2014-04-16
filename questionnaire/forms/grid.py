@@ -19,10 +19,18 @@ class GridForm(forms.Form):
         self.subsection = kwargs.pop('subsection', None)
         self.region = kwargs.pop('region', None)
         super(GridForm, self).__init__(*args, **kwargs)
-        self.fields['primary_question'].queryset = Question.objects.filter(is_primary=True, region=self.region)
-        non_primary_questions = Question.objects.exclude(is_primary=True).filter(region=self.region)
+        unused_regional_questions = self.unused_regional_questions()
+        self.fields['primary_question'].queryset = unused_regional_questions.filter(is_primary=True)
+        non_primary_questions = unused_regional_questions.exclude(is_primary=True)
         self.fields['columns'].queryset = non_primary_questions
         self.fields['subgroup'].queryset = non_primary_questions
+
+    def unused_regional_questions(self):
+        questions = Question.objects.filter(region=self.region)
+        if self.subsection:
+            questionnaire = self.subsection.section.questionnaire
+            questions = questions.exclude(question_group__subsection__section__questionnaire=questionnaire).distinct()
+        return questions
 
     def clean(self):
         cleaned_data = super(GridForm, self).clean()
@@ -30,11 +38,25 @@ class GridForm(forms.Form):
         primary_question = cleaned_data.get('primary_question')
         if not type or not primary_question:
             return cleaned_data
-        if not primary_question.is_multichoice() and (type == 'display_all' or type == 'hybrid'):
+        self._clean_multichoice_(primary_question, type)
+        self._clean_('columns', primary_question.theme)
+        self._clean_('subgroup', primary_question.theme)
+        return cleaned_data
+
+    def _clean_multichoice_(self, primary_question, type_):
+        if not primary_question.is_multichoice() and type_ == 'display_all':
             message = 'This type of grid requires a multichoice primary question.'
             self._errors['primary_question'] = self.error_class([message])
             del self.cleaned_data['primary_question']
-        return cleaned_data
+
+    def _clean_(self, fieldname, theme):
+        field = self.cleaned_data.get(fieldname, None)
+        if field:
+            fields_with_different_themes = field.exclude(theme=theme)
+            if fields_with_different_themes:
+                message = 'All questions must be with theme %s.' % theme.name
+                self._errors[fieldname] = self.error_class([message])
+                del self.cleaned_data[fieldname]
 
     def save(self):
         primary_question = self.cleaned_data.get('primary_question')
@@ -45,7 +67,8 @@ class GridForm(forms.Form):
         return grid_group
 
     def _create_grid(self, primary_question, non_primary_questions, sub_group_questions):
-        remaining_questions = filter(lambda question: question not in sub_group_questions, non_primary_questions)
+        sub_group_ids = sub_group_questions.values_list('id', flat=True)
+        remaining_questions = non_primary_questions.exclude(id__in=sub_group_ids)
         parent_grid_group = self._create_parent_grid(primary_question, remaining_questions)
         self._create_grid_sub_group(parent_grid_group, sub_group_questions)
         return parent_grid_group
@@ -74,5 +97,5 @@ class GridForm(forms.Form):
         grid_group.orders.create(order=0, question=primary_question)
         question_ids = self.data.getlist('columns') if hasattr(self.data, 'getlist') else self.data.get('columns')
         for index, question_id in enumerate(question_ids):
-            question = non_primary_questions.get(id=question_id)
-            grid_group.orders.create(order=index+1, question=question)
+            question = filter(lambda question: question.id == int(question_id), non_primary_questions)
+            grid_group.orders.create(order=index+1, question=question[0])

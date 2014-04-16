@@ -44,8 +44,8 @@ jQuery(function($){
             newElement = $select.clone(true),
             $form = $el.parents('form'),
             $columns = $form.find('#columns');
-        removeSelectedOptions(newElement, $columns)
         $select.after(newElement);
+        removeSelectedOptions(newElement, $columns);
         assignOptionNumbers($form);
         newElement.rules('add', {required: true});
     });
@@ -73,7 +73,6 @@ jQuery(function($){
             addTemplate('#addmore-displayall-template', $first_columns);
         }
         else if ($el.val() ==='hybrid'){
-            removeNonMultiChoiceOptions($all_primary_questions);
             addTemplate('#hybrid-template', $first_columns);
         }
         else if ($el.val() ==='allow_multiples'){
@@ -84,6 +83,14 @@ jQuery(function($){
         }
         $primary_question.html($all_primary_questions.html());
 
+    });
+
+   $('body').on('change', '#id_primary_question', function(){
+        var $el = $(this),
+            theme_id = $el.find('option:selected').attr('theme'),
+            $parent_form = $el.parents('.create-grid-form'),
+            $columns = $parent_form.find('#columns');
+        removeQuestionsWithOtherThemes($columns, theme_id);
     });
 
     $('body').on('change', '.mid-row-add-hybrid-grid select[name=columns]', function(){
@@ -100,11 +107,17 @@ jQuery(function($){
 
 });
 
+function removeQuestionsWithOtherThemes($columns, theme_id) {
+    $columns.find('option[theme!="'+ theme_id +'"]').each(function(){
+        $(this).remove();
+    });
+}
+
 function removeSelectedOptions(newElement, $columns) {
-    var  used_options = $columns.find('option:selected[value!=""]');
+    var  used_options = $columns.find('option:selected');
     used_options.each(function(){
         var val = $(this).val();
-        newElement.find('option[value=' + val + ']').remove()
+        newElement.find('option[value=' + val + ']').remove();
     });
 }
 
