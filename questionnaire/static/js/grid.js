@@ -91,6 +91,7 @@ jQuery(function($){
             $parent_form = $el.parents('.create-grid-form'),
             $columns = $parent_form.find('#columns');
         removeQuestionsWithOtherThemes($columns, theme_id);
+        assignFirstOptionToSubgroup();
     });
 
     $('body').on('change', '.mid-row-add-hybrid-grid select[name=columns]', function(){
@@ -104,8 +105,15 @@ jQuery(function($){
         $(this).parents('.grid-group').removeClass('show-border');
     });
 
-
 });
+
+function assignFirstOptionToSubgroup() {
+   var $subgroup = $('input[type=hidden][name=subgroup]'),
+       $select_of_subgroup = $subgroup.prev('select[name=columns]'),
+       $first_option = $select_of_subgroup.find('option');
+   $subgroup.val($first_option.val());
+}
+
 
 function removeQuestionsWithOtherThemes($columns, theme_id) {
     $columns.find('option[theme!="'+ theme_id +'"]').each(function(){
