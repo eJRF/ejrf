@@ -41,6 +41,7 @@ jQuery(function($){
 function assignOptionNumbers($form){
     assignOptionNumbersUsing($form, "span.number");
     assignOptionNumbersUsing($form, "span.mid-table-number");
+    assignIdsWithNumbers($form, 'select[name=columns]')
     }
 
 function assignOptionNumbersUsing($form, number_selector){
@@ -48,6 +49,13 @@ function assignOptionNumbersUsing($form, number_selector){
             $(element).text(++i);
         });
     }
+
+function assignIdsWithNumbers($form, inputName){
+        $form.find(inputName).each(function(i, element){
+            $(element).attr('id', 'id-column-' + i);
+        });
+    }
+
 function removeOptions(){
         $("div.input-group").each(function(){
            $(this).remove();

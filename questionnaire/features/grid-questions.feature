@@ -23,4 +23,3 @@ Feature: Grid questions display all
         And the rest of my correct responses
         When I hover the errored cell
         Then I should see the cell error message
-

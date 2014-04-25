@@ -129,3 +129,7 @@ class PageObject(object):
 
     def get_text_of_element_by_id(self, id):
         return self.browser.find_by_id(id).first.text
+
+    def choose_this_value_in_this_select_order_by_this_name(self, value, select_order, name):
+        script = "document.getElementsByName('%s')[%s].value = %s" % (name, select_order, value)
+        self.browser.execute_script(script)

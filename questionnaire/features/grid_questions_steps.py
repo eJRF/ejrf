@@ -1,9 +1,11 @@
 from lettuce import step, world
 from questionnaire.models import Question, QuestionGroup, QuestionGroupOrder, QuestionOption
 
+
 @step(u'And I have a grid group with all options of the primary question showable')
 def and_i_have_a_grid_group_with_all_options_of_the_primary_question_showable(step):
     world.grid_group = QuestionGroup.objects.create(subsection=world.sub_section, order=1, grid=True, display_all=True)
+
 
 @step(u'And I have 3 questions in that group one of which is primary')
 def and_i_have_3_questions_in_that_group_one_of_which_is_primary(step):
@@ -35,6 +37,7 @@ def then_i_should_see_that_grid_with_all_the_options_of_the_primary_question_sho
     for i in range(1, 5):
         world.page.is_text_present(eval("world.option%d" % i).text)
 
+
 @step(u'And I have a sub group in that group with two questions')
 def and_i_have_a_sub_group_in_that_group_with_two_questions(step):
     sub_group = QuestionGroup.objects.create(subsection=world.sub_section, order=2, grid=True,
@@ -45,19 +48,21 @@ def and_i_have_a_sub_group_in_that_group_with_two_questions(step):
 
 
 def _create_correct_responses(world):
-    data ={ }
-    counter =0
+    data = {}
+    counter = 0
     for index, option in enumerate(world.question1.options.all()):
         for i in range(4):
             data['Number-%d-response' % counter] = str(counter)
             counter += 1
     return data
 
+
 @step(u'When I respond the questions')
 def when_i_respond_the_questions(step):
     data = _create_correct_responses(world)
     world.valid_responses = data.copy()
     world.page.fill_form(data)
+
 
 @step(u'When I respond wrongly questions')
 def when_i_respond_wrongly_questions(step):
@@ -66,14 +71,17 @@ def when_i_respond_wrongly_questions(step):
     world.valid_responses = data.copy()
     world.page.fill_form(data)
 
+
 @step(u'And the rest of my correct responses')
 def and_the_rest_of_my_correct_responses(step):
     del world.valid_responses['Number-0-response']
     world.page.validate_responses(world.valid_responses)
 
+
 @step(u'When I hover the errored cell')
 def when_i_hover_the_errored_cell(step):
     world.page.hover_over_id('id_Number-0-response')
+
 
 @step(u'Then I should see the cell error message')
 def then_i_should_see_the_cell_error_message(step):
