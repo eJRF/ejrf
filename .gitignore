@@ -8,3 +8,4 @@ Vagrantfile
 .vagrant/
 screenshots/
 .ejrf-env
+node_modules

@@ -2,7 +2,7 @@ var form_has_changed = false;
 var editable = false;
 
 $(document).ready(function() {
-    $('.pagination').children('ul').addClass('pagination')
+    $('.pagination').children('ul').addClass('pagination');
     $('a[data-toggle=popover]').popover();
     $('a[data-toggle=tooltip]').tooltip();
     groupRolesBootstrap();
@@ -35,7 +35,7 @@ function replaceAttributes($el, index) {
 }
 
 function _replace($el, attr, index){
-    return $($el).attr(attr).replace(/-[\d]+-/g, '-'+ index.toString()+'-')
+    return $($el).attr(attr).replace(/-[\d]+-/g, '-'+ index.toString()+'-');
 }
 
 function reIndexFieldNames() {

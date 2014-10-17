@@ -1,6 +1,6 @@
 $(document).ready(function(){
     $("input[type=checkbox][name=regions]").on('click', function(){
-        var regions = []
+        var regions = [];
         $("input[type=checkbox][name=regions]:checked").each(function(){
                 regions.push($(this).val());
             });
