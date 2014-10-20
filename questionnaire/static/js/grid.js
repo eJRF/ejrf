@@ -91,7 +91,7 @@ jQuery(function($){
             $parent_form = $el.parents('.create-grid-form'),
             $columns = $parent_form.find('#columns');
         removeQuestionsWithOtherThemes($columns, theme_id);
-        // assignFirstOptionToSubgroup();
+        assignFirstOptionToSubgroup();
     });
 
     $('body').on('change', '.mid-row-add-hybrid-grid select[name=columns]', function(){
