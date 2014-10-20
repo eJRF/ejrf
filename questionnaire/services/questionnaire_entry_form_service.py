@@ -88,6 +88,7 @@ class QuestionnaireEntryFormService(object):
         if answer.is_draft():
             initial['answer'] = answer
 
+    #slow sometimes 0.359 seconds (called multiple times in one request)
     def _get_initial(self, orders, answer_type):
         initial = []
         for order_dict in orders:
@@ -103,7 +104,6 @@ class QuestionnaireEntryFormService(object):
                         self._update(row_number, question_orders, initial)
             else:
                 initial.append(self._initial(order_dict=order_dict))
-
         return initial
 
     @staticmethod
