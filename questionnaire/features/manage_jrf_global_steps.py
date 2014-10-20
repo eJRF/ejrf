@@ -344,4 +344,5 @@ def then_i_should_see_a_message_that_questionnaire_was_updated(step):
 
 @step(u'And I should see the questionnaire with its new name')
 def and_i_should_see_the_questionnaire_with_its_new_name(step):
+    sleep(10)
     world.page.is_text_present('Updated Questionnaire Name')
