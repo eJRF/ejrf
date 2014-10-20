@@ -6,7 +6,7 @@ jQuery(function($){
             create_grid_url = "/subsection/" + subsection_id +"/grid/new/";
         $.get(create_grid_url, function( data ) {
             var $holder = $('<div></div>').append(String(data));
-            var content =  $holder.find("#create-grid-form-content").html()
+            var content =  $holder.find("#create-grid-form-content").html();
             $( "#create-grid-ajax-content-"+subsection_id ).html(content);
 
         });
@@ -91,7 +91,7 @@ jQuery(function($){
             $parent_form = $el.parents('.create-grid-form'),
             $columns = $parent_form.find('#columns');
         removeQuestionsWithOtherThemes($columns, theme_id);
-        assignFirstOptionToSubgroup();
+        // assignFirstOptionToSubgroup();
     });
 
     $('body').on('change', '.mid-row-add-hybrid-grid select[name=columns]', function(){
@@ -108,10 +108,10 @@ jQuery(function($){
 });
 
 function assignFirstOptionToSubgroup() {
-   var $subgroup = $('input[type=hidden][name=subgroup]'),
+    var $subgroup = $('input[type=hidden][name=subgroup]'),
        $select_of_subgroup = $subgroup.prev('select[name=columns]'),
        $first_option = $select_of_subgroup.find('option');
-   $subgroup.val($first_option.val());
+    $subgroup.val($first_option.val());
 }
 
 
