@@ -24,10 +24,10 @@ Installation
 
 * To run locally with data run after following the above steps
 
-##Git
+```
 ./manage loaddata questionnaire_core_2013.json
 ./manage runserver
-==
+```
 
 Done!! you're good to go :)
 
