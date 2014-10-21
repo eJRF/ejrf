@@ -1,19 +1,20 @@
 Feature: Manage JRF
 
-    Scenario: Global admin viewing and Editing Questionnaires (Names)
-        Given I am logged in as a global admin
-        Then I should see manage JRF, users, question bank, extract links
-        Given I have four finalised questionnaires
-        And I have two draft questionnaires for two years
-        And I visit the manage JRF page
-        Then I should see a list of the three most recent finalised questionnaires
-        And I should see a list of draft questionnaires
-        When I choose the option to edit the name of a questionnaire
-        Then I should see modal with the questionnaires current name
-        When I update the name of the questionnaire and save my changes
-        Then I should see a message that questionnaire was updated
-        And I should see the questionnaire with its new name
-        
+  @WIP
+  Scenario: Global admin viewing and Editing Questionnaires (Names)
+    Given I am logged in as a global admin
+    Then I should see manage JRF, users, question bank, extract links
+    Given I have four finalised questionnaires
+    And I have two draft questionnaires for two years
+    And I visit the manage JRF page
+    Then I should see a list of the three most recent finalised questionnaires
+    And I should see a list of draft questionnaires
+    When I choose the option to edit the name of a questionnaire
+    Then I should see modal with the questionnaires current name
+    When I update the name of the questionnaire and save my changes
+    Then I should see a message that questionnaire was updated
+    And I should see the questionnaire with its new name
+
     Scenario: Viewing older finalised questionnaires
         Given I am logged in as a global admin
         Given I have four finalised questionnaires
