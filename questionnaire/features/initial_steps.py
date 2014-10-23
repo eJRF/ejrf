@@ -1,5 +1,6 @@
 import glob
 import os
+import logging
 
 from lettuce import *
 from splinter import Browser
@@ -22,6 +23,7 @@ def clear_screen_shots():
 
 
 def open_browser():
+    logging.warning("about to open browser")
     world.browser = Browser("phantomjs")
     world.browser.driver.set_window_size(1024, 720)
 
