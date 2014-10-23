@@ -16,6 +16,7 @@ def flush_database(step):
 
 @before.all
 def clear_screen_shots():
+    logging.warning("about to clear screenshots")
     screen_shots = glob.glob('./screenshots/*.png')
     for screen_shot in screen_shots:
         os.remove(screen_shot)
