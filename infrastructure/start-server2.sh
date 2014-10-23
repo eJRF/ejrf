@@ -1,3 +1,3 @@
 #!/bin/bash
 sudo initctl reload-configuration
-sudo start djangoservice
+sudo restart djangoservice
