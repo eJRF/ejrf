@@ -1,5 +1,7 @@
 ---
 - hosts: all
+  vars:
+    version: {{ ansible_env.SNAP_COMMIT }}
   tasks:
 
     - file: path=/srv/checkout owner=ubuntu  mode=0777
