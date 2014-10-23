@@ -8,7 +8,7 @@
       sudo: yes
 
     - name: ejrf repo
-      git: repo=https://github.com/eJRF/ejrf.git dest=/srv/checkout version=7667ed415f46a8d792a215f35dbeb31409fd0efc
+      git: repo=https://github.com/eJRF/ejrf.git dest=/srv/checkout version="{{ version }}"
 
     - name: ejrf requirements
       pip: requirements=/srv/checkout/pip-requirements.txt virtualenv=/srv/checkout/ejrfvenv
