@@ -1,28 +1,23 @@
 ---
 - hosts: all
-  vars:
-    version: "{{ lookup('env','SNAP_COMMIT') }}"
   tasks:
 
     - file: path=/srv/checkout owner=ubuntu  mode=0755
       sudo: yes
 
     - name: ejrf repo
-      git: repo=https://github.com/eJRF/ejrf.git dest=/srv/checkout version="{{ version }}"
+      git: repo=https://github.com/eJRF/ejrf.git dest=/srv/checkout version=HEAD
       sudo: yes
 
     - name: ejrf requirements
       pip: requirements=/srv/checkout/pip-requirements.txt virtualenv=/srv/checkout/ejrfvenv
 
-#initial config
     - pip: name=psycopg2
       sudo: yes
 
-#inital config
     - postgresql_db: name=ejrf owner=ejrf state=present login_user=ejrf login_password=ejrf
       sudo: yes
 
-#initial config
     - name: ejrf sync db
       script: sync-db.sh
       args:
@@ -41,4 +36,4 @@
       copy: src=run-server.sh dest=/srv/checkout/run-server.sh mode=777
 
     - name: start server
-      script: start-server2.sh
+      script: start-server-initial.sh
