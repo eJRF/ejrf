@@ -1,5 +1,5 @@
 Feature: Support document upload
-
+  @Upload
   Scenario: Upload PDF file
        Given I am logged in as a data submitter
        And I have a questionnaire published for my region with sections and subsections
@@ -13,6 +13,7 @@ Feature: Support document upload
        And I should see the number of attachments indicated in the attachments link
        And I clean up the files
 
+  @Upload
   Scenario: Upload Unacceptable File Extension
         Given I am logged in as a data submitter
         And I have a questionnaire published for my region with sections and subsections
