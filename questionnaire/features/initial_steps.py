@@ -24,7 +24,7 @@ def clear_screen_shots():
 
 def open_browser():
     logging.warning("about to open browser")
-    world.browser = Browser("phantomjs")
+    world.browser = Browser("firefox")
     logging.warning("browser set")
     world.browser.driver.set_window_size(1024, 720)
     logging.warning("window size set")
