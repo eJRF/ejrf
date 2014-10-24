@@ -2,7 +2,7 @@ import json
 from django.http import HttpResponse
 from django.views.generic import View
 
-class SkipQuestion(View):
+class SubsectionQuestions(View):
     def get(self, request, *args, **kwargs):
         data = {}
         data['something'] = 'useful'

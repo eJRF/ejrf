@@ -17,6 +17,11 @@ var Responses = React.createClass({
 });
 
 var Question = React.createClass({
+    getInitialState: function() {
+        return (
+            { selectOption: null }
+        );
+    },
     updateSelectedQuestion: function(event) {
         var e = document.getElementById("root-question");
         var v = e.options[e.selectedIndex].value;
@@ -31,7 +36,7 @@ var Question = React.createClass({
         return (
             <div>
                 <label for="root-question">{this.props.label}</label>
-                <select name="root-question" id="root-question" onChange={this.updateSelectedQuestion}>
+                <select name="root-question" id="root-question" onChange={this.updateSelectedQuestion} value={this.state.selectedOption}>
                 {options}
                 </select>
         </div>
