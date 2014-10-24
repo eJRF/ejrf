@@ -1,39 +1,53 @@
 ---
 - hosts: all
   tasks:
-
-    - file: path=/srv/checkout owner=ubuntu  mode=0755
+    - apt: name=python-pip state=present update_cache=yes
       sudo: yes
 
-    - name: ejrf repo
-      git: repo=https://github.com/eJRF/ejrf.git dest=/srv/checkout version=HEAD
+    - name: postgreql
+      apt: name={{ item }} state=present
       sudo: yes
-
-    - name: ejrf requirements
-      pip: requirements=/srv/checkout/pip-requirements.txt virtualenv=/srv/checkout/ejrfvenv
+      with_items:
+        - postgresql
+        - postgresql-contrib
+        - pgadmin3
+        - python-psycopg2
+        - libpq-dev
 
     - pip: name=psycopg2
       sudo: yes
 
-    - postgresql_db: name=ejrf owner=ejrf state=present login_user=ejrf login_password=ejrf
-      sudo: yes
+    # - postgresql_user: name=ejrf password=ejrf
 
-    - name: ejrf sync db
-      script: sync-db.sh
-      args:
-        chdir: /srv/checkout/
+    # - file: path=/srv/checkout owner=ubuntu  mode=0755
+    #   sudo: yes
 
-    - name: ejrf migrate db
-      script: migrate-db.sh
-      args:
-        chdir: /srv/checkout/
+    # - name: ejrf repo
+    #   git: repo=https://github.com/eJRF/ejrf.git dest=/srv/checkout version=HEAD
+    #   sudo: yes
 
-    - name: copy service config
-      copy: src=djangoservice.conf dest=/etc/init/djangoservice.conf
-      sudo: yes
+    # - name: ejrf requirements
+    #   pip: requirements=/srv/checkout/pip-requirements.txt virtualenv=/srv/checkout/ejrfvenv
 
-    - name: copy run server
-      copy: src=run-server.sh dest=/srv/checkout/run-server.sh mode=777
+    # - postgresql_db: namejrf owner=ejrf state=prese login_user=ejrf login_password=ejrf
+    #   sudo: yes
 
-    - name: start server
-      script: start-server-initial.sh
+    # - name: ejrf sync db
+    #   script: sync-db.sh
+    #   args:
+    #     chdir: /srv/checkout/
+
+    # - name: ejrf migrate db
+    #   script: migrate-db.sh
+    #   args:
+    #     chdir: /srv/checkout/
+
+    # - name: copy service config
+    #   copy: src=djangoservice.conf dest=/etc/init/djangoservice.conf
+    #   sudo: yes
+
+    # - name: copy run server
+    #   copy: src=run-server.sh dest=/srv/checkout/run-server.sh mode=777
+
+    # - name: start server
+    #   script: start-server-initial.sh
