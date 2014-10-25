@@ -1,0 +1,1 @@
+default ansible_ssh_host=127.0.0.1 ansible_ssh_port=2222 install_certificate=false server_stage=localhost ejrf_db_name=ejrf ejrf_db_password=ejrf
