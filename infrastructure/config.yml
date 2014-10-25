@@ -17,7 +17,27 @@
     - pip: name=psycopg2
       sudo: yes
 
-    # - postgresql_user: name=ejrf password=ejrf
+    - postgresql_user: name=ejrf password=ejrf
+      sudo: yes
+      sudo_user: postgres
+
+    - name: pg_hba.conf localhost md5
+      lineinfile: dest=/etc/postgresql/9.3/main/pg_hba.conf regexp="^local[\s]+all[\s]+all[\s]+[\w]+$" line="local    all             all                                     md5"
+      sudo: yes
+
+    - service: name=postgresql state=reloaded
+      sudo: yes
+
+    - command: ./postgresql reload
+      sudo: yes
+      args:
+        chdir: /etc/init.d/
+
+
+    - postgresql_db: name=ejrf owner=ejrf state=present
+      sudo: yes
+      sudo_user: postgres
+
 
     # - file: path=/srv/checkout owner=ubuntu  mode=0755
     #   sudo: yes
@@ -29,16 +49,13 @@
     # - name: ejrf requirements
     #   pip: requirements=/srv/checkout/pip-requirements.txt virtualenv=/srv/checkout/ejrfvenv
 
-    # - postgresql_db: namejrf owner=ejrf state=prese login_user=ejrf login_password=ejrf
-    #   sudo: yes
 
     # - name: ejrf sync db
     #   script: sync-db.sh
     #   args:
-    #     chdir: /srv/checkout/
+    #     chdir: /srv/checko/
 
-    # - name: ejrf migrate db
-    #   script: migrate-db.sh
+    # - name: ejrf migrate d    #   script: migrate-db.sh
     #   args:
     #     chdir: /srv/checkout/
 
