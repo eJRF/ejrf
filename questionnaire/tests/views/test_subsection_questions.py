@@ -11,33 +11,30 @@ class SubsectionQuestionsTest(BaseTest):
     def setUp(self):
         self.region = None
         self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013, region=self.region)
-        self.questionnaire.save()
+
         self.section = Section.objects.create(name="section", questionnaire=self.questionnaire, order=1)
-        self.section.save()
+
         self.subsection = SubSection.objects.create(title="subsection 1", section=self.section, order=1, pk=1)
-        self.subsection.save()
+
         self.question_group = QuestionGroup.objects.create(subsection_id=self.subsection.id)
+        self.question_group2 = QuestionGroup.objects.create(subsection_id=self.subsection.id)
+
         self.question1 = Question.objects.create(text='Q1', UID='C00003', answer_type='Number', region=self.region)
-        self.question1.save()
         self.question2 = Question.objects.create(text='Q2', UID='C00002', answer_type='Number', region=self.region)
-        self.question2.save()
+        self.question3 = Question.objects.create(text='Q3', UID='C00004', answer_type='Number', region=self.region)
+
         self.question_group.question.add(self.question1)
         self.question_group.question.add(self.question2)
-        self.question_group.save()
-
 
     def test_should_get_back_questionnaire_id_from_url(self):
+
         response = self.client.get('/questionnaire/subsection/1/questions/')
         self.assertEqual(200, response.status_code)
         self.assertEqual(json.loads(response.content)['questions'], serializers.serialize("json", [self.question1, self.question2]))
 
 
     def test_should_get_back_questionnaire_id_from_url_when_there_are_two_question_groups(self):
-        self.question_group2 = QuestionGroup.objects.create(subsection_id=self.subsection.id)
-        self.question3 = Question.objects.create(text='Q3', UID='C00004', answer_type='Number', region=self.region)
-        self.question3.save()
         self.question_group2.question.add(self.question3)
-
         response = self.client.get('/questionnaire/subsection/1/questions/')
         self.assertEqual(200, response.status_code)
         self.assertEqual(set(json.loads(response.content)['questions']), set(serializers.serialize("json", [self.question1, self.question2, self.question3])))
