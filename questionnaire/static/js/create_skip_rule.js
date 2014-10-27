@@ -17,7 +17,7 @@ var Responses = React.createClass({
         return (
             <div>
                 <label for="responses">Select Response</label>
-                {options}
+                {options} 
             </div>
         );
     }
@@ -110,13 +110,7 @@ skipRules.updateSubsection = function(subsectionId) {
     skipRules.subsection = subsectionId;
     $.get( "/questionnaire/subsection/" + subsectionId + "/questions/", function( data ) {
         var questions = data.questions;
-
-        output = data; //questions.filter(function(q) { return q.fields.answer_type == "MultiChoice"; });
         component.setState({questions: questions});
         component.setState({selectedQuestion: questions[0]});
     }, dataType="json");
-    // var questions = [ {id: 10, responses: [{value:"yes", text:"yes"}, {value:"no", text:"no"}]},
-    //                     {id: 20, responses: [{value:"yes", text:"yes"}, {value:"no", text:"no"}]},
-    //                     {id: 30, responses: [{value:"yes", text:"yes"}, {value:"no", text:"no"}]}];  //make get request
-    // component.setState({questions: questions});
 };
