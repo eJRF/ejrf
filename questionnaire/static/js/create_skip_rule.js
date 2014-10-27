@@ -4,9 +4,14 @@ skipRules.subsection = "";
 
 var Responses = React.createClass({
     render: function() {
+        var divStyle = {
+            paddingLeft: '20px',
+            paddingRight: '20px'
+        };
+
         var options = this.props.responses.map(function(r) {
             return (
-                <label><input type="radio" name="responses" value="{r.pk}" />{r.fields.text}</label>
+                <label className="pull-right" style={divStyle}><input type="radio" name="responses" value="{r.pk}" />{r.fields.text}</label>
             );
         });
         return (
@@ -30,7 +35,7 @@ var AllQuestions = React.createClass({
         return (
             <div>
                 <label for="root-question">{this.props.label}</label>
-                <select name="root-question" id="root-question">
+                <select className="pull-right" name="root-question" id="root-question">
                 {options}
                 </select>
         </div>
@@ -66,7 +71,7 @@ var Question = React.createClass({
         return (
             <div>
                 <label for="root-question">{this.props.label}</label>
-                <select name="root-question" id="root-question" onChange={this.updateSelectedQuestion} value={this.state.selectedOption}>
+                <select className="pull-right" name="root-question" id="root-question" onChange={this.updateSelectedQuestion} value={this.state.selectedOption}>
                 {options}
                 </select>
                 <Responses responses={responses || []} />
