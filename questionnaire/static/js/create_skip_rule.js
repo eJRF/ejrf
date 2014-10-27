@@ -6,7 +6,7 @@ var Responses = React.createClass({
     render: function() {
         var options = this.props.responses.map(function(r) {
             return (
-                <label><input type="radio" name="responses" value="{r.value}" />{r.text}</label>
+                <label><input type="radio" name="responses" value="{r.pk}" />{r.fields.text}</label>
             );
         });
         return (
@@ -60,13 +60,16 @@ var Question = React.createClass({
                 <option value={q.pk}>{q.fields.text}</option>
             );
         });
+        if (this.props.questions.length > 0) {
+            var responses = this.props.questions[0].options;
+        }   
         return (
             <div>
                 <label for="root-question">{this.props.label}</label>
                 <select name="root-question" id="root-question" onChange={this.updateSelectedQuestion} value={this.state.selectedOption}>
                 {options}
                 </select>
-                <Responses responses={this.state.selectedQuestion.responses || []} />
+                <Responses responses={responses || []} />
         </div>
         );
     }
@@ -101,8 +104,9 @@ var output= {};
 skipRules.updateSubsection = function(subsectionId) {
     skipRules.subsection = subsectionId;
     $.get( "/questionnaire/subsection/" + subsectionId + "/questions/", function( data ) {
-        var questions = jQuery.parseJSON( data.questions );
-        output = questions.filter(function(q) { return q.fields.answer_type == "MultiChoice"; });
+        var questions = data.questions;
+
+        output = data; //questions.filter(function(q) { return q.fields.answer_type == "MultiChoice"; });
         component.setState({questions: questions});
         component.setState({selectedQuestion: questions[0]});
     }, dataType="json");

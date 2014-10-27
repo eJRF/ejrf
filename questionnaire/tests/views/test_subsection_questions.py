@@ -30,11 +30,38 @@ class SubsectionQuestionsTest(BaseTest):
 
         response = self.client.get('/questionnaire/subsection/1/questions/')
         self.assertEqual(200, response.status_code)
-        self.assertEqual(json.loads(response.content)['questions'], serializers.serialize("json", [self.question1, self.question2]))
+        expected_content = []
+        q1 = self.obj_to_dict(self.question1)
+        q1['options'] = []
+        expected_content.append(q1)
+        
+        q2 = self.obj_to_dict(self.question2)
+        q2['options'] = []
+        expected_content.append(q2)
 
+        self.assertEqual(json.loads(response.content)['questions'], expected_content)
+
+
+    def obj_to_dict(self, question):
+        return json.loads(serializers.serialize('json', [question]))[0]
 
     def test_should_get_back_questionnaire_id_from_url_when_there_are_two_question_groups(self):
         self.question_group2.question.add(self.question3)
         response = self.client.get('/questionnaire/subsection/1/questions/')
         self.assertEqual(200, response.status_code)
-        self.assertEqual(set(json.loads(response.content)['questions']), set(serializers.serialize("json", [self.question1, self.question2, self.question3])))
+        expected_content = []
+        q3 = self.obj_to_dict(self.question3)
+        q3['options'] = []
+        expected_content.append(q3)
+
+        q1 = self.obj_to_dict(self.question1)
+        q1['options'] = []
+        expected_content.append(q1)
+        
+        q2 = self.obj_to_dict(self.question2)
+        q2['options'] = []
+        expected_content.append(q2)
+
+        
+
+        self.assertEqual(json.loads(response.content)['questions'], expected_content)
