@@ -30,16 +30,16 @@ class SubsectionQuestionsTest(BaseTest):
 
         response = self.client.get('/questionnaire/subsection/1/questions/')
         self.assertEqual(200, response.status_code)
-        expected_content = []
+
         q1 = self.obj_to_dict(self.question1)
         q1['options'] = []
-        expected_content.append(q1)
         
         q2 = self.obj_to_dict(self.question2)
         q2['options'] = []
-        expected_content.append(q2)
 
-        self.assertEqual(json.loads(response.content)['questions'], expected_content)
+        actualResponse = json.loads(response.content)['questions']
+        self.assertTrue(q1 in actualResponse)
+        self.assertTrue(q2 in actualResponse)
 
 
     def obj_to_dict(self, question):
@@ -49,19 +49,17 @@ class SubsectionQuestionsTest(BaseTest):
         self.question_group2.question.add(self.question3)
         response = self.client.get('/questionnaire/subsection/1/questions/')
         self.assertEqual(200, response.status_code)
-        expected_content = []
+
         q3 = self.obj_to_dict(self.question3)
         q3['options'] = []
-        expected_content.append(q3)
 
         q1 = self.obj_to_dict(self.question1)
         q1['options'] = []
-        expected_content.append(q1)
         
         q2 = self.obj_to_dict(self.question2)
         q2['options'] = []
-        expected_content.append(q2)
 
-        
-
-        self.assertEqual(json.loads(response.content)['questions'], expected_content)
+        actualResponse = json.loads(response.content)['questions']
+        self.assertTrue(q1 in actualResponse)
+        self.assertTrue(q2 in actualResponse)
+        self.assertTrue(q3 in actualResponse)      
