@@ -41,7 +41,7 @@ urlpatterns = patterns('',
     url(r'^questionnaire/(?P<questionnaire_id>\d+)/publish/$', PublishQuestionnaire.as_view(), name="publish_questionnaire_page"),
     url(r'^questionnaire/(?P<questionnaire_id>\d+)/preview/$', PreviewQuestionnaire.as_view(), name="preview_specific_questionnaire"),
 
-    url(r'^questionnaire/(?P<questionnaire_id>\d+)/section/(?P<section_id>\d+)/subsection/(?P<subsection_id>\d+)/questions/$', SubsectionQuestions.as_view(), name="subsection_questions"),
+    url(r'^questionnaire/subsection/(?P<subsection_id>\d+)/questions/$', SubsectionQuestions.as_view(), name="subsection_questions"),
     url(r'^questionnaire/(?P<questionnaire_id>\d+)/section/(?P<section_id>\d+)/subsection/(?P<subsection_id>\d+)/skiprules/$', SkipQuestion.as_view(), name="skip_rules"),
 
     url(r'^questionnaire/entry/(?P<questionnaire_id>\d+)/documents/upload/$', UploadDocument.as_view(), name='upload_document'),
