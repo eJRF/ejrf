@@ -18,20 +18,43 @@ var Responses = React.createClass({
     }
 });
 
+
+var AllQuestions = React.createClass({
+    render: function() {
+        var options = this.props.questions
+                .map(function(q) {
+            return (
+                <option value={q.pk}>{q.fields.text}</option>
+            );
+        });
+        return (
+            <div>
+                <label for="root-question">{this.props.label}</label>
+                <select name="root-question" id="root-question">
+                {options}
+                </select>
+        </div>
+        );
+    }
+});
+
 var Question = React.createClass({
     getInitialState: function() {
         return (
-            { selectOption: null }
+            { selectedQuestion: {} }
         );
     },
     updateSelectedQuestion: function(event) {
         var e = document.getElementById("root-question");
         var v = e.options[e.selectedIndex].value;
-        this.props.selectQuestion(v);
+        var question = this.props.questions.filter(function(q) { return q.pk == v; })[0];
+        this.setState({selectQuestion: question});
+        this.props.selectQuestion(question);
     },
+    filterQuestions: function(q) { return q.fields.answer_type == "MultiChoice"; },
     render: function() {
         var options = this.props.questions
-                .filter(this.props.filterFunction)
+                .filter(this.filterQuestions)
                 .map(function(q) {
             return (
                 <option value={q.pk}>{q.fields.text}</option>
@@ -43,6 +66,7 @@ var Question = React.createClass({
                 <select name="root-question" id="root-question" onChange={this.updateSelectedQuestion} value={this.state.selectedOption}>
                 {options}
                 </select>
+                <Responses responses={this.state.selectedQuestion.responses || []} />
         </div>
         );
     }
@@ -51,25 +75,21 @@ var Question = React.createClass({
 var AddSkipRule = React.createClass({
     dummyFunction: function(a) { return true; },
     selectQuestion: function(question) {
-        var selectedQuestion = this.state.questions.filter(function(q) {
-            return q.pk == question;
-        })[0];
-        this.setState({questions:this.state.questions, selectedQuestion: selectedQuestion});
+        this.setState({selectedQuestion: question});
     },
     getInitialState: function() {
         return {
-            questions: [],
-            selectedQuestion: {pk: null, responses: []}};
+            selectedQuestion: {},
+            questions: []};
     },
-    filterQuestions: function(q) { return q.fields.answer_type == "MultiChoice"; },
+
     render: function() {
         var selectedQuestion = this.state.selectedQuestion;
-        var qs = this.state.questions;//This.questions.filter(function(q) { return q != selectedQuestion; });
+        var qs = this.state.questions.filter(function(q) { return q != selectedQuestion; });
         return (
             <div>
-                <Question questions={this.state.questions} selectQuestion={this.selectQuestion} filterFunction={this.filterQuestions} label="Select Root Question"/>
-                <Responses responses={this.state.selectedQuestion.responses} />
-                <Question questions={qs} selectQuestion={this.dummyFunction} filterFunction={this.dummyFunction} label="Select Question to Skip"/>
+                <Question questions={this.state.questions} selectQuestion={this.selectQuestion} label="Select Root Question"/>
+                <AllQuestions questions={qs} label="Select Question to Skip"/>
             </div>
         );
     }
@@ -84,6 +104,7 @@ skipRules.updateSubsection = function(subsectionId) {
         var questions = jQuery.parseJSON( data.questions );
         output = questions.filter(function(q) { return q.fields.answer_type == "MultiChoice"; });
         component.setState({questions: questions});
+        component.setState({selectedQuestion: questions[0]});
     }, dataType="json");
     // var questions = [ {id: 10, responses: [{value:"yes", text:"yes"}, {value:"no", text:"no"}]},
     //                     {id: 20, responses: [{value:"yes", text:"yes"}, {value:"no", text:"no"}]},
