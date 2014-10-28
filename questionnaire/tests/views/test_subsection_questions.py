@@ -9,6 +9,7 @@ from django.core import serializers
 class SubsectionQuestionsTest(BaseTest):
 
     def setUp(self):
+        self.client = Client()
         self.region = None
         self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013, region=self.region)
 

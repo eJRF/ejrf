@@ -5,8 +5,8 @@ skipRules.subsection = "";
 var Responses = React.createClass({
     render: function() {
         var divStyle = {
-            paddingLeft: '20px',
-            paddingRight: '20px'
+            paddingLeft: '10px',
+            paddingRight: '10px'
         };
 
         var options = this.props.responses.map(function(r) {
@@ -23,7 +23,6 @@ var Responses = React.createClass({
     }
 });
 
-
 var AllQuestions = React.createClass({
     render: function() {
         var options = this.props.questions
@@ -35,7 +34,7 @@ var AllQuestions = React.createClass({
         return (
             <div>
                 <label for="root-question">{this.props.label}</label>
-                <select className="pull-right" name="root-question" id="root-question">
+                <select className="pull-right" name="skip-question" id="root-question">
                 {options}
                 </select>
         </div>
@@ -53,7 +52,6 @@ var Question = React.createClass({
         var e = document.getElementById("root-question");
         var v = e.options[e.selectedIndex].value;
         var question = this.props.questions.filter(function(q) { return q.pk == v; })[0];
-        this.setState({selectQuestion: question});
         this.props.selectQuestion(question);
     },
     filterQuestions: function(q) { return q.fields.answer_type == "MultiChoice"; },
@@ -65,17 +63,15 @@ var Question = React.createClass({
                 <option value={q.pk}>{q.fields.text}</option>
             );
         });
-        if (this.props.questions.length > 0) {
-            var responses = this.props.questions[0].options;
-        }   
+        var responses = this.props.selectedQuestion.options; 
         return (
             <div>
                 <label for="root-question">{this.props.label}</label>
-                <select className="pull-right" name="root-question" id="root-question" onChange={this.updateSelectedQuestion} value={this.state.selectedOption}>
+                <select className="pull-right" name="root-question" id="root-question" onChange={this.updateSelectedQuestion} value={this.state.selectedQuestion.pk}>
                 {options}
                 </select>
                 <Responses responses={responses || []} />
-        </div>
+            </div>
         );
     }
 });
@@ -96,7 +92,7 @@ var AddSkipRule = React.createClass({
         var qs = this.state.questions.filter(function(q) { return q != selectedQuestion; });
         return (
             <div>
-                <Question questions={this.state.questions} selectQuestion={this.selectQuestion} label="Select Root Question"/>
+                <Question questions={this.state.questions} selectQuestion={this.selectQuestion} label="Select Root Question" selectedQuestion={this.state.selectedQuestion}/>
                 <AllQuestions questions={qs} label="Select Question to Skip"/>
             </div>
         );
