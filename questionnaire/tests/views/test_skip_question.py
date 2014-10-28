@@ -8,9 +8,12 @@ class SkipQuestionTest(BaseTest):
 	def setUp(self):
 		self.client = Client()
 		self.url ="/questionnaire/subsection/1/skiprules/"
-		self.form_data = {'root-question': '1',
+		region = None
+		question1 = Question.objects.create(text='Q1', UID='C00003', answer_type='Number', region=region)
+		self.form_data = {'root-question': question1.pk,
 						  'responses': '1',
 						  'skip-question': '2'}
+		
 
 
 	def test_post_skip_question(self):
