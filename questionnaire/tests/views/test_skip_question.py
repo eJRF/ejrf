@@ -79,12 +79,19 @@ class SkipQuestionTest(BaseTest):
 		self.assertEqual(400, response.status_code)
 		self.assertEqual(json.loads(response.content)['result'], 'skip-question is not part of subsection')
 
-	def test_post_skip_question_for_response_option_not_being_related_to_root_question(self):
+	def test_post_skip_question_for_response_one_of_root_questions_options(self):
 		data = self.form_data
 		data['root-question'] = self.random_question.pk
 		response = self.client.post(self.url % self.subsection_id, data=data)
 		self.assertEqual(400, response.status_code)
 		self.assertEqual(json.loads(response.content)['result'], "root question's options does not contain the provided response")
+
+	def test_post_skip_question_root_question_is_not_equal_to_skip_question(self):
+		data = self.form_data
+		data['skip-question'] = data['root-question']
+		response = self.client.post(self.url % self.subsection_id, data=data)
+		self.assertEqual(400, response.status_code)
+		self.assertEqual(json.loads(response.content)['result'], "root question cannot be the same as skip question")
 
 
 	# def test_post_response_for_root_question(self):

@@ -11,6 +11,9 @@ class SkipQuestion(BaseModel):
 
 	@classmethod
 	def create(cls, root_question_id, response_id, skip_question_id, subsection_id):
+		if root_question_id == skip_question_id:
+			raise ValidationError("root question cannot be the same as skip question")
+
 		if not Question.objects.filter(pk=root_question_id).exists():
 			raise ValidationError('root-question does not exist')
 		root_question = Question.objects.get(pk=root_question_id)
