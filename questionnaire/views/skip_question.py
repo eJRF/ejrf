@@ -29,7 +29,7 @@ class SkipQuestionView(View):
 
 		except Exception as e2:
 			logging.error(e2)
-			return self.error_response('Question or response do not exist')
+			return self.error_response('Unknown error occured')
 
 		data = {}
 		data['result'] = 'success'

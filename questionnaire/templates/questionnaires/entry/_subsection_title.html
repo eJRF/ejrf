@@ -5,11 +5,6 @@
 
     {{ subsection.title | default_if_none:''}}
     {% if perms.auth.can_edit_questionnaire and user.user_profile.region == questionnaire.region and not preview %}
-    <script type="text/javascript">
-      function alertSubsectionId(subsectionId) {
-      alert(subsectionId);
-      }
-    </script>
         <div class="btn-group pull-right">
             <a href="" id="id-create-skip-rule-{{ subsection.id }}" class="btn btn-sm btn-default"
                data-toggle="modal" data-target="#create-skip-rule" onClick="skipRules.updateSubsection({{ subsection.id }})">

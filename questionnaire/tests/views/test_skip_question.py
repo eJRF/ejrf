@@ -38,10 +38,10 @@ class SkipQuestionTest(BaseTest):
 		question_group3.question.add(skip_question)
 
 		response = QuestionOption.objects.create(text = "Some response", question=root_question, UID = "U0003")
-		self.form_data = {'root-question': root_question.pk,
-						  'responses': response.pk,
-						  'skip-question': skip_question.pk,
-						  'subsection-id': self.subsection_id}
+		self.form_data = {'root-question': str(root_question.pk),
+						  'responses': str(response.pk),
+						  'skip-question': str(skip_question.pk),
+						  'subsection-id': str(self.subsection_id)}
 
 	def test_post_skip_question(self):
 		self.assertEqual(SkipQuestion.objects.all().count(), 0)
@@ -51,21 +51,21 @@ class SkipQuestionTest(BaseTest):
 
 	def test_post_skip_question_for_root_question_not_existing(self):
 		data = self.form_data
-		data['root-question'] = 341543
+		data['root-question'] = '341543'
 		response = self.client.post(self.url, data=data)
 		self.assertEqual(400, response.status_code)
 		self.assertEqual(json.loads(response.content)['result'], 'root-question does not exist')
 
 	def test_post_skip_question_for_response_not_existing(self):
 		data = self.form_data
-		data['responses'] = 341543
+		data['responses'] = '341543'
 		response = self.client.post(self.url, data=data)
 		self.assertEqual(400, response.status_code)
 		self.assertEqual(json.loads(response.content)['result'], 'response does not exist')
 
 	def test_post_skip_question_for_skip_question_not_existing(self):
 		data = self.form_data
-		data['skip-question'] = 341543
+		data['skip-question'] = '341543'
 		response = self.client.post(self.url, data=data)
 		self.assertEqual(400, response.status_code)
 		self.assertEqual(json.loads(response.content)['result'], 'skip-question does not exist')

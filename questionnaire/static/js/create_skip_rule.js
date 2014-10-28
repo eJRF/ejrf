@@ -11,7 +11,7 @@ var Responses = React.createClass({
 
         var options = this.props.responses.map(function(r) {
             return (
-                <label className="pull-right" style={divStyle}><input type="radio" name="responses" value="{r.pk}" />{r.fields.text}</label>
+                <label className="pull-right" style={divStyle}><input type="radio" name="responses" value={r.pk} />{r.fields.text}</label>
             );
         });
         return (
@@ -83,6 +83,7 @@ var AddSkipRule = React.createClass({
     },
     getInitialState: function() {
         return {
+            subsectionId: -1,
             selectedQuestion: {},
             questions: []};
     },
@@ -92,6 +93,7 @@ var AddSkipRule = React.createClass({
         var qs = this.state.questions.filter(function(q) { return q != selectedQuestion; });
         return (
             <div>
+                <input name="subsection-id" type="hidden" value={this.state.subsectionId} />
                 <Question questions={this.state.questions} selectQuestion={this.selectQuestion} label="Select Root Question" selectedQuestion={this.state.selectedQuestion}/>
                 <AllQuestions questions={qs} label="Select Question to Skip"/>
             </div>
@@ -106,6 +108,7 @@ skipRules.updateSubsection = function(subsectionId) {
     skipRules.subsection = subsectionId;
     $.get( "/questionnaire/subsection/" + subsectionId + "/questions/", function( data ) {
         var questions = data.questions;
+        component.setState({subsectionId: subsectionId})
         component.setState({questions: questions});
         component.setState({selectedQuestion: questions[0]});
     }, dataType="json");
