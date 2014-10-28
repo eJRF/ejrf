@@ -17,3 +17,4 @@ class SkipQuestionTest(BaseTest):
 		self.assertEqual(SkipQuestion.objects.all().count(), 0)
 		response = self.client.post(self.url, data=self.form_data)
 		self.assertEqual(201, response.status_code)
+		self.assertEqual(SkipQuestion.objects.all().count(), 1)

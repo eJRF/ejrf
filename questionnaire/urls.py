@@ -1,5 +1,5 @@
 from django.conf.urls import patterns, url
-from questionnaire.views.skip_question import SkipQuestion
+from questionnaire.views.skip_question import SkipQuestionView
 from questionnaire.views.subsection_questions import SubsectionQuestions
 from questionnaire.views.assign_questions import AssignQuestion, UnAssignQuestion
 from questionnaire.views.export_to_text import ExportToTextView, ExportSectionPDF, DownloadSectionPDF, SpecificExportView
@@ -42,7 +42,7 @@ urlpatterns = patterns('',
     url(r'^questionnaire/(?P<questionnaire_id>\d+)/preview/$', PreviewQuestionnaire.as_view(), name="preview_specific_questionnaire"),
 
     url(r'^questionnaire/subsection/(?P<subsection_id>\d+)/questions/$', SubsectionQuestions.as_view(), name="subsection_questions"),
-    url(r'^questionnaire/subsection/(?P<subsection_id>\d+)/skiprules/$', SkipQuestion.as_view(), name="skip_rules"),
+    url(r'^questionnaire/subsection/(?P<subsection_id>\d+)/skiprules/$', SkipQuestionView.as_view(), name="skip_rules"),
 
     url(r'^questionnaire/entry/(?P<questionnaire_id>\d+)/documents/upload/$', UploadDocument.as_view(), name='upload_document'),
     url(r'^questionnaire/entry/(?P<questionnaire_id>\d+)/documents/(?P<document_id>\d+)/download/$', DownloadDocument.as_view(), name='download_document'),
