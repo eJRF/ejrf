@@ -42,7 +42,7 @@ urlpatterns = patterns('',
     url(r'^questionnaire/(?P<questionnaire_id>\d+)/preview/$', PreviewQuestionnaire.as_view(), name="preview_specific_questionnaire"),
 
     url(r'^questionnaire/subsection/(?P<subsection_id>\d+)/questions/$', SubsectionQuestions.as_view(), name="subsection_questions"),
-    url(r'^questionnaire/subsection/(?P<subsection_id>\d+)/skiprules/$', SkipQuestionView.as_view(), name="skip_rules"),
+    url(r'^questionnaire/subsection/skiprules/$', SkipQuestionView.as_view(), name="skip_rules"),
 
     url(r'^questionnaire/entry/(?P<questionnaire_id>\d+)/documents/upload/$', UploadDocument.as_view(), name='upload_document'),
     url(r'^questionnaire/entry/(?P<questionnaire_id>\d+)/documents/(?P<document_id>\d+)/download/$', DownloadDocument.as_view(), name='download_document'),

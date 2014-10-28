@@ -15,7 +15,7 @@ class SkipQuestionView(View):
 		root_question_id = 	request.POST['root-question']
 		response_id = 	request.POST['responses']	
 		skip_question_id = 	request.POST['skip-question']
-		subsection_id = kwargs['subsection_id']
+		subsection_id = request.POST['subsection-id']
 
 		try: 	
 			
