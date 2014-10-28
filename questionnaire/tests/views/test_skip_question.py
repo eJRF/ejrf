@@ -1,6 +1,7 @@
 from questionnaire.tests.base_test import BaseTest
 from django.test import Client
 import logging
+from questionnaire.models import Question, SkipQuestion
 
 class SkipQuestionTest(BaseTest):
 
@@ -13,6 +14,6 @@ class SkipQuestionTest(BaseTest):
 
 
 	def test_post_skip_question(self):
+		self.assertEqual(SkipQuestion.objects.all().count(), 0)
 		response = self.client.post(self.url, data=self.form_data)
-		logging.warning(response)
-		self.assertEqual(200, response.status_code)
+		self.assertEqual(201, response.status_code)

@@ -8,6 +8,7 @@ from questionnaire.models.locations import Location, Region, Country, Organizati
 from questionnaire.models.questionnaires import Questionnaire
 from questionnaire.models.questions import Question, QuestionOption
 from questionnaire.models.sections import Section, SubSection
+from questionnaire.models.skip_question import SkipQuestion
 from questionnaire.models.support_document import SupportDocument
 from questionnaire.models.themes import Theme
 from questionnaire.models.users import UserProfile
@@ -33,5 +34,6 @@ __all__ = [
     'QuestionGroupOrder',
     'UserProfile',
     'SupportDocument',
+    'SkipQuestion',
     'Theme',
 ]
