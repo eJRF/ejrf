@@ -12,5 +12,9 @@ class SkipQuestionView(View):
 
         data = {}
         data['result'] = 'success'
-        SkipQuestion.objects.create(root_question=Question.objects.get(pk=root_question_id), response=QuestionOption.objects.get(pk=response_id), skip_question=Question.objects.get(pk=skip_question_id))
+        try:
+        	SkipQuestion.objects.create(root_question=Question.objects.get(pk=root_question_id), response=QuestionOption.objects.get(pk=response_id), skip_question=Question.objects.get(pk=skip_question_id))
+    	except Exception as e:
+    		print e
+    		return HttpResponse(json.dumps({'result': 'Question or response do not exist'}), content_type= "application/json", status=400)
         return HttpResponse(json.dumps(data), content_type = "application/json", status=201)

@@ -15,13 +15,27 @@ class SkipQuestionTest(BaseTest):
 		self.form_data = {'root-question': question1.pk,
 						  'responses': response.pk,
 						  'skip-question': question2.pk}
-		
-		
-
-
 
 	def test_post_skip_question(self):
 		self.assertEqual(SkipQuestion.objects.all().count(), 0)
 		response = self.client.post(self.url, data=self.form_data)
 		self.assertEqual(201, response.status_code)
 		self.assertEqual(SkipQuestion.objects.all().count(), 1)
+
+	def test_post_skip_question_for_root_question_not_existing(self):
+		data = self.form_data
+		data['root-question'] = 341543
+		response = self.client.post(self.url, data=data)
+		self.assertEqual(400, response.status_code)
+
+	def test_post_skip_question_for_response_not_existing(self):
+		data = self.form_data
+		data['responses'] = 341543
+		response = self.client.post(self.url, data=data)
+		self.assertEqual(400, response.status_code)
+
+	def test_post_skip_question_for_skip_question_not_existing(self):
+		data = self.form_data
+		data['skip-question'] = 341543
+		response = self.client.post(self.url, data=data)
+		self.assertEqual(400, response.status_code)
