@@ -18,9 +18,19 @@
           <script type="text/javascript">
             $( "#sumbit-skip-rule" ).submit(function( event ) {
                 event.preventDefault();
-                $.post("{% url 'skip_rules' %}", $('#sumbit-skip-rule').serialize(), function(data) {
-                    console.log(data);
-                })
+                $.post("{% url 'skip_rules' %}", $('#sumbit-skip-rule').serialize())
+                  .done(function(data) {
+                    $('#page-alert-success').show();
+                    $('#page-alert-success').html(data.result);
+                  })
+                  .fail(function(data) {
+                    $('#page-alert-error').show();
+                    console.log(data)
+                    $('#page-alert-error').html(data.responseJSON.result || "An unknown error occured saving the skip rule");
+                  })
+                  .always(function() {
+                      $('#create-skip-rule').modal('toggle');
+                  });
             });
           </script>
         </div>
