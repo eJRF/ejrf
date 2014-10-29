@@ -10,6 +10,10 @@ class SubsectionQuestionsTest(BaseTest):
 
     def setUp(self):
         self.client = Client()
+        user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
+        self.assign('can_view_questionnaire', user)
+        self.client.login(username=user.username, password='pass')
+
         self.region = None
         self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013, region=self.region)
 

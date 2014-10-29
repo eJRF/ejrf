@@ -4,8 +4,11 @@ from django.views.generic import View
 from questionnaire.models import SubSection, Questionnaire, Question, QuestionGroup, QuestionOption
 from django.core import serializers
 import logging
+from braces.views import PermissionRequiredMixin
 
-class SubsectionQuestions(View):
+class SubsectionQuestions(PermissionRequiredMixin, View):
+    permission_required = 'auth.can_view_questionnaire'
+
     def get(self, request, *args, **kwargs):
         subsection_id=kwargs['subsection_id']
         question_group = QuestionGroup.objects.select_related('question').filter(subsection_id=subsection_id)
