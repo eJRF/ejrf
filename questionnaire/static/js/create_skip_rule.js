@@ -1,6 +1,7 @@
 /** @jsx React.DOM */
 var skipRules = skipRules || {};
 skipRules.subsection = "";
+skipRules.isMultichoiceQuestion = function(q) { return q.fields.answer_type == "MultiChoice"; }
 
 var Responses = React.createClass({
     render: function() {
@@ -54,10 +55,9 @@ var Question = React.createClass({
         var question = this.props.questions.filter(function(q) { return q.pk == v; })[0];
         this.props.selectQuestion(question);
     },
-    filterQuestions: function(q) { return q.fields.answer_type == "MultiChoice"; },
     render: function() {
         var options = this.props.questions
-                .filter(this.filterQuestions)
+                .filter(skipRules.isMultichoiceQuestion)
                 .map(function(q) {
             return (
                 <option value={q.pk}>{q.fields.text}</option>
@@ -91,19 +91,24 @@ var AddSkipRule = React.createClass({
     render: function() {
         var selectedQuestion = this.state.selectedQuestion;
         var qs = this.state.questions.filter(function(q) { return q != selectedQuestion; });
-        return (
-            <div>
-                <input name="subsection-id" type="hidden" value={this.state.subsectionId} />
-                <Question questions={this.state.questions} selectQuestion={this.selectQuestion} label="Select Root Question" selectedQuestion={this.state.selectedQuestion}/>
-                <AllQuestions questions={qs} label="Select Question to Skip"/>
-            </div>
-        );
+        if (this.state.questions.filter(function(q) { return q.fields.answer_type == "MultiChoice"; }).length > 0) {
+            $("#save-skip-rule-button").show();
+            return (
+                <div>
+                    <input name="subsection-id" type="hidden" value={this.state.subsectionId} />
+                    <Question questions={this.state.questions} selectQuestion={this.selectQuestion} label="Select Root Question" selectedQuestion={this.state.selectedQuestion}/>
+                    <AllQuestions questions={qs} label="Select Question to Skip"/>
+                </div>
+            );
+        } else {
+            $("#save-skip-rule-button").hide();     
+            return (<div>There are no Multiple Choice questions to create skip rules for</div>);
+        }
     }
 });
 
 var component = React.renderComponent(<AddSkipRule />, document.getElementById('id_create-skip-rule'));
 
-var output= {};
 skipRules.updateSubsection = function(subsectionId) {
     skipRules.subsection = subsectionId;
     $.get( "/questionnaire/subsection/" + subsectionId + "/questions/", function( data ) {
