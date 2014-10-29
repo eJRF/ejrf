@@ -14,7 +14,6 @@ class SkipQuestionView(PermissionRequiredMixin, View):
         return HttpResponse(json.dumps({'result': error_message}), content_type="application/json", status=400)
 
     def post(self, request, *args, **kwargs):
-
         try:
             root_question_id = request.POST['root-question']
             response_id = request.POST['responses']

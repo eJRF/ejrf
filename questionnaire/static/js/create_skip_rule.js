@@ -115,6 +115,6 @@ skipRules.updateSubsection = function(subsectionId) {
         var questions = data.questions;
         component.setState({subsectionId: subsectionId})
         component.setState({questions: questions});
-        component.setState({selectedQuestion: questions[0]});
+        component.setState({selectedQuestion: questions.filter(function(q) { return q.fields.answer_type == "MultiChoice"; })[0]});
     }, dataType="json");
 };
