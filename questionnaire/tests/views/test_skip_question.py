@@ -9,6 +9,9 @@ class SkipQuestionTest(BaseTest):
 	def setUp(self):
 		self.client = Client()
 		self.url = "/questionnaire/subsection/skiprules/"
+		user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
+		self.assign('can_edit_questionnaire', user)
+		self.client.login(username=user.username, password='pass')
 		region = None
 
 		questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013, region=region)

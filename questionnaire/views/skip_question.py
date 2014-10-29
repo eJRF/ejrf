@@ -4,8 +4,11 @@ from django.views.generic import View
 from questionnaire.models import SkipQuestion, Question, QuestionOption, SubSection
 import logging
 from django.core.exceptions import ValidationError
+from braces.views import PermissionRequiredMixin
 
-class SkipQuestionView(View):
+class SkipQuestionView(PermissionRequiredMixin, View):
+	permission_required = 'auth.can_edit_questionnaire'
+
 	def error_response(self, error_message):
 		return HttpResponse(json.dumps({'result': error_message}), content_type= "application/json", status=400)
 
