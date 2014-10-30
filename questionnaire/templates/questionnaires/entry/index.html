@@ -12,15 +12,13 @@
     <div id="page-alert-error" class="alert alert-danger" style='display:none;'></div>   
     {% include 'questionnaires/entry/_section_buttons.html' %}
 
+    <script src="{{ STATIC_URL }}js/lib/angular.min.js" type="text/javascript" charset="utf-8"></script>
     {% include 'questionnaires/create_skip_rule_modal.html' %}
-    <script src="{{ STATIC_URL }}js/create_skip_rule.js" type="text/jsx" charset="utf-8"></script>
-    <div id="testing"></div>
-    <script>
-        $.get('/static/skipRuleModal.html', function(data) {
-            $("#testing").html(data);
-        });
 
-    </script>
+    <script src="{{ STATIC_URL }}js/create_skip_rule.js" type="text/javascript" charset="utf-8"></script>
+    <div id="testing" ng-app="questionnaireApp">
+        <div ng-include="'/static/skipRuleModal.html'"> </div>
+    </div>
 
     <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/css/bootstrap.css" type="text/css" media="all">
     <div class="form-table">

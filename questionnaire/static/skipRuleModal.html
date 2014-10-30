@@ -1,1 +1,16 @@
-<div></div>
+<div>Hello</div>
+<div data-ng-controller="SkipRuleController">
+	<input name="subsection-id" type="hidden" value={{subsectionId}} />
+	<select className="pull-right" name="root-question" id="root-question" data-ng-model="selectedQuestion" data-ng-options="q.fields.text for q in questions" >
+		<option value="">Select Root Question</option>
+	</select>
+	<ul>
+		<li>{{selectedQuestion}}</li>
+	</ul>
+	<label ng-repeat="option in selectedQuestion.options">
+       <input type="radio" name="pageSet" data-ng-model="questionResponse" ng-value="option.pk" />{{option.fields.text}}
+     </label>
+     <select className="pull-right" name="root-question" id="root-question" data-ng-model="selectedSkipQuestion" data-ng-options="q.fields.text for q in questions | filter: !selectedQuestion" >
+		<option value="">Select Root Question</option>
+	</select>
+</div>
