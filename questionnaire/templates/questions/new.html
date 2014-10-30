@@ -1,11 +1,12 @@
 {% extends 'base/form.html' %}
 {% block display_form_fields %}
+    {% load generic_tags %}
     <h3>{{ title }}</h3>
     <hr/>
     {% include 'base/naked_form.html' with a_form=form %}
     {% include 'base/_question_options.html' %}
     {% if form.instance.id and form.instance.is_multichoice %}
-        {% load generic_tags %}
+
         <div id="option-choices" class="show">
             <label id="option-choices-label">Options</label>
             {% for options in form.KNOWN_OPTIONS %}
@@ -13,7 +14,7 @@
                     <input type="radio" id="options-{{ forloop.counter }}" value="{{ options }}"
                            {{form.instance|packaged_options:options}} name="options"> {{ options }}
                 </label>
-        {% endfor %}
+                {% endfor %}
                 <label class="radio-inline">
                     <input type="radio" id="options-{{ forloop.counter|add:1 }}" value="custom"
                     {{ form.instance|custom_options }}  name="options-custom"> Custom
@@ -31,7 +32,6 @@
 
         {% endif %}
     {% endif %}
-
     <script type="text/template" id="question-option-template">
         <div class="input-group" id="option-input-group">
             <label class="option-control-label">Option <span class="number"></span></label>

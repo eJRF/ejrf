@@ -1,29 +1,40 @@
-;
 jQuery(function($){
+
+
     var $form = $("#id-new-question-form"),
         template = $("#question-option-template").html(),
         answerTypeSelect = $('#id_answer_type');
 
     function addQuestionOption($element){
         $element.before(template);
-        assignOptionNumbers($form)
+        assignOptionNumbers($form);
+    }
+
+    if(answerTypeSelect.val() == 'MultiChoice'){
+        $('#option-choices').addClass('show').removeClass('hide');
+    } else if (answerTypeSelect.val() == 'Date') {
+        $("#id_answer_sub_type_span").show();
     }
 
     answerTypeSelect.on('change', function(){
+        $('#option-choices').removeClass('show').addClass('hide');
+        removeOptions();
+
+        $("#id_answer_sub_type_span").hide();
+
         if($(this).val() == 'MultiChoice'){
-            $('#option-choices').addClass('show').removeClass('hide')
-        }else{
-            $('#option-choices').removeClass('show').addClass('hide')
-            removeOptions();
+            $('#option-choices').addClass('show').removeClass('hide');
+        } else if ($(this).val() == 'Date') {
+            $("#id_answer_sub_type_span").show();
         }
     });
 
     $('input[type=radio]').on('change', function(){
         if($(this).val() == 'custom'){
             addQuestionOption($("div.form-actions"));
-            $form.find('input[name=options]').prop('checked', false)
+            $form.find('input[name=options]').prop('checked', false);
         }else{
-            $form.find('input[name=options-custom]').prop('checked', false)
+            $form.find('input[name=options-custom]').prop('checked', false);
             removeOptions()
         }
     });
@@ -41,8 +52,8 @@ jQuery(function($){
 function assignOptionNumbers($form){
     assignOptionNumbersUsing($form, "span.number");
     assignOptionNumbersUsing($form, "span.mid-table-number");
-    assignIdsWithNumbers($form, 'select[name=columns]')
-    }
+    assignIdsWithNumbers($form, 'select[name=columns]');
+}   
 
 function assignOptionNumbersUsing($form, number_selector){
         $form.find(number_selector).each(function(i, element){
