@@ -14,6 +14,15 @@
 
     {% include 'questionnaires/create_skip_rule_modal.html' %}
     <script src="{{ STATIC_URL }}js/create_skip_rule.js" type="text/jsx" charset="utf-8"></script>
+    <div id="testing"></div>
+    <script>
+        $.get('/static/skipRuleModal.html', function(data) {
+            $("#testing").html(data);
+        });
+
+    </script>
+
+    <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/css/bootstrap.css" type="text/css" media="all">
     <div class="form-table">
         {% include 'questionnaires/entry/section_breadcrumps_wizzard.html' %}
 
