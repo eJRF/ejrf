@@ -7,7 +7,7 @@
       </div>
       <form  method="post" action="{% url 'skip_rules' %}" class="form-horizontal" id="sumbit-skip-rule" name="skip-form">
         {% csrf_token %}
-        <div ng-include="'/static/skipRuleModal.html'"> </div>
+        <div ng-include="'/static/templates/skipRuleModal.html'"> </div>
       </form>
     </div>
   </div>
