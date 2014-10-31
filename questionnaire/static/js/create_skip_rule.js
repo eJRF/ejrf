@@ -1,8 +1,12 @@
 var skipRules = skipRules || {};
+skipRules.subsection = "";
 
 angular.module('questionnaireApp', [])
-    .controller('SkipRuleController', ['$scope', function($scope) {
-        $scope.skipRule = {selectedQuestion: {}, rootQuestion: {}};
+    .controller('SkipRuleController', ['$scope', '$http', function($scope, $http) {
+        var resetSkipRule = function() {
+            $scope.skipRule = {selectedQuestion: {}, rootQuestion: {}, csrfToken: window.csrfToken};
+        };
+        resetSkipRule();
         $scope.questions = [];
         $scope.matchSelectedQuestion = function(question) {
             return !($scope.skipRule.rootQuestion.pk == question.pk);
@@ -11,9 +15,10 @@ angular.module('questionnaireApp', [])
         $scope.updateSkipRuleModal = function(subsectionId) {
             $.get( "/questionnaire/subsection/" + subsectionId + "/questions/", function( data ) {
                 var questions = data.questions;
+                $scope.questions = questions;
                 $scope.$apply(function() {
+                    // resetSkipRule();
                     $scope.questions = questions;
-                    $scope.skipRule = {selectedQuestion: {}, rootQuestion: {}};
                     $scope.skipRule.subsectionId = subsectionId;
                     $scope.skipResult = {show: false};
                 });
@@ -28,15 +33,15 @@ angular.module('questionnaireApp', [])
                 root_question: $scope.skipRule.rootQuestion.pk,
                 response: $scope.skipRule.questionResponse,
                 subsection: $scope.skipRule.subsectionId,
-                skip_question: $scope.skipRule.skipQuestion.pk
+                skip_question: $scope.skipRule.skipQuestion.pk,
+                csrfmiddlewaretoken: $scope.skipRule.csrfToken
             };
         };
 
-        $( "#sumbit-skip-rule" ).submit(function( event ) {
-            event.preventDefault();
+        $scope.submitForm = function() {
+            console.log($scope.skipForm);
             data = getFormData();
-            data.csrfmiddlewaretoken = $('#sumbit-skip-rule input[name=csrfmiddlewaretoken]').val();
-            $.post($( "#sumbit-skip-rule" ).attr('action'), data)
+            $.post(window.url, data)
                 .done(function(data) {
                     $scope.$apply(function() {
                         $scope.skipResult = { className: "alert-success", message: data.result, show: true};
@@ -47,7 +52,7 @@ angular.module('questionnaireApp', [])
                         $scope.skipResult = { className: "alert-danger", message: data.result, show: true};
                     });
                 });
-        });
+        };
     }]);
 
 skipRules.updateSubsection = function(subsectionId) {

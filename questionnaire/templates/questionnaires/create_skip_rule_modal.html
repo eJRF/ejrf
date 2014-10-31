@@ -1,11 +1,11 @@
 <div class="modal fade create-skip-rule" id="create-skip-rule" tabindex="-1" role="dialog"
      aria-labelledby="preview_modal_label" aria-hidden="true" ng-app="questionnaireApp">
   <div class="modal-dialog modal-lg">
-    <div class="modal-content">
+    <div class="modal-content" data-ng-controller="SkipRuleController" id="skip-rule-controller">
       <div class="modal-header">
         <h4 class="modal-title cyan"> Define Skip Rule</h4>
       </div>
-      <form  method="post" action="{% url 'skip_rules' %}" class="form-horizontal" id="sumbit-skip-rule" name="skip-form">
+      <form  method="post" class="form-horizontal" id="sumbit-skip-rule" name="skipForm" data-ng-submit="submitForm()">
         {% csrf_token %}
         <div ng-include="'/static/templates/skipRuleModal.html'"> </div>
       </form>
@@ -15,4 +15,5 @@
 
 <script type="text/javascript">
   var csrfToken = '{{ csrf_token }}';
+  var url = "{% url 'skip_rules' %}";
 </script>

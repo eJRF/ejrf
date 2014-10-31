@@ -24,3 +24,6 @@ class SkipQuestionView(PermissionRequiredMixin, View):
             errors_message = skip_question_rule_form.errors.values()
             error_msgs = [error for errors in errors_message for error in errors]
             return self.error_response(error_msgs)
+
+    # def get(self request, *args, **kwargs):
+    #     pass
