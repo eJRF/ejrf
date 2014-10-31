@@ -13,16 +13,14 @@ angular.module('questionnaireApp', [])
         };
 
         $scope.updateSkipRuleModal = function(subsectionId) {
-            $.get( "/questionnaire/subsection/" + subsectionId + "/questions/", function( data ) {
-                var questions = data.questions;
-                $scope.questions = questions;
-                $scope.$apply(function() {
-                    // resetSkipRule();
+            $http.get( "/questionnaire/subsection/" + subsectionId + "/questions/").
+                success(function(data, status, headers, config) {
+                    var questions = data.questions;
+                    resetSkipRule();
                     $scope.questions = questions;
                     $scope.skipRule.subsectionId = subsectionId;
                     $scope.skipResult = {show: false};
                 });
-            }, dataType="json");
         };
         $scope.fns = {};
         $scope.fns.createRule = function() {
@@ -39,10 +37,10 @@ angular.module('questionnaireApp', [])
         };
 
         $scope.submitForm = function() {
-            console.log($scope.skipForm);
             data = getFormData();
             $.post(window.url, data)
                 .done(function(data) {
+                    resetSkipRule();
                     $scope.$apply(function() {
                         $scope.skipResult = { className: "alert-success", message: data.result, show: true};
                     });
