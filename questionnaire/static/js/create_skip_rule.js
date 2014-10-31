@@ -37,26 +37,24 @@ angular.module('questionnaireApp', [])
         };
 
         $scope.submitForm = function() {
-            data = getFormData();
-            $.post(window.url, data)
-                .done(function(data) {
-                    resetSkipRule();
-                    $scope.$apply(function() {
-                        $scope.skipResult = { className: "alert-success", message: data.result, show: true};
+            if($scope.skipForm.$valid) {
+                data = getFormData();
+                $.post(window.url, data)
+                    .done(function(data) {
+                        resetSkipRule();
+                        $scope.$apply(function() {
+                            $scope.skipResult = { className: "alert-success", message: data.result, show: true};
+                        });
+                    })
+                    .fail(function(data) {
+                        $scope.$apply(function() {
+                            $scope.skipResult = { className: "alert-danger", message: data.result, show: true};
+                        });
                     });
-                })
-                .fail(function(data) {
-                    $scope.$apply(function() {
-                        $scope.skipResult = { className: "alert-danger", message: data.result, show: true};
-                    });
-                });
+            }
         };
     }]);
 
 skipRules.updateSubsection = function(subsectionId) {
     angular.element(document.getElementById('skip-rule-controller')).scope().updateSkipRuleModal(subsectionId);
-};
-
-skipRules.submit = function(event) {
-    event.preventDefault();
 };
