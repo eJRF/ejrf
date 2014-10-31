@@ -5,7 +5,7 @@
       <div class="modal-header">
         <h4 class="modal-title cyan"> Define Skip Rule</h4>
       </div>
-      <form novalidate method="post" action="{% url 'skip_rules' %}" class="form-horizontal" id="sumbit-skip-rule">
+      <form  method="post" action="{% url 'skip_rules' %}" class="form-horizontal" id="sumbit-skip-rule" name="skip-form">
         {% csrf_token %}
         <div ng-include="'/static/skipRuleModal.html'"> </div>
       </form>

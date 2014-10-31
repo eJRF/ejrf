@@ -1,9 +1,11 @@
 <div data-ng-controller="SkipRuleController" id="skip-rule-controller">
   <div class="modal-body">
+    <div data-ng-class="skipResult.className" class="alert" data-ng-show="skipResult.show">{{skipResult.message}}</div>
+
     <input name="subsection_id" type="hidden" data-ng-model="skipRule.subsectionId" value="{{subsectionId}}"/>
     <div>
       <label>Select Root Question</label>
-      <select className="pull-right" name="root_question" id="root-question" data-ng-model="skipRule.rootQuestion" data-ng-options="q.fields.text for q in questions | filter: {fields:{answer_type: 'MultiChoice'}}" >
+      <select className="pull-right" required name="root_question" id="root-question" data-ng-model="skipRule.rootQuestion" data-ng-options="q.fields.text for q in questions | filter: {fields:{answer_type: 'MultiChoice'}}" >
         <option value="">Select Root Question</option>
       </select>
     </div>
@@ -11,13 +13,13 @@
       <label>Select Response</label>
       <label ng-repeat="option in skipRule.rootQuestion.options">
         <div>
-          <input type="radio" name="response" data-ng-model="skipRule.questionResponse" ng-value="option.pk" />{{option.fields.text}}
+          <input type="radio" name="response" required data-ng-model="skipRule.questionResponse" ng-value="option.pk" />{{option.fields.text}}
         </div>
       </label>
     </div>
     <div>
       <label>Select Question to Skip</label>
-      <select className="pull-right" name="skip_question" data-ng-model="skipRule.skipQuestion" data-ng-options="q.fields.text for q in questions | filter:matchSelectedQuestion" >
+      <select className="pull-right" name="skip_question" required data-ng-model="skipRule.skipQuestion" data-ng-options="q.fields.text for q in questions | filter:matchSelectedQuestion" >
         <option value="">Select Skip Question</option>
       </select>
     </div>

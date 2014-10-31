@@ -15,12 +15,12 @@ angular.module('questionnaireApp', [])
                     $scope.questions = questions;
                     $scope.skipRule = {selectedQuestion: {}, rootQuestion: {}};
                     $scope.skipRule.subsectionId = subsectionId;
+                    $scope.skipResult = {show: false};
                 });
             }, dataType="json");
         };
         $scope.fns = {};
         $scope.fns.createRule = function() {
-            console.log($('#submit-skip-rule'));
         };
 
         var getFormData = function() {
@@ -36,12 +36,16 @@ angular.module('questionnaireApp', [])
             event.preventDefault();
             data = getFormData();
             data.csrfmiddlewaretoken = $('#sumbit-skip-rule input[name=csrfmiddlewaretoken]').val();
-            $.post("/questionnaire/subsection/skiprules/", data)
+            $.post($( "#sumbit-skip-rule" ).attr('action'), data)
                 .done(function(data) {
-                    console.log("success");
+                    $scope.$apply(function() {
+                        $scope.skipResult = { className: "alert-success", message: data.result, show: true};
+                    });
                 })
                 .fail(function(data) {
-                    console.log("fail");
+                    $scope.$apply(function() {
+                        $scope.skipResult = { className: "alert-danger", message: data.result, show: true};
+                    });
                 });
         });
     }]);
