@@ -1,40 +1,18 @@
 <div class="modal fade create-skip-rule" id="create-skip-rule" tabindex="-1" role="dialog"
-     aria-labelledby="preview_modal_label" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h4 class="modal-title cyan"> Define Skip Rule</h4>
-          </div>
-            <form method="post" action="{% url 'skip_rules' %}" class="form-horizontal" id="sumbit-skip-rule">
-            {% csrf_token %}
-            <div class="modal-body" id="id_create-skip-rule">
-            </div>
-             <div class="modal-footer">
-              <a type="cancel" class="btn btn-default" data-dismiss="modal">
-                <span class="red bold"><i class="glyphicon glyphicon-remove"></i> CANCEL</span>
-              </a>
-              <button type="submit" class="btn btn-default" id="save-skip-rule-button">
-                <span class="green bold"><i class="glyphicon glyphicon-ok"></i> Done</span></button>
-            </div>
-          </form> 
-          <script type="text/javascript">
-            $( "#sumbit-skip-rule" ).submit(function( event ) {
-                event.preventDefault();
-                $.post("{% url 'skip_rules' %}", $('#sumbit-skip-rule').serialize())
-                  .done(function(data) {
-                    $('#page-alert-success').show();
-                    $('#page-alert-success').html(data.result);
-                  })
-                  .fail(function(data) {
-                    $('#page-alert-error').show();
-                    console.log(data)
-                    $('#page-alert-error').html(data.responseJSON.result || "An unknown error occured saving the skip rule");
-                  })
-                  .always(function() {
-                      $('#create-skip-rule').modal('toggle');
-                  });
-            });
-          </script>
-        </div>
+     aria-labelledby="preview_modal_label" aria-hidden="true" ng-app="questionnaireApp">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title cyan"> Define Skip Rule</h4>
+      </div>
+      <form novalidate method="post" action="{% url 'skip_rules' %}" class="form-horizontal" id="sumbit-skip-rule">
+        {% csrf_token %}
+        <div ng-include="'/static/skipRuleModal.html'"> </div>
+      </form>
     </div>
+  </div>
 </div>
+
+<script type="text/javascript">
+  var csrfToken = '{{ csrf_token }}';
+</script>

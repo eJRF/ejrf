@@ -1,16 +1,32 @@
-<div>Hello</div>
-<div data-ng-controller="SkipRuleController">
-	<input name="subsection-id" type="hidden" value={{subsectionId}} />
-	<select className="pull-right" name="root-question" id="root-question" data-ng-model="selectedQuestion" data-ng-options="q.fields.text for q in questions" >
-		<option value="">Select Root Question</option>
-	</select>
-	<ul>
-		<li>{{selectedQuestion}}</li>
-	</ul>
-	<label ng-repeat="option in selectedQuestion.options">
-       <input type="radio" name="pageSet" data-ng-model="questionResponse" ng-value="option.pk" />{{option.fields.text}}
-     </label>
-     <select className="pull-right" name="root-question" id="root-question" data-ng-model="selectedSkipQuestion" data-ng-options="q.fields.text for q in questions | filter: !selectedQuestion" >
-		<option value="">Select Root Question</option>
-	</select>
+<div data-ng-controller="SkipRuleController" id="skip-rule-controller">
+  <div class="modal-body">
+    <input name="subsection_id" type="hidden" data-ng-model="skipRule.subsectionId" value="{{subsectionId}}"/>
+    <div>
+      <label>Select Root Question</label>
+      <select className="pull-right" name="root_question" id="root-question" data-ng-model="skipRule.rootQuestion" data-ng-options="q.fields.text for q in questions | filter: {fields:{answer_type: 'MultiChoice'}}" >
+        <option value="">Select Root Question</option>
+      </select>
+    </div>
+    <div>
+      <label>Select Response</label>
+      <label ng-repeat="option in skipRule.rootQuestion.options">
+        <div>
+          <input type="radio" name="response" data-ng-model="skipRule.questionResponse" ng-value="option.pk" />{{option.fields.text}}
+        </div>
+      </label>
+    </div>
+    <div>
+      <label>Select Question to Skip</label>
+      <select className="pull-right" name="skip_question" data-ng-model="skipRule.skipQuestion" data-ng-options="q.fields.text for q in questions | filter:matchSelectedQuestion" >
+        <option value="">Select Skip Question</option>
+      </select>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <a type="cancel" class="btn btn-default" data-dismiss="modal">
+      <span class="red bold"><i class="glyphicon glyphicon-remove"></i> CANCEL</span>
+    </a>
+    <button tyep="button" class="btn btn-default" id="save-skip-rule-button" data-ng-click="fns.createRule()">
+      <span class="green bold"><i class="glyphicon glyphicon-ok"></i> Done</span></button>
+  </div>
 </div>
