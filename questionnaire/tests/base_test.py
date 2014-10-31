@@ -6,6 +6,9 @@ from django.test import TestCase
 from urllib import quote
 from questionnaire.models import Country, UserProfile, Region, Organization
 
+import logging
+logging.getLogger("factory").setLevel(logging.WARN)
+
 
 class BaseTest(TestCase):
 

@@ -24,19 +24,23 @@ class QuestionForm(ModelForm):
         self.fields['text'].label = 'Display label (Online)'
         self.fields['export_label'].label = 'Export label (Detail)'
         self.fields['theme'].empty_label = 'Select theme'
+        self.fields['answer_sub_type'].label = 'Response sub type'
+        self.fields['answer_sub_type'].hidden = True
 
     class Meta:
         model = Question
-        fields = ('text', 'export_label', 'instructions', 'answer_type', 'options', 'theme', 'is_primary')
+        fields = ('text', 'export_label', 'instructions', 'answer_type', 'answer_sub_type', 'options', 'theme', 'is_primary')
         widgets = {'text':  forms.Textarea(attrs={"rows": 6, "cols": 50}),
                    'instructions':  forms.Textarea(attrs={"rows": 6, "cols": 50}),
                    'answer_type': forms.Select(),
+                   'answer_sub_type': forms.Select(),
                    'theme': forms.Select(),
                    'export_label': forms.Textarea(attrs={"rows": 2, "cols": 50})}
 
     def clean(self):
         self._clean_options()
         self._clean_export_label()
+        self._clean_answer_sub_type()
         return super(QuestionForm, self).clean()
 
     def _clean_options(self):
@@ -48,6 +52,16 @@ class QuestionForm(ModelForm):
             self._errors['answer_type'] = self.error_class([message])
             del self.cleaned_data['answer_type']
         return options
+
+    def _clean_answer_sub_type(self):
+        answer_type = self.cleaned_data.get('answer_type', None)
+        answer_sub_type = self.cleaned_data.get('answer_sub_type', None)
+        print answer_sub_type
+        print answer_type
+        if (answer_type == 'Date' and answer_sub_type == None):
+            message = "This field is required if you select date"
+            self._errors['answer_sub_type'] = self.error_class([message])
+            del self.cleaned_data['answer_sub_type']
 
     def _clean_export_label(self):
         export_label = self.cleaned_data.get('export_label', None)

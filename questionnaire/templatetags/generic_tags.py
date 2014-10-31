@@ -1,9 +1,7 @@
 from django import template
 from django.core.urlresolvers import reverse
 from questionnaire.forms.questions import QuestionForm
-from questionnaire.forms.support_documents import SupportDocumentUploadForm
 from questionnaire.forms.theme import ThemeForm
-from questionnaire.models import Questionnaire
 
 ASSIGN_QUESTION_PAGINATION_SIZE = 30
 

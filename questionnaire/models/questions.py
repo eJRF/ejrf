@@ -8,6 +8,10 @@ class Question(BaseModel):
     NUMBER = "Number"
     MULTICHOICE = "MultiChoice"
     DATE = "Date"
+    DATE_SUB_TYPES = (
+        ("DD/MM/YYYY", "DD/MM/YYYY"),
+        ("MM/YYYY", "MM/YYYY")
+    )
     ANSWER_TYPES = (
         ("Date", DATE),
         ("MultiChoice", MULTICHOICE),
@@ -19,7 +23,10 @@ class Question(BaseModel):
     export_label = models.TextField(blank=True, null=False)
     instructions = models.TextField(blank=True, null=True)
     UID = models.CharField(blank=False, null=False, max_length=6)
+    
     answer_type = models.CharField(blank=False, null=False, max_length=20, choices=ANSWER_TYPES)
+    answer_sub_type = models.CharField(blank=True, null=True, max_length=20, choices=DATE_SUB_TYPES)
+
     region = models.ForeignKey("Region", blank=False, null=True, related_name="questions")
     theme = models.ForeignKey("Theme", null=True, related_name="questions")
     is_primary = models.BooleanField(blank=False, null=False, default=False)

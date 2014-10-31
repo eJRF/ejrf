@@ -64,8 +64,8 @@ class QuestionTest(BaseTest):
     def test_question_fields(self):
         question = Question()
         fields = [str(item.attname) for item in question._meta.fields]
-        self.assertEqual(13, len(fields))
-        for field in ['id', 'created', 'modified', 'text', 'instructions', 'UID', 'answer_type',
+        self.assertEqual(14, len(fields))
+        for field in ['id', 'created', 'modified', 'text', 'instructions', 'UID', 'answer_type', 'answer_sub_type',
                       'region_id', 'is_primary', 'is_required', 'export_label', 'parent_id', 'theme_id']:
             self.assertIn(field, fields)
 
