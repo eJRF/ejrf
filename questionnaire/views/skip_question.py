@@ -6,6 +6,7 @@ from questionnaire.models import SkipQuestion
 import logging
 from django.core.exceptions import ValidationError
 from braces.views import PermissionRequiredMixin
+from django.core import serializers
 
 
 class SkipQuestionView(PermissionRequiredMixin, View):
@@ -25,5 +26,10 @@ class SkipQuestionView(PermissionRequiredMixin, View):
             error_msgs = [error for errors in errors_message for error in errors]
             return self.error_response(error_msgs)
 
-    # def get(self request, *args, **kwargs):
-    #     pass
+
+    def get(self, request, subsection_id, *args, **kwargs):
+
+        data = SkipQuestion.objects.select_related('root_question', 'subsection', 'response', 'skip_question').filter(subsection_id=subsection_id)
+        responses = map(lambda q: q.to_dictionary(), data)
+        print responses
+        return HttpResponse(json.dumps(responses), content_type="application/json", status=200)

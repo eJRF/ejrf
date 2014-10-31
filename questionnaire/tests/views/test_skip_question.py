@@ -3,6 +3,7 @@ from django.test import Client
 from questionnaire.models import Question, SkipQuestion, QuestionOption, Questionnaire, Section, SubSection, \
     QuestionGroup
 import json
+from questionnaire.tests.factories.skip_question_rule_factory import SkipQuestionFactory
 
 
 class SkipQuestionPostTest(BaseTest):
@@ -124,3 +125,17 @@ class SkipQuestionPostTest(BaseTest):
 
         self.assertEqual(SkipQuestion.objects.all().count(), 0)
         self.assertEqual(json.loads(response.content)['result'], [u'Root question cannot be the same as skip question'])
+
+class SkipQuestionGetTest(BaseTest):
+    def setUp(self):
+        self.skip_rule = SkipQuestionFactory()
+        self.client = Client()
+        user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
+        self.assign('can_edit_questionnaire', user)
+        self.client.login(username=user.username, password='pass')
+        self.url = "/questionnaire/subsection/%d/skiprules/" % self.skip_rule.id
+
+    def test_get_existing_skip_rules(self):
+        self.assertTrue(SkipQuestion.objects.all().count() == 1)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
