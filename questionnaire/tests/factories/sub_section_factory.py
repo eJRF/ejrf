@@ -1,5 +1,5 @@
 from questionnaire.models import SubSection
-from questionnaire.tests.factory.section_factory import SectionFactory
+from questionnaire.tests.factories.section_factory import SectionFactory
 import factory
 
 

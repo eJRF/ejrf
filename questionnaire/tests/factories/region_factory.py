@@ -1,5 +1,5 @@
 from questionnaire.models import Region
-from questionnaire.tests.factory.organization_factory import OrganizationFactory
+from questionnaire.tests.factories.organization_factory import OrganizationFactory
 import factory
 
 

@@ -1,8 +1,8 @@
 from questionnaire.models import SkipQuestion
 import factory
-from questionnaire.tests.factory.question_factory import QuestionFactory
-from questionnaire.tests.factory.question_option_factory import QuestionOptionFactory
-from questionnaire.tests.factory.sub_section_factory import SubSectionFactory
+from questionnaire.tests.factories.question_factory import QuestionFactory
+from questionnaire.tests.factories.question_option_factory import QuestionOptionFactory
+from questionnaire.tests.factories.sub_section_factory import SubSectionFactory
 
 
 class SkipQuestionFactory(factory.DjangoModelFactory):

@@ -1,10 +1,10 @@
 from questionnaire.forms.skip_question_form import SkipQuestionRuleForm
 from questionnaire.models import SkipQuestion
 from questionnaire.tests.base_test import BaseTest
-from questionnaire.tests.factory.question_factory import QuestionFactory
-from questionnaire.tests.factory.question_group_factory import QuestionGroupFactory
-from questionnaire.tests.factory.question_option_factory import QuestionOptionFactory
-from questionnaire.tests.factory.sub_section_factory import SubSectionFactory
+from questionnaire.tests.factories.question_factory import QuestionFactory
+from questionnaire.tests.factories.question_group_factory import QuestionGroupFactory
+from questionnaire.tests.factories.question_option_factory import QuestionOptionFactory
+from questionnaire.tests.factories.sub_section_factory import SubSectionFactory
 
 
 class SkipQuestionFormTest(BaseTest):

@@ -1,5 +1,5 @@
 from questionnaire.models import QuestionOption
-from questionnaire.tests.factory.question_factory import QuestionFactory
+from questionnaire.tests.factories.question_factory import QuestionFactory
 import factory
 
 

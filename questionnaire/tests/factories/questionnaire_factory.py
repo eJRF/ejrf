@@ -1,6 +1,6 @@
 import factory
 from questionnaire.models import Questionnaire
-from questionnaire.tests.factory.region_factory import RegionFactory
+from questionnaire.tests.factories.region_factory import RegionFactory
 
 
 class QuestionnaireFactory(factory.DjangoModelFactory):
