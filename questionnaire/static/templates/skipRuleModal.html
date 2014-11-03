@@ -1,5 +1,13 @@
 <div>
   <div class="modal-body">
+      <h4 class="modal-title cyan"> Existing Rules</h4>
+
+      <div data-ng-repeat="rule in existingRules | orderBy:'id'">
+          ID - {{rule.id}}.  When the questions "{{rule.root_question}}" is answered with "{{rule.response}}" the question "{{rule.skip_question}}" will be skipped.
+      </div>
+    <hr />
+    <h4 class="modal-title cyan"> New Rule</h4>
+
     <div data-ng-class="skipResult.className" class="alert" data-ng-show="skipResult.show">{{skipResult.message}}</div>
 
     <input name="subsection_id" type="hidden" data-ng-model="skipRule.subsectionId" value="{{subsectionId}}"/>

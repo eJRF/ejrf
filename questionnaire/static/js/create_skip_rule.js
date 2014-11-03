@@ -8,11 +8,21 @@ angular.module('questionnaireApp', [])
         };
         resetSkipRule();
         $scope.questions = [];
+        $scope.existingRules = [];
         $scope.matchSelectedQuestion = function(question) {
             return !($scope.skipRule.rootQuestion.pk == question.pk);
         };
 
+        var updateRules = function(subsectionId){
+            $http.get( "/questionnaire/subsection/" + subsectionId + "/skiprules/").
+                success(function(data, status, headers, config) {
+                $scope.existingRules = data;
+            });
+        }
+
         $scope.updateSkipRuleModal = function(subsectionId) {
+            updateRules(subsectionId);
+
             $http.get( "/questionnaire/subsection/" + subsectionId + "/questions/").
                 success(function(data, status, headers, config) {
                     var questions = data.questions;
@@ -38,13 +48,16 @@ angular.module('questionnaireApp', [])
 
         $scope.submitForm = function() {
             if($scope.skipForm.$valid) {
-                data = getFormData();
-                $.post(window.url, data)
+                postData = getFormData();
+                $.post(window.url, postData)
                     .done(function(data) {
                         resetSkipRule();
                         $scope.$apply(function() {
                             $scope.skipResult = { className: "alert-success", message: data.result, show: true};
                         });
+                        $scope.skipRule.subsectionId = postData.subsection;
+                        updateRules(postData.subsection);
+
                     })
                     .fail(function(data) {
                         $scope.$apply(function() {
