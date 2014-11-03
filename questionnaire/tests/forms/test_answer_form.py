@@ -133,13 +133,6 @@ class DateAnswerFormTest(BaseTest):
         answer_form = DateAnswerForm(self.form_data, initial=self.initial)
         self.assertTrue(answer_form.is_valid())
 
-    def test_response_cannot_be_text(self):
-        form_data = self.form_data.copy()
-        form_data['response'] = 'some text which is not a date'
-        answer_form = DateAnswerForm(form_data, initial=self.initial)
-        self.assertFalse(answer_form.is_valid())
-        message = 'Enter a valid date.'
-        self.assertEqual([message], answer_form.errors['response'])
 
 
 class MultiChoiceAnswerFormTest(BaseTest):

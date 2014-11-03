@@ -51,7 +51,7 @@ class TextAnswer(Answer):
 
 
 class DateAnswer(Answer):
-    response = models.DateField(null=True)
+    response = models.CharField(null=True, max_length=10)
 
     def format_response(self):
         return self.response

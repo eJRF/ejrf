@@ -149,11 +149,6 @@ class DateAnswerTest(TestCase):
         self.assertEqual(some_date, answer.response)
         self.assertEqual(some_date, answer.format_response())
 
-    def test_date_answer_can_only_be_date(self):
-        not_date = 'hahaha'
-        answer = DateAnswer(question=self.question, country=self.country, response=not_date, questionnaire=self.questionnaire)
-        self.assertRaises(ValidationError, answer.save)
-
 
 class MultiChoiceAnswerTest(TestCase):
 

@@ -6,13 +6,12 @@ from questionnaire.models import Question, QuestionOption, Questionnaire
 
 class QuestionForm(ModelForm):
     KNOWN_OPTIONS = ["Yes, No",
-                    "Yes, No, NR",
-                    "Yes, No, NR, ND",
-                    "Male, Female, Both",
-                    "Local currency, US $",
-                    "National, Sub national",
-                    ]
-
+                     "Yes, No, NR",
+                     "Yes, No, NR, ND",
+                     "Male, Female, Both",
+                     "Local currency, US $",
+                     "National, Sub national",
+    ]
 
     options = forms.CharField(widget=forms.HiddenInput(), required=False)
 
@@ -29,9 +28,10 @@ class QuestionForm(ModelForm):
 
     class Meta:
         model = Question
-        fields = ('text', 'export_label', 'instructions', 'answer_type', 'answer_sub_type', 'options', 'theme', 'is_primary')
-        widgets = {'text':  forms.Textarea(attrs={"rows": 6, "cols": 50}),
-                   'instructions':  forms.Textarea(attrs={"rows": 6, "cols": 50}),
+        fields = (
+        'text', 'export_label', 'instructions', 'answer_type', 'answer_sub_type', 'options', 'theme', 'is_primary')
+        widgets = {'text': forms.Textarea(attrs={"rows": 6, "cols": 50}),
+                   'instructions': forms.Textarea(attrs={"rows": 6, "cols": 50}),
                    'answer_type': forms.Select(),
                    'answer_sub_type': forms.Select(),
                    'theme': forms.Select(),
@@ -56,9 +56,7 @@ class QuestionForm(ModelForm):
     def _clean_answer_sub_type(self):
         answer_type = self.cleaned_data.get('answer_type', None)
         answer_sub_type = self.cleaned_data.get('answer_sub_type', None)
-        print answer_sub_type
-        print answer_type
-        if (answer_type == 'Date' and answer_sub_type == None):
+        if answer_type == 'Date' and answer_sub_type is None:
             message = "This field is required if you select date"
             self._errors['answer_sub_type'] = self.error_class([message])
             del self.cleaned_data['answer_sub_type']
