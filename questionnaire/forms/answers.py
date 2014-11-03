@@ -4,11 +4,11 @@ from django.forms.util import ErrorDict
 from django.forms import ModelForm, ModelChoiceField
 from questionnaire.forms.custom_widgets import MultiChoiceAnswerSelectWidget
 
-from questionnaire.models import NumericalAnswer, TextAnswer, DateAnswer, MultiChoiceAnswer, QuestionOption
+from questionnaire.models import NumericalAnswer, TextAnswer, DateAnswer, MultiChoiceAnswer, QuestionOption, Question
 
 
 class AnswerForm(ModelForm):
-    def __init__(self,  *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super(AnswerForm, self).__init__(*args, **kwargs)
         self.question = self._get_question(kwargs)
         self.fields['response'].required = self.question.is_required
@@ -68,12 +68,21 @@ class TextAnswerForm(AnswerForm):
 
 
 class DateAnswerForm(AnswerForm):
+    def __init__(self, *args, **kwargs):
+        super(DateAnswerForm, self).__init__(*args, **kwargs)
+        self.fields['response'].widget = self._get_date_widget(self._initial['question'].answer_sub_type)
+
     class Meta:
         model = DateAnswer
         exclude = ('question', 'status', 'country', 'version', 'code', 'questionnaire')
-        widgets = {
-            'response': forms.DateInput(attrs={'class': 'form-control datetimepicker', 'data-format':'YYYY-MM-DD'})
-        }
+
+    def _get_date_widget(self, date_answer_sub_type):
+        if date_answer_sub_type == "MM/YYYY":
+            return forms.DateInput(format=('%m-%Y'), attrs={'class': 'form-control date-time-picker', 'data-date-format': 'mm/yyyy',
+                                          'data-date-option': 'mm'})
+        else:
+            return forms.DateInput(attrs={'class': 'form-control date-time-picker', 'data-date-format': 'dd/mm/yyyy',
+                                          'data-date-option': 'dd'})
 
 
 class MultiChoiceAnswerForm(AnswerForm):
