@@ -63,9 +63,15 @@ angular.module('questionnaireApp', [])
                     updateRules(postData.subsection);
                 })
                 .fail(function(data) {
-                    $scope.$apply(function() {
-                        $scope.skipResult = { className: "alert-danger", message: data.result, show: true};
-                    });
+                    if(data.result){
+                        $scope.$apply(function() {
+                            $scope.skipResult = { className: "alert-danger", message: data.result, show: true};
+                        });
+                    } else {
+                        $scope.$apply(function() {
+                            $scope.skipResult = { className: "alert-danger", message: data.responseJSON.result.join(","), show: true};
+                        });
+                    }
                 });
         };
     }]);
