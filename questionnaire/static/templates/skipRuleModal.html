@@ -1,42 +1,70 @@
 <div>
-  <div class="modal-body">
-      <h4 class="modal-title cyan"> Existing Rules</h4>
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active"><a href="#newRule" role="tab" data-toggle="tab" data-ng-click="setActiveTab('newRuleTab')">New Rule</a></li>
+        <li role="presentation"><a href="#existingRules" role="tab" data-toggle="tab" data-ng-click="setActiveTab('existingRulesTab')">Existing Rules</a></li>
+    </ul>
+    <div id="newRuleTab" data-ng-show="activeTab == 'newRuleTab'">
+        <form method="post" class="form-horizontal" id="sumbit-skip-rule" name="skipForm" data-ng-submit="submitForm()">
+            <div class="modal-body">
+                <h4 class="modal-title cyan"> New Rule</h4>
 
-      <div data-ng-repeat="rule in existingRules | orderBy:'id'">
-          ID - {{rule.id}}.  When the questions "{{rule.root_question}}" is answered with "{{rule.response}}" the question "{{rule.skip_question}}" will be skipped.
-      </div>
-    <hr />
-    <h4 class="modal-title cyan"> New Rule</h4>
+                <div data-ng-class="skipResult.className" class="alert" data-ng-show="skipResult.show">
+                    {{skipResult.message}}
+                </div>
 
-    <div data-ng-class="skipResult.className" class="alert" data-ng-show="skipResult.show">{{skipResult.message}}</div>
+                <input name="subsection_id" type="hidden" data-ng-model="skipRule.subsectionId"
+                       value="{{subsectionId}}"/>
 
-    <input name="subsection_id" type="hidden" data-ng-model="skipRule.subsectionId" value="{{subsectionId}}"/>
-    <div>
-      <label>Select Root Question</label>
-      <select className="pull-right" required name="root_question" id="root-question" data-ng-model="skipRule.rootQuestion" data-ng-options="q.fields.text for q in questions | filter: {fields:{answer_type: 'MultiChoice'}}" >
-        <option value="">Select Root Question</option>
-      </select>
+                <div>
+                    <label>Select Root Question</label>
+                    <select className="pull-right" required name="root_question" id="root-question"
+                            data-ng-model="skipRule.rootQuestion"
+                            data-ng-options="q.fields.text for q in questions | filter: {fields:{answer_type: 'MultiChoice'}}">
+                        <option value="">Select Root Question</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Select Response</label>
+                    <label ng-repeat="option in skipRule.rootQuestion.options">
+                        <div>
+                            <input type="radio" name="response" required data-ng-model="skipRule.questionResponse"
+                                   ng-value="option.pk"/>{{option.fields.text}}
+                        </div>
+                    </label>
+                </div>
+                <div>
+                    <label>Select Question to Skip</label>
+                    <select className="pull-right" name="skip_question" required data-ng-model="skipRule.skipQuestion"
+                            data-ng-options="q.fields.text for q in questions | filter:matchSelectedQuestion">
+                        <option value="">Select Skip Question</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a type="cancel" class="btn btn-default" data-dismiss="modal">
+                    <span class="red bold"><i class="glyphicon glyphicon-remove"></i> Cancel</span>
+                </a>
+                <button tyep="button" class="btn btn-default" id="save-skip-rule-button"
+                        data-ng-click="fns.createRule()">
+                    <span class="green bold"><i class="glyphicon glyphicon-ok"></i> Done</span></button>
+            </div>
+        </form>
     </div>
-    <div>
-      <label>Select Response</label>
-      <label ng-repeat="option in skipRule.rootQuestion.options">
-        <div>
-          <input type="radio" name="response" required data-ng-model="skipRule.questionResponse" ng-value="option.pk" />{{option.fields.text}}
+    <div id="existingRulesTab" data-ng-show="activeTab == 'existingRulesTab'">
+        <div class="modal-body">
+            <h4 class="modal-title cyan"> Existing Rules</h4>
+
+            <div data-ng-repeat="rule in existingRules | orderBy:'id'">
+                ID - {{rule.id}}. When the questions "{{rule.root_question}}" is answered with "{{rule.response}}"
+                the
+                question "{{rule.skip_question}}" will be skipped.
+            </div>
         </div>
-      </label>
+        <div class="modal-footer">
+            <a type="cancel" class="btn btn-default" data-dismiss="modal">
+                <span class="red bold"><i class="glyphicon glyphicon-remove"></i> Close</span>
+            </a>
+        </div>
     </div>
-    <div>
-      <label>Select Question to Skip</label>
-      <select className="pull-right" name="skip_question" required data-ng-model="skipRule.skipQuestion" data-ng-options="q.fields.text for q in questions | filter:matchSelectedQuestion" >
-        <option value="">Select Skip Question</option>
-      </select>
-    </div>
-  </div>
-  <div class="modal-footer">
-    <a type="cancel" class="btn btn-default" data-dismiss="modal">
-      <span class="red bold"><i class="glyphicon glyphicon-remove"></i> CANCEL</span>
-    </a>
-    <button tyep="button" class="btn btn-default" id="save-skip-rule-button" data-ng-click="fns.createRule()">
-      <span class="green bold"><i class="glyphicon glyphicon-ok"></i> Done</span></button>
-  </div>
 </div>
+

@@ -3,9 +3,15 @@ skipRules.subsection = "";
 
 angular.module('questionnaireApp', [])
     .controller('SkipRuleController', ['$scope', '$http', function($scope, $http) {
+        $scope.activeTab = "newRuleTab";
+        $scope.setActiveTab = function(activeTabName){
+            $scope.activeTab = activeTabName;
+        };
+
         var resetSkipRule = function() {
             $scope.skipRule = {selectedQuestion: {}, rootQuestion: {}, csrfToken: window.csrfToken};
         };
+
         resetSkipRule();
         $scope.questions = [];
         $scope.existingRules = [];
@@ -22,7 +28,6 @@ angular.module('questionnaireApp', [])
 
         $scope.updateSkipRuleModal = function(subsectionId) {
             updateRules(subsectionId);
-
             $http.get( "/questionnaire/subsection/" + subsectionId + "/questions/").
                 success(function(data, status, headers, config) {
                     var questions = data.questions;
@@ -57,7 +62,6 @@ angular.module('questionnaireApp', [])
                         });
                         $scope.skipRule.subsectionId = postData.subsection;
                         updateRules(postData.subsection);
-
                     })
                     .fail(function(data) {
                         $scope.$apply(function() {

@@ -5,10 +5,7 @@
       <div class="modal-header">
         <h4 class="modal-title cyan"> Skip Rules</h4>
       </div>
-      <form  method="post" class="form-horizontal" id="sumbit-skip-rule" name="skipForm" data-ng-submit="submitForm()">
-        {% csrf_token %}
         <div ng-include="'/static/templates/skipRuleModal.html'"> </div>
-      </form>
     </div>
   </div>
 </div>
