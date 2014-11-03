@@ -11,7 +11,7 @@ class SubsectionQuestions(PermissionRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         subsection_id=kwargs['subsection_id']
-        question_group = QuestionGroup.objects.select_related('question').filter(subsection_id=subsection_id)
+        question_group = QuestionGroup.objects.select_related('question').filter(subsection_id=subsection_id, grid=False)
         question_group_list = map(lambda qg: list(qg.question.all()), list(question_group))
         questions = []
         for qg in question_group_list:
