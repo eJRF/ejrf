@@ -4,6 +4,11 @@ from django.db import models
 
 
 class SkipQuestion(BaseModel):
+
+    class Meta:
+        unique_together = ("root_question", "response", "skip_question", "subsection")
+        app_label = 'questionnaire'
+
     root_question = models.ForeignKey(Question, blank=False, null=False, related_name="root_question")
     response = models.ForeignKey(QuestionOption, blank=False, null=False, related_name="response_option")
     skip_question = models.ForeignKey(Question, blank=False, null=False, related_name="skip_question")
