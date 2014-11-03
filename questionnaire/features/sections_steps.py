@@ -11,9 +11,12 @@ from nose.tools import assert_false
 
 @step(u'Given I am logged in as a global admin')
 def given_i_am_logged_in_as_a_global_admin(step):
+    world.region = None
     user = create_global_admin_with_no_permissions(username='Rajni')
+    world.user = user
     world.user = assign('can_view_users', user)
-    world.user = assign('can_edit_questionnaire', world.user)
+    world.user = assign('can_edit_questionnaire', user)
+    world.user = assign('can_view_questionnaire', user)
 
     world.page = LoginPage(world.browser)
     world.page.visit()

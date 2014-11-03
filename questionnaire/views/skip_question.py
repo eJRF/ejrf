@@ -28,8 +28,6 @@ class SkipQuestionView(PermissionRequiredMixin, View):
 
 
     def get(self, request, subsection_id, *args, **kwargs):
-
         data = SkipQuestion.objects.select_related('root_question', 'subsection', 'response', 'skip_question').filter(subsection_id=subsection_id)
         responses = map(lambda q: q.to_dictionary(), data)
-        print responses
         return HttpResponse(json.dumps(responses), content_type="application/json", status=200)

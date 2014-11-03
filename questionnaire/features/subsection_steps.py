@@ -2,7 +2,11 @@ from time import sleep
 from lettuce import step, world
 from questionnaire.features.pages.questionnaires import QuestionnairePage
 from questionnaire.features.pages.sections import CreateSubSectionPage
-from questionnaire.models import SubSection, Section, Questionnaire
+from questionnaire.features.pages.skip_rule_modal import SkipRuleModalPage
+from questionnaire.models import SubSection, Section, Questionnaire, Question
+from questionnaire.tests.factories.question_factory import QuestionFactory
+from questionnaire.tests.factories.question_group_factory import QuestionGroupFactory
+from questionnaire.tests.factories.question_option_factory import QuestionOptionFactory
 
 
 @step(u'And I click add new subsection link')
@@ -87,7 +91,7 @@ def and_i_have_a_questionnaire_in_a_region_with_sections_and_subsections(step):
     world.section1 = Section.objects.create(order=0, title="WHO/UNICEF Joint Reporting Form",
                                             questionnaire=world.questionnaire, name="Cover page", region=world.region)
     world.section_1 = Section.objects.create(order=2, title="section_1",
-                                            questionnaire=world.questionnaire, name="Cover page")
+                                             questionnaire=world.questionnaire, name="Cover page")
     world.section2 = Section.objects.create(order=1, title="Another title",
                                             description="This is just another one of them",
                                             questionnaire=world.questionnaire, name="Reported Cases",
@@ -100,3 +104,33 @@ def and_i_have_a_questionnaire_in_a_region_with_sections_and_subsections(step):
                                             questionnaire=world.questionnaire, name="Section 3")
     world.sub_section = SubSection.objects.create(title="other R subs", order=1, section=world.section_1, region=world.region)
     world.core_sub_section = SubSection.objects.create(title="core subs", order=2, section=world.section_1)
+
+
+@step(u'And I have questions and responses in the correct section')
+def and_i_have_questions_and_responses_in_the_correct_section(step):
+    root_question = QuestionFactory()
+    question_to_skip = QuestionFactory()
+    response = QuestionOptionFactory(question=root_question)
+    question_group = QuestionGroupFactory(subsection=world.sub_section)
+
+    root_question.question_group.add(question_group)
+    question_to_skip.question_group.add(question_group)
+    world.sub_section.question_group.add(question_group)
+
+@step(u'And I click to add a skip rule')
+def and_i_click_to_add_a_skip_rule(step):
+    world.page.click_by_id('id-create-skip-rule-%s' % world.sub_section.id)
+    world.skip_rule_page = SkipRuleModalPage(world.browser)
+
+@step(u'And I choose to see existing skip rules')
+def and_i_choose_to_see_existing_skip_rules(step):
+    world.skip_rule_page.view_existing_rules()
+
+@step(u'Then I should see \'([^\']*)\' existing skip rules')
+def then_i_should_see_group1_existing_skip_rules(step, number_of_rules):
+    actual_number = world.skip_rule_page.number_of_rules()
+    assert (actual_number == int(number_of_rules)), 'Expecting %s number of rules, got %s number of rules' % (int(number_of_rules), actual_number)
+
+@step(u'When I create a new skip rule')
+def when_i_create_a_new_skip_rule(step):
+    world.skip_rule_page.create_new_rule()

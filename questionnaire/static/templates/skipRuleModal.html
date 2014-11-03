@@ -1,8 +1,8 @@
 <div>
     <ul class="nav nav-tabs" role="tablist">
-        <li role="presentation" class="active"><a href="#newRule" role="tab" data-toggle="tab"
+        <li role="presentation" class="active"><a id="selectNewRuleTab" href="#newRule" role="tab" data-toggle="tab"
                                                   data-ng-click="setActiveTab('newRuleTab')">New Rule</a></li>
-        <li role="presentation"><a href="#existingRules" role="tab" data-toggle="tab"
+        <li role="presentation"><a id="selectExistingRuleTab" href="#existingRules" role="tab" data-toggle="tab"
                                    data-ng-click="setActiveTab('existingRulesTab')">Existing Rules</a></li>
     </ul>
     <div id="newRuleTab" data-ng-show="activeTab == 'newRuleTab'">
@@ -65,7 +65,7 @@
     <div id="existingRulesTab" data-ng-show="activeTab == 'existingRulesTab'">
         <div class="modal-body">
             <div class="question-group indent">
-                <div data-ng-repeat="rule in existingRules | orderBy:'id'">
+                <div data-ng-repeat="rule in existingRules | orderBy:'id'" class="existingRule">
                     <div class="form-group" style="display:none;"><label class="col-sm-3 control-label">Rule ID</label>{{rule.id}}</div>
                     <div class="form-group"><label class="col-sm-2 control-label">Root Question</label>{{rule.root_question}}</div>
                     <div class="form-group"><label class="col-sm-2 control-label">Response</label>{{rule.response}}</div>

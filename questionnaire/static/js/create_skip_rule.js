@@ -52,23 +52,21 @@ angular.module('questionnaireApp', [])
         };
 
         $scope.submitForm = function() {
-            if($scope.skipForm.$valid) {
-                postData = getFormData();
-                $.post(window.url, postData)
-                    .done(function(data) {
-                        resetSkipRule();
-                        $scope.$apply(function() {
-                            $scope.skipResult = { className: "alert-success", message: data.result, show: true};
-                        });
-                        $scope.skipRule.subsectionId = postData.subsection;
-                        updateRules(postData.subsection);
-                    })
-                    .fail(function(data) {
-                        $scope.$apply(function() {
-                            $scope.skipResult = { className: "alert-danger", message: data.result, show: true};
-                        });
+            postData = getFormData();
+            $.post(window.url, postData)
+                .done(function(data) {
+                    resetSkipRule();
+                    $scope.$apply(function() {
+                        $scope.skipResult = { className: "alert-success", message: data.result, show: true};
                     });
-            }
+                    $scope.skipRule.subsectionId = postData.subsection;
+                    updateRules(postData.subsection);
+                })
+                .fail(function(data) {
+                    $scope.$apply(function() {
+                        $scope.skipResult = { className: "alert-danger", message: data.result, show: true};
+                    });
+                });
         };
     }]);
 

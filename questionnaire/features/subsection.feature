@@ -20,6 +20,18 @@ Feature: Subsection feature
         Then I should see a message that the subsection was updated
         And I should see the changes I made to the subsection in the questionnaire
 
+    Scenario: Add skip Rules to a Subsection in Core Questionnaire
+        Given I am logged in as a global admin
+        And I have a questionnaire with sections and subsections
+        And I have questions and responses in the correct section
+        And I visit that questionnaires section page
+        And I click to add a skip rule
+        And I choose to see existing skip rules
+        Then I should see '0' existing skip rules
+          When I create a new skip rule
+        Then I should see '1' existing skip rules
+
+
     Scenario: Delete Regional Subsection from a regional Questionnaire
         Given I am a Regional Admin
         And I have a questionnaire for my region with sections and subsections
