@@ -6,8 +6,7 @@
     {% include 'questionnaires/entry/_extra_css.html' %}
 {% endblock %}
 {% block content %}
-    {% load questionnaire_entry_tags %}
-    {% load generic_tags %}
+
     <div id="page-alert-success" class="alert alert-success" style='display:none;'></div>
     <div id="page-alert-error" class="alert alert-danger" style='display:none;'></div>
     {% include 'questionnaires/entry/_section_buttons.html' %}
@@ -16,7 +15,10 @@
 
     <script src="{{ STATIC_URL }}js/create_skip_rule.js" type="text/javascript" charset="utf-8"></script>
     {% include 'questionnaires/create_skip_rule_modal.html' %}
-    <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/css/bootstrap.css" type="text/css" media="all">
+        
+    {% load questionnaire_entry_tags %}
+    {% load generic_tags %}
+
     <div class="form-table">
         {% include 'questionnaires/entry/section_breadcrumps_wizzard.html' %}
 
