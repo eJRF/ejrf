@@ -48,10 +48,10 @@ def given_i_have_a_questionnaire_with_questions(step):
     world.question5 = Question.objects.create(text='Email address of UNICEF contact', UID='C00027', answer_type='Text',)
     world.question6 = Question.objects.create(text='Name of WHO contact', UID='C00028', answer_type='Text',)
     world.question7 = Question.objects.create(text='Email address of WHO contact', UID='C00029', answer_type='Text',)
-    world.question8 = Question.objects.create(text='Total number of districts in the country', UID='C00030', answer_type='Number',
-                                    instructions="""
-                                    A district is defined as the third administrative level (nation is the first, province is the second).
-                                    """)
+    world.question8 = Question.objects.create(text='Total number of districts in the country', UID='C00030',
+                                              answer_type='Number', answer_sub_type=Question.INTEGER,
+                                              instructions=""" A district is defined as the third administrative level
+                                               (nation is the first, province is the second).""")
 
     parent = QuestionGroup.objects.create(subsection=world.sub_section, order=1)
     parent.question.add(world.question1, world.question2, world.question3, world.question4, world.question5, world.question6, world.question7, world.question8)

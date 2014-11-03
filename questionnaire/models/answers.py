@@ -38,10 +38,12 @@ class NumericalAnswer(Answer):
     response = models.DecimalField(max_digits=9, decimal_places=2, null=True)
 
     def format_response(self):
-        if self.response and float(self.response).is_integer():
+        if self._answer_sub_type_is_integer():
             return int(self.response)
         return self.response
 
+    def _answer_sub_type_is_integer(self):
+        return self.response and self.question.answer_sub_type and self.question.answer_sub_type.lower() == Question.INTEGER.lower()
 
 class TextAnswer(Answer):
     response = models.CharField(max_length=100, null=True)

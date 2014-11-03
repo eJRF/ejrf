@@ -1,7 +1,8 @@
 from urllib import quote
 from django.test import Client
 from questionnaire.forms.filter import ExportFilterForm
-from questionnaire.models import Questionnaire, Section, SubSection, Question, QuestionGroup, Organization, Region, Country, NumericalAnswer, Answer, QuestionGroupOrder, AnswerGroup, \
+from questionnaire.models import Questionnaire, Section, SubSection, Question, QuestionGroup, Organization, Region, \
+    Country, NumericalAnswer, Answer, QuestionGroupOrder, AnswerGroup, \
     MultiChoiceAnswer, QuestionOption, Theme
 from questionnaire.tests.base_test import BaseTest
 
@@ -31,9 +32,11 @@ class ExportToTextViewTest(BaseTest):
 
         self.theme = Theme.objects.create(name="Theme1", description="Some Theme")
 
-        self.question1 = Question.objects.create(text='B. Number of cases tested', UID='C00003', answer_type='Number', theme=self.theme)
+        self.question1 = Question.objects.create(text='B. Number of cases tested', UID='C00003', answer_type='Number',
+                                                 theme=self.theme, answer_sub_type=Question.INTEGER)
 
-        self.question2 = Question.objects.create(text='C. Number of cases positive', UID='C00004', answer_type='Number', theme=self.theme)
+        self.question2 = Question.objects.create(text='C. Number of cases positive', UID='C00004', answer_type='Number',
+                                                 theme=self.theme, answer_sub_type=Question.INTEGER)
 
         self.parent = QuestionGroup.objects.create(subsection=self.sub_section, order=1)
         self.parent.question.add(self.question1, self.question2)
@@ -73,14 +76,16 @@ class ExportToTextViewTest(BaseTest):
         self.assertEquals(response.get('Content-Type'), 'text/csv')
         self.assertEquals(response.get('Content-Disposition'), 'attachment; filename="%s"' % file_name)
 
-        question_text1 = "%s | %s" % (self.section_1.name,  self.question1.text)
+        question_text1 = "%s | %s" % (self.section_1.name, self.question1.text)
         question_text_2 = "%s | %s" % (self.section_1.name, self.question2.text)
 
         answer_id_1 = "C_%s_%s" % (self.question1.UID, self.question1.UID)
         answer_id_2 = "C_%s_%s" % (self.question1.UID, self.question2.UID)
         headings = "ISO\tCountry\tYear\tField code\tQuestion text\tValue"
-        row1 = "UGX\t%s\t2013\t%s\t%s\t%s" % (self.country.name, answer_id_1.encode('base64').strip(), question_text1, '23')
-        row2 = "UGX\t%s\t2013\t%s\t%s\t%s" % (self.country.name, answer_id_2.encode('base64').strip(), question_text_2, '1')
+        row1 = "UGX\t%s\t2013\t%s\t%s\t%s" % (
+            self.country.name, answer_id_1.encode('base64').strip(), question_text1, '23')
+        row2 = "UGX\t%s\t2013\t%s\t%s\t%s" % (
+            self.country.name, answer_id_2.encode('base64').strip(), question_text_2, '1')
         contents = "%s\r\n%s\r\n%s" % ("".join(headings), "".join(row1), "".join(row2))
         self.assertEqual(contents, response.content)
 
@@ -92,13 +97,15 @@ class ExportToTextViewTest(BaseTest):
         self.assertEquals(response.get('Content-Type'), 'text/csv')
         self.assertEquals(response.get('Content-Disposition'), 'attachment; filename="%s"' % file_name)
 
-        question_text1 = "%s | %s" % (self.section_1.name,  self.question1.text)
+        question_text1 = "%s | %s" % (self.section_1.name, self.question1.text)
         question_text_2 = "%s | %s" % (self.section_1.name, self.question2.text)
         answer_id_1 = "C_%s_%s" % (self.question1.UID, self.question1.UID)
         answer_id_2 = "C_%s_%s" % (self.question1.UID, self.question2.UID)
         headings = "ISO\tCountry\tYear\tField code\tQuestion text\tValue"
-        row1 = "UGX\t%s\t2013\t%s\t%s\t%s" % (self.country.name, answer_id_1.encode('base64').strip(), question_text1, '23')
-        row2 = "UGX\t%s\t2013\t%s\t%s\t%s" % (self.country.name, answer_id_2.encode('base64').strip(), question_text_2, '1')
+        row1 = "UGX\t%s\t2013\t%s\t%s\t%s" % (
+            self.country.name, answer_id_1.encode('base64').strip(), question_text1, '23')
+        row2 = "UGX\t%s\t2013\t%s\t%s\t%s" % (
+            self.country.name, answer_id_2.encode('base64').strip(), question_text_2, '1')
         contents = "%s\r\n%s\r\n%s" % ("".join(headings), "".join(row1), "".join(row2))
         self.assertEqual(contents, response.content)
 
@@ -110,21 +117,25 @@ class SpecificExportViewTest(BaseTest):
         self.login_user()
         self.region = self.user.user_profile.country.regions.all()[0]
 
-        self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", description="From dropbox as given by Rouslan",
+        self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English",
+                                                          description="From dropbox as given by Rouslan",
                                                           year=2013, status=Questionnaire.PUBLISHED, region=self.region)
-        self.section_1 = Section.objects.create(title="Reported Cases of Selected Vaccine Preventable Diseases (VPDs)", order=1,
-                                                      questionnaire=self.questionnaire, name="Reported Cases")
+        self.section_1 = Section.objects.create(title="Reported Cases of Selected Vaccine Preventable Diseases (VPDs)",
+                                                order=1,
+                                                questionnaire=self.questionnaire, name="Reported Cases")
 
-        self.sub_section = SubSection.objects.create(title="Reported cases for the year 2013", order=1, section=self.section_1)
+        self.sub_section = SubSection.objects.create(title="Reported cases for the year 2013", order=1,
+                                                     section=self.section_1)
         self.primary_question = Question.objects.create(text='Disease', UID='C00003', answer_type='MultiChoice')
         self.option = QuestionOption.objects.create(text="Measles", question=self.primary_question, UID="QO1")
         self.option2 = QuestionOption.objects.create(text="TB", question=self.primary_question, UID="QO2")
 
-        self.question1 = Question.objects.create(text='B. Number of cases tested', UID='C00004', answer_type='Number')
+        self.question1 = Question.objects.create(text='B. Number of cases tested', UID='C00004', answer_type='Number',
+                                                 answer_sub_type=Question.INTEGER)
 
         self.question2 = Question.objects.create(text='C. Number of cases positive',
-                                            instructions="Include only those cases found positive for the infectious agent.",
-                                            UID='C00005', answer_type='Number')
+                                                 instructions="Include only those cases found positive for the infectious agent.",
+                                                 UID='C00005', answer_type='Number', answer_sub_type=Question.INTEGER)
 
         self.parent = QuestionGroup.objects.create(subsection=self.sub_section, order=1)
         self.parent.question.add(self.question1, self.question2, self.primary_question)
@@ -134,10 +145,12 @@ class SpecificExportViewTest(BaseTest):
         self.regions.countries.add(self.country)
         self.headings = "ISO\tCountry\tYear\tField code\tQuestion text\tValue"
 
-        self.primary_question_answer = MultiChoiceAnswer.objects.create(question=self.primary_question, country=self.country,
-                                                               status=Answer.SUBMITTED_STATUS,  response=self.option)
+        self.primary_question_answer = MultiChoiceAnswer.objects.create(question=self.primary_question,
+                                                                        country=self.country,
+                                                                        status=Answer.SUBMITTED_STATUS,
+                                                                        response=self.option)
         self.question1_answer = NumericalAnswer.objects.create(question=self.question1, country=self.country,
-                                                               status=Answer.SUBMITTED_STATUS,  response=23)
+                                                               status=Answer.SUBMITTED_STATUS, response=23)
         self.question2_answer = NumericalAnswer.objects.create(question=self.question2, country=self.country,
                                                                status=Answer.SUBMITTED_STATUS, response=1)
         self.answer_group1 = self.primary_question_answer.answergroup.create(grouped_question=self.parent, row=1)
@@ -153,9 +166,10 @@ class SpecificExportViewTest(BaseTest):
         self.region.countries.add(ghana)
         primary_question_answer2 = MultiChoiceAnswer.objects.create(question=self.primary_question, country=ghana,
                                                                     status=Answer.SUBMITTED_STATUS,
-                                                                    response=self.option2, version=2, questionnaire=self.questionnaire)
+                                                                    response=self.option2, version=2,
+                                                                    questionnaire=self.questionnaire)
         question1_answer2 = NumericalAnswer.objects.create(question=self.question1, country=ghana,
-                                                           status=Answer.SUBMITTED_STATUS,  response=4, version=2,
+                                                           status=Answer.SUBMITTED_STATUS, response=4, version=2,
                                                            questionnaire=self.questionnaire)
         question2_answer2 = NumericalAnswer.objects.create(question=self.question2, country=ghana,
                                                            status=Answer.SUBMITTED_STATUS, response=55, version=2,
@@ -178,15 +192,19 @@ class SpecificExportViewTest(BaseTest):
         answer_id_2 = "C_%s_%s" % (self.primary_question.UID, self.question2.UID)
 
         expected_data = [self.headings,
-                         "%s\t%s\t2013\t%s\t%s\t%s" % (ghana.code, ghana.name, answer_id.encode('base64').strip(), question_text, self.option2.text),
-                         "%s\t%s\t2013\t%s\t%s\t%s" % (ghana.code, ghana.name, answer_id_1.encode('base64').strip(), question_text1, '4'),
-                         "%s\t%s\t2013\t%s\t%s\t%s" % (ghana.code, ghana.name, answer_id_2.encode('base64').strip(), question_text_2, '55')]
+                         "%s\t%s\t2013\t%s\t%s\t%s" % (
+                             ghana.code, ghana.name, answer_id.encode('base64').strip(), question_text,
+                             self.option2.text),
+                         "%s\t%s\t2013\t%s\t%s\t%s" % (
+                             ghana.code, ghana.name, answer_id_1.encode('base64').strip(), question_text1, '4'),
+                         "%s\t%s\t2013\t%s\t%s\t%s" % (
+                             ghana.code, ghana.name, answer_id_2.encode('base64').strip(), question_text_2, '55')]
 
         contents = "%s\r\n%s\r\n%s\r\n%s" % ("".join(expected_data[0]), "".join(expected_data[1]),
                                              "".join(expected_data[2]), "".join(expected_data[3]))
         self.assertEqual(contents, response.content)
 
     def test_login_required_for_home_get(self):
-        url = '/extract/country/%d/version/%d/'%(self.country.id, 2)
+        url = '/extract/country/%d/version/%d/' % (self.country.id, 2)
         self.assert_login_required(url)
 
