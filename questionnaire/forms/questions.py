@@ -25,17 +25,25 @@ class QuestionForm(ModelForm):
         self.fields['theme'].empty_label = 'Select theme'
         self.fields['answer_sub_type'].label = 'Response sub type'
         self.fields['answer_sub_type'].hidden = True
+        self.fields['answer_sub_type'].choices = self._set_subtype_choices()
+
 
     class Meta:
         model = Question
         fields = (
-        'text', 'export_label', 'instructions', 'answer_type', 'answer_sub_type', 'options', 'theme', 'is_primary')
+            'text', 'export_label', 'instructions', 'answer_type', 'answer_sub_type', 'options', 'theme', 'is_primary')
         widgets = {'text': forms.Textarea(attrs={"rows": 6, "cols": 50}),
                    'instructions': forms.Textarea(attrs={"rows": 6, "cols": 50}),
                    'answer_type': forms.Select(),
                    'answer_sub_type': forms.Select(),
                    'theme': forms.Select(),
                    'export_label': forms.Textarea(attrs={"rows": 2, "cols": 50})}
+
+    def _set_subtype_choices(self):
+        choices = self.fields['answer_sub_type'].choices
+        choices[0] = ('', 'Select a Sub-Type', )
+        return choices
+
 
     def clean(self):
         self._clean_options()

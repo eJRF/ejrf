@@ -27,11 +27,11 @@ class QuestionnaireEntryAsServiceTest(BaseTest):
                                                  UID='C00002', answer_type='Text')
 
         self.question3 = Question.objects.create(text='question 3', instructions="instruction 3",
-                                                 UID='C00003', answer_type='Number')
+                                                 UID='C00003', answer_type='Number', answer_sub_type=Question.INTEGER)
 
         self.question4 = Question.objects.create(text='question 4', UID='C00004', answer_type='MultiChoice')
         self.question5 = Question.objects.create(text='question 4', instructions="instruction 2",
-                                                 UID='C00005', answer_type='Number')
+                                                 UID='C00005', answer_type='Number', answer_sub_type=Question.INTEGER)
 
         self.question6 = Question.objects.create(text='question 6', instructions="instruction 3",
                                                  UID='C00006', answer_type='Date')
@@ -222,11 +222,11 @@ class QuestionnaireEntryAsFormTest(BaseTest):
         self.question1 = Question.objects.create(text='Disease', UID='C00001', answer_type='MultiChoice')
         self.question2 = Question.objects.create(text='B. Number of cases tested',
                                                  instructions="Enter the total number of cases for which specimens were collected, and tested in laboratory",
-                                                 UID='C00003', answer_type='Number')
+                                                 UID='C00003', answer_type='Number', answer_sub_type='INTEGER')
 
         self.question3 = Question.objects.create(text='C. Number of cases positive',
                                                  instructions="Include only those cases found positive for the infectious agent.",
-                                                 UID='C00004', answer_type='Number')
+                                                 UID='C00004', answer_type='Number', answer_sub_type='DECIMAL')
 
         self.option1 = QuestionOption.objects.create(text='tusker lager', question=self.question1)
         self.option2 = QuestionOption.objects.create(text='tusker lager1', question=self.question1)
@@ -797,7 +797,7 @@ class AllowMultiplesGridEntryServiceTest(BaseTest):
                                                  UID='C00002', answer_type='Text')
 
         self.question3 = Question.objects.create(text='self.question 3 - number', instructions="instruction 3",
-                                                 UID='C00003', answer_type='Number')
+                                                 UID='C00003', answer_type='Number', answer_sub_type=Question.INTEGER)
 
         self.question4 = Question.objects.create(text='self.question 4 - date', instructions="instruction 2",
                                                  UID='C00005', answer_type='Date')

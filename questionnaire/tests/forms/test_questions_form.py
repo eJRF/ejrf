@@ -52,6 +52,14 @@ class QuestionsFormTest(BaseTest):
         question_form = QuestionForm()
         self.assertIn(('', 'Response type'), question_form.fields['answer_type'].choices)
 
+    def test_answer_sub_type_choices(self):
+        question_form = QuestionForm()
+        self.assertIn(('', 'Select a Sub-Type'), question_form.fields['answer_sub_type'].choices)
+        self.assertIn(('DD/MM/YYYY', 'DD/MM/YYYY'), question_form.fields['answer_sub_type'].choices)
+        self.assertIn(('MM/YYYY', 'MM/YYYY'), question_form.fields['answer_sub_type'].choices)
+        self.assertIn(('integer', 'Integer'), question_form.fields['answer_sub_type'].choices)
+        self.assertIn(('decimal', 'Decimal'), question_form.fields['answer_sub_type'].choices)
+
     def test_save_multichoice_question_saves_packaged_options(self):
         options = ['', 'Yes, No, Maybe']
         form = {'text': 'How many kids were immunised this year?',

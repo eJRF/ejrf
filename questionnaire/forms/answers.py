@@ -58,6 +58,19 @@ class NumericalAnswerForm(AnswerForm):
         model = NumericalAnswer
         exclude = ('question', 'status', 'country', 'version', 'code', 'questionnaire')
 
+    def clean(self):
+        self._clean_response()
+        return super(NumericalAnswerForm, self).clean()
+
+    def _clean_response(self):
+        response = self.cleaned_data.get('response', None)
+        if self._matches_answer_sub_type(response):
+            self._errors['response'] = ["Response should be a whole number."]
+
+    def _matches_answer_sub_type(self, response):
+        return self.question.answer_sub_type and self.question.answer_sub_type.lower() == Question.INTEGER.lower() and response and not float(response).is_integer()
+
+
 
 class TextAnswerForm(AnswerForm):
     response = forms.CharField(widget=forms.Textarea)
@@ -78,7 +91,7 @@ class DateAnswerForm(AnswerForm):
 
     def _get_date_widget(self, date_answer_sub_type):
         if date_answer_sub_type == "MM/YYYY":
-            return forms.DateInput(format=('%m-%Y'), attrs={'class': 'form-control date-time-picker', 'data-date-format': 'mm/yyyy',
+            return forms.DateInput(attrs={'class': 'form-control date-time-picker', 'data-date-format': 'mm/yyyy',
                                           'data-date-option': 'mm'})
         else:
             return forms.DateInput(attrs={'class': 'form-control date-time-picker', 'data-date-format': 'dd/mm/yyyy',

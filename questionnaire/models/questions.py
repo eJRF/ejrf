@@ -4,13 +4,19 @@ from questionnaire.utils.model_utils import largest_uid, stringify
 
 
 class Question(BaseModel):
-
     NUMBER = "Number"
     MULTICHOICE = "MultiChoice"
+    DAY_MONTH_YEAR = "DD/MM/YYYY"
+    MONTH_YEAR = "MM/YYYY"
+    DECIMAL = 'decimal'
+    INTEGER = 'integer'
     DATE = "Date"
+
     DATE_SUB_TYPES = (
-        ("DD/MM/YYYY", "DD/MM/YYYY"),
-        ("MM/YYYY", "MM/YYYY")
+        ("DD/MM/YYYY", DAY_MONTH_YEAR),
+        ("MM/YYYY", MONTH_YEAR),
+        (DECIMAL, 'Decimal'),
+        (INTEGER, 'Integer')
     )
     ANSWER_TYPES = (
         ("Date", DATE),
@@ -31,7 +37,7 @@ class Question(BaseModel):
     theme = models.ForeignKey("Theme", null=True, related_name="questions")
     is_primary = models.BooleanField(blank=False, null=False, default=False)
     is_required = models.BooleanField(blank=False, null=False, default=False)
-    parent = models.ForeignKey("Question",blank=False, null=True, related_name="child")
+    parent = models.ForeignKey("Question", blank=False, null=True, related_name="child")
 
     def save(self, *args, **kwargs):
         if self.parent:
@@ -90,14 +96,15 @@ class Question(BaseModel):
 
     def questionnaires(self):
         from questionnaire.models import Questionnaire
+
         return Questionnaire.objects.filter(sections__sub_sections__question_group__in=self.question_group.all())
 
     def is_multichoice(self):
         return self.answer_type == self.MULTICHOICE
 
     def answered_options(self, question_group, **kwargs):
-        all_answers = self.answers.filter(answergroup__grouped_question=question_group, **kwargs).\
-                                        order_by('modified').distinct().select_subclasses()
+        all_answers = self.answers.filter(answergroup__grouped_question=question_group, **kwargs). \
+            order_by('modified').distinct().select_subclasses()
         return [answer.response for answer in all_answers]
 
     @classmethod
@@ -119,7 +126,7 @@ class QuestionOption(BaseModel):
         latest = cls.objects.exclude(UID=None)
         if latest.exists():
             latest = latest.latest('modified').UID
-            return '%s%d'%(latest[:-1], int(latest[-1])+1)
+            return '%s%d' % (latest[:-1], int(latest[-1]) + 1)
         return None
 
     class Meta:

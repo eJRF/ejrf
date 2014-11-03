@@ -1,74 +1,78 @@
-jQuery(function($){
+jQuery(function ($) {
 
 
     var $form = $("#id-new-question-form"),
         template = $("#question-option-template").html(),
         answerTypeSelect = $('#id_answer_type');
 
-    function addQuestionOption($element){
+    function addQuestionOption($element) {
         $element.before(template);
         assignOptionNumbers($form);
     }
 
-    if(answerTypeSelect.val() == 'MultiChoice'){
+    if (answerTypeSelect.val() == 'MultiChoice') {
         $('#option-choices').addClass('show').removeClass('hide');
     } else if (answerTypeSelect.val() == 'Date') {
         $("#id_answer_sub_type_span").show();
     }
 
-    answerTypeSelect.on('change', function(){
+    answerTypeSelect.on('change', function () {
         $('#option-choices').removeClass('show').addClass('hide');
         removeOptions();
 
         $("#id_answer_sub_type_span").hide();
 
-        if($(this).val() == 'MultiChoice'){
+        if ($(this).val() == 'MultiChoice') {
             $('#option-choices').addClass('show').removeClass('hide');
         } else if ($(this).val() == 'Date') {
-            $("#id_answer_sub_type_span").show();
+            var template = $("#date-subtype-template").html();
+            $("#id_answer_sub_type_span").html(template).show();
+        } else if ($(this).val() == 'Number') {
+            var template = $("#number-subtype-template").html();
+            $("#id_answer_sub_type_span").html(template).show();
         }
     });
 
-    $('input[type=radio]').on('change', function(){
-        if($(this).val() == 'custom'){
+    $('input[type=radio]').on('change', function () {
+        if ($(this).val() == 'custom') {
             addQuestionOption($("div.form-actions"));
             $form.find('input[name=options]').prop('checked', false);
-        }else{
+        } else {
             $form.find('input[name=options-custom]').prop('checked', false);
             removeOptions()
         }
     });
 
-    $form.on("click", ".add-option", function(){
+    $form.on("click", ".add-option", function () {
         addQuestionOption($("div.form-actions"));
     });
 
-    $form.on("click", ".remove-option", function(){
+    $form.on("click", ".remove-option", function () {
         $(this).parents("div#option-input-group").remove();
         assignOptionNumbers($form)
     });
 });
 
-function assignOptionNumbers($form){
+function assignOptionNumbers($form) {
     assignOptionNumbersUsing($form, "span.number");
     assignOptionNumbersUsing($form, "span.mid-table-number");
     assignIdsWithNumbers($form, 'select[name=columns]');
-}   
+}
 
-function assignOptionNumbersUsing($form, number_selector){
-        $form.find(number_selector).each(function(i, element){
-            $(element).text(++i);
-        });
-    }
+function assignOptionNumbersUsing($form, number_selector) {
+    $form.find(number_selector).each(function (i, element) {
+        $(element).text(++i);
+    });
+}
 
-function assignIdsWithNumbers($form, inputName){
-        $form.find(inputName).each(function(i, element){
-            $(element).attr('id', 'id-column-' + i);
-        });
-    }
+function assignIdsWithNumbers($form, inputName) {
+    $form.find(inputName).each(function (i, element) {
+        $(element).attr('id', 'id-column-' + i);
+    });
+}
 
-function removeOptions(){
-        $("div.input-group").each(function(){
-           $(this).remove();
-        });
-    }
+function removeOptions() {
+    $("div.input-group").each(function () {
+        $(this).remove();
+    });
+}

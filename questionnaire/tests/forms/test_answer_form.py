@@ -1,23 +1,28 @@
 from django.forms import Select
 from questionnaire.forms.answers import NumericalAnswerForm, TextAnswerForm, DateAnswerForm, MultiChoiceAnswerForm
 from questionnaire.forms.custom_widgets import MultiChoiceAnswerSelectWidget
-from questionnaire.models import Question, Country, QuestionOption, QuestionGroup, Section, Questionnaire, SubSection, MultiChoiceAnswer
+from questionnaire.models import Question, Country, QuestionOption, QuestionGroup, Section, Questionnaire, SubSection, \
+    MultiChoiceAnswer
 from questionnaire.tests.base_test import BaseTest
+from questionnaire.tests.factories.question_factory import QuestionFactory
 
 
 class NumericalAnswerFormTest(BaseTest):
     def setUp(self):
         self.country = Country.objects.create(name="Peru")
         self.question = Question.objects.create(text='C. Number of cases positive',
-                                            instructions="Include only those cases found positive for the infectious agent.",
-                                            UID='C00001', answer_type='Number')
+                                                instructions="Include only those cases found ...",
+                                                UID='C00001', answer_type='Number', answer_sub_type=Question.INTEGER)
 
-        self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", description="From dropbox as given by Rouslan")
+        self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English",
+                                                          description="From dropbox as given by Rouslan")
 
-        self.section = Section.objects.create(title="Reported Cases of Selected Vaccine Preventable Diseases (VPDs)", order=1,
-                                                      questionnaire=self.questionnaire, name="Reported Cases")
+        self.section = Section.objects.create(title="Reported Cases of Selected Vaccine Preventable Diseases (VPDs)",
+                                              order=1,
+                                              questionnaire=self.questionnaire, name="Reported Cases")
 
-        self.sub_section = SubSection.objects.create(title="Reported cases for the year 2013", order=1, section=self.section)
+        self.sub_section = SubSection.objects.create(title="Reported cases for the year 2013", order=1,
+                                                     section=self.section)
         self.question_group = QuestionGroup.objects.create(subsection=self.sub_section, order=1, allow_multiples=True)
         self.question_group.question.add(self.question)
 
@@ -30,7 +35,7 @@ class NumericalAnswerFormTest(BaseTest):
             'country': self.country.id,
             'status': 'DRAFT',
             'version': 1,
-            'code':'HAHA123',
+            'code': 'HAHA123',
             'group': self.question_group
         }
 
@@ -46,6 +51,22 @@ class NumericalAnswerFormTest(BaseTest):
         message = 'Enter a number.'
         self.assertEqual([message], answer_form.errors['response'])
 
+    def test_decimal_response_is_invalid_if_question_answer_subtype_is_integer(self):
+        form_data = self.form_data.copy()
+        form_data['response'] = 33.4
+        answer_form = NumericalAnswerForm(form_data, initial=self.initial)
+        self.assertFalse(answer_form.is_valid())
+        message = 'Response should be a whole number.'
+        self.assertEqual([message], answer_form.errors['response'])
+
+    def test_integer_response_is_valid_if_question_answer_subtype_is_decimal(self):
+        question = QuestionFactory(answer_type=Question.NUMBER, answer_sub_type=Question.DECIMAL)
+        form_data = self.form_data.copy()
+        form_data['response'] = 33
+        initial = self.initial.copy()
+        initial['question'] = question
+        answer_form = NumericalAnswerForm(form_data, initial=initial)
+        self.assertTrue(answer_form.is_valid())
 
     def test_required_question_shows_field_required_error_when_no_data_is_posted_and_no_initial_passed_in(self):
         self.question.is_required = True
@@ -54,11 +75,11 @@ class NumericalAnswerFormTest(BaseTest):
         answer_form_without_data.show_is_required_errors()
         self.assertEqual(['This field is required.'], answer_form_without_data.errors['response'])
 
-        answer_form_with_data = NumericalAnswerForm(data={'response': 1},initial=self.initial)
+        answer_form_with_data = NumericalAnswerForm(data={'response': 1}, initial=self.initial)
         answer_form_with_data.show_is_required_errors()
         self.assertEqual({}, answer_form_with_data.errors)
 
-        _initial=self.initial.copy()
+        _initial = self.initial.copy()
         _initial['response'] = '1'
         answer_form_with_initial = NumericalAnswerForm(initial=_initial)
         answer_form_with_initial.show_is_required_errors()
@@ -69,28 +90,30 @@ class TextAnswerFormTest(BaseTest):
     def setUp(self):
         self.country = Country.objects.create(name="Peru")
         self.question = Question.objects.create(text='C. Number of cases positive',
-                                            instructions="Include only those cases found positive for the infectious agent.",
-                                            UID='C00001', answer_type='Text')
+                                                instructions="Include only those cases found positive for the infectious agent.",
+                                                UID='C00001', answer_type='Text')
 
+        self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English",
+                                                          description="From dropbox as given by Rouslan")
 
-        self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", description="From dropbox as given by Rouslan")
+        self.section = Section.objects.create(title="Reported Cases of Selected Vaccine Preventable Diseases (VPDs)",
+                                              order=1,
+                                              questionnaire=self.questionnaire, name="Reported Cases")
 
-        self.section = Section.objects.create(title="Reported Cases of Selected Vaccine Preventable Diseases (VPDs)", order=1,
-                                                      questionnaire=self.questionnaire, name="Reported Cases")
-
-        self.sub_section = SubSection.objects.create(title="Reported cases for the year 2013", order=1, section=self.section)
+        self.sub_section = SubSection.objects.create(title="Reported cases for the year 2013", order=1,
+                                                     section=self.section)
         self.question_group = QuestionGroup.objects.create(subsection=self.sub_section, order=1, allow_multiples=True)
         self.question_group.question.add(self.question)
 
         self.form_data = {
-            'response':'some answer',
+            'response': 'some answer',
         }
         self.initial = {
             'question': self.question,
             'country': self.country.id,
             'status': 'DRAFT',
-            'version':1,
-            'code':'HAHA123',
+            'version': 1,
+            'code': 'HAHA123',
             'group': self.question_group
         }
 
@@ -103,28 +126,31 @@ class DateAnswerFormTest(BaseTest):
     def setUp(self):
         self.country = Country.objects.create(name="Peru")
         self.question = Question.objects.create(text='C. Number of cases positive',
-                                            instructions="Include only those cases found positive for the infectious agent.",
-                                            UID='C00001', answer_type='Date')
+                                                instructions="Include only those cases found positive for the infectious agent.",
+                                                UID='C00001', answer_type='Date')
 
-        self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", description="From dropbox as given by Rouslan")
+        self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English",
+                                                          description="From dropbox as given by Rouslan")
 
-        self.section = Section.objects.create(title="Reported Cases of Selected Vaccine Preventable Diseases (VPDs)", order=1,
-                                                      questionnaire=self.questionnaire, name="Reported Cases")
+        self.section = Section.objects.create(title="Reported Cases of Selected Vaccine Preventable Diseases (VPDs)",
+                                              order=1,
+                                              questionnaire=self.questionnaire, name="Reported Cases")
 
-        self.sub_section = SubSection.objects.create(title="Reported cases for the year 2013", order=1, section=self.section)
+        self.sub_section = SubSection.objects.create(title="Reported cases for the year 2013", order=1,
+                                                     section=self.section)
         self.question_group = QuestionGroup.objects.create(subsection=self.sub_section, order=1, allow_multiples=True)
         self.question_group.question.add(self.question)
 
         self.form_data = {
-            'response':'2014-01-01',
+            'response': '2014-01-01',
         }
 
         self.initial = {
             'question': self.question,
             'country': self.country.id,
             'status': 'DRAFT',
-            'version':1,
-            'code':'HAHA123',
+            'version': 1,
+            'code': 'HAHA123',
             'group': self.question_group,
             'questionnaire': self.questionnaire.id
         }
@@ -143,12 +169,14 @@ class MultiChoiceAnswerFormTest(BaseTest):
                                                 UID='C00001', answer_type='MultiChoice', is_primary=True)
         self.question_option_one = QuestionOption.objects.create(text='Option One', question=self.question)
 
-        self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", description="From dropbox as given by Rouslan")
+        self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English",
+                                                          description="From dropbox as given by Rouslan")
 
         self.section = Section.objects.create(title="Reported Cases of Selected Vaccine Preventable Diseases (VPDs)",
                                               order=1, questionnaire=self.questionnaire, name="Reported Cases")
 
-        self.sub_section = SubSection.objects.create(title="Reported cases for the year 2013", order=1, section=self.section)
+        self.sub_section = SubSection.objects.create(title="Reported cases for the year 2013", order=1,
+                                                     section=self.section)
         self.question_group = QuestionGroup.objects.create(subsection=self.sub_section, order=1, allow_multiples=True)
         self.question_group.question.add(self.question)
 
@@ -181,9 +209,12 @@ class MultiChoiceAnswerFormTest(BaseTest):
         self.assertEqual([message], answer_form.errors['response'])
 
     def test_multiple_form_choice_form_adds_data_instruction_attributes_for_question_options(self):
-        question_option_two = QuestionOption.objects.create(text='Option 2', question=self.question, instructions="Some stuff")
-        question_option_3 = QuestionOption.objects.create(text='Option 3', question=self.question, instructions="Some stuff")
-        question_option_4 = QuestionOption.objects.create(text='Option 4', question=self.question, instructions="Some stuff")
+        question_option_two = QuestionOption.objects.create(text='Option 2', question=self.question,
+                                                            instructions="Some stuff")
+        question_option_3 = QuestionOption.objects.create(text='Option 3', question=self.question,
+                                                          instructions="Some stuff")
+        question_option_4 = QuestionOption.objects.create(text='Option 4', question=self.question,
+                                                          instructions="Some stuff")
 
         answer_form = MultiChoiceAnswerForm(initial=self.initial)
         query_set = answer_form._get_response_choices(self.initial)
