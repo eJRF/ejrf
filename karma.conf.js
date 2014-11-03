@@ -14,6 +14,8 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
+      'questionnaire/static/js/lib/angular.min.js',
+      'spec/lib/angular-mocks.js',
       'questionnaire/static/js/lib/*.js',
       'questionnaire/static/js/**/*.js',
       'spec/*.js'
@@ -22,8 +24,6 @@ module.exports = function(config) {
 
     // list of files to exclude
     exclude: [
-        'questionnaire/static/js/lib/react.min.js',
-        'questionnaire/static/js/create_skip_rule.js',
         'questionnaire/static/js/export-section.js',
         'questionnaire/static/js/application.js'
     ],
