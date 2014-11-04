@@ -17,7 +17,7 @@ jQuery(function ($) {
         isEql: function (question, other) {
             return question.element == other.element && question.skipQuestion == other.skipQuestion;
         },
-        pop: function (question) {
+        drop: function (question) {
             var self = this;
             this.questions = this.questions.filter(function (qn) {
                 return !self.isEql(question, qn);
@@ -38,7 +38,7 @@ jQuery(function ($) {
     var showQuestion = function (element) {
         var skipQuestionId = $(element).parent('label').parent('li').attr('data-skip-rules');
         if (skipQuestionId) {
-            skipRuleScope.pop({element: element, skipQuestion: skipQuestionId});
+            skipRuleScope.drop({element: element, skipQuestion: skipQuestionId});
             var qnFormGroupDiv = $('.form-group-question-' + skipQuestionId);
             qnFormGroupDiv.removeClass('hide');
             qnFormGroupDiv.addClass('show');

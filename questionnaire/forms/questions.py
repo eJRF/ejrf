@@ -27,7 +27,6 @@ class QuestionForm(ModelForm):
         self.fields['answer_sub_type'].hidden = True
         self.fields['answer_sub_type'].choices = self._set_subtype_choices()
 
-
     class Meta:
         model = Question
         fields = (
@@ -44,9 +43,7 @@ class QuestionForm(ModelForm):
         choices[0] = ('', 'Select a Sub-Type', )
         return choices
 
-
     def clean(self):
-        print self.cleaned_data
         self._clean_options()
         self._clean_export_label()
         self._clean_answer_sub_type()

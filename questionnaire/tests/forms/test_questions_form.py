@@ -24,7 +24,6 @@ class QuestionsFormTest(BaseTest):
         Question.objects.create(text='B. Number of cases tested',
                                 instructions="Enter the total number of cases", UID='00001', answer_type='Number', answer_sub_type="Integer")
         question_form = QuestionForm(data=self.form_data)
-        print ""
         question = question_form.save(commit=True)
         self.assertEqual('00002', question.UID)
 

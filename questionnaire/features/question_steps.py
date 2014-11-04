@@ -45,6 +45,7 @@ def and_i_click_add_new_question_page(step):
 def and_i_fill_in_the_question_details(step):
     world.page.fill_form(world.data)
     world.page.select('answer_type', 'Number')
+    world.page.select('answer_sub_type', 'Decimal')
 
 
 @step(u'Then I should see the question created')
