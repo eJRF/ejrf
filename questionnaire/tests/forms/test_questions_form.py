@@ -11,7 +11,7 @@ class QuestionsFormTest(BaseTest):
         self.form_data = {'text': 'How many kids were immunised this year?',
                           'instructions': 'Some instructions',
                           'short_instruction': 'short version',
-                          'answer_type': 'Number',
+                          'answer_type': 'Text',
                           'export_label': 'Some export text',
                           'options': ['', ],
                           'theme': self.theme.id}
@@ -22,8 +22,9 @@ class QuestionsFormTest(BaseTest):
 
     def test_increments_uid_of_existing_question_by_one_upon_save_given_instance(self):
         Question.objects.create(text='B. Number of cases tested',
-                                instructions="Enter the total number of cases", UID='00001', answer_type='Number')
+                                instructions="Enter the total number of cases", UID='00001', answer_type='Number', answer_sub_type="Integer")
         question_form = QuestionForm(data=self.form_data)
+        print ""
         question = question_form.save(commit=True)
         self.assertEqual('00002', question.UID)
 
@@ -57,8 +58,8 @@ class QuestionsFormTest(BaseTest):
         self.assertIn(('', 'Select a Sub-Type'), question_form.fields['answer_sub_type'].choices)
         self.assertIn(('DD/MM/YYYY', 'DD/MM/YYYY'), question_form.fields['answer_sub_type'].choices)
         self.assertIn(('MM/YYYY', 'MM/YYYY'), question_form.fields['answer_sub_type'].choices)
-        self.assertIn(('integer', 'Integer'), question_form.fields['answer_sub_type'].choices)
-        self.assertIn(('decimal', 'Decimal'), question_form.fields['answer_sub_type'].choices)
+        self.assertIn(('Integer', 'Integer'), question_form.fields['answer_sub_type'].choices)
+        self.assertIn(('Decimal', 'Decimal'), question_form.fields['answer_sub_type'].choices)
 
     def test_save_multichoice_question_saves_packaged_options(self):
         options = ['', 'Yes, No, Maybe']
@@ -127,13 +128,13 @@ class QuestionHistoryTest(BaseTest):
         self.questionnaire = Questionnaire.objects.create(name="2014", description="some description")
         self.section = Section.objects.create(title="section", order=1, questionnaire=self.questionnaire)
         self.sub_section = SubSection.objects.create(title="subsection", order=1, section=self.section)
-        self.question1 = Question.objects.create(text='q1', UID='C00003', answer_type='Number')
+        self.question1 = Question.objects.create(text='q1', UID='C00003', answer_type='Text')
         self.parent_group = QuestionGroup.objects.create(subsection=self.sub_section, name="group1")
         self.theme = Theme.objects.create(name="Theme1")
         self.parent_group.question.add(self.question1)
 
         self.form_data = {'text': 'q1 edited.',
-                          'answer_type': 'Number',
+                          'answer_type': 'Text',
                           'export_label': 'Some export text',
                           'theme': self.theme.id}
 

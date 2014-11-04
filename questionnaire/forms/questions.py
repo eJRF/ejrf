@@ -11,7 +11,7 @@ class QuestionForm(ModelForm):
                      "Male, Female, Both",
                      "Local currency, US $",
                      "National, Sub national",
-    ]
+                     ]
 
     options = forms.CharField(widget=forms.HiddenInput(), required=False)
 
@@ -46,6 +46,7 @@ class QuestionForm(ModelForm):
 
 
     def clean(self):
+        print self.cleaned_data
         self._clean_options()
         self._clean_export_label()
         self._clean_answer_sub_type()
@@ -64,7 +65,11 @@ class QuestionForm(ModelForm):
     def _clean_answer_sub_type(self):
         answer_type = self.cleaned_data.get('answer_type', None)
         answer_sub_type = self.cleaned_data.get('answer_sub_type', None)
-        if answer_type == 'Date' and answer_sub_type is None:
+        if answer_type == 'Number' and not Question.NUMBER_SUB_TYPES.__contains__(answer_sub_type):
+            message = "This field is required if you select number"
+            self._errors['answer_sub_type'] = self.error_class([message])
+            del self.cleaned_data['answer_sub_type']
+        if answer_type == 'Date' and not Question.DATE_SUB_TYPES.__contains__(answer_sub_type):
             message = "This field is required if you select date"
             self._errors['answer_sub_type'] = self.error_class([message])
             del self.cleaned_data['answer_sub_type']

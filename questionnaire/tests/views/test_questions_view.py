@@ -21,7 +21,7 @@ class QuestionViewTest(BaseTest):
         self.theme = Theme.objects.create(name="Another theme")
         self.form_data = {'text': 'How many kids were immunised this year?',
                           'instructions': 'Some instructions',
-                          'answer_type': 'Number',
+                          'answer_type': 'Text',
                           'export_label': 'Some export text',
                           'options': ['', ],
                           'theme': self.theme.id}
@@ -172,7 +172,7 @@ class QuestionViewTest(BaseTest):
     def test_delete_question(self):
         data = {'text': 'B. Number of cases tested',
                 'instructions': "Enter the total number of cases",
-                'UID': '00001', 'answer_type': 'Number',
+                'UID': '00001', 'answer_type': 'Text',
                 'theme': self.theme.id}
         query_data = data.copy()
         del query_data['theme']
@@ -186,7 +186,7 @@ class QuestionViewTest(BaseTest):
     def test_does_not_delete_question_when_it_belongs_to_others(self):
         data = {'text': 'B. Number of cases tested',
                 'instructions': "Enter the total number of cases",
-                'UID': '00001', 'answer_type': 'Number',
+                'UID': '00001', 'answer_type': 'Text',
                 'theme': self.theme.id}
         query_data = data.copy()
         del query_data['theme']
@@ -198,7 +198,7 @@ class QuestionViewTest(BaseTest):
     def test_does_not_delete_question_when_it_has_answers(self):
         data = {'text': 'B. Number of cases tested',
                 'instructions': "Enter the total number of cases",
-                'UID': '00001', 'answer_type': 'Number',
+                'UID': '00001', 'answer_type': 'Text',
                 'theme': self.theme}
         question = Question.objects.create(**data)
         country = Country.objects.create(name="Peru")
@@ -213,7 +213,7 @@ class QuestionViewTest(BaseTest):
     def test_questions_list_in_particular_theme(self):
         data = {'text': 'B. Number of cases tested',
                 'instructions': "Enter the total number of cases",
-                'UID': '00001', 'answer_type': 'Number',
+                'UID': '00001', 'answer_type': 'Text',
                 'theme': self.theme}
         question = Question.objects.create(**data)
         response = self.client.get('/questions/?theme=%d' % self.theme.id)
@@ -239,7 +239,7 @@ class RegionalQuestionsViewTest(BaseTest):
         self.form_data = {'text': 'How many kids were immunised this year?',
                           'instructions': 'Some instructions',
                           'export_label': 'blah',
-                          'answer_type': 'Number',
+                          'answer_type': 'Text',
                           'theme': self.theme.id}
 
     def test_get_regional_questions(self):
@@ -268,7 +268,7 @@ class RegionalQuestionsViewTest(BaseTest):
     def test_delete_question(self):
         data = {'text': 'B. Number of cases tested',
                 'instructions': "Enter the total number of cases",
-                'UID': '00001', 'answer_type': 'Number',
+                'UID': '00001', 'answer_type': 'Text',
                 'theme': self.theme}
         question = Question.objects.create(region=self.region, **data)
         response = self.client.post('/questions/%s/delete/' % question.id, {})
@@ -282,7 +282,7 @@ class RegionalQuestionsViewTest(BaseTest):
         self.assign('can_edit_questionnaire', user_not_in_same_region)
         data = {'text': 'B. Number of cases tested',
                 'instructions': "Enter the total number of cases",
-                'UID': '00001', 'answer_type': 'Number',
+                'UID': '00001', 'answer_type': 'Text',
                 'theme': self.theme}
         paho = Region.objects.create(name="paho")
         question = Question.objects.create(region=paho, **data)
@@ -314,7 +314,7 @@ class DoesNotExistExceptionViewTest(BaseTest):
         self.form_data = {'text': 'How many kids were immunised this year?',
                           'instructions': 'Some instructions',
                           'export_label': 'blah',
-                          'answer_type': 'Number',
+                          'answer_type': 'Text',
                           'theme': self.theme.id}
 
     def test_get_regional_questions(self):
@@ -347,7 +347,7 @@ class EditQuestionViewTest(BaseTest):
         self.form_data = {'text': 'How many kids were immunised this year?',
                           'instructions': 'Some instructions',
                           'export_label': 'blah',
-                          'answer_type': 'Number',
+                          'answer_type': 'Text',
                           'theme': self.theme.id}
 
     def test_get_edit_question(self):

@@ -12,8 +12,8 @@ jQuery(function ($) {
 
     if (answerTypeSelect.val() == 'MultiChoice') {
         $('#option-choices').addClass('show').removeClass('hide');
-    } else if (answerTypeSelect.val() == 'Date') {
-        $("#id_answer_sub_type_span").show();
+    } else if (answerTypeSelect.val() == 'Date' || answerTypeSelect.val() == 'Number' ) {
+        showResponseSubType(answerTypeSelect.val());
     }
 
     answerTypeSelect.on('change', function () {
@@ -24,12 +24,8 @@ jQuery(function ($) {
 
         if ($(this).val() == 'MultiChoice') {
             $('#option-choices').addClass('show').removeClass('hide');
-        } else if ($(this).val() == 'Date') {
-            var template = $("#date-subtype-template").html();
-            $("#id_answer_sub_type_span").html(template).show();
-        } else if ($(this).val() == 'Number') {
-            var template = $("#number-subtype-template").html();
-            $("#id_answer_sub_type_span").html(template).show();
+        } else if ($(this).val() == 'Date' || $(this).val() == 'Number') {
+            showResponseSubType($(this).val());
         }
     });
 
@@ -39,7 +35,7 @@ jQuery(function ($) {
             $form.find('input[name=options]').prop('checked', false);
         } else {
             $form.find('input[name=options-custom]').prop('checked', false);
-            removeOptions()
+            removeOptions();
         }
     });
 
@@ -49,9 +45,22 @@ jQuery(function ($) {
 
     $form.on("click", ".remove-option", function () {
         $(this).parents("div#option-input-group").remove();
-        assignOptionNumbers($form)
+        assignOptionNumbers($form);
     });
 });
+
+function showResponseSubType(selectedResponseType) {
+    var answer_sub_type_template =
+            {
+                Date:   $("#date-subtype-template").html(),
+                Number: $("#number-subtype-template").html()
+            };
+    var selectedResponseSubType = $('#id_answer_sub_type').val();
+    var template = answer_sub_type_template[selectedResponseType];
+    $("#id_answer_sub_type_span").show();
+    $("#id_answer_sub_type").html(template);
+    $('#id_answer_sub_type').val(selectedResponseSubType);
+}
 
 function assignOptionNumbers($form) {
     assignOptionNumbersUsing($form, "span.number");
