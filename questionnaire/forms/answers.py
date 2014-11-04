@@ -2,7 +2,7 @@ import copy
 from django import forms
 from django.forms.util import ErrorDict
 from django.forms import ModelForm, ModelChoiceField
-from questionnaire.forms.custom_widgets import MultiChoiceAnswerSelectWidget
+from questionnaire.forms.custom_widgets import MultiChoiceAnswerSelectWidget, SkipRuleSelectWidget
 
 from questionnaire.models import NumericalAnswer, TextAnswer, DateAnswer, MultiChoiceAnswer, QuestionOption, Question
 
@@ -71,7 +71,6 @@ class NumericalAnswerForm(AnswerForm):
         return self.question.answer_sub_type and self.question.answer_sub_type.lower() == Question.INTEGER.lower() and response and not float(response).is_integer()
 
 
-
 class TextAnswerForm(AnswerForm):
     response = forms.CharField(widget=forms.Textarea)
 
@@ -131,7 +130,7 @@ class MultiChoiceAnswerForm(AnswerForm):
         if 'option' in self.initial.keys() and self.initial['question'].is_primary:
             return forms.Select(attrs={'class': 'hide'})
         if self.widget_is_radio_button(query_set):
-            return forms.RadioSelect()
+            return SkipRuleSelectWidget()
         if query_set.exclude(instructions=None).exists():
             return MultiChoiceAnswerSelectWidget(question_options=query_set)
         return forms.Select()

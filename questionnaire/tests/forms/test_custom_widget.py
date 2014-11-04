@@ -67,14 +67,18 @@ class SkipRuleSelectWidgetTest(BaseTest):
 
         widget = SkipRuleSelectWidget()
 
-        expected_stuff = '<ul>\n<li data-skip-rules="[]"><label><input checked="checked" name="name" type="radio" value="%s" /> %s</label></li>\n<li data-skip-rules="[]"><label><input name="name" type="radio" value="2" /> Really</label></li>\n</ul>' \
+        expected_stuff = '<ul>\n<li data-skip-rules="">' \
+                         '<label><input checked="checked" name="name" type="radio" value="%s" /> %s</label></li>\n' \
+                         '<li data-skip-rules=""' \
+                         '><label><input name="name" type="radio" value="2" /> Really</label></li>\n</ul>' \
                          % (option1.id, option1.text)
 
         self.assertEqual(expected_stuff,
-                         widget.render('name', option1.id, choices=((option1.id, option1.text), ('2', 'Really'),)))
+                         widget.render('name', option1.id, choices=((option1.id, option1.text), ('2', 'Really'), )))
 
 
 class DataRuleRadioFieldRendererTest(BaseTest):
+
     def test_get_rules_for_option(self):
         question = Question.objects.create(text='what do you drink?', UID='C_2013', answer_type='MultiChoice')
         option1 = QuestionOption.objects.create(text='tusker lager', question=question, instructions="yeah yeah")
@@ -85,7 +89,7 @@ class DataRuleRadioFieldRendererTest(BaseTest):
                                               choices=((option1.id, option1.text), ('2', 'Really'),))
 
         rules_for_option_1 = renderer._get_rules(option1.id)
-        expected_rule = serializers.serialize('json', [skip_rule])
+        expected_rule = skip_rule.skip_question.id
 
         self.assertEqual(expected_rule, rules_for_option_1)
 

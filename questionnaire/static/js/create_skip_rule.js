@@ -24,7 +24,7 @@ angular.module('questionnaireApp', [])
                 success(function(data, status, headers, config) {
                 $scope.existingRules = data;
             });
-        }
+        };
 
         $scope.updateSkipRuleModal = function(subsectionId) {
             updateRules(subsectionId);
@@ -52,7 +52,7 @@ angular.module('questionnaireApp', [])
         };
 
         $scope.submitForm = function() {
-            postData = getFormData();
+            var postData = getFormData();
             $.post(window.url, postData)
                 .done(function(data) {
                     resetSkipRule();

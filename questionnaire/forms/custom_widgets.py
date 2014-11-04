@@ -65,6 +65,8 @@ class MultiChoiceQuestionSelectWidget(forms.Select):
 
 
 class DataRuleRadioFieldRenderer(RadioFieldRenderer):
+    def __init__(self, name, value, attrs, choices):
+        super(DataRuleRadioFieldRenderer, self).__init__(name, value, attrs, choices)
 
     def render(self):
         return format_html('<ul>\n{0}\n</ul>',
@@ -72,11 +74,12 @@ class DataRuleRadioFieldRenderer(RadioFieldRenderer):
                                             [(self._get_rules(w.choice_value), force_text(w),) for w in self]))
 
     def _get_rules(self, option):
-        options = QuestionOption.objects.filter(id=option)
+        options = QuestionOption.objects.filter(id=option, skip_rules__isnull=False)
+        blank = ''
         if options.exists():
-            return serializers.serialize('json', options[0].skip_rules.all())
-        else:
-            return []
+            all_rules = options[0].skip_rules.all()
+            return all_rules[0].skip_question.id
+        return blank
 
 
 class SkipRuleSelectWidget(forms.RadioSelect):

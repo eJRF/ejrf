@@ -160,7 +160,6 @@ class DateAnswerFormTest(BaseTest):
         self.assertTrue(answer_form.is_valid())
 
 
-
 class MultiChoiceAnswerFormTest(BaseTest):
     def setUp(self):
         self.country = Country.objects.create(name="Peru")
