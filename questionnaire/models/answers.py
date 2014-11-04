@@ -45,6 +45,7 @@ class NumericalAnswer(Answer):
     def _answer_sub_type_is_integer(self):
         return self.response and self.question.answer_sub_type and self.question.answer_sub_type.lower() == Question.INTEGER.lower()
 
+
 class TextAnswer(Answer):
     response = models.CharField(max_length=100, null=True)
 

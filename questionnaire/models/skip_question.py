@@ -9,10 +9,10 @@ class SkipQuestion(BaseModel):
         unique_together = ("root_question", "response", "skip_question", "subsection")
         app_label = 'questionnaire'
 
-    root_question = models.ForeignKey(Question, blank=False, null=False, related_name="root_question")
-    response = models.ForeignKey(QuestionOption, blank=False, null=False, related_name="response_option")
-    skip_question = models.ForeignKey(Question, blank=False, null=False, related_name="skip_question")
-    subsection = models.ForeignKey(SubSection, blank=False, null=False, related_name="subsection")
+    root_question = models.ForeignKey(Question, blank=False, null=False, related_name="root_skip_rules")
+    response = models.ForeignKey(QuestionOption, blank=False, null=False, related_name="skip_rules")
+    skip_question = models.ForeignKey(Question, blank=False, null=False, related_name="skip_rules")
+    subsection = models.ForeignKey(SubSection, blank=False, null=False, related_name="skip_rules")
 
     def to_dictionary(self):
         return {'id': self.id, 'skip_question':  self.skip_question.text,
