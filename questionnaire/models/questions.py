@@ -7,14 +7,12 @@ class Question(BaseModel):
 
     NUMBER = "Number"
     MULTICHOICE = "MultiChoice"
-<<<<<<< Updated upstream
-=======
     CHECKBOX = "CheckBox"
     DAY_MONTH_YEAR = "DD/MM/YYYY"
     MONTH_YEAR = "MM/YYYY"
     DECIMAL = 'decimal'
     INTEGER = 'integer'
->>>>>>> Stashed changes
+
     DATE = "Date"
     DATE_SUB_TYPES = (
         ("DD/MM/YYYY", "DD/MM/YYYY"),
