@@ -1,12 +1,10 @@
 {% extends 'base/form.html' %}
 {% block display_form_fields %}
-    {% load generic_tags %}
+
     <h3>{{ title }}</h3>
     <hr/>
-    {% include 'base/naked_form.html' with a_form=form %}
-    {% include 'base/_question_options.html' %}
-    {% if form.instance.id and form.instance.is_multichoice %}
 
+<<<<<<< Updated upstream
         <div id="option-choices" class="show">
             <label id="option-choices-label">Options</label>
             {% for options in form.KNOWN_OPTIONS %}
@@ -41,3 +39,25 @@
         </div>
     </script>
 {% endblock %}
+=======
+    <script src="{{ STATIC_URL }}js/lib/angular.min.js" type="text/javascript" charset="utf-8"></script>
+
+    <script  type="text/javascript" charset="utf-8">
+      var x = "{% form.text %}";
+
+      angular.module('questionnaireApp', [])
+        .controller('CreateQuestionController', ['$scope', '$http', function($scope, $http) {
+          $scope.csrfToken = '{{csrf_token}}';
+          $scope.displayText = 'test';
+      }]);
+
+    </script>
+
+    <div data-ng-app="questionnaireApp">
+      <div data-ng-include="'/static/templates/createQuestion.html'"></div>
+    </div>
+
+
+
+{% endblock %}
+>>>>>>> Stashed changes

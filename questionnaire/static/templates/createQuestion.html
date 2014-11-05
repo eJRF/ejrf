@@ -1,0 +1,141 @@
+<form action="" method="post" accept-charset="utf-8" id="id-new-question-form" class="form-horizontal " data-ng-controller="CreateQuestionController">
+  <input type="hidden" name="csrfmiddlewaretoken" value="5jlm11RPZrvyntyGiQbRFMknay11wjM8">
+
+  <p id="id_text_span">
+    <label for="id_text">Display label (Online)</label>
+    <textarea cols="50" id="id_text" data-ng-model="displayText" name="text" rows="6" style="overflow: hidden; word-wrap: break-word; resize: horizontal; height: 126px;"></textarea><label class="error">
+
+    </label>
+  </p>
+
+  <p id="id_export_label_span">
+    <label for="id_export_label">Export label (Detail)</label>
+    <textarea cols="50" id="id_export_label" name="export_label" rows="2" style="overflow: hidden; word-wrap: break-word; resize: horizontal; height: 66px;">Is there a surveillance system in place for rotavirus diarrhoea, in which suspected cases are confirmed by laboratory and surveillance data</textarea> <label class="error">
+
+    </label>
+  </p>
+
+  <p id="id_instructions_span">
+    <label for="id_instructions">Instructions</label>
+    <textarea cols="50" id="id_instructions" name="instructions" rows="6" style="overflow: hidden; word-wrap: break-word; resize: horizontal; height: 34px;"></textarea> <label class="error">
+
+    </label>
+  </p>
+
+  <p id="id_answer_type_span">
+    <label for="id_answer_type">Response Type</label>
+    <select id="id_answer_type" name="answer_type">
+      <option value="">Response type</option>
+      <option value="Date">Date</option>
+      <option value="MultiChoice" selected="selected">MultiChoice</option>
+      <option value="Number">Number</option>
+      <option value="Text">Text</option>
+      <option value="CheckBox">Check Box</option>
+    </select> <label class="error">
+
+    </label>
+  </p>
+
+  <p id="id_answer_sub_type_span" style="display:none;">
+    <label for="id_answer_sub_type">Response sub type</label>
+    <select id="id_answer_sub_type" name="answer_sub_type">
+      <option value="" selected="selected">Select a Sub-Type</option>
+      <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+      <option value="MM/YYYY">MM/YYYY</option>
+      <option value="Decimal">Decimal</option>
+      <option value="Integer">Integer</option>
+    </select> <label class="error">
+
+    </label>
+  </p>
+
+  <p id="id_theme_span">
+    <label for="id_theme">Theme</label>
+    <select id="id_theme" name="theme">
+      <option value="" selected="selected">Select theme</option>
+      <option value="1">default</option>
+    </select> <label class="error">
+
+    </label>
+  </p>
+
+  <p id="id_is_primary_span">
+    <label for="id_is_primary">Is primary</label>
+    <input id="id_is_primary" name="is_primary" type="checkbox"> <label class="error">
+
+    </label>
+  </p>
+
+
+
+  <input id="id_options" name="options" type="hidden">
+
+
+  <div id="option-choices" class="show">
+    <label id="option-choices-label">Options</label>
+    <label class="radio-inline">
+      <input type="radio" id="options-1" value="Yes, No" name="options"> Yes, No
+    </label>
+
+    <label class="radio-inline">
+      <input type="radio" id="options-2" value="Yes, No, NR" name="options"> Yes, No, NR
+    </label>
+
+    <label class="radio-inline">
+      <input type="radio" id="options-3" value="Yes, No, NR, ND" name="options"> Yes, No, NR, ND
+    </label>
+
+    <label class="radio-inline">
+      <input type="radio" id="options-4" value="Male, Female, Both" name="options"> Male, Female, Both
+    </label>
+
+    <label class="radio-inline">
+      <input type="radio" id="options-5" value="Local currency, US $" name="options"> Local currency, US $
+    </label>
+
+    <label class="radio-inline">
+      <input type="radio" id="options-6" value="National, Sub national" name="options"> National, Sub national
+    </label>
+
+    <label class="radio-inline">
+      <input type="radio" id="options-7" value="custom" name="options-custom"> Custom
+    </label>
+  </div>
+
+  <script type="text/template" id="question-option-template">
+    <div class="input-group" id="option-input-group">
+      <label class="option-control-label">Option <span class="number"></span></label>
+      <input type="text" maxlength="100" name="options">
+      <a href="javascript:;" class="input-group-addon btn btn-sm btn-primary add-option"><i
+                                                                                            class="glyphicon glyphicon-plus"></i></a>
+      <a href="javascript:;" class="input-group-addon btn btn-sm  btn-primary remove-option"><i
+                                                                                                class="glyphicon glyphicon-remove"></i></a>
+    </div>
+  </script>
+
+  <script type="text/template" id="date-subtype-template">
+    <select id="id_answer_sub_type" name="answer_sub_type">
+      <option value="" selected="selected">Select a Sub-Type</option>
+      <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+      <option value="MM/YYYY">MM/YYYY</option>
+    </select>
+  </script>
+  <script type="text/template" id="number-subtype-template">
+    <select id="id_answer_sub_type" name="answer_sub_type">
+      <option value="" selected="selected">Select a Sub-Type</option>
+      <option value="Decimal">Decimal</option>
+      <option value="Integer">Integer</option>
+    </select>
+  </script>
+
+  <div class="input-group" id="option-input-group">
+    <label class="option-control-label">Option <span class="number">1</span></label>
+    <input type="text" maxlength="100" name="options">
+    <a href="javascript:;" class="input-group-addon btn btn-sm btn-primary add-option"><i class="glyphicon glyphicon-plus"></i></a>
+    <a href="javascript:;" class="input-group-addon btn btn-sm  btn-primary remove-option"><i class="glyphicon glyphicon-remove"></i></a>
+  </div>
+  <div class="form-actions">
+    <a href="/questions/" type="cancel" class="btn btn-default"> <span class="red bold"><i class="glyphicon glyphicon-remove"></i> CANCEL</span></a>
+    <button type="submit" class="btn btn-default submit"><span class="green bold"><i class="glyphicon glyphicon-floppy-disk"></i> SAVE</span></button>
+  </div>
+</form>

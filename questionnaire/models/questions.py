@@ -7,6 +7,14 @@ class Question(BaseModel):
 
     NUMBER = "Number"
     MULTICHOICE = "MultiChoice"
+<<<<<<< Updated upstream
+=======
+    CHECKBOX = "CheckBox"
+    DAY_MONTH_YEAR = "DD/MM/YYYY"
+    MONTH_YEAR = "MM/YYYY"
+    DECIMAL = 'decimal'
+    INTEGER = 'integer'
+>>>>>>> Stashed changes
     DATE = "Date"
     DATE_SUB_TYPES = (
         ("DD/MM/YYYY", "DD/MM/YYYY"),
@@ -17,6 +25,7 @@ class Question(BaseModel):
         ("MultiChoice", MULTICHOICE),
         ("Number", NUMBER),
         ("Text", "Text"),
+        (CHECKBOX, "Check Box"),
     )
 
     text = models.TextField(blank=False, null=False)
@@ -94,6 +103,9 @@ class Question(BaseModel):
 
     def is_multichoice(self):
         return self.answer_type == self.MULTICHOICE
+
+    def is_checkbox(self):
+        return self.answer_type == self.CHECKBOX
 
     def answered_options(self, question_group, **kwargs):
         all_answers = self.answers.filter(answergroup__grouped_question=question_group, **kwargs).\

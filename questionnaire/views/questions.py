@@ -56,6 +56,7 @@ class CreateQuestion(PermissionRequiredMixin, CreateView):
 
     def post(self, request, *args, **kwargs):
         region = self.request.user.user_profile.region
+        print request.POST
         self.form = QuestionForm(region=region, data=request.POST)
         if self.form.is_valid():
             return self._form_valid()

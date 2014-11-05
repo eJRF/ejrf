@@ -8,6 +8,16 @@ angular.module('questionnaireApp', [])
             return !($scope.skipRule.rootQuestion.pk == question.pk);
         };
 
+<<<<<<< Updated upstream
+=======
+        var updateRules = function(subsectionId){
+            $http.get( "/questionnaire/subsection/" + subsectionId + "/skiprules/").
+                success(function(data, status, headers, config) {
+                $scope.existingRules = data;
+            });
+        };
+
+>>>>>>> Stashed changes
         $scope.updateSkipRuleModal = function(subsectionId) {
             $.get( "/questionnaire/subsection/" + subsectionId + "/questions/", function( data ) {
                 var questions = data.questions;

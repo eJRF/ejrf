@@ -122,7 +122,7 @@ class QuestionForm(ModelForm):
     def _save_options_if_multichoice(self, question):
         options = dict(self.data).get('options', [])
         options = filter(lambda text: text.strip(), options)
-        if options and question.answer_type == Question.MULTICHOICE:
+        if options and (question.answer_type == Question.MULTICHOICE or question.answer_type == Question.CHECKBOX):
             for grouped_option in options:
                 for option in grouped_option.split(','):
                     QuestionOption.objects.get_or_create(text=option.strip(), question=question)

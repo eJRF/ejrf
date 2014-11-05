@@ -1,6 +1,10 @@
+<<<<<<< Updated upstream
 jQuery(function($){
 
 
+=======
+jQuery(function ($) {
+>>>>>>> Stashed changes
     var $form = $("#id-new-question-form"),
         template = $("#question-option-template").html(),
         answerTypeSelect = $('#id_answer_type');
@@ -24,8 +28,16 @@ jQuery(function($){
 
         if($(this).val() == 'MultiChoice'){
             $('#option-choices').addClass('show').removeClass('hide');
+<<<<<<< Updated upstream
         } else if ($(this).val() == 'Date') {
             $("#id_answer_sub_type_span").show();
+=======
+        } else if ($(this).val() == 'Date' || $(this).val() == 'Number') {
+            showResponseSubType($(this).val());
+        } else if ($(this).val() == 'CheckBox') {
+            addQuestionOption($("div.form-actions"));
+            $('input[name=options-custom]')[0].checked = true
+>>>>>>> Stashed changes
         }
     });
 
