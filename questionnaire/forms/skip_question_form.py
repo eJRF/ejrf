@@ -10,6 +10,10 @@ class SkipQuestionRuleForm(forms.ModelForm):
     def _clean_root_question(self):
         root_question = self.cleaned_data.get('root_question', None)
         skip_question = self.cleaned_data.get('skip_question', None)
+        subsection = self.cleaned_data.get('subsection', None)
+
+        if skip_question and root_question and skip_question.is_ordered_after(root_question, subsection):
+            raise ValidationError("Root question must be before skip question")
 
         if self._is_same_question(root_question, skip_question):
             raise ValidationError("Root question cannot be the same as skip question")

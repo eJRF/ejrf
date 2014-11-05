@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import models, IntegrityError
 from questionnaire.models.base import BaseModel
 from questionnaire.utils.model_utils import largest_uid, stringify
@@ -120,6 +121,15 @@ class Question(BaseModel):
     @classmethod
     def next_uid(cls):
         return stringify(largest_uid(cls) + 1)
+
+    def is_ordered_after(self, other, subsection):
+        question_orders = self.orders.filter(question_group__subsection=subsection)
+        other_question_orders = other.orders.filter(question_group__subsection=subsection)
+        if question_orders.exists() and other_question_orders.exists():
+            return question_orders[0].order < other_question_orders[0].order
+        elif not question_orders.exists():
+            raise ValidationError('Both questions should belong to the same subsection')
+        return False
 
 
 class QuestionOption(BaseModel):

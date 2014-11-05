@@ -1,8 +1,13 @@
 from django.db import IntegrityError
+from django.core.exceptions import ValidationError
 from questionnaire.models import Questionnaire, Section, SubSection, Organization, Region, Country, QuestionGroup, \
     NumericalAnswer, Answer, QuestionGroupOrder, AnswerGroup, MultiChoiceAnswer, TextAnswer, DateAnswer
 from questionnaire.models.questions import Question, QuestionOption
 from questionnaire.tests.base_test import BaseTest
+from questionnaire.tests.factories.question_factory import QuestionFactory
+from questionnaire.tests.factories.question_group_factory import QuestionGroupFactory
+from questionnaire.tests.factories.question_option_factory import QuestionOptionFactory
+from questionnaire.tests.factories.sub_section_factory import SubSectionFactory
 
 
 class QuestionTest(BaseTest):
@@ -253,18 +258,50 @@ class QuestionTest(BaseTest):
         self.assertNotIn(option3, answered_options)
 
     def test_answered_options_when_question_is_not_multichoice(self):
-        country = Country.objects.create(name="Kenya")
+        Country.objects.create(name="Kenya")
         question = Question.objects.create(text='what do you drink?', UID='C_2013', answer_type='text', is_primary=True)
-        data={'questionnaire': self.questionnaire, 'country': self.country, 'version': 1}
+        data = {'questionnaire': self.questionnaire, 'country': self.country, 'version': 1}
         text1_answer = TextAnswer.objects.create(response="text1", question=question, **data)
-        text2_answer= TextAnswer.objects.create(response="text2", question=question, **data)
-        text3_answer= TextAnswer.objects.create(response="text3", question=question, **data)
+        text2_answer = TextAnswer.objects.create(response="text2", question=question, **data)
+        TextAnswer.objects.create(response="text3", question=question, **data)
         group = question.question_group.create(order=1, subsection=self.sub_section_1)
         text1_answer.answergroup.create(grouped_question=group, row=1)
         text2_answer.answergroup.create(grouped_question=group, row=1)
         answered_options = question.answered_options(question_group=group, **data)
         self.assertEquals(["text1", "text2"], answered_options)
         self.assertNotIn("text3", answered_options)
+
+class QuestionOrderTest(BaseTest):
+
+    def setUp(self):
+        self.root_question = QuestionFactory()
+        self.question_to_skip = QuestionFactory()
+        self.response = QuestionOptionFactory(question=self.root_question)
+        self.subsection = SubSectionFactory()
+        self.other_subsection = SubSectionFactory()
+        self.question_group = QuestionGroupFactory()
+
+        self.root_question.question_group.add(self.question_group)
+        self.question_to_skip.question_group.add(self.question_group)
+        self.subsection.question_group.add(self.question_group)
+
+    def test_returns_true_if_question_comes_after_another(self):
+        QuestionGroupOrder.objects.create(question=self.root_question, question_group=self.question_group, order=1)
+        QuestionGroupOrder.objects.create(question=self.question_to_skip, question_group=self.question_group, order=2)
+
+        self.assertFalse(self.question_to_skip.is_ordered_after(self.root_question, self.subsection))
+
+    def test_returns_false_if_question_comes_before_another(self):
+        QuestionGroupOrder.objects.create(question=self.root_question, question_group=self.question_group, order=2)
+        QuestionGroupOrder.objects.create(question=self.question_to_skip, question_group=self.question_group, order=1)
+
+        self.assertTrue(self.question_to_skip.is_ordered_after(self.root_question, self.subsection))
+
+    def test_throws_exception_if_question_is_in_another_subsection(self):
+        QuestionGroupOrder.objects.create(question=self.root_question, question_group=self.question_group, order=2)
+        QuestionGroupOrder.objects.create(question=self.question_to_skip, question_group=self.question_group, order=1)
+
+        self.assertRaises(ValidationError, self.question_to_skip.is_ordered_after, self.root_question, self.other_subsection)
 
 
 class QuestionOptionTest(BaseTest):

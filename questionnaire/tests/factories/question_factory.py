@@ -1,6 +1,7 @@
 from questionnaire.models import Question
 import factory
 
+
 class QuestionFactory(factory.DjangoModelFactory):
     class Meta:
         model = Question

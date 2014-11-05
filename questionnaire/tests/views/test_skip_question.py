@@ -1,7 +1,7 @@
 from questionnaire.tests.base_test import BaseTest
 from django.test import Client
 from questionnaire.models import Question, SkipQuestion, QuestionOption, Questionnaire, Section, SubSection, \
-    QuestionGroup
+    QuestionGroup, QuestionGroupOrder
 import json
 from questionnaire.tests.factories.skip_question_rule_factory import SkipQuestionFactory
 
@@ -32,6 +32,8 @@ class SkipQuestionPostTest(BaseTest):
         question_group.question.add(root_question)
         question_group.question.add(skip_question)
         question_group.question.add(self.random_question)
+        QuestionGroupOrder.objects.create(question=root_question, question_group=question_group, order=1)
+        QuestionGroupOrder.objects.create(question=skip_question, question_group=question_group, order=2)
 
         self.subsection_with_only_root_question = subsection3.pk
         question_group2 = QuestionGroup.objects.create(subsection_id=self.subsection_with_only_root_question)

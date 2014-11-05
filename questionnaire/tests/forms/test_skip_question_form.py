@@ -1,5 +1,5 @@
 from questionnaire.forms.skip_question_form import SkipQuestionRuleForm
-from questionnaire.models import SkipQuestion
+from questionnaire.models import SkipQuestion, QuestionGroupOrder
 from questionnaire.tests.base_test import BaseTest
 from questionnaire.tests.factories.question_factory import QuestionFactory
 from questionnaire.tests.factories.question_group_factory import QuestionGroupFactory
@@ -7,7 +7,7 @@ from questionnaire.tests.factories.question_option_factory import QuestionOption
 from questionnaire.tests.factories.sub_section_factory import SubSectionFactory
 
 
-class SkipQuestionFormTest(BaseTest):
+class SkipQuestionRuleFormTest(BaseTest):
 
     def setUp(self):
 
@@ -25,6 +25,9 @@ class SkipQuestionFormTest(BaseTest):
                           'response': self.response.id,
                           'skip_question': self.question_to_skip.id,
                           'subsection': self.subsection.id}
+        QuestionGroupOrder.objects.create(question=self.root_question, question_group=self.question_group, order=1)
+        QuestionGroupOrder.objects.create(question=self.question_to_skip, question_group=self.question_group, order=2)
+
 
     def test_save(self):
         skip_question_form = SkipQuestionRuleForm(data=self.form_data)
@@ -64,6 +67,20 @@ class SkipQuestionFormTest(BaseTest):
 
         data = {'root_question': self.root_question.id,
                 'response': invalid_option.id,
+                'skip_question': self.question_to_skip.id,
+                'subsection': self.subsection.id}
+
+        skip_question_rule_form = SkipQuestionRuleForm(data=data)
+        self.assertFalse(skip_question_rule_form.is_valid())
+
+    def test_is_invalid_if_root_question_order_is_greater_than_skip_question(self):
+        root_question = QuestionFactory()
+        self.question_group.question.add(root_question)
+
+        QuestionGroupOrder.objects.create(question=root_question, question_group=self.question_group, order=3)
+
+        data = {'root_question': root_question.id,
+                'response': self.response.id,
                 'skip_question': self.question_to_skip.id,
                 'subsection': self.subsection.id}
 
