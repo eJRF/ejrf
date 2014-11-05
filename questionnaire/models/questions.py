@@ -125,8 +125,13 @@ class Question(BaseModel):
     def is_ordered_after(self, other, subsection):
         question_orders = self.orders.filter(question_group__subsection=subsection)
         other_question_orders = other.orders.filter(question_group__subsection=subsection)
+        # print other_question_orders.count()
         if question_orders.exists() and other_question_orders.exists():
-            return question_orders[0].order < other_question_orders[0].order
+            # print other_question_orders[0].question_group.__dict__
+            if question_orders[0].question_group == other_question_orders[0].question_group:
+                return question_orders[0].order > other_question_orders[0].order
+            else:
+                return question_orders[0].question_group.order > other_question_orders[0].question_group.order
         elif not question_orders.exists():
             raise ValidationError('Both questions should belong to the same subsection')
         return False

@@ -279,7 +279,7 @@ class QuestionOrderTest(BaseTest):
         self.response = QuestionOptionFactory(question=self.root_question)
         self.subsection = SubSectionFactory()
         self.other_subsection = SubSectionFactory()
-        self.question_group = QuestionGroupFactory()
+        self.question_group = QuestionGroupFactory(order=1)
 
         self.root_question.question_group.add(self.question_group)
         self.question_to_skip.question_group.add(self.question_group)
@@ -289,13 +289,32 @@ class QuestionOrderTest(BaseTest):
         QuestionGroupOrder.objects.create(question=self.root_question, question_group=self.question_group, order=1)
         QuestionGroupOrder.objects.create(question=self.question_to_skip, question_group=self.question_group, order=2)
 
-        self.assertFalse(self.question_to_skip.is_ordered_after(self.root_question, self.subsection))
+        self.assertTrue(self.question_to_skip.is_ordered_after(self.root_question, self.subsection))
 
     def test_returns_false_if_question_comes_before_another(self):
         QuestionGroupOrder.objects.create(question=self.root_question, question_group=self.question_group, order=2)
         QuestionGroupOrder.objects.create(question=self.question_to_skip, question_group=self.question_group, order=1)
 
-        self.assertTrue(self.question_to_skip.is_ordered_after(self.root_question, self.subsection))
+        self.assertFalse(self.question_to_skip.is_ordered_after(self.root_question, self.subsection))
+
+    def test_returns_true_if_question_in_another_group_that_comes_after(self):
+        question_to_skip = QuestionFactory()
+        QuestionGroupOrder.objects.create(question=self.root_question, question_group=self.question_group, order=1)
+        new_group = QuestionGroupFactory(order=5, subsection=self.subsection)
+        new_group.question.add(question_to_skip)
+        QuestionGroupOrder.objects.create(question=question_to_skip, question_group=new_group, order=1)
+
+        self.assertTrue(question_to_skip.is_ordered_after(self.root_question, self.subsection))
+
+    def test_returns_false_if_question_in_another_group_that_comes_before(self):
+        root_question = QuestionFactory()
+        new_group = QuestionGroupFactory(order=5, subsection=self.subsection)
+        new_group.question.add(root_question)
+
+        QuestionGroupOrder.objects.create(question=self.question_to_skip, question_group=self.question_group, order=1)
+        QuestionGroupOrder.objects.create(question=root_question, question_group=new_group, order=1)
+
+        self.assertFalse(self.question_to_skip.is_ordered_after(root_question, self.subsection))
 
     def test_throws_exception_if_question_is_in_another_subsection(self):
         QuestionGroupOrder.objects.create(question=self.root_question, question_group=self.question_group, order=2)

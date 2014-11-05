@@ -19,6 +19,7 @@ class SkipQuestionView(PermissionRequiredMixin, View):
             data = {'result':  'Skip rule created successfully'}
             return HttpResponse(json.dumps(data), content_type="application/json", status=201)
         else:
+            print skip_question_rule_form.errors
             errors_message = skip_question_rule_form.errors.values()
             error_msgs = [error for errors in errors_message for error in errors]
             return self.error_response(error_msgs)

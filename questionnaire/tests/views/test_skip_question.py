@@ -110,7 +110,7 @@ class SkipQuestionPostTest(BaseTest):
     def test_post_skip_question_for_response_one_of_root_questions_options(self):
         self.assertEqual(SkipQuestion.objects.all().count(), 0)
         data = self.form_data
-        data['root_question'] = self.random_question.pk
+        data['response'] = str(int(data['response']) + 10)
         response = self.client.post(self.url, data=data)
         self.assertEqual(400, response.status_code)
 
