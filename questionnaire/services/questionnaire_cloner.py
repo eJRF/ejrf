@@ -1,4 +1,5 @@
 import copy
+
 from questionnaire.models import QuestionGroupOrder, Questionnaire
 from questionnaire.utils.cloner_util import create_copies
 
@@ -62,5 +63,6 @@ class QuestionnaireClonerService(object):
             new_group.question.add(*old_group.all_questions())
             if not old_group.parent:
                 for order in old_group.question_orders():
-                    QuestionGroupOrder.objects.create(order=order.order, question_group=self.question_groups.get(old_group),
+                    QuestionGroupOrder.objects.create(order=order.order,
+                                                      question_group=self.question_groups.get(old_group),
                                                       question=order.question)

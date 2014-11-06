@@ -1,11 +1,10 @@
-from questionnaire.models import Questionnaire, Section, QuestionGroup, Question, SubSection, Answer, MultiChoiceAnswer, NumericalAnswer
+from questionnaire.models import Questionnaire, Section, QuestionGroup, Question, SubSection, Answer, NumericalAnswer
 from questionnaire.models.answers import AnswerStatus, TextAnswer
 from questionnaire.models.locations import Region, Country, Organization
 from questionnaire.tests.base_test import BaseTest
 
 
 class RegionTest(BaseTest):
-
     def test_region_fields(self):
         region = Region()
         fields = [str(item.attname) for item in region._meta.fields]
@@ -23,11 +22,12 @@ class RegionTest(BaseTest):
     def test_region_gets_latest_questionnaire(self):
         region = Region.objects.create(name="Region")
         asean = Region.objects.create(name="ASEAN")
-        questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013, region=region, status=Questionnaire.PUBLISHED)
-        asean_questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013, region=asean, status=Questionnaire.PUBLISHED)
+        questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013, region=region,
+                                                     status=Questionnaire.PUBLISHED)
+        asean_questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013, region=asean,
+                                                           status=Questionnaire.PUBLISHED)
         self.assertEqual(questionnaire, region.latest_questionnaire())
         self.assertEqual(asean_questionnaire, asean.latest_questionnaire())
-
 
 
 class CountryTest(BaseTest):
@@ -36,8 +36,10 @@ class CountryTest(BaseTest):
         self.afro = Region.objects.create(name="Afro", organization=self.organisation)
         self.uganda = Country.objects.create(name="Uganda", code="UGX")
         self.afro.countries.add(self.uganda)
-        self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013, region=self.afro, status=Questionnaire.PUBLISHED)
-        section_1 = Section.objects.create(title="Reported Cases of Selected Vaccine Preventable Diseases (VPDs)", order=1,
+        self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013, region=self.afro,
+                                                          status=Questionnaire.PUBLISHED)
+        section_1 = Section.objects.create(title="Reported Cases of Selected Vaccine Preventable Diseases (VPDs)",
+                                           order=1,
                                            questionnaire=self.questionnaire, name="Reported Cases")
         sub_section = SubSection.objects.create(title="Reported cases for the year 2013", order=1, section=section_1)
         self.question2 = Question.objects.create(text='C. Number of cases positive', UID='C00005', answer_type='Number')
@@ -63,7 +65,8 @@ class CountryTest(BaseTest):
 
     def test_country_knows_answer_status_given_questionnaire(self):
         self.assertEqual(AnswerStatus.options[None], self.uganda.answer_status())
-        answer = NumericalAnswer.objects.create(question=self.question2, country=self.uganda, status=Answer.DRAFT_STATUS,
+        answer = NumericalAnswer.objects.create(question=self.question2, country=self.uganda,
+                                                status=Answer.DRAFT_STATUS,
                                                 response=22)
         self.assertEqual(AnswerStatus.options['Draft'], self.uganda.answer_status())
 
@@ -101,7 +104,8 @@ class CountryTest(BaseTest):
         section_1 = Section.objects.create(title="Cover PAge", order=1,
                                            questionnaire=questionnaire, name="Cover Pages")
         sub_section = SubSection.objects.create(title="Details", order=1, section=section_1)
-        question = Question.objects.create(text='Name of person in Ministry of Health', UID='C00054', answer_type='Number')
+        question = Question.objects.create(text='Name of person in Ministry of Health', UID='C00054',
+                                           answer_type='Number')
         parent = QuestionGroup.objects.create(subsection=sub_section, order=1)
         parent.question.add(question)
 
@@ -109,21 +113,23 @@ class CountryTest(BaseTest):
         afro = Region.objects.create(name="Afro", organization=organisation)
         uganda = Country.objects.create(name="Uganda", code="UGX")
         afro.countries.add(uganda)
-        TextAnswer.objects.create(question=question, response="jacinta",status=Answer.DRAFT_STATUS,country=uganda, questionnaire=questionnaire)
+        TextAnswer.objects.create(question=question, response="jacinta", status=Answer.DRAFT_STATUS, country=uganda,
+                                  questionnaire=questionnaire)
 
         self.assertEqual('jacinta', uganda.data_submitter())
 
     def test_gets_versions_for_a__list_of_questionnaires(self):
-        answer = NumericalAnswer.objects.create(question=self.question2, country=self.uganda, status=Answer.SUBMITTED_STATUS,
-                                       response=22, questionnaire=self.questionnaire)
+        answer = NumericalAnswer.objects.create(question=self.question2, country=self.uganda,
+                                                status=Answer.SUBMITTED_STATUS,
+                                                response=22, questionnaire=self.questionnaire)
         questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013)
         section_1 = Section.objects.create(title="Cover PAge", order=1,
                                            questionnaire=questionnaire, name="Cover Pages")
-        self.assertEqual({self.questionnaire: [answer.version], questionnaire: []}, self.uganda.get_versions_for([self.questionnaire, questionnaire]))
+        self.assertEqual({self.questionnaire: [answer.version], questionnaire: []},
+                         self.uganda.get_versions_for([self.questionnaire, questionnaire]))
 
 
 class OrgTest(BaseTest):
-
     def test_org_fields(self):
         org = Organization()
         fields = [str(item.attname) for item in org._meta.fields]

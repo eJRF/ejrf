@@ -1,9 +1,10 @@
 from model_utils import Choices
 from model_utils.fields import StatusField
-from questionnaire.models.base import BaseModel
 from django.db import models
-from questionnaire.models import Region, Country
 from django.core.urlresolvers import reverse
+
+from questionnaire.models.base import BaseModel
+from questionnaire.models import Region, Country
 
 
 class Questionnaire(BaseModel):
@@ -23,6 +24,7 @@ class Questionnaire(BaseModel):
     def sub_sections(self):
         sections = self.sections.all()
         from questionnaire.models import SubSection
+
         return SubSection.objects.filter(section__in=sections)
 
     def get_all_questions(self):
@@ -63,6 +65,6 @@ class Questionnaire(BaseModel):
 
 
 class CountryQuestionnaireSubmission(BaseModel):
-        country = models.ForeignKey(Country, blank=False, related_name="submissions")
-        questionnaire = models.ForeignKey('Questionnaire', blank=False, related_name="submissions")
-        version = models.IntegerField(blank=False, default=1)
+    country = models.ForeignKey(Country, blank=False, related_name="submissions")
+    questionnaire = models.ForeignKey('Questionnaire', blank=False, related_name="submissions")
+    version = models.IntegerField(blank=False, default=1)

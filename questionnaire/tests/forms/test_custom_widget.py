@@ -1,9 +1,10 @@
+from django.core import serializers
+
 from questionnaire.forms.custom_widgets import MultiChoiceAnswerSelectWidget, MultiChoiceQuestionSelectWidget, \
     SkipRuleSelectWidget, DataRuleRadioFieldRenderer
 from questionnaire.models import Question, QuestionOption, Theme
 from questionnaire.tests.base_test import BaseTest
 from questionnaire.tests.factories.skip_question_rule_factory import SkipQuestionFactory
-from django.core import serializers
 
 
 class MultiChoiceAnswerSelectWidgetTest(BaseTest):
@@ -78,7 +79,6 @@ class SkipRuleSelectWidgetTest(BaseTest):
 
 
 class DataRuleRadioFieldRendererTest(BaseTest):
-
     def test_get_rules_for_option(self):
         question = Question.objects.create(text='what do you drink?', UID='C_2013', answer_type='MultiChoice')
         option1 = QuestionOption.objects.create(text='tusker lager', question=question, instructions="yeah yeah")

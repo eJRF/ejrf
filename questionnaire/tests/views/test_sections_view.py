@@ -56,7 +56,8 @@ class SectionsViewTest(BaseTest):
     def test_permission_required_for_create_section(self):
         self.assert_permission_required(self.url)
 
-        user_not_in_same_region = self.create_user(username="asian_chic", group=self.REGIONAL_ADMIN, region="ASEAN", org="WHO")
+        user_not_in_same_region = self.create_user(username="asian_chic", group=self.REGIONAL_ADMIN, region="ASEAN",
+                                                   org="WHO")
         self.assign('can_edit_questionnaire', user_not_in_same_region)
 
         self.client.logout()
@@ -97,7 +98,8 @@ class EditSectionsViewTest(BaseTest):
                           'questionnaire': self.questionnaire.id}
         self.create_form_data = self.form_data.copy()
         del self.create_form_data['questionnaire']
-        self.section = Section.objects.create(region=self.region, questionnaire=self.questionnaire, **self.create_form_data)
+        self.section = Section.objects.create(region=self.region, questionnaire=self.questionnaire,
+                                              **self.create_form_data)
         self.url = '/section/%d/edit/' % self.section.id
 
     def test_get_edit_section(self):
@@ -124,7 +126,8 @@ class EditSectionsViewTest(BaseTest):
     def test_permission_required_for_create_section(self):
         self.assert_permission_required(self.url)
 
-        user_not_in_same_region = self.create_user(username="asian_chic", group=self.REGIONAL_ADMIN, region="ASEAN", org="WHO")
+        user_not_in_same_region = self.create_user(username="asian_chic", group=self.REGIONAL_ADMIN, region="ASEAN",
+                                                   org="WHO")
         self.assign('can_edit_questionnaire', user_not_in_same_region)
 
         self.client.logout()
@@ -184,7 +187,8 @@ class DeleteSectionsViewTest(BaseTest):
     def test_successful_post_redirect_to_first_section_if_referer_url_is_self(self):
         referer_url = '/questionnaire/entry/%d/section/%d/' % (self.questionnaire.id, self.section.id)
         response = self.client.post(self.url, data={}, HTTP_REFERER=referer_url)
-        self.assertRedirects(response, reverse('questionnaire_entry_page', args=(self.questionnaire.id, self.section_1.id)))
+        self.assertRedirects(response,
+                             reverse('questionnaire_entry_page', args=(self.questionnaire.id, self.section_1.id)))
 
     def test_successful_post_display_success_message(self):
         referer_url = '/questionnaire/entry/%d/section/%d/' % (self.questionnaire.id, self.section_1.id)
@@ -196,7 +200,8 @@ class DeleteSectionsViewTest(BaseTest):
     def test_successful_deletion_of_section_reindexes_section_orders(self):
         referer_url = '/questionnaire/entry/%d/section/%d/' % (self.questionnaire.id, self.section_1.id)
         meta = {'HTTP_REFERER': referer_url}
-        section_3 = Section.objects.create(name="section", questionnaire=self.questionnaire, order=3, region=self.region)
+        section_3 = Section.objects.create(name="section", questionnaire=self.questionnaire, order=3,
+                                           region=self.region)
         Section.objects.create(name="section 2", questionnaire=self.questionnaire, order=4)
         self.client.post('/section/%d/delete/' % section_3.id, data={}, **meta)
         self.assertEqual([0, 1, 2], list(Section.objects.values_list('order', flat=True)))
@@ -245,7 +250,7 @@ class SubSectionsViewTest(BaseTest):
         self.assertEqual(1, subsection.count())
         self.assertIn('Subsection successfully created.', response.cookies['messages'].value)
         self.assertRedirects(response, expected_url='/questionnaire/entry/%s/section/%s/' % (
-        self.questionnaire.id, self.section.id))
+            self.questionnaire.id, self.section.id))
 
     def test_post_with_form_increments_order_before_saving(self):
         SubSection.objects.create(title="Some", order=1, section=self.section)
@@ -257,12 +262,13 @@ class SubSectionsViewTest(BaseTest):
         self.failUnless(subsection)
         self.assertEqual(1, subsection.count())
         self.assertRedirects(response, expected_url='/questionnaire/entry/%s/section/%s/' % (
-        self.questionnaire.id, self.section.id))
+            self.questionnaire.id, self.section.id))
 
     def test_permission_required_for_create_section(self):
         self.assert_permission_required(self.url)
 
-        user_not_in_same_region = self.create_user(username="asian_chic", group=self.REGIONAL_ADMIN, region="ASEAN", org="WHO")
+        user_not_in_same_region = self.create_user(username="asian_chic", group=self.REGIONAL_ADMIN, region="ASEAN",
+                                                   org="WHO")
         self.assign('can_edit_questionnaire', user_not_in_same_region)
 
         self.client.logout()
@@ -357,7 +363,8 @@ class DeleteSubSectionsViewTest(BaseTest):
         self.client.login(username=self.user.username, password='pass')
 
         self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013, region=self.region)
-        self.section = Section.objects.create(name="section", questionnaire=self.questionnaire, order=1, region=self.region)
+        self.section = Section.objects.create(name="section", questionnaire=self.questionnaire, order=1,
+                                              region=self.region)
         self.form_data = {'description': 'First Section',
                           'title': 'Title for First Section',
                           'order': 1,
@@ -384,7 +391,8 @@ class DeleteSubSectionsViewTest(BaseTest):
 
     def test_successful_deletion_reindexes_subsections(self):
         sub_section1 = SubSection.objects.create(title="Cured Cases of Measles 3", order=2, section=self.section)
-        sub_section2 = SubSection.objects.create(title="Cured Cases of Measles 3", order=3, section=self.section, region=self.region)
+        sub_section2 = SubSection.objects.create(title="Cured Cases of Measles 3", order=3, section=self.section,
+                                                 region=self.region)
         sub_section3 = SubSection.objects.create(title="Cured Cases of Measles 3", order=4, section=self.section)
         referer_url = '/questionnaire/entry/%d/section/%d/' % (self.questionnaire.id, self.section.id)
         meta = {'HTTP_REFERER': referer_url}
@@ -403,16 +411,18 @@ class DeleteSubSectionsViewTest(BaseTest):
 
 
 class RegionalSectionsViewTest(BaseTest):
-
     def setUp(self):
         self.client = Client()
         self.user = self.create_user(group=self.REGIONAL_ADMIN, org="WHO", region="AFRO")
         self.region = self.user.user_profile.region
         self.assign('can_edit_questionnaire', self.user)
         self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013, region=self.region)
-        self.section = Section.objects.create(name="section", questionnaire=self.questionnaire, order=1, region=self.region)
-        self.section1 = Section.objects.create(name="section1", questionnaire=self.questionnaire, order=2, region=self.region)
-        self.subsection = SubSection.objects.create(title="subsection 1", section=self.section, order=1, region=self.region)
+        self.section = Section.objects.create(name="section", questionnaire=self.questionnaire, order=1,
+                                              region=self.region)
+        self.section1 = Section.objects.create(name="section1", questionnaire=self.questionnaire, order=2,
+                                               region=self.region)
+        self.subsection = SubSection.objects.create(title="subsection 1", section=self.section, order=1,
+                                                    region=self.region)
         self.user = self.assign('can_edit_questionnaire', self.user)
 
     def test_post_deletes_section_that_belongs_to_your_region(self):
@@ -426,7 +436,8 @@ class RegionalSectionsViewTest(BaseTest):
 
     def test_post_delete_section_spares_section_thats_not_for_your_region(self):
         client = Client()
-        user_not_in_same_region = self.create_user(username="asian_chic", group=self.REGIONAL_ADMIN, region="ASEAN", org="WHO")
+        user_not_in_same_region = self.create_user(username="asian_chic", group=self.REGIONAL_ADMIN, region="ASEAN",
+                                                   org="WHO")
         self.assign('can_edit_questionnaire', user_not_in_same_region)
         client.login(username=user_not_in_same_region.username, password='pass')
 
@@ -442,14 +453,16 @@ class RegionalSectionsViewTest(BaseTest):
 
 
 class RegionalSubSectionsViewTest(BaseTest):
-
     def setUp(self):
         self.user = self.create_user(group=self.REGIONAL_ADMIN, org="WHO", region="AFRO")
         self.region = self.user.user_profile.region
         self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013, region=self.region)
-        self.section = Section.objects.create(name="section", questionnaire=self.questionnaire, order=1, region=self.region)
-        self.section1 = Section.objects.create(name="section1", questionnaire=self.questionnaire, order=2, region=self.region)
-        self.subsection = SubSection.objects.create(title="subsection 1", section=self.section, order=1, region=self.region)
+        self.section = Section.objects.create(name="section", questionnaire=self.questionnaire, order=1,
+                                              region=self.region)
+        self.section1 = Section.objects.create(name="section1", questionnaire=self.questionnaire, order=2,
+                                               region=self.region)
+        self.subsection = SubSection.objects.create(title="subsection 1", section=self.section, order=1,
+                                                    region=self.region)
         self.user = self.assign('can_edit_questionnaire', self.user)
 
     def test_post_deletes_section_that_belongs_to_your_region(self):
@@ -463,7 +476,8 @@ class RegionalSubSectionsViewTest(BaseTest):
 
     def test_post_delete_section_spares_section_thats_not_for_your_region(self):
         client = Client()
-        user_not_in_same_region = self.create_user(username="asian_chic", group=self.REGIONAL_ADMIN, region="ASEAN", org="WHO")
+        user_not_in_same_region = self.create_user(username="asian_chic", group=self.REGIONAL_ADMIN, region="ASEAN",
+                                                   org="WHO")
         self.assign('can_edit_questionnaire', user_not_in_same_region)
         self.assign('can_edit_questionnaire', self.user)
         client.login(username=user_not_in_same_region.username, password='pass')

@@ -4,7 +4,6 @@ from questionnaire.tests.base_test import BaseTest
 
 
 class CoreSectionFormTest(BaseTest):
-
     def setUp(self):
         self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013)
         self.form_data = {'name': 'New section',
@@ -22,7 +21,6 @@ class CoreSectionFormTest(BaseTest):
 
 
 class CoreSubSectionFormTest(BaseTest):
-
     def setUp(self):
         self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013)
         self.section = Section.objects.create(name="section", questionnaire=self.questionnaire, order=1)

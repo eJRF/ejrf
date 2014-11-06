@@ -5,7 +5,8 @@ from django.http import HttpResponseRedirect
 from django.views.generic import CreateView, UpdateView, DeleteView, View
 
 from questionnaire.forms.sections import SectionForm, SubSectionForm
-from questionnaire.mixins import RegionAndPermissionRequiredMixin, DoesNotExistExceptionHandlerMixin, OwnerAndPermissionRequiredMixin
+from questionnaire.mixins import RegionAndPermissionRequiredMixin, DoesNotExistExceptionHandlerMixin, \
+    OwnerAndPermissionRequiredMixin
 from questionnaire.models import Section, SubSection
 from questionnaire.services.question_re_indexer import QuestionReIndexer
 from questionnaire.utils.model_utils import reindex_orders_in
@@ -35,7 +36,7 @@ class NewSection(RegionAndPermissionRequiredMixin, CreateView):
 
     def form_invalid(self, form):
         messages.error(self.request, "Section NOT created. See errors below.")
-        context = {'id':  "new-section-modal",
+        context = {'id': "new-section-modal",
                    'form': form, 'btn_label': "CREATE", }
         return self.render_to_response(context)
 
@@ -60,7 +61,7 @@ class EditSection(OwnerAndPermissionRequiredMixin, UpdateView):
         return super(EditSection, self).form_valid(form)
 
     def form_invalid(self, form):
-        messages.error(self.request, "Section NOT updated. See errors below." )
+        messages.error(self.request, "Section NOT updated. See errors below.")
         return super(EditSection, self).form_invalid(form)
 
 
@@ -120,7 +121,7 @@ class NewSubSection(RegionAndPermissionRequiredMixin, CreateView):
         subsection.order = SubSection.get_next_order(self.section.id)
         subsection.region = self.request.user.user_profile.region
         subsection.save()
-        messages.success(self.request, "Subsection successfully created." )
+        messages.success(self.request, "Subsection successfully created.")
         return HttpResponseRedirect(self.referer_url)
 
 

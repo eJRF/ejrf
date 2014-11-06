@@ -4,6 +4,7 @@ from django.core.urlresolvers import reverse, reverse_lazy
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import CreateView, DeleteView, View, UpdateView
+
 from questionnaire.forms.filter import QuestionFilterForm
 from questionnaire.forms.questions import QuestionForm
 from questionnaire.mixins import DoesNotExistExceptionHandlerMixin, OwnerAndPermissionRequiredMixin

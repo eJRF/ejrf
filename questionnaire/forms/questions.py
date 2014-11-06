@@ -1,7 +1,9 @@
 from django.forms import ModelForm
 from django import forms
 from django.forms.models import model_to_dict
+
 from questionnaire.models import Question, QuestionOption, Questionnaire
+from questionnaire.utils.answer_type import AnswerTypes
 
 
 class QuestionForm(ModelForm):
@@ -11,7 +13,7 @@ class QuestionForm(ModelForm):
                      "Male, Female, Both",
                      "Local currency, US $",
                      "National, Sub national",
-                     ]
+    ]
 
     options = forms.CharField(widget=forms.HiddenInput(), required=False)
 
@@ -53,7 +55,7 @@ class QuestionForm(ModelForm):
         answer_type = self.cleaned_data.get('answer_type', None)
         options = dict(self.data).get('options', [])
         options = [option for option in options if option]
-        if (answer_type and answer_type == Question.MULTICHOICE) and len(options) < 1:
+        if (answer_type and answer_type == AnswerTypes.MULTI_CHOICE) and len(options) < 1:
             message = "MultiChoice questions must have at least one option"
             self._errors['answer_type'] = self.error_class([message])
             del self.cleaned_data['answer_type']
@@ -62,11 +64,11 @@ class QuestionForm(ModelForm):
     def _clean_answer_sub_type(self):
         answer_type = self.cleaned_data.get('answer_type', None)
         answer_sub_type = self.cleaned_data.get('answer_sub_type', None)
-        if answer_type == 'Number' and not Question.NUMBER_SUB_TYPES.__contains__(answer_sub_type):
+        if answer_type == 'Number' and not AnswerTypes.VALID_TYPES[answer_type].__contains__(answer_sub_type):
             message = "This field is required if you select number"
             self._errors['answer_sub_type'] = self.error_class([message])
             del self.cleaned_data['answer_sub_type']
-        if answer_type == 'Date' and not Question.DATE_SUB_TYPES.__contains__(answer_sub_type):
+        if answer_type == 'Date' and not AnswerTypes.VALID_TYPES[answer_type].__contains__(answer_sub_type):
             message = "This field is required if you select date"
             self._errors['answer_sub_type'] = self.error_class([message])
             del self.cleaned_data['answer_sub_type']
@@ -130,7 +132,7 @@ class QuestionForm(ModelForm):
     def _save_options_if_multichoice(self, question):
         options = dict(self.data).get('options', [])
         options = filter(lambda text: text.strip(), options)
-        if options and question.answer_type == Question.MULTICHOICE:
+        if options and question.answer_type == AnswerTypes.MULTI_CHOICE:
             for grouped_option in options:
                 for option in grouped_option.split(','):
                     QuestionOption.objects.get_or_create(text=option.strip(), question=question)

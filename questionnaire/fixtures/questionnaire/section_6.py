@@ -1,5 +1,5 @@
-from django.core import serializers
-from questionnaire.models import Questionnaire, Section, SubSection, Question, QuestionGroup, QuestionOption, QuestionGroupOrder
+from questionnaire.models import Questionnaire, Section, SubSection, Question, QuestionGroup, QuestionOption, \
+    QuestionGroupOrder
 
 questionnaire = Questionnaire.objects.get(name="JRF 2013 Core English", description="From dropbox as given by Rouslan")
 
@@ -41,11 +41,11 @@ parent1.question.add(question2, question1)
 QuestionGroupOrder.objects.create(question=question1, question_group=parent1, order=1)
 QuestionGroupOrder.objects.create(question=question2, question_group=parent1, order=2)
 
-
 sub_section1 = SubSection.objects.create(order=2, section=section_1, title=" ")
-question_1 = Question.objects.create(text="Please explain why these are your official estimates and where they come from",
-                                      export_label='Explanatory comments on official coverage estimates',
-                                     UID='C00073', answer_type='Text', instructions="")
+question_1 = Question.objects.create(
+    text="Please explain why these are your official estimates and where they come from",
+    export_label='Explanatory comments on official coverage estimates',
+    UID='C00073', answer_type='Text', instructions="")
 
 parent2 = QuestionGroup.objects.create(subsection=sub_section1, order=1)
 parent2.question.add(question_1)

@@ -1,14 +1,14 @@
-from questionnaire.models import Country
-
 from django.test import TestCase
+
+from questionnaire.models import Country
 import questionnaire.models
 from questionnaire.models.questionnaires import CountryQuestionnaireSubmission
 
 
 class CountryQuestionnaireSubmissionTest(TestCase):
-
     def setUp(self):
-        self.questionnaire = questionnaire.models.Questionnaire.objects.create(name="JRF 2013 Core English", description="From dropbox as given by Rouslan")
+        self.questionnaire = questionnaire.models.Questionnaire.objects.create(name="JRF 2013 Core English",
+                                                                               description="From dropbox as given by Rouslan")
         self.uganda = Country.objects.create(name='uganda')
 
     def test_answer_fields(self):
@@ -19,6 +19,7 @@ class CountryQuestionnaireSubmissionTest(TestCase):
             self.assertIn(field, fields)
 
     def test_save_submission(self):
-        submission = CountryQuestionnaireSubmission.objects.create(country=self.uganda, questionnaire=self.questionnaire, version=1)
+        submission = CountryQuestionnaireSubmission.objects.create(country=self.uganda,
+                                                                   questionnaire=self.questionnaire, version=1)
         self.assertEqual(submission.country, self.uganda)
         self.assertEqual(submission.questionnaire, self.questionnaire)

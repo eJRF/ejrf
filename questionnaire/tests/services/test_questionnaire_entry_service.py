@@ -1,9 +1,9 @@
-import urllib
-from django.http.request import QueryDict
 from questionnaire.forms.answers import NumericalAnswerForm, TextAnswerForm, DateAnswerForm, MultiChoiceAnswerForm
 from questionnaire.services.questionnaire_entry_form_service import QuestionnaireEntryFormService
-from questionnaire.models import Questionnaire, Section, SubSection, QuestionGroup, Question, QuestionGroupOrder, NumericalAnswer, Answer, AnswerGroup, Country, TextAnswer, QuestionOption, MultiChoiceAnswer, DateAnswer
+from questionnaire.models import Questionnaire, Section, SubSection, QuestionGroup, Question, QuestionGroupOrder, \
+    NumericalAnswer, Answer, AnswerGroup, Country, TextAnswer, QuestionOption, MultiChoiceAnswer, DateAnswer
 from questionnaire.tests.base_test import BaseTest
+from questionnaire.utils.answer_type import AnswerTypes
 
 
 class QuestionnaireEntryAsServiceTest(BaseTest):
@@ -27,11 +27,13 @@ class QuestionnaireEntryAsServiceTest(BaseTest):
                                                  UID='C00002', answer_type='Text')
 
         self.question3 = Question.objects.create(text='question 3', instructions="instruction 3",
-                                                 UID='C00003', answer_type='Number', answer_sub_type=Question.INTEGER)
+                                                 UID='C00003', answer_type='Number',
+                                                 answer_sub_type=AnswerTypes.INTEGER)
 
         self.question4 = Question.objects.create(text='question 4', UID='C00004', answer_type='MultiChoice')
         self.question5 = Question.objects.create(text='question 4', instructions="instruction 2",
-                                                 UID='C00005', answer_type='Number', answer_sub_type=Question.INTEGER)
+                                                 UID='C00005', answer_type='Number',
+                                                 answer_sub_type=AnswerTypes.INTEGER)
 
         self.question6 = Question.objects.create(text='question 6', instructions="instruction 3",
                                                  UID='C00006', answer_type='Date')
@@ -797,7 +799,8 @@ class AllowMultiplesGridEntryServiceTest(BaseTest):
                                                  UID='C00002', answer_type='Text')
 
         self.question3 = Question.objects.create(text='self.question 3 - number', instructions="instruction 3",
-                                                 UID='C00003', answer_type='Number', answer_sub_type=Question.INTEGER)
+                                                 UID='C00003', answer_type='Number',
+                                                 answer_sub_type=AnswerTypes.INTEGER)
 
         self.question4 = Question.objects.create(text='self.question 4 - date', instructions="instruction 2",
                                                  UID='C00005', answer_type='Date')

@@ -1,9 +1,9 @@
-from time import sleep
+from time import sleep, time
 from lettuce import step, world
 from questionnaire.features.pages.questionnaires import QuestionnairePage
 from questionnaire.features.pages.sections import CreateSubSectionPage
 from questionnaire.features.pages.skip_rule_modal import SkipRuleModalPage
-from questionnaire.models import SubSection, Section, Questionnaire, Question
+from questionnaire.models import SubSection, Section, Questionnaire, Question, QuestionGroupOrder
 from questionnaire.tests.factories.question_factory import QuestionFactory
 from questionnaire.tests.factories.question_group_factory import QuestionGroupFactory
 from questionnaire.tests.factories.question_option_factory import QuestionOptionFactory
@@ -102,20 +102,23 @@ def and_i_have_a_questionnaire_in_a_region_with_sections_and_subsections(step):
     world.section4 = Section.objects.create(order=3, title="Core Section",
                                             description="Section 3 description",
                                             questionnaire=world.questionnaire, name="Section 3")
-    world.sub_section = SubSection.objects.create(title="other R subs", order=1, section=world.section_1, region=world.region)
+    world.sub_section = SubSection.objects.create(title="other R subs", order=1, section=world.section_1,
+                                                  region=world.region)
     world.core_sub_section = SubSection.objects.create(title="core subs", order=2, section=world.section_1)
 
 
 @step(u'And I have questions and responses in the correct section')
 def and_i_have_questions_and_responses_in_the_correct_section(step):
     root_question = QuestionFactory()
-    question_to_skip = QuestionFactory()
+    question_to_skip = QuestionFactory(text="question 2")
     response = QuestionOptionFactory(question=root_question)
-    question_group = QuestionGroupFactory(subsection=world.sub_section)
+    question_group = QuestionGroupFactory(subsection=world.sub_section, order=1)
+    QuestionGroupOrder.objects.create(question=root_question, order=1, question_group=question_group)
+    QuestionGroupOrder.objects.create(question=question_to_skip, order=2, question_group=question_group)
 
     root_question.question_group.add(question_group)
     question_to_skip.question_group.add(question_group)
-    world.sub_section.question_group.add(question_group)
+
 
 @step(u'And I click to add a skip rule')
 def and_i_click_to_add_a_skip_rule(step):

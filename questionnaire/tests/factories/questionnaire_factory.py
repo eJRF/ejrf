@@ -1,4 +1,5 @@
 import factory
+
 from questionnaire.models import Questionnaire
 from questionnaire.tests.factories.region_factory import RegionFactory
 

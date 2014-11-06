@@ -1,13 +1,16 @@
 from django import forms
+
 from questionnaire.models import Questionnaire, Region
 from questionnaire.services.questionnaire_cloner import QuestionnaireClonerService
 from questionnaire.utils.form_utils import _set_year_choices
 
 
 class QuestionnaireFilterForm(forms.Form):
-    questionnaire = forms.ModelChoiceField(queryset=Questionnaire.objects.filter(status__in=[Questionnaire.FINALIZED, Questionnaire.PUBLISHED], region=None),
-                                           empty_label="Select Questionnaire",
-                                           widget=forms.Select(attrs={"class": 'form-control'}), required=True)
+    questionnaire = forms.ModelChoiceField(
+        queryset=Questionnaire.objects.filter(status__in=[Questionnaire.FINALIZED, Questionnaire.PUBLISHED],
+                                              region=None),
+        empty_label="Select Questionnaire",
+        widget=forms.Select(attrs={"class": 'form-control'}), required=True)
     year = forms.ChoiceField(widget=forms.Select(attrs={"class": 'form-control'}), required=True, choices=[])
     name = forms.CharField(widget=forms.HiddenInput(), required=True)
 
@@ -29,7 +32,8 @@ class PublishQuestionnaireForm(forms.Form):
     def _set_region_choices(self):
         questionnaire = self.initial.get('questionnaire')
         regions = Region.objects.filter(organization__name="WHO")
-        regions_with_questionnaire = Questionnaire.objects.filter(year=questionnaire.year, region__isnull=False).values_list('region', flat=True)
+        regions_with_questionnaire = Questionnaire.objects.filter(year=questionnaire.year,
+                                                                  region__isnull=False).values_list('region', flat=True)
         return regions.exclude(id__in=regions_with_questionnaire)
 
     def save(self):

@@ -1,4 +1,3 @@
-
 def extra_rows(data, given_key, group_id):
     related_keys = filter(lambda key: same_group_data_keys(key, given_key, data, group_id), data.keys())
     row_numbers = []

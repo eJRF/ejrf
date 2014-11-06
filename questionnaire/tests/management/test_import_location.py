@@ -1,4 +1,5 @@
 import os
+
 from questionnaire.models import Region, Country
 from questionnaire.management.commands.import_location import Command
 from questionnaire.tests.base_test import BaseTest
@@ -29,7 +30,7 @@ class ImportLocationTest(BaseTest):
         self.importer = FakeCommand()
 
     def tearDown(self):
-        os.system("rm -rf %s"%self.filename)
+        os.system("rm -rf %s" % self.filename)
 
     def test_should_create_regions_and_countries(self):
         self.importer.handle(self.filename, 'UNICEF')

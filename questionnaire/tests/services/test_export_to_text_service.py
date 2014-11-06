@@ -3,6 +3,7 @@ from questionnaire.models import Question, QuestionGroup, Questionnaire, SubSect
     QuestionGroupOrder, Theme
 from questionnaire.services.export_data_service import ExportToTextService
 from questionnaire.tests.base_test import BaseTest
+from questionnaire.utils.answer_type import AnswerTypes
 
 
 class ExportToTextServiceTest(BaseTest):
@@ -277,11 +278,12 @@ class GRIDQuestionsExportTest(BaseTest):
         self.option2 = QuestionOption.objects.create(text="TB", question=self.primary_question, UID="QO2")
 
         self.question1 = Question.objects.create(text='B. Number of cases tested', UID='C00004', answer_type='Number',
-                                                 answer_sub_type=Question.INTEGER)
+                                                 answer_sub_type=AnswerTypes.INTEGER)
 
         self.question2 = Question.objects.create(text='C. Number of cases positive',
                                                  instructions="Include only those cases found positive for the infectious agent.",
-                                                 UID='C00005', answer_type='Number', answer_sub_type=Question.INTEGER)
+                                                 UID='C00005', answer_type='Number',
+                                                 answer_sub_type=AnswerTypes.INTEGER)
 
         self.parent = QuestionGroup.objects.create(subsection=self.sub_section, order=1, grid=True, display_all=True)
         self.parent.question.add(self.question1, self.question2, self.primary_question)
@@ -381,9 +383,9 @@ class MultipleQuestionnaireFilterAndExportToTextServiceTest(BaseTest):
         sub_section = SubSection.objects.create(title="sun section one", order=1, section=section_1)
 
         question1 = Question.objects.create(text='B. Number of cases tested', UID='C5' + str(year),
-                                            answer_type='Number', theme=theme, answer_sub_type=Question.INTEGER)
+                                            answer_type='Number', theme=theme, answer_sub_type=AnswerTypes.INTEGER)
         question2 = Question.objects.create(text='C. Number of cases positive', UID='C6' + str(year),
-                                            answer_type='Number', theme=theme, answer_sub_type=Question.INTEGER)
+                                            answer_type='Number', theme=theme, answer_sub_type=AnswerTypes.INTEGER)
         question3 = Question.objects.create(text='primary_question', UID='C4' + str(year), answer_type='MultiChoice',
                                             is_primary=True, theme=theme)
         option = QuestionOption.objects.create(text="Measles", question=question3, UID="Q3" + str(year))
@@ -428,7 +430,7 @@ class MultipleQuestionnaireFilterAndExportToTextServiceTest(BaseTest):
         if question == primary_question:
             answer_id = "C_%s_%s_%s" % (primary_question.UID, question.UID, response.UID)
         expected_data.append(self.line_format % (
-        country.code, country.name, year, answer_id.encode('base64').strip(), question_text, str(response)))
+            country.code, country.name, year, answer_id.encode('base64').strip(), question_text, str(response)))
 
     def test_export_questions_and_answers_for_two_questionnaires(self):
         expected_data = [self.headings]

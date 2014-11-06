@@ -1,17 +1,20 @@
 import json
+
 from django.http import HttpResponse
 from django.views.generic import View
-from questionnaire.models import SubSection, Questionnaire, Question, QuestionGroup, QuestionOption
 from django.core import serializers
-import logging
 from braces.views import PermissionRequiredMixin
+
+from questionnaire.models import QuestionGroup
+
 
 class SubsectionQuestions(PermissionRequiredMixin, View):
     permission_required = 'auth.can_view_questionnaire'
 
     def get(self, request, *args, **kwargs):
-        subsection_id=kwargs['subsection_id']
-        question_group = QuestionGroup.objects.select_related('question').filter(subsection_id=subsection_id, grid=False)
+        subsection_id = kwargs['subsection_id']
+        question_group = QuestionGroup.objects.select_related('question').filter(subsection_id=subsection_id,
+                                                                                 grid=False)
         question_group_list = map(lambda qg: list(qg.question.all()), list(question_group))
         questions = []
         for qg in question_group_list:
@@ -24,5 +27,5 @@ class SubsectionQuestions(PermissionRequiredMixin, View):
 
         data = {}
         data['questions'] = questions
-        
-        return HttpResponse(json.dumps(data), content_type = "application/json")
+
+        return HttpResponse(json.dumps(data), content_type="application/json")

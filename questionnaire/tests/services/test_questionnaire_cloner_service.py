@@ -1,19 +1,24 @@
-from questionnaire.models import Question, QuestionGroup, Questionnaire, SubSection, Section, QuestionOption, QuestionGroupOrder
+from questionnaire.models import Question, QuestionGroup, Questionnaire, SubSection, Section, QuestionOption, \
+    QuestionGroupOrder
 from questionnaire.services.questionnaire_cloner import QuestionnaireClonerService
 from questionnaire.tests.base_test import BaseTest
 
 
 class QuestionnaireClonerServiceTest(BaseTest):
-
     def setUp(self):
-        self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", description="From dropbox as given by Rouslan", year=2013, status=Questionnaire.FINALIZED)
-        self.section_1 = Section.objects.create(title="Reported Cases of Selected Vaccine Preventable Diseases (VPDs)", order=1,
-                                                      questionnaire=self.questionnaire, name="Reported Cases")
+        self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English",
+                                                          description="From dropbox as given by Rouslan", year=2013,
+                                                          status=Questionnaire.FINALIZED)
+        self.section_1 = Section.objects.create(title="Reported Cases of Selected Vaccine Preventable Diseases (VPDs)",
+                                                order=1,
+                                                questionnaire=self.questionnaire, name="Reported Cases")
         self.section_2 = Section.objects.create(title="Cured Cases of Measles", order=1,
                                                 questionnaire=self.questionnaire, name="Cured Cases")
 
-        self.sub_section1 = SubSection.objects.create(title="Reported cases for the year 2013", order=1, section=self.section_1)
-        self.sub_section2 = SubSection.objects.create(title="Reported cases for the year", order=2, section=self.section_1)
+        self.sub_section1 = SubSection.objects.create(title="Reported cases for the year 2013", order=1,
+                                                      section=self.section_1)
+        self.sub_section2 = SubSection.objects.create(title="Reported cases for the year", order=2,
+                                                      section=self.section_1)
         self.sub_section3 = SubSection.objects.create(title="Reported cures 2014", order=1, section=self.section_2)
         self.sub_section4 = SubSection.objects.create(title="Reported cures", order=2, section=self.section_2)
         self.primary_question = Question.objects.create(text='Disease', UID='C00003', answer_type='MultiChoice',
@@ -102,14 +107,16 @@ class QuestionnaireClonerServiceTest(BaseTest):
         for section in old_sections:
             subsections = section.sub_sections.all()
             for subsection in subsections:
-                for group_values in subsection.all_question_groups().values('name', 'instructions', 'parent', 'order', 'allow_multiples'):
+                for group_values in subsection.all_question_groups().values('name', 'instructions', 'parent', 'order',
+                                                                            'allow_multiples'):
                     self.assertEqual(10, QuestionGroup.objects.filter(**group_values).count())
 
         new_sections = new.sections.all()
         for section in new_sections:
             subsections = section.sub_sections.all()
             for subsection in subsections:
-                for group_values in subsection.all_question_groups().values('name', 'instructions', 'parent', 'order', 'allow_multiples'):
+                for group_values in subsection.all_question_groups().values('name', 'instructions', 'parent', 'order',
+                                                                            'allow_multiples'):
                     self.assertEqual(10, QuestionGroup.objects.filter(**group_values).count())
 
     def test_clones_sub_groups_of_groups_from_questionnaire(self):
@@ -121,18 +128,22 @@ class QuestionnaireClonerServiceTest(BaseTest):
         self.assertEqual(12, QuestionGroup.objects.all().count())
         new, old = QuestionnaireClonerService(self.questionnaire).clone()
         self.assertEqual(24, QuestionGroup.objects.all().count())
-        self.assertEqual(2, QuestionGroup.objects.filter(subsection=self.sub_section1, parent__in=[self.parent10, self.parent12]).count())
+        self.assertEqual(2, QuestionGroup.objects.filter(subsection=self.sub_section1,
+                                                         parent__in=[self.parent10, self.parent12]).count())
         self.assertEqual(12, len(old.all_groups()))
         self.assertIn(sub_group1, old.all_groups())
         self.assertIn(sub_group2, old.all_groups())
         self.assertEqual(12, len(new.all_groups()))
         self.assertNotIn(sub_group1, new.all_groups())
         self.assertNotIn(sub_group2, new.all_groups())
-        self.assertEqual(2, QuestionGroup.objects.filter(subsection__section__in=new.sections.all(), parent__isnull=False).count())
+        self.assertEqual(2, QuestionGroup.objects.filter(subsection__section__in=new.sections.all(),
+                                                         parent__isnull=False).count())
 
     def test_clones_questions_in_the_questionnaire_with_their_order_objects(self):
-        question3 = Question.objects.create(text='B. Number of cases tested', UID=Question.next_uid(), answer_type='Number')
-        question4 = Question.objects.create(text='C. Number of cases positive', UID=Question.next_uid(), answer_type='Number')
+        question3 = Question.objects.create(text='B. Number of cases tested', UID=Question.next_uid(),
+                                            answer_type='Number')
+        question4 = Question.objects.create(text='C. Number of cases positive', UID=Question.next_uid(),
+                                            answer_type='Number')
         QuestionGroupOrder.objects.create(order=1, question_group=self.parent10, question=self.primary_question)
         QuestionGroupOrder.objects.create(order=2, question_group=self.parent10, question=self.question1)
         QuestionGroupOrder.objects.create(order=3, question_group=self.parent10, question=self.question2)

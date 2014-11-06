@@ -7,7 +7,7 @@ def export_id(primary_answer):
         return ''
     primary_answer = primary_answer[0]
     if hasattr(primary_answer.response, 'UID'):
-        return '_%s'% primary_answer.response.UID
+        return '_%s' % primary_answer.response.UID
     return ''
 
 

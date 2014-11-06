@@ -1,5 +1,6 @@
-from questionnaire.models import SkipQuestion
 import factory
+
+from questionnaire.models import SkipQuestion
 from questionnaire.tests.factories.question_factory import QuestionFactory
 from questionnaire.tests.factories.question_option_factory import QuestionOptionFactory
 from questionnaire.tests.factories.sub_section_factory import SubSectionFactory

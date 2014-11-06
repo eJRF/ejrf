@@ -4,7 +4,6 @@ from questionnaire.tests.base_test import BaseTest
 
 
 class CoreSectionFormTest(BaseTest):
-
     def setUp(self):
         self.form_data = {'name': 'New theme',
                           'description': 'funny theme'}

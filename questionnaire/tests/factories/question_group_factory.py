@@ -1,6 +1,7 @@
+import factory
+
 from questionnaire.models import QuestionGroup
 from questionnaire.tests.factories.sub_section_factory import SubSectionFactory
-import factory
 
 
 class QuestionGroupFactory(factory.DjangoModelFactory):

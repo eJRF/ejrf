@@ -47,7 +47,8 @@ class ExportToTextView(LoginRequiredMixin, TemplateView):
 
         formatted_responses = export_service.get_formatted_responses()
         response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="%s-%s.txt"' % ('data', '_'.join(years) or self.ALL_QUESTIONNAIRES)
+        response['Content-Disposition'] = 'attachment; filename="%s-%s.txt"' % (
+        'data', '_'.join(years) or self.ALL_QUESTIONNAIRES)
         response.write("\r\n".join(formatted_responses))
         return response
 
@@ -57,7 +58,8 @@ class SpecificExportView(LoginRequiredMixin, TemplateView):
 
     def post(self, *args, **kwargs):
         country = Country.objects.get(id=kwargs['country_id'])
-        questionnaire = Questionnaire.objects.filter(region__countries=country, status=Questionnaire.PUBLISHED).latest('modified')
+        questionnaire = Questionnaire.objects.filter(region__countries=country, status=Questionnaire.PUBLISHED).latest(
+            'modified')
         version = kwargs.get('version_number', None)
         export_service = ExportToTextService([questionnaire], countries=[country], version=version)
         formatted_responses = export_service.get_formatted_responses()
@@ -69,7 +71,6 @@ class SpecificExportView(LoginRequiredMixin, TemplateView):
 
 
 class ExportSectionPDF(LoginRequiredMixin, View):
-
     def get(self, *args, **kwargs):
         session_id = self.request.COOKIES['sessionid']
         file_name = 'eJRF_export_%s.pdf' % str(time.time())
@@ -90,7 +91,6 @@ class ExportSectionPDF(LoginRequiredMixin, View):
 
 
 class DownloadSectionPDF(LoginRequiredMixin, View):
-
     def get(self, *args, **kwargs):
         filename = kwargs.get('filename', '')
         return_file = File(open('export/' + filename, 'r'))

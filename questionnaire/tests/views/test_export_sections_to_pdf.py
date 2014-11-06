@@ -5,6 +5,7 @@ import time
 
 from django.test import Client
 from mock import patch
+
 from questionnaire.models import Questionnaire, Section
 from questionnaire.tests.base_test import BaseTest
 
@@ -22,7 +23,7 @@ class ExportSectionToPDFViewTest(BaseTest):
                                                 questionnaire=self.questionnaire, name="Reported Cases")
 
     def test_get(self):
-        meta ={'HTTP_REFERER': 'http://', 'HTTP_HOST': 'somehost'}
+        meta = {'HTTP_REFERER': 'http://', 'HTTP_HOST': 'somehost'}
 
         mock_time = '123'
         with patch.object(time, 'time', return_value=mock_time):
@@ -39,7 +40,7 @@ class ExportSectionToPDFViewTest(BaseTest):
         self.assertTrue(file_name, content['filename'])
 
         session_id = response.client.cookies['sessionid'].value
-        url = (meta['HTTP_REFERER'] +'?printable=1')
+        url = (meta['HTTP_REFERER'] + '?printable=1')
         domain = meta['HTTP_HOST']
         phantomjs_script = 'questionnaire/static/js/export-section.js'
         command = ["phantomjs", phantomjs_script, url, export_file_name, session_id, domain, "&> /dev/null &"]
@@ -62,7 +63,7 @@ class DownloadSectionPDFViewTest(BaseTest):
 
         response = self.client.get('/export-section/%s' % filename)
         self.assertEqual('attachment; filename=%s' % filename, response.get('Content-Disposition'))
-        self.assertFalse(os.path.isfile('export/'+filename))
+        self.assertFalse(os.path.isfile('export/' + filename))
 
     def test_login_required(self):
         self.assert_login_required('/export-section/hahaha.pdf')

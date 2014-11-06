@@ -1,7 +1,9 @@
 from django import template
 from django.core.urlresolvers import reverse
+
 from questionnaire.forms.questions import QuestionForm
 from questionnaire.forms.theme import ThemeForm
+
 
 ASSIGN_QUESTION_PAGINATION_SIZE = 30
 
@@ -31,8 +33,9 @@ def get_url_with_ids(args, url_name):
 
 @register.filter
 def divide_to_paginate(questions):
-    size_of_paginated = 1 + len(questions)/ASSIGN_QUESTION_PAGINATION_SIZE
-    paginated = [questions[i * ASSIGN_QUESTION_PAGINATION_SIZE:(i+1) * ASSIGN_QUESTION_PAGINATION_SIZE] for i in range(size_of_paginated)]
+    size_of_paginated = 1 + len(questions) / ASSIGN_QUESTION_PAGINATION_SIZE
+    paginated = [questions[i * ASSIGN_QUESTION_PAGINATION_SIZE:(i + 1) * ASSIGN_QUESTION_PAGINATION_SIZE] for i in
+                 range(size_of_paginated)]
     return paginated
 
 
@@ -52,11 +55,13 @@ def bootstrap_class(status):
     css_class_status_map = {'Submitted': 'text-success', 'In Progress': 'text-warning', 'Not Started': 'text-danger'}
     return css_class_status_map[status]
 
+
 @register.filter
 def packaged_options(question, packaged_opts):
     question_options = question.options.values_list('text', flat=True)
     if packaged_opts == ", ".join(question_options):
         return 'checked'
+
 
 @register.filter
 def custom_options(question):

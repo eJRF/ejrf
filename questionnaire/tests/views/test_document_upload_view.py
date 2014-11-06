@@ -1,11 +1,12 @@
 import os
 from urllib import quote
+
 from django.core.files import File
 from django.core.urlresolvers import reverse
 from django.test import Client
 from mock import mock_open, patch
-from questionnaire.forms.support_documents import SupportDocumentUploadForm
 
+from questionnaire.forms.support_documents import SupportDocumentUploadForm
 from questionnaire.tests.base_test import BaseTest
 from questionnaire.models import Questionnaire, Country, SupportDocument, Section
 
@@ -32,7 +33,7 @@ class UploadSupportDocumentTest(BaseTest):
                 document.write("Some stuff")
             self.document = open(self.filename, 'rb')
 
-        self.url = '/questionnaire/entry/%d/documents/upload/'%self.questionnaire.id
+        self.url = '/questionnaire/entry/%d/documents/upload/' % self.questionnaire.id
 
     def test_get_upload_view(self):
         response = self.client.get(self.url)
@@ -47,15 +48,16 @@ class UploadSupportDocumentTest(BaseTest):
         self.assertEqual(self.section2, ordered_sections[1])
         self.assertIsInstance(response.context['upload_form'], SupportDocumentUploadForm)
         self.assertIsNotNone(response.context['preview'])
-        self.assertEqual(reverse("new_section_page", args=(self.questionnaire.id,)), response.context['new_section_action'])
+        self.assertEqual(reverse("new_section_page", args=(self.questionnaire.id,)),
+                         response.context['new_section_action'])
         self.assertEqual(reverse('upload_document', args=(self.questionnaire.id,)), response.context['action'])
 
     def test_upload_view_has_all_document_for_questionnaire(self):
         document_in = SupportDocument.objects.create(path=File(self.document), country=self.uganda,
-                                                   questionnaire=self.questionnaire)
+                                                     questionnaire=self.questionnaire)
         questionnaire_2 = Questionnaire.objects.create(name="haha", year=2013)
         document_not_in = SupportDocument.objects.create(path=File(self.document), country=self.uganda,
-                                                   questionnaire=questionnaire_2)
+                                                         questionnaire=questionnaire_2)
 
         response = self.client.get(self.url)
         self.assertEqual(200, response.status_code)
@@ -83,7 +85,8 @@ class UploadSupportDocumentTest(BaseTest):
         uganda = Country.objects.create(name="Uganda")
         questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013)
 
-        _document = SupportDocument.objects.create(path=File(self.document), country=uganda, questionnaire=questionnaire)
+        _document = SupportDocument.objects.create(path=File(self.document), country=uganda,
+                                                   questionnaire=questionnaire)
         url = '/questionnaire/entry/%s/documents/%s/download/' % (questionnaire.id, _document.id)
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
@@ -111,7 +114,8 @@ class UploadSupportDocumentTest(BaseTest):
         url = '/questionnaire/document/%s/delete/' % _document.id
         self.assert_permission_required(url)
 
-        user_not_in_same_region = self.create_user(username="asian_chic", group=self.REGIONAL_ADMIN, region="ASEAN", org="WHO")
+        user_not_in_same_region = self.create_user(username="asian_chic", group=self.REGIONAL_ADMIN, region="ASEAN",
+                                                   org="WHO")
         self.assign('can_edit_questionnaire', user_not_in_same_region)
 
         self.client.logout()
@@ -126,8 +130,10 @@ class UploadSupportDocumentTest(BaseTest):
                 document.write("Some stuff")
             kenya_document = open(self.kenyan_filename, 'rb')
         kenya = Country.objects.create(name="Kenya")
-        kenya_document = SupportDocument.objects.create(path=File(kenya_document), country=kenya, questionnaire=self.questionnaire)
-        uganda_document = SupportDocument.objects.create(path=File(self.document), country=self.uganda, questionnaire=self.questionnaire)
+        kenya_document = SupportDocument.objects.create(path=File(kenya_document), country=kenya,
+                                                        questionnaire=self.questionnaire)
+        uganda_document = SupportDocument.objects.create(path=File(self.document), country=self.uganda,
+                                                         questionnaire=self.questionnaire)
 
         response = self.client.get(self.url)
 

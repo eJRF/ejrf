@@ -3,8 +3,9 @@ from django.forms.widgets import RadioFieldRenderer
 from django.utils.encoding import force_text
 from django.utils.html import format_html, format_html_join
 from django.utils.safestring import mark_safe
-from questionnaire.models import Question, QuestionOption
 from django.core import serializers
+
+from questionnaire.models import Question, QuestionOption
 
 
 class MultiChoiceAnswerSelectWidget(forms.Select):

@@ -1,5 +1,6 @@
-from questionnaire.models.base import BaseModel
 from django.db import models
+
+from questionnaire.models.base import BaseModel
 from questionnaire.utils.model_utils import map_question_type_with
 
 

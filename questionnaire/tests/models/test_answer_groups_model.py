@@ -5,7 +5,8 @@ from questionnaire.tests.base_test import BaseTest
 
 class GroupedAnswerTest(BaseTest):
     def setUp(self):
-        self.question = Question.objects.create(text='Uganda Revision 2014 what what?', UID='abc123', answer_type='Text')
+        self.question = Question.objects.create(text='Uganda Revision 2014 what what?', UID='abc123',
+                                                answer_type='Text')
         self.questionnaire = Questionnaire.objects.create(name="Uganda Revision 2014", description="some description")
         self.section = Section.objects.create(title="Immunisation Coverage", order=1, questionnaire=self.questionnaire)
         self.sub_section = SubSection.objects.create(title="Immunisation Extra Coverage", order=1, section=self.section)

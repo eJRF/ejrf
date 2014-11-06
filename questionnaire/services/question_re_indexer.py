@@ -1,4 +1,5 @@
 import copy
+
 from questionnaire.models import QuestionGroupOrder, QuestionGroup
 
 
@@ -30,11 +31,12 @@ class QuestionReIndexer(object):
     def get_old_orders(self):
         orders = {}
         for posted_order_values in dict(self.cleaned_data).values():
-            orders.update({QuestionGroupOrder.objects.get(id=posted_order_values[self.OLD_ORDER_ID_INDEX]): posted_order_values})
+            orders.update(
+                {QuestionGroupOrder.objects.get(id=posted_order_values[self.OLD_ORDER_ID_INDEX]): posted_order_values})
         return orders
 
     def clean_data_posted(self):
-        data  = copy.deepcopy(self.data)
+        data = copy.deepcopy(self.data)
         clean_keys = filter(lambda key: self.is_allowed(key), data.keys())
         cleaned_data = (dict((key, self.clean_values(value)) for key, value in data.iteritems() if key in clean_keys))
         return cleaned_data

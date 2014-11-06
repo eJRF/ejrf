@@ -1,10 +1,12 @@
 from django.forms import Select
+
 from questionnaire.forms.answers import NumericalAnswerForm, TextAnswerForm, DateAnswerForm, MultiChoiceAnswerForm
 from questionnaire.forms.custom_widgets import MultiChoiceAnswerSelectWidget
 from questionnaire.models import Question, Country, QuestionOption, QuestionGroup, Section, Questionnaire, SubSection, \
     MultiChoiceAnswer
 from questionnaire.tests.base_test import BaseTest
 from questionnaire.tests.factories.question_factory import QuestionFactory
+from questionnaire.utils.answer_type import AnswerTypes
 
 
 class NumericalAnswerFormTest(BaseTest):
@@ -12,7 +14,7 @@ class NumericalAnswerFormTest(BaseTest):
         self.country = Country.objects.create(name="Peru")
         self.question = Question.objects.create(text='C. Number of cases positive',
                                                 instructions="Include only those cases found ...",
-                                                UID='C00001', answer_type='Number', answer_sub_type=Question.INTEGER)
+                                                UID='C00001', answer_type='Number', answer_sub_type=AnswerTypes.INTEGER)
 
         self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English",
                                                           description="From dropbox as given by Rouslan")
@@ -60,7 +62,7 @@ class NumericalAnswerFormTest(BaseTest):
         self.assertEqual([message], answer_form.errors['response'])
 
     def test_integer_response_is_valid_if_question_answer_subtype_is_decimal(self):
-        question = QuestionFactory(answer_type=Question.NUMBER, answer_sub_type=Question.DECIMAL)
+        question = QuestionFactory(answer_type=AnswerTypes.NUMBER, answer_sub_type=AnswerTypes.DECIMAL)
         form_data = self.form_data.copy()
         form_data['response'] = 33
         initial = self.initial.copy()

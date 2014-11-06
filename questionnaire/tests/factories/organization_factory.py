@@ -1,5 +1,7 @@
-from questionnaire.models import Organization
 import factory
+
+from questionnaire.models import Organization
+
 
 class OrganizationFactory(factory.DjangoModelFactory):
     class Meta:

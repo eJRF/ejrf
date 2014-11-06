@@ -1,7 +1,9 @@
 from model_utils.managers import InheritanceManager
 from django.db import models
+
 from questionnaire.models.questions import Question, QuestionOption
 from questionnaire.models.base import BaseModel
+from questionnaire.utils.answer_type import AnswerTypes
 
 
 class Answer(BaseModel):
@@ -43,7 +45,7 @@ class NumericalAnswer(Answer):
         return self.response
 
     def _answer_sub_type_is_integer(self):
-        return self.response and self.question.answer_sub_type and self.question.answer_sub_type.lower() == Question.INTEGER.lower()
+        return self.response and self.question.answer_sub_type and self.question.answer_sub_type.lower() == AnswerTypes.INTEGER.lower()
 
 
 class TextAnswer(Answer):

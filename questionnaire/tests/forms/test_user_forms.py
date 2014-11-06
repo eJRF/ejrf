@@ -1,4 +1,5 @@
-from django.contrib.auth.models import User, Group, Permission
+from django.contrib.auth.models import User, Group
+
 from questionnaire.forms.user_profile import UserProfileForm, EditUserProfileForm
 from questionnaire.models import Country, Region, UserProfile, Organization
 from questionnaire.tests.base_test import BaseTest

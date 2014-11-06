@@ -23,7 +23,8 @@ ANSWER_FORM = {'Number': NumericalAnswerForm,
                'Text': TextAnswerForm,
                'Date': DateAnswerForm,
                'MultiChoice': MultiChoiceAnswerForm,
-               }
+}
+
 
 class Entry(DoesNotExistExceptionHandlerMixin, AdvancedMultiplePermissionsRequiredMixin, FormView):
     template_name = 'questionnaires/entry/index.html'
@@ -59,7 +60,7 @@ class Entry(DoesNotExistExceptionHandlerMixin, AdvancedMultiplePermissionsRequir
                    'the_version': version or get_version,
                    'country': country,
                    'documents': self.user_questionnaire_service.attachments()}
-        #slow in some instances take 1.5 secs
+        # slow in some instances take 1.5 secs
         return self.render_to_response(context)
 
     def _check_preview_mode(self, questionnaire):

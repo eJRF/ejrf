@@ -1,6 +1,8 @@
 from django import forms
+
 from questionnaire.forms.custom_widgets import MultiChoiceQuestionSelectWidget
 from questionnaire.models import Question
+
 
 GRID_TYPES = (('', 'Choose One'),
               ('display_all', 'Display All'),
@@ -10,7 +12,8 @@ GRID_TYPES = (('', 'Choose One'),
 
 class GridForm(forms.Form):
     type = forms.ChoiceField(choices=GRID_TYPES)
-    primary_question = forms.ModelChoiceField(queryset=None, empty_label='Choose One',widget=MultiChoiceQuestionSelectWidget())
+    primary_question = forms.ModelChoiceField(queryset=None, empty_label='Choose One',
+                                              widget=MultiChoiceQuestionSelectWidget())
     columns = forms.ModelMultipleChoiceField(queryset=None, widget=forms.SelectMultiple(attrs={'class': 'hide'}))
     subgroup = forms.ModelMultipleChoiceField(queryset=None, widget=forms.SelectMultiple(attrs={'class': 'hide'}),
                                               required=False)
@@ -86,7 +89,7 @@ class GridForm(forms.Form):
 
     def _get_grid_attributes(self):
         order = self.subsection.next_group_order() if self.subsection else 0
-        attributes ={'order': order, 'subsection': self.subsection, 'grid': True}
+        attributes = {'order': order, 'subsection': self.subsection, 'grid': True}
         type_ = self.cleaned_data.get('type')
         attributes[type_] = True
         if type_ == 'hybrid':
@@ -98,4 +101,4 @@ class GridForm(forms.Form):
         question_ids = self.data.getlist('columns') if hasattr(self.data, 'getlist') else self.data.get('columns')
         for index, question_id in enumerate(question_ids):
             question = filter(lambda question: question.id == int(question_id), non_primary_questions)
-            grid_group.orders.create(order=index+1, question=question[0])
+            grid_group.orders.create(order=index + 1, question=question[0])

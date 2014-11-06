@@ -1,4 +1,5 @@
 from django.db import models
+
 from questionnaire.models import Answer
 from questionnaire.models.answers import AnswerStatus
 from questionnaire.models.base import BaseModel
@@ -28,6 +29,7 @@ class Region(Location):
 
     def latest_questionnaire(self):
         from questionnaire.models import Questionnaire
+
         return self.questionnaire.filter(status=Questionnaire.PUBLISHED).latest('modified')
 
 
@@ -43,12 +45,15 @@ class Country(Location):
 
     def data_submitter(self):
         data_submitter_name_question = "Name of person in Ministry of Health"
-        submitter_answer = Answer.objects.filter(country=self, question__text__contains=data_submitter_name_question).latest('modified')
+        submitter_answer = Answer.objects.filter(country=self,
+                                                 question__text__contains=data_submitter_name_question).latest(
+            'modified')
         if submitter_answer:
             return submitter_answer.textanswer.response
 
     def all_versions(self, questionnaire=None):
         from questionnaire.models import Questionnaire
+
         query_params = {'questionnaire__region__countries': self,
                         'questionnaire__status': 'published'}
         all_answers = Answer.objects.select_subclasses()
@@ -57,7 +62,9 @@ class Country(Location):
             answers = all_answers.filter(country=self, questionnaire=questionnaire, status=Answer.SUBMITTED_STATUS)
             return {questionnaire: list(set(answers.values_list('version', flat=True)))}
         questionnaire = Questionnaire.objects.filter(region__countries=self, status='published').latest('modified')
-        return list(set(answers.filter(questionnaire=questionnaire, status=Answer.SUBMITTED_STATUS).values_list('version', flat=True)))
+        return list(set(
+            answers.filter(questionnaire=questionnaire, status=Answer.SUBMITTED_STATUS).values_list('version',
+                                                                                                    flat=True)))
 
     def get_versions_for(self, questionnaires):
         questionnaire_version_map = {}

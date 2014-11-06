@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.views.generic import ListView, CreateView, UpdateView
+
 from questionnaire.forms.filter import UserFilterForm
 from questionnaire.forms.user_profile import UserProfileForm, EditUserProfileForm
 from questionnaire.models import Organization, Region, Country
@@ -42,7 +43,8 @@ class UsersList(PermissionRequiredMixin, ListView):
             return self.render_to_response(context)
 
     def _query_for(self, post, query_key_map):
-        query_params = dict((self._get_query_field(key, query_key_map), value) for key, value in post if value.strip() != '' and key in query_key_map.keys())
+        query_params = dict((self._get_query_field(key, query_key_map), value) for key, value in post if
+                            value.strip() != '' and key in query_key_map.keys())
         return query_params
 
     @staticmethod
@@ -75,7 +77,7 @@ class CreateUser(PermissionRequiredMixin, CreateView):
         context = super(CreateUser, self).get_context_data(**kwargs)
         context_vars = {'btn_label': "CREATE",
                         'title': "Create new user",
-                        'id':'create-user-form',
+                        'id': 'create-user-form',
                         'organizations': Organization.objects.all(),
                         'regions': Region.objects.all(),
                         'countries': Country.objects.all(),

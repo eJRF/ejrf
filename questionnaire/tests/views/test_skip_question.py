@@ -1,8 +1,10 @@
-from questionnaire.tests.base_test import BaseTest
+import json
+
 from django.test import Client
+
+from questionnaire.tests.base_test import BaseTest
 from questionnaire.models import Question, SkipQuestion, QuestionOption, Questionnaire, Section, SubSection, \
     QuestionGroup, QuestionGroupOrder
-import json
 from questionnaire.tests.factories.skip_question_rule_factory import SkipQuestionFactory
 
 
@@ -95,7 +97,8 @@ class SkipQuestionPostTest(BaseTest):
         self.assertEqual(400, response.status_code)
 
         self.assertEqual(SkipQuestion.objects.all().count(), 0)
-        self.assertEqual(json.loads(response.content)['result'], [u'Both questions should belong to the same subsection'])
+        self.assertEqual(json.loads(response.content)['result'],
+                         [u'Both questions should belong to the same subsection'])
 
     def test_post_skip_question_for_skip_question_not_being_part_of_subsection(self):
         self.assertEqual(SkipQuestion.objects.all().count(), 0)
@@ -105,7 +108,8 @@ class SkipQuestionPostTest(BaseTest):
         self.assertEqual(400, response.status_code)
 
         self.assertEqual(SkipQuestion.objects.all().count(), 0)
-        self.assertEqual(json.loads(response.content)['result'], [u'Both questions should belong to the same subsection'])
+        self.assertEqual(json.loads(response.content)['result'],
+                         [u'Both questions should belong to the same subsection'])
 
     def test_post_skip_question_for_response_one_of_root_questions_options(self):
         self.assertEqual(SkipQuestion.objects.all().count(), 0)
@@ -127,6 +131,7 @@ class SkipQuestionPostTest(BaseTest):
 
         self.assertEqual(SkipQuestion.objects.all().count(), 0)
         self.assertEqual(json.loads(response.content)['result'], [u'Root question cannot be the same as skip question'])
+
 
 class SkipQuestionGetTest(BaseTest):
     def setUp(self):

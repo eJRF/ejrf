@@ -1,13 +1,14 @@
 from django.db import IntegrityError
 from django.core.exceptions import ValidationError
+
 from questionnaire.models import Questionnaire, Section, SubSection, Organization, Region, Country, QuestionGroup, \
-    NumericalAnswer, Answer, QuestionGroupOrder, AnswerGroup, MultiChoiceAnswer, TextAnswer, DateAnswer
-from questionnaire.models.questions import Question, QuestionOption, AnswerType
+    NumericalAnswer, Answer, QuestionGroupOrder, AnswerGroup, MultiChoiceAnswer, TextAnswer, Question, QuestionOption
 from questionnaire.tests.base_test import BaseTest
 from questionnaire.tests.factories.question_factory import QuestionFactory
 from questionnaire.tests.factories.question_group_factory import QuestionGroupFactory
 from questionnaire.tests.factories.question_option_factory import QuestionOptionFactory
 from questionnaire.tests.factories.sub_section_factory import SubSectionFactory
+from questionnaire.utils.answer_type import AnswerTypes
 
 
 class QuestionTest(BaseTest):
@@ -338,7 +339,7 @@ class AnswerSubTypeTest(BaseTest):
             ("Number", 'Number'),
             ("Text", "Text"),
         )
-        self.assertEqual(expected_answer_types, AnswerType.answer_types())
+        self.assertEqual(expected_answer_types, AnswerTypes.answer_types())
 
     def test_returns_answer_sub_types_as_a_tuple_of_tuples(self):
         expected_sub_types = (
@@ -349,7 +350,7 @@ class AnswerSubTypeTest(BaseTest):
             ('Decimal', 'Decimal'),
             ('Integer', 'Integer')
         )
-        self.assertEqual(expected_sub_types, AnswerType.answer_sub_types())
+        self.assertEqual(expected_sub_types, AnswerTypes.answer_sub_types())
 
 
 class QuestionOptionTest(BaseTest):

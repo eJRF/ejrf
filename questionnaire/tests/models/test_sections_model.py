@@ -5,10 +5,11 @@ from questionnaire.tests.base_test import BaseTest
 
 class SectionTest(BaseTest):
     def setUp(self):
-        self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", description="From dropbox as given by Rouslan")
+        self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English",
+                                                          description="From dropbox as given by Rouslan")
 
         self.section = Section.objects.create(title="Immunisation Coverage", order=1, description='section description',
-                                                      questionnaire=self.questionnaire, name="im cover")
+                                              questionnaire=self.questionnaire, name="im cover")
 
         self.sub_section = SubSection.objects.create(title="subsection 1", order=1, section=self.section)
         self.sub_section2 = SubSection.objects.create(title="subsection 2", order=2, section=self.section)
@@ -19,16 +20,16 @@ class SectionTest(BaseTest):
 
         self.question1 = Question.objects.create(text='question 1', UID='C00001', answer_type='MultiChoice')
         self.question2 = Question.objects.create(text='question 2', instructions="instruction 2",
-                                                    UID='C00002', answer_type='Text')
+                                                 UID='C00002', answer_type='Text')
 
         self.question3 = Question.objects.create(text='question 3', instructions="instruction 3",
-                                            UID='C00003', answer_type='Number')
+                                                 UID='C00003', answer_type='Number')
 
         self.question4 = Question.objects.create(text='question 4', UID='C00004', answer_type='MultiChoice')
         self.question5 = Question.objects.create(text='question 4', instructions="instruction 2",
-                                                    UID='C00005', answer_type='Number')
+                                                 UID='C00005', answer_type='Number')
         self.question6 = Question.objects.create(text='question 6', instructions="instruction 3",
-                                            UID='C00006', answer_type='Date')
+                                                 UID='C00006', answer_type='Date')
 
         self.question_group.question.add(self.question1, self.question3, self.question2)
         self.question_group2.question.add(self.question4, self.question5)
@@ -45,7 +46,8 @@ class SectionTest(BaseTest):
         section = Section()
         fields = [str(item.attname) for item in section._meta.fields]
         self.assertEqual(9, len(fields))
-        for field in ['id', 'created', 'modified', 'title', 'order', 'questionnaire_id', 'name', 'description', 'region_id']:
+        for field in ['id', 'created', 'modified', 'title', 'order', 'questionnaire_id', 'name', 'description',
+                      'region_id']:
             self.assertIn(field, fields)
 
     def test_section_store(self):
@@ -94,7 +96,8 @@ class SectionTest(BaseTest):
         self.assertEqual(0, Section.get_next_order(self.questionnaire))
 
     def test_mapped_question_orders(self):
-        grid_question_group = QuestionGroup.objects.create(subsection=self.sub_section, order=11, grid=True, display_all=True)
+        grid_question_group = QuestionGroup.objects.create(subsection=self.sub_section, order=11, grid=True,
+                                                           display_all=True)
         self.question1.is_primary = True
         self.question1.save()
         self.option1 = QuestionOption.objects.create(text='tusker lager', question=self.question1)
@@ -124,11 +127,13 @@ class SubSectionTest(BaseTest):
     def setUp(self):
         self.questionnaire = Questionnaire.objects.create(name="Uganda Revision 2014", description="some description")
         self.section = Section.objects.create(title="Immunisation Coverage", order=1,
-                                              questionnaire=self.questionnaire, name="im cover" , description="section description")
-        self.sub_section = SubSection.objects.create(title="Infant Immunisation Coverage", order=1, section=self.section)
+                                              questionnaire=self.questionnaire, name="im cover",
+                                              description="section description")
+        self.sub_section = SubSection.objects.create(title="Infant Immunisation Coverage", order=1,
+                                                     section=self.section)
         self.question1 = Question.objects.create(text='question 1', UID='C00001', answer_type='MultiChoice')
         self.question2 = Question.objects.create(text='question 2', instructions="instruction 2",
-                                                    UID='C00002', answer_type='Text')
+                                                 UID='C00002', answer_type='Text')
 
     def test_sub_section_fields(self):
         sub_section = SubSection()

@@ -4,6 +4,7 @@ from questionnaire.forms.theme import ThemeForm
 
 from questionnaire.models import Theme, Question
 from questionnaire.tests.base_test import BaseTest
+from questionnaire.utils.answer_type import AnswerTypes
 
 
 class GlobalAdminThemeViewTest(BaseTest):
@@ -110,9 +111,9 @@ class DeleteThemeViewTest(BaseTest):
 
     def test_post_delete_de_associates_the_questions_from_it(self):
         beer_question = Question.objects.create(text="How many beers do you drink?", UID='BR01',
-                                                answer_type=Question.NUMBER, theme=self.theme)
+                                                answer_type=AnswerTypes.NUMBER, theme=self.theme)
         beer_question1 = Question.objects.create(text="When did you last drink beer?", UID='BR02',
-                                                 answer_type=Question.DATE, theme=self.theme)
+                                                 answer_type=AnswerTypes.DATE, theme=self.theme)
 
         response = self.client.post(self.url, {})
         self.assertEqual(Question.objects.all().count(), 2)
@@ -159,7 +160,8 @@ class RegionalAdminEditThemeViewTest(BaseTest):
         self.assign('can_edit_questionnaire', self.user)
         self.client.login(username=self.user.username, password='pass')
 
-        self.theme = Theme.objects.create(name="Some Regional theme", description="some description", region=self.region)
+        self.theme = Theme.objects.create(name="Some Regional theme", description="some description",
+                                          region=self.region)
         self.url = '/themes/%d/edit/' % self.theme.id
         self.form_data = {'name': 'Edited Regional Theme',
                           'description': self.theme.description}
@@ -168,18 +170,22 @@ class RegionalAdminEditThemeViewTest(BaseTest):
         self.assertRaises(Theme.DoesNotExist, Theme.objects.get, **self.form_data)
         response = self.client.post(self.url, self.form_data)
         self.assertRedirects(response, reverse("theme_list_page"))
-        self.failIf(Theme.objects.filter(name=getattr(self.theme, 'name'), description=getattr(self.theme, 'description'), region=getattr(self.theme, 'region')))
+        self.failIf(
+            Theme.objects.filter(name=getattr(self.theme, 'name'), description=getattr(self.theme, 'description'),
+                                 region=getattr(self.theme, 'region')))
         self.failUnless(Theme.objects.get(region=self.user.user_profile.region, **self.form_data))
         message = "Theme successfully updated."
         self.assertIn(message, response.cookies['messages'].value)
 
     def test_post_save_global_admin_theme(self):
-        self.theme = Theme.objects.create(name= "Some Global Admin Theme.", description="Some description")
+        self.theme = Theme.objects.create(name="Some Global Admin Theme.", description="Some description")
         self.url = '/themes/%d/edit/' % self.theme.id
         self.assertRaises(Theme.DoesNotExist, Theme.objects.get, **self.form_data)
         response = self.client.post(self.url, self.form_data)
         self.assertRedirects(response, reverse("login_page") + "?next=" + self.url)
-        self.failUnless(Theme.objects.filter(name=getattr(self.theme, 'name'), description=getattr(self.theme, 'description'), region=getattr(self.theme, 'region')))
+        self.failUnless(
+            Theme.objects.filter(name=getattr(self.theme, 'name'), description=getattr(self.theme, 'description'),
+                                 region=getattr(self.theme, 'region')))
 
 
 class RegionalAdminDeleteThemeViewTest(BaseTest):
@@ -190,7 +196,8 @@ class RegionalAdminDeleteThemeViewTest(BaseTest):
         self.assign('can_edit_questionnaire', self.user)
         self.client.login(username=self.user.username, password='pass')
 
-        self.theme = Theme.objects.create(name="Some Regional theme", description="some description", region=self.region)
+        self.theme = Theme.objects.create(name="Some Regional theme", description="some description",
+                                          region=self.region)
         self.url = '/themes/%d/delete/' % self.theme.id
 
     def test_post_delete_theme(self):
@@ -198,13 +205,16 @@ class RegionalAdminDeleteThemeViewTest(BaseTest):
         response = self.client.post(self.url, {})
         self.assertRedirects(response, reverse("theme_list_page"))
         self.failIf(
-            Theme.objects.filter(name=getattr(self.theme, 'name'), description=getattr(self.theme, 'description'), region=getattr(self.theme, "region")))
+            Theme.objects.filter(name=getattr(self.theme, 'name'), description=getattr(self.theme, 'description'),
+                                 region=getattr(self.theme, "region")))
         message = "Theme successfully deleted."
         self.assertIn(message, response.cookies['messages'].value)
 
     def test_post_delete_global_admin_theme(self):
-        self.theme = Theme.objects.create(name= "Some Global Admin Theme.", description="Some description")
+        self.theme = Theme.objects.create(name="Some Global Admin Theme.", description="Some description")
         self.url = '/themes/%d/delete/' % self.theme.id
-        response = self.client.post(self.url,  {})
+        response = self.client.post(self.url, {})
         self.assertRedirects(response, reverse("login_page") + "?next=" + self.url)
-        self.failUnless(Theme.objects.filter(name=getattr(self.theme, 'name'), description=getattr(self.theme, 'description'), region=getattr(self.theme, 'region')))
+        self.failUnless(
+            Theme.objects.filter(name=getattr(self.theme, 'name'), description=getattr(self.theme, 'description'),
+                                 region=getattr(self.theme, 'region')))

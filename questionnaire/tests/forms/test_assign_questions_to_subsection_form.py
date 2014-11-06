@@ -4,13 +4,12 @@ from questionnaire.tests.base_test import BaseTest
 
 
 class AssignQuestionFormTest(BaseTest):
-
     def setUp(self):
         self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013)
         self.section = Section.objects.create(name="section", questionnaire=self.questionnaire, order=1)
         self.subsection = SubSection.objects.create(title="subsection 1", section=self.section, order=1)
-        self.question1 = Question.objects.create(text='Q1', UID='C00003', answer_type='Number')        
-        self.question2 = Question.objects.create(text='Q2', UID='C00002', answer_type='Number')        
+        self.question1 = Question.objects.create(text='Q1', UID='C00003', answer_type='Number')
+        self.question2 = Question.objects.create(text='Q2', UID='C00002', answer_type='Number')
         self.form_data = {'questions': [self.question1.id, self.question2.id]}
 
     def test_valid(self):

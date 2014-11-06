@@ -14,7 +14,8 @@ class GRIDQuestionsExportTest(BaseTest):
         primary_answer = MultiChoiceAnswer.objects.filter()
         self.assertEqual('', export_id(primary_answer))
 
-        primary_question_answer = MultiChoiceAnswer.objects.create(question=self.primary_question, response=self.option_without_uid)
+        primary_question_answer = MultiChoiceAnswer.objects.create(question=self.primary_question,
+                                                                   response=self.option_without_uid)
         primary_answer = MultiChoiceAnswer.objects.filter(id=primary_question_answer.id)
         self.assertEqual('_None', export_id(primary_answer))
 
@@ -26,7 +27,8 @@ class GRIDQuestionsExportTest(BaseTest):
         primary_answer = MultiChoiceAnswer.objects.filter()
         self.assertEqual('', export_text(primary_answer))
 
-        primary_question_answer = MultiChoiceAnswer.objects.create(question=self.primary_question, response=self.option_without_uid)
+        primary_question_answer = MultiChoiceAnswer.objects.create(question=self.primary_question,
+                                                                   response=self.option_without_uid)
         primary_answer = MultiChoiceAnswer.objects.filter(id=primary_question_answer.id)
         self.assertEqual(' | TB', export_text(primary_answer))
 

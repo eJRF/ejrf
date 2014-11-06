@@ -99,10 +99,10 @@ class TestQuestionReIndexer(BaseTest):
         order2 = QuestionGroupOrder.objects.create(question_group=question_group1, question=question5, order=2)
 
         cross_data = {'Number-0-response-order': ["%d,%d, 0" % (self.question_group.id, self.order3.id)],
-                     'Text-1-response-order': ["%d,%d, 1" % (self.question_group.id, self.order2.id)],
-                     'Text-2-response-order': ["%d,%d, 2" % (self.question_group.id, order1.id)],
-                     'Text-0-response-order': ["%d,%d, 0" % (question_group1.id, self.order1.id)],
-                     'Text-3-response-order': ["%d,%d, 1" % (question_group1.id, order2.id)]}
+                      'Text-1-response-order': ["%d,%d, 1" % (self.question_group.id, self.order2.id)],
+                      'Text-2-response-order': ["%d,%d, 2" % (self.question_group.id, order1.id)],
+                      'Text-0-response-order': ["%d,%d, 0" % (question_group1.id, self.order1.id)],
+                      'Text-3-response-order': ["%d,%d, 1" % (question_group1.id, order2.id)]}
 
         dirty_data_query_dict = self.cast_to_queryDict(cross_data)
         QuestionReIndexer(dirty_data_query_dict).reorder_questions()

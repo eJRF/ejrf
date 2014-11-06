@@ -1,12 +1,13 @@
 from urllib import quote
+
+from django.test import Client
+
 from questionnaire.forms.assign_question import AssignQuestionForm
 from questionnaire.models import Questionnaire, Section, SubSection, Question, Region
 from questionnaire.tests.base_test import BaseTest
-from django.test import Client
 
 
 class AssignQuestionViewTest(BaseTest):
-
     def setUp(self):
         self.client = Client()
         self.user = self.create_user(org="WHO")
@@ -60,7 +61,7 @@ class AssignQuestionViewTest(BaseTest):
         self.question1.save()
 
         used_question1 = Question.objects.create(text='USed question', UID='C00033', answer_type='Number',
-                                            region=self.region, parent=parent_question)
+                                                 region=self.region, parent=parent_question)
         used_question1.question_group.create(subsection=self.subsection)
 
         response = self.client.get(self.url)
@@ -80,7 +81,7 @@ class AssignQuestionViewTest(BaseTest):
         self.failIf(self.question2.question_group.all())
 
         meta = {'HTTP_REFERER': self.url}
-        response = self.client.post(self.url, data={'questions':[self.question1.id, self.question2.id]}, **meta)
+        response = self.client.post(self.url, data={'questions': [self.question1.id, self.question2.id]}, **meta)
 
         question_group = self.question1.question_group.all()
         self.assertEqual(1, question_group.count())
@@ -89,7 +90,7 @@ class AssignQuestionViewTest(BaseTest):
 
     def test_successful_post_redirect_to_referer_url(self):
         meta = {'HTTP_REFERER': self.url}
-        response = self.client.post(self.url, data={'questions':[self.question1.id, self.question2.id]}, **meta)
+        response = self.client.post(self.url, data={'questions': [self.question1.id, self.question2.id]}, **meta)
         self.assertRedirects(response, self.url)
 
     def test_successful_post_display_success_message(self):
@@ -118,7 +119,8 @@ class AssignQuestionViewTest(BaseTest):
     def test_permission_required_for_create_section(self):
         self.assert_permission_required(self.url)
 
-        user_not_in_same_region = self.create_user(username="asian_chic", group=self.REGIONAL_ADMIN, region="ASEAN", org="WHO")
+        user_not_in_same_region = self.create_user(username="asian_chic", group=self.REGIONAL_ADMIN, region="ASEAN",
+                                                   org="WHO")
         self.assign('can_edit_questionnaire', user_not_in_same_region)
 
         self.client.logout()
@@ -140,7 +142,6 @@ class AssignQuestionViewTest(BaseTest):
 
 
 class UnAssignQuestionViewTest(BaseTest):
-
     def setUp(self):
         self.client = Client()
         self.user = self.create_user(org="WHO")
@@ -159,7 +160,7 @@ class UnAssignQuestionViewTest(BaseTest):
         self.question_group.question.add(self.question2)
         self.question2.orders.create(question_group=self.question_group, order=2)
 
-        self.url = '/subsection/%d/question/%d/unassign/'%(self.subsection.id, self.question1.id)
+        self.url = '/subsection/%d/question/%d/unassign/' % (self.subsection.id, self.question1.id)
 
     def test_post_unassign_question_to_group_and_removes_question_order(self):
         meta = {'HTTP_REFERER': '/questionnaire/entry/%d/section/%d/' % (self.questionnaire.id, self.section.id)}
@@ -176,7 +177,7 @@ class UnAssignQuestionViewTest(BaseTest):
         self.assertRedirects(response, referer_url)
 
     def test_successful_post_display_success_message(self):
-        referer_url = '/questionnaire/entry/%d/section/%d/'%(self.questionnaire.id, self.section.id)
+        referer_url = '/questionnaire/entry/%d/section/%d/' % (self.questionnaire.id, self.section.id)
         meta = {'HTTP_REFERER': referer_url}
         response = self.client.post(self.url, data={}, **meta)
         message = "Question successfully unassigned from questionnaire."
@@ -188,7 +189,8 @@ class UnAssignQuestionViewTest(BaseTest):
     def test_permission_required_for_create_section(self):
         self.assert_permission_required(self.url)
 
-        user_not_in_same_region = self.create_user(username="asian_chic", group=self.REGIONAL_ADMIN, region="ASEAN", org="WHO")
+        user_not_in_same_region = self.create_user(username="asian_chic", group=self.REGIONAL_ADMIN, region="ASEAN",
+                                                   org="WHO")
         self.assign('can_edit_questionnaire', user_not_in_same_region)
 
         self.client.logout()

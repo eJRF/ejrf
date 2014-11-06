@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
-from questionnaire.models.base import BaseModel
 from django.db import models
+
+from questionnaire.models.base import BaseModel
 
 
 class UserProfile(BaseModel):

@@ -1,12 +1,12 @@
 from django.core.urlresolvers import reverse
 from django.test import Client
+
 from questionnaire.forms.questionnaires import QuestionnaireFilterForm, PublishQuestionnaireForm
 from questionnaire.models import Questionnaire, Section, Organization, Region, SubSection
 from questionnaire.tests.base_test import BaseTest
 
 
 class ManageJRFViewTest(BaseTest):
-
     def setUp(self):
         self.client = Client()
         self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
@@ -21,7 +21,7 @@ class ManageJRFViewTest(BaseTest):
         core1 = Questionnaire.objects.create(name="JRF Jamaica core", description="bla", year=2012,
                                              status=Questionnaire.FINALIZED)
         core1_publish = Questionnaire.objects.create(name="JRF Jamaica core", description="bla", year=2011,
-                                             status=Questionnaire.PUBLISHED)
+                                                     status=Questionnaire.PUBLISHED)
         core2 = Questionnaire.objects.create(name="JRF Brazil core", description="bla", year=2013,
                                              status=Questionnaire.DRAFT)
         questionnaire1 = Questionnaire.objects.create(name="JRF Jamaica paho", description="bla", year=2012,
@@ -56,7 +56,6 @@ class ManageJRFViewTest(BaseTest):
 
 
 class FinalizeQuestionnaireViewTest(BaseTest):
-
     def setUp(self):
         self.client = Client()
         self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
@@ -83,7 +82,8 @@ class FinalizeQuestionnaireViewTest(BaseTest):
     def test_post_unfinalizes_questionnaire(self):
         referer_url = reverse('manage_jrf_page')
         self.assign('can_edit_questionnaire', self.user)
-        questionnaire = Questionnaire.objects.create(name="JRF Brazil", description="bla", year=2013, status=Questionnaire.FINALIZED)
+        questionnaire = Questionnaire.objects.create(name="JRF Brazil", description="bla", year=2013,
+                                                     status=Questionnaire.FINALIZED)
         section = Section.objects.create(name="haha", questionnaire=questionnaire, order=1)
         url = '/questionnaire/%d/unfinalize/' % questionnaire.id
         response = self.client.post(url, HTTP_REFERER=referer_url)
@@ -92,7 +92,8 @@ class FinalizeQuestionnaireViewTest(BaseTest):
         self.assertRedirects(response, referer_url)
 
     def test_post_shows_error_message_when_attempting_to_unfinalize_published_questionnaire(self):
-        questionnaire = Questionnaire.objects.create(name="JRF Brazil", description="bla", year=2013, status=Questionnaire.PUBLISHED)
+        questionnaire = Questionnaire.objects.create(name="JRF Brazil", description="bla", year=2013,
+                                                     status=Questionnaire.PUBLISHED)
         Section.objects.create(title="Cured Cases of Measles", order=1, questionnaire=questionnaire, name="Cured Cases")
         url = '/questionnaire/%d/unfinalize/' % questionnaire.id
         response = self.client.post(url)
@@ -105,7 +106,6 @@ class FinalizeQuestionnaireViewTest(BaseTest):
 
 
 class PublishQuestionnaireToRegionsViewTest(BaseTest):
-
     def setUp(self):
         self.client = Client()
         self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
@@ -113,10 +113,11 @@ class PublishQuestionnaireToRegionsViewTest(BaseTest):
         self.assign('can_view_users', self.user)
         self.client.login(username=self.user.username, password='pass')
 
-        self.questionnaire = Questionnaire.objects.create(name="JRF Brazil", description="bla", year=2013, status=Questionnaire.FINALIZED)
-        self.section = Section.objects.create(title="Cured Cases of Measles", order=1, questionnaire=self.questionnaire, name="Cured Cases")
+        self.questionnaire = Questionnaire.objects.create(name="JRF Brazil", description="bla", year=2013,
+                                                          status=Questionnaire.FINALIZED)
+        self.section = Section.objects.create(title="Cured Cases of Measles", order=1, questionnaire=self.questionnaire,
+                                              name="Cured Cases")
         self.subsection = SubSection.objects.create(title="Cured Cases of Measles", order=1, section=self.section)
-
 
         self.url = '/questionnaire/%d/publish/' % self.questionnaire.id
         self.who = Organization.objects.create(name="WHO")
@@ -128,7 +129,8 @@ class PublishQuestionnaireToRegionsViewTest(BaseTest):
         paho = Region.objects.create(name="Paho", organization=self.who)
         pacific = Region.objects.create(name="Pacific", organization=self.who)
         asia = Region.objects.create(name="Asia", organization=self.who)
-        questionnaire = Questionnaire.objects.create(name="JRF Brazil", description="bla", year=2013, status=Questionnaire.FINALIZED, region=afro)
+        questionnaire = Questionnaire.objects.create(name="JRF Brazil", description="bla", year=2013,
+                                                     status=Questionnaire.FINALIZED, region=afro)
         Section.objects.create(title="Cured Cases of Measles", order=1, questionnaire=questionnaire, name="Cured Cases")
         Region.objects.create(name="UNICEF ASIA", organization=self.unicef)
 
@@ -142,8 +144,10 @@ class PublishQuestionnaireToRegionsViewTest(BaseTest):
         self.assertEqual(5, questionnaires.count())
         [self.assertEqual(1, region.questionnaire.all().count()) for region in [paho, pacific, asia]]
         self.assertEqual(1, afro.questionnaire.all().count())
-        [self.assertIn(self.section.name, region.sections.values_list('name', flat=True)) for region in [paho, pacific, asia]]
-        [self.assertIn(self.subsection.title, region.sub_sections.values_list('title', flat=True)) for region in [paho, pacific, asia]]
+        [self.assertIn(self.section.name, region.sections.values_list('name', flat=True)) for region in
+         [paho, pacific, asia]]
+        [self.assertIn(self.subsection.title, region.sub_sections.values_list('title', flat=True)) for region in
+         [paho, pacific, asia]]
         [self.assertEqual(1, region.sub_sections.count()) for region in [paho, pacific, asia]]
         [self.assertEqual(1, region.sections.count()) for region in [paho, pacific, asia]]
 
@@ -169,7 +173,6 @@ class PublishQuestionnaireToRegionsViewTest(BaseTest):
 
 
 class ApproveQuestionnaireToDataSubmittersViewTest(BaseTest):
-
     def setUp(self):
         self.client = Client()
         self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
@@ -177,8 +180,10 @@ class ApproveQuestionnaireToDataSubmittersViewTest(BaseTest):
         self.assign('can_view_users', self.user)
         self.client.login(username=self.user.username, password='pass')
 
-        self.questionnaire = Questionnaire.objects.create(name="JRF Brazil", description="bla", year=2013, status=Questionnaire.FINALIZED, region=self.region)
-        Section.objects.create(title="Cured Cases of Measles", order=1, questionnaire=self.questionnaire, name="Cured Cases")
+        self.questionnaire = Questionnaire.objects.create(name="JRF Brazil", description="bla", year=2013,
+                                                          status=Questionnaire.FINALIZED, region=self.region)
+        Section.objects.create(title="Cured Cases of Measles", order=1, questionnaire=self.questionnaire,
+                               name="Cured Cases")
 
         self.url = '/questionnaire/%d/approve/' % self.questionnaire.id
         self.who = Organization.objects.create(name="WHO")
@@ -186,15 +191,17 @@ class ApproveQuestionnaireToDataSubmittersViewTest(BaseTest):
         self.australia = Region.objects.create(name="Australia", organization=self.who)
 
     def test_post_approves_questionnaire(self):
-        referer_url = reverse('manage_jrf_page',)
+        referer_url = reverse('manage_jrf_page', )
         self.assign('can_view_users', self.user)
         response = self.client.post(self.url, HTTP_REFERER=referer_url)
-        self.assertNotIn(self.questionnaire, Questionnaire.objects.filter(status=Questionnaire.FINALIZED, region=self.region).all())
-        self.assertIn(self.questionnaire, Questionnaire.objects.filter(status=Questionnaire.PUBLISHED, region=self.region).all())
+        self.assertNotIn(self.questionnaire,
+                         Questionnaire.objects.filter(status=Questionnaire.FINALIZED, region=self.region).all())
+        self.assertIn(self.questionnaire,
+                      Questionnaire.objects.filter(status=Questionnaire.PUBLISHED, region=self.region).all())
         self.assertRedirects(response, referer_url)
 
     def test_get_approve_questionnaire(self):
-        referer_url = reverse('manage_jrf_page',)
+        referer_url = reverse('manage_jrf_page', )
         response = self.client.get(self.url, HTTP_REFERER=referer_url)
         self.assertEqual(200, response.status_code)
         self.assertEqual(self.questionnaire, response.context['questionnaire'])

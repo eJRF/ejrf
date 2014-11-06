@@ -1,28 +1,31 @@
-from questionnaire.models import Section, SubSection, Organization, Region, Country, NumericalAnswer, Answer, Question, QuestionGroup
+from questionnaire.models import Section, SubSection, Organization, Region, Country, NumericalAnswer, Answer, Question, \
+    QuestionGroup
 from questionnaire.models.questionnaires import Questionnaire
 from questionnaire.tests.base_test import BaseTest
 
 
 class QuestionnaireTest(BaseTest):
-
     def setUp(self):
-        self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", description="From dropbox as given by Rouslan")
-        self.section_1 = Section.objects.create(title="Reported Cases of Selected Vaccine Preventable Diseases (VPDs)", order=1,
-                                                      questionnaire=self.questionnaire, name="Reported Cases")
-        self.sub_section_1 = SubSection.objects.create(title="Reported cases for the year 2013", order=1, section=self.section_1)
+        self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English",
+                                                          description="From dropbox as given by Rouslan")
+        self.section_1 = Section.objects.create(title="Reported Cases of Selected Vaccine Preventable Diseases (VPDs)",
+                                                order=1,
+                                                questionnaire=self.questionnaire, name="Reported Cases")
+        self.sub_section_1 = SubSection.objects.create(title="Reported cases for the year 2013", order=1,
+                                                       section=self.section_1)
         self.sub_section_2 = SubSection.objects.create(title="Another", order=2, section=self.section_1)
         self.organisation = Organization.objects.create(name="WHO")
-        self.regions = Region.objects.create(name="The Afro",organization=self.organisation)
+        self.regions = Region.objects.create(name="The Afro", organization=self.organisation)
         self.country = Country.objects.create(name="Uganda")
         self.regions.countries.add(self.country)
         self.question1 = Question.objects.create(text='B. Number of cases tested',
-                                            instructions="Enter the total number of cases for which specimens were collected, and tested in laboratory",
-                                            UID='C00003', answer_type='Number')
+                                                 instructions="Enter the total number of cases for which specimens were collected, and tested in laboratory",
+                                                 UID='C00003', answer_type='Number')
         self.sub_group = QuestionGroup.objects.create(subsection=self.sub_section_1, name="Laboratory Investigation")
         self.sub_group.question.add(self.question1)
 
         self.question1_answer = NumericalAnswer.objects.create(question=self.question1, country=self.country,
-                                                               status=Answer.SUBMITTED_STATUS,  response=23)
+                                                               status=Answer.SUBMITTED_STATUS, response=23)
         self.question1_answer_2 = NumericalAnswer.objects.create(question=self.question1, country=self.country,
                                                                  status=Answer.SUBMITTED_STATUS, response=1)
 
@@ -86,8 +89,9 @@ class QuestionnaireTest(BaseTest):
     def test_questionnaire_knows_it_has_more_than_one_section(self):
         self.assertFalse(self.questionnaire.has_more_than_one_section())
 
-        section_2 = Section.objects.create(title="Reported Cases of Selected Vaccine Preventable Diseases (VPDs)", order=2,
-                                                      questionnaire=self.questionnaire, name="Reported Cases")
+        section_2 = Section.objects.create(title="Reported Cases of Selected Vaccine Preventable Diseases (VPDs)",
+                                           order=2,
+                                           questionnaire=self.questionnaire, name="Reported Cases")
 
         self.assertTrue(self.questionnaire.has_more_than_one_section())
 
@@ -100,5 +104,6 @@ class QuestionnaireTest(BaseTest):
 
     def test_questionnaire_knows_its_newest_un_submited_answer_version(self):
         NumericalAnswer.objects.create(question=self.question1, country=self.country,
-                                       status=Answer.DRAFT_STATUS,  response=23, version=2, questionnaire=self.questionnaire)
+                                       status=Answer.DRAFT_STATUS, response=23, version=2,
+                                       questionnaire=self.questionnaire)
         self.assertEqual(2, self.questionnaire.current_answer_version())

@@ -1,10 +1,12 @@
 import copy
+
 from django import forms
 from django.forms.util import ErrorDict
 from django.forms import ModelForm, ModelChoiceField
-from questionnaire.forms.custom_widgets import MultiChoiceAnswerSelectWidget, SkipRuleSelectWidget
 
-from questionnaire.models import NumericalAnswer, TextAnswer, DateAnswer, MultiChoiceAnswer, QuestionOption, Question
+from questionnaire.forms.custom_widgets import MultiChoiceAnswerSelectWidget, SkipRuleSelectWidget
+from questionnaire.models import NumericalAnswer, TextAnswer, DateAnswer, MultiChoiceAnswer, QuestionOption
+from questionnaire.utils.answer_type import AnswerTypes
 
 
 class AnswerForm(ModelForm):
@@ -68,7 +70,8 @@ class NumericalAnswerForm(AnswerForm):
             self._errors['response'] = ["Response should be a whole number."]
 
     def _matches_answer_sub_type(self, response):
-        return self.question.answer_sub_type and self.question.answer_sub_type.lower() == Question.INTEGER.lower() and response and not float(response).is_integer()
+        return self.question.answer_sub_type and self.question.answer_sub_type.lower() == AnswerTypes.INTEGER.lower() and response and not float(
+            response).is_integer()
 
 
 class TextAnswerForm(AnswerForm):

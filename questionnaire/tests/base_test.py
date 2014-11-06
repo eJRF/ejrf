@@ -1,17 +1,18 @@
 import csv
+from urllib import quote
+import logging
+
 from django.contrib.auth.models import User, Permission, Group
 from django.contrib.contenttypes.models import ContentType
 from django.http.request import QueryDict
 from django.test import TestCase
-from urllib import quote
+
 from questionnaire.models import Country, UserProfile, Region, Organization
 
-import logging
 logging.getLogger("factory").setLevel(logging.WARN)
 
 
 class BaseTest(TestCase):
-
     DATA_SUBMITTER = 'DATA_SUBMITTER'
     REGIONAL_ADMIN = 'REGIONAL_ADMIN'
     GLOBAL_ADMIN = 'GLOBAL_ADMIN'

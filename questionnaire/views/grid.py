@@ -2,9 +2,10 @@ from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import View
+
 from questionnaire.forms.grid import GridForm
 from questionnaire.mixins import RegionAndPermissionRequiredMixin
-from questionnaire.models import SubSection, Question, QuestionGroup
+from questionnaire.models import SubSection, QuestionGroup
 
 
 class CreateGrid(RegionAndPermissionRequiredMixin, View):
@@ -16,7 +17,8 @@ class CreateGrid(RegionAndPermissionRequiredMixin, View):
         region = request.user.user_profile.region
         form = GridForm(subsection=subsection, region=region)
         context = {'grid_form': form, 'non_primary_questions': form.fields['columns'].queryset,
-                   'btn_label': 'Create', 'subsection': subsection, 'id': 'create_grid_form', 'class': 'create-grid-form',}
+                   'btn_label': 'Create', 'subsection': subsection, 'id': 'create_grid_form',
+                   'class': 'create-grid-form', }
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
@@ -29,7 +31,8 @@ class CreateGrid(RegionAndPermissionRequiredMixin, View):
             messages.success(request, "Grid successfully created.")
             return HttpResponseRedirect(referer_url)
         context = {'grid_form': form, 'non_primary_questions': form.fields['columns'].queryset,
-                   'btn_label': 'Create', 'subsection': subsection, 'id': 'create_grid_form', 'class': 'create-grid-form',}
+                   'btn_label': 'Create', 'subsection': subsection, 'id': 'create_grid_form',
+                   'class': 'create-grid-form', }
         messages.error(request, "Grid NOT created. See errors below.")
         return render(request, self.template_name, context)
 

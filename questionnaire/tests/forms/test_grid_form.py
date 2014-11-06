@@ -4,7 +4,6 @@ from questionnaire.tests.base_test import BaseTest
 
 
 class GridFormTest(BaseTest):
-
     def setUp(self):
         self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English")
 
@@ -12,7 +11,8 @@ class GridFormTest(BaseTest):
                                                questionnaire=self.questionnaire, name="Reported Cases")
 
         self.region = Region.objects.create(name="AFR")
-        self.sub_section = SubSection.objects.create(title="subsection 1", order=1, section=self.section1, region=self.region)
+        self.sub_section = SubSection.objects.create(title="subsection 1", order=1, section=self.section1,
+                                                     region=self.region)
         self.sub_section2 = SubSection.objects.create(title="subsection 2", order=2, section=self.section1)
         self.theme = Theme.objects.create(name="Theme1", description="Our theme.")
 
@@ -26,12 +26,12 @@ class GridFormTest(BaseTest):
                                                  UID='C00002', answer_type='Text', region=self.region)
 
         self.question3 = Question.objects.create(text='question 3', instructions="instruction 3",
-                                                 UID='C00003', answer_type='Number' , theme=self.theme)
+                                                 UID='C00003', answer_type='Number', theme=self.theme)
 
         self.question4 = Question.objects.create(text='question 4', instructions="instruction 2",
                                                  UID='C00005', answer_type='Date', theme=self.theme)
 
-        self.form_data ={
+        self.form_data = {
             'type': 'display_all',
             'primary_question': str(self.question1.id),
             'columns': [str(self.question2.id), str(self.question3.id)]
@@ -50,11 +50,14 @@ class GridFormTest(BaseTest):
 
     def test_only_unused_questions_in_questionnaire_are_available(self):
         primary_question_not_in_self_questionnaire = Question.objects.create(text='primary other Qnaire', UID='C00011',
-                                    answer_type='MultiChoice', is_primary=True, region=self.region, theme=self.theme)
+                                                                             answer_type='MultiChoice', is_primary=True,
+                                                                             region=self.region, theme=self.theme)
         question_not_in_self_questionnaire = Question.objects.create(text='non primary  other Qnaire', UID='C00012',
-                                    answer_type='Text', region=self.region, theme=self.theme)
+                                                                     answer_type='Text', region=self.region,
+                                                                     theme=self.theme)
 
-        section1 = Section.objects.create(title="section 2", order=1, questionnaire=self.questionnaire, name="section 2", region=self.region)
+        section1 = Section.objects.create(title="section 2", order=1, questionnaire=self.questionnaire,
+                                          name="section 2", region=self.region)
         sub = SubSection.objects.create(title="subsection 1", order=1, section=section1, region=self.region)
         group = primary_question_not_in_self_questionnaire.question_group.create(subsection=sub)
         group.question.add(question_not_in_self_questionnaire)
@@ -82,7 +85,7 @@ class GridFormTest(BaseTest):
 
     def test_only_questions_from_the_same_theme_are_allowed_for_columns(self):
         question_from_different_theme = Question.objects.create(text='question 2', theme=None,
-                                                 UID='C00022', answer_type='Text', region=self.region)
+                                                                UID='C00022', answer_type='Text', region=self.region)
         data = self.form_data.copy()
         data['columns'] = [question_from_different_theme.id, self.question2.id]
         grid_form = GridForm(data, subsection=self.sub_section, region=self.region)
@@ -93,7 +96,7 @@ class GridFormTest(BaseTest):
 
     def test_only_questions_from_the_same_theme_are_allowed_for_subgroups(self):
         question_from_different_theme = Question.objects.create(text='question 2', theme=None,
-                                                 UID='C00022', answer_type='Text', region=self.region)
+                                                                UID='C00022', answer_type='Text', region=self.region)
         data = self.form_data.copy()
         data['subgroup'] = [question_from_different_theme.id]
         grid_form = GridForm(data, subsection=self.sub_section, region=self.region)
@@ -104,7 +107,6 @@ class GridFormTest(BaseTest):
 
 
 class DisplayAllGridFormTest(BaseTest):
-
     def setUp(self):
         self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English")
 
@@ -130,7 +132,7 @@ class DisplayAllGridFormTest(BaseTest):
         self.question4 = Question.objects.create(text='question 4', instructions="instruction 2",
                                                  UID='C00005', answer_type='Date', theme=self.theme)
 
-        self.form_data ={
+        self.form_data = {
             'type': 'display_all',
             'primary_question': str(self.question1.id),
             'columns': [str(self.question2.id), str(self.question3.id)]
@@ -207,7 +209,6 @@ class DisplayAllGridFormTest(BaseTest):
 
 
 class AddMoreGridFormTest(BaseTest):
-
     def setUp(self):
         self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English")
 
@@ -230,7 +231,7 @@ class AddMoreGridFormTest(BaseTest):
         self.question4 = Question.objects.create(text='question 4', instructions="instruction 2",
                                                  UID='C00005', answer_type='Date', theme=self.theme)
 
-        self.form_data ={
+        self.form_data = {
             'type': 'allow_multiples',
             'primary_question': str(self.question1.id),
             'columns': [str(self.question2.id), str(self.question3.id)]
@@ -289,7 +290,6 @@ class AddMoreGridFormTest(BaseTest):
 
 
 class HybridGridFormTest(BaseTest):
-
     def setUp(self):
         self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English")
 
@@ -317,7 +317,7 @@ class HybridGridFormTest(BaseTest):
         self.question5 = Question.objects.create(text='question 5', instructions="instruction 5",
                                                  UID='C00006', answer_type='MultiChoice', theme=self.theme)
 
-        self.form_data ={
+        self.form_data = {
             'type': 'hybrid',
             'primary_question': str(self.question1.id),
             'columns': [str(self.question2.id), str(self.question4.id), str(self.question5.id), str(self.question3.id)],

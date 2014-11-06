@@ -1,8 +1,10 @@
 import json
+
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.core.urlresolvers import reverse
 from django.test import Client
+
 from questionnaire.forms.filter import UserFilterForm
 from questionnaire.forms.user_profile import UserProfileForm, EditUserProfileForm
 from questionnaire.models import Organization, Region, Country, UserProfile
@@ -31,7 +33,7 @@ class UsersViewTest(BaseTest):
             'email': 'raj@ni.kant',
             'groups': self.global_admin.id,
             'organization': self.organization.id,
-            }
+        }
 
     def test_get_login(self):
         response = self.client.get('/accounts/login/')
@@ -87,13 +89,13 @@ class UsersViewTest(BaseTest):
         self.assertEqual('/users/', response.context['cancel_url'])
 
     def test_post_update(self):
-        saved_user = User.objects.create(username='user1', email= 'emily@gmail.com')
+        saved_user = User.objects.create(username='user1', email='emily@gmail.com')
         user_profile = UserProfile.objects.create(user=saved_user, region=self.afro, country=self.uganda,
                                                   organization=self.organization)
         self.global_admin.user_set.add(saved_user)
         form_data = {
             'username': 'user1tom',
-            'email': 'raj@ni.kant',}
+            'email': 'raj@ni.kant', }
         response = self.client.post('/users/%d/edit/' % saved_user.pk, data=form_data)
         self.assertRedirects(response, expected_url='/users/')
 
@@ -111,13 +113,13 @@ class UsersViewTest(BaseTest):
         self.assertIn(message, response.cookies['messages'].value)
 
     def test_post_update_with_errors(self):
-        saved_user = User.objects.create(username='user1', email= 'emily@gmail.com')
+        saved_user = User.objects.create(username='user1', email='emily@gmail.com')
         user_profile = UserProfile.objects.create(user=saved_user, region=self.afro, country=self.uganda,
                                                   organization=self.organization)
         self.global_admin.user_set.add(saved_user)
         form_data = {
             'username': 'user1tom hjdhdh',
-            'email': 'raj@ni.kant',}
+            'email': 'raj@ni.kant', }
         response = self.client.post('/users/%d/edit/' % saved_user.pk, data=form_data)
         self.assertEqual(200, response.status_code)
         self.failUnless(User.objects.filter(username='user1', email='emily@gmail.com'))
@@ -129,7 +131,7 @@ class UsersViewTest(BaseTest):
         self.assertIn('Edit User', response.context['title'])
 
     def test_post_update_with_no_email_shows_errors(self):
-        saved_user = User.objects.create(username='user1', email= 'testuser@unicef.org')
+        saved_user = User.objects.create(username='user1', email='testuser@unicef.org')
         user_profile = UserProfile.objects.create(user=saved_user, region=self.afro, country=self.uganda,
                                                   organization=self.organization)
         self.global_admin.user_set.add(saved_user)

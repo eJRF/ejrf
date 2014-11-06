@@ -3,7 +3,8 @@ from django.contrib import messages
 from django.contrib.auth.views import redirect_to_login
 from django.http import HttpResponseRedirect
 from eJRF.settings import LOGIN_REDIRECT_URL
-from questionnaire.models import Questionnaire, Region, SubSection, Question, Section, Theme, QuestionGroup, SupportDocument
+from questionnaire.models import Questionnaire, Region, SubSection, Question, Section, Theme, QuestionGroup, \
+    SupportDocument
 
 
 class WithErrorMessageAccessMixin(AccessMixin):
@@ -22,7 +23,6 @@ class WithErrorMessageAccessMixin(AccessMixin):
 
 
 class RegionalPermissionRequired(WithErrorMessageAccessMixin):
-
     def get_permissions_from_request(self, request, **kwargs):
         user = request.user
         regions = self.get_region(kwargs)
@@ -37,7 +37,6 @@ class RegionalPermissionRequired(WithErrorMessageAccessMixin):
 
 
 class RegionAndPermissionRequiredMixin(RegionalPermissionRequired):
-
     def get_region(self, kwargs):
         if 'region_id' in kwargs:
             return [Region.objects.get(id=kwargs['region_id'])]
@@ -60,12 +59,12 @@ class OwnerAndPermissionRequiredMixin(RegionalPermissionRequired):
         if 'subsection_id' in kwargs:
             return [SubSection.objects.get(id=kwargs['subsection_id']).region]
         object_ids = filter(lambda key: key.endswith('_id'), kwargs.keys())
-        objects = [eval(object_id.replace("_id", "").capitalize()).objects.get(id=kwargs[object_id]) for object_id in object_ids]
+        objects = [eval(object_id.replace("_id", "").capitalize()).objects.get(id=kwargs[object_id]) for object_id in
+                   object_ids]
         return [object.region for object in objects]
 
 
 class DeleteDocumentMixin(WithErrorMessageAccessMixin):
-
     def get_permissions_from_request(self, request, **kwargs):
         user = request.user
         document = SupportDocument.objects.get(id=kwargs['document_id'])

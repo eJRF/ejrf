@@ -1,6 +1,8 @@
 from urllib import quote
+
 from django.core.urlresolvers import reverse
 from django.test import Client
+
 from questionnaire.models import Organization, Questionnaire, Section
 from questionnaire.tests.base_test import BaseTest
 
@@ -38,7 +40,8 @@ class ManageJRFViewTest(BaseTest):
     def test_permission_required_for_create_section(self):
         self.assert_permission_required(self.url)
 
-        user_not_in_same_region = self.create_user(username="asian_chic", group=self.REGIONAL_ADMIN, region="ASEAN", org="WHO")
+        user_not_in_same_region = self.create_user(username="asian_chic", group=self.REGIONAL_ADMIN, region="ASEAN",
+                                                   org="WHO")
         self.assign('can_edit_questionnaire', user_not_in_same_region)
 
         self.client.logout()

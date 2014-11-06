@@ -1,49 +1,19 @@
 from django.core.exceptions import ValidationError
 from django.db import models, IntegrityError
+
 from questionnaire.models.base import BaseModel
+from questionnaire.utils.answer_type import AnswerTypes
 from questionnaire.utils.model_utils import largest_uid, stringify
-import itertools
 
 
 class Question(BaseModel):
-    NUMBER = "Number"
-    MULTICHOICE = "MultiChoice"
-    DAY_MONTH_YEAR = "DD/MM/YYYY"
-    MONTH_YEAR = "MM/YYYY"
-    DECIMAL = 'decimal'
-    INTEGER = 'integer'
-    DATE = "Date"
-
-    DATE_SUB_TYPES = (
-        "DD/MM/YYYY",
-        "MM/YYYY"
-    )
-    NUMBER_SUB_TYPES = (
-        'Decimal',
-        'Integer'
-    )
-
-    ANSWER_SUB_TYPES = (
-        (DATE_SUB_TYPES[0], DATE_SUB_TYPES[0]),
-        (DATE_SUB_TYPES[1], DATE_SUB_TYPES[1]),
-        (NUMBER_SUB_TYPES[0], NUMBER_SUB_TYPES[0]),
-        (NUMBER_SUB_TYPES[1], NUMBER_SUB_TYPES[1]),
-    )
-
-    ANSWER_TYPES = (
-        ("Date", DATE),
-        ("MultiChoice", MULTICHOICE),
-        ("Number", NUMBER),
-        ("Text", "Text"),
-    )
-
     text = models.TextField(blank=False, null=False)
     export_label = models.TextField(blank=True, null=False)
     instructions = models.TextField(blank=True, null=True)
     UID = models.CharField(blank=False, null=False, max_length=6)
 
-    answer_type = models.CharField(blank=False, null=False, max_length=20, choices=ANSWER_TYPES)
-    answer_sub_type = models.CharField(blank=True, null=True, max_length=20, choices=ANSWER_SUB_TYPES)
+    answer_type = models.CharField(blank=False, null=False, max_length=20, choices=AnswerTypes.answer_types())
+    answer_sub_type = models.CharField(blank=True, null=True, max_length=20, choices=AnswerTypes.answer_sub_types())
 
     region = models.ForeignKey("Region", blank=False, null=True, related_name="questions")
     theme = models.ForeignKey("Theme", null=True, related_name="questions")
@@ -112,7 +82,7 @@ class Question(BaseModel):
         return Questionnaire.objects.filter(sections__sub_sections__question_group__in=self.question_group.all())
 
     def is_multichoice(self):
-        return self.answer_type == self.MULTICHOICE
+        return self.answer_type == AnswerTypes.MULTI_CHOICE
 
     def answered_options(self, question_group, **kwargs):
         all_answers = self.answers.filter(answergroup__grouped_question=question_group, **kwargs). \
@@ -126,47 +96,15 @@ class Question(BaseModel):
     def is_ordered_after(self, other, subsection):
         question_orders = self.orders.filter(question_group__subsection=subsection)
         other_question_orders = other.orders.filter(question_group__subsection=subsection)
-        # print other_question_orders.count()
         if question_orders.exists() and other_question_orders.exists():
-            # print other_question_orders[0].question_group.__dict__
             if question_orders[0].question_group == other_question_orders[0].question_group:
                 return question_orders[0].order > other_question_orders[0].order
             else:
                 return question_orders[0].question_group.order > other_question_orders[0].question_group.order
         elif not question_orders.exists():
+            print '*'*100
             raise ValidationError('Both questions should belong to the same subsection')
         return False
-
-
-class AnswerType(object):
-    valid_types = {
-            "Date": (
-                "DD/MM/YYYY",
-                "MM/YYYY"
-            ),
-            "MultiChoice": (
-                "MultipleResponse",
-                "SingleResponse"
-            ),
-            "Number": (
-                'Decimal',
-                'Integer'
-            ),
-            "Text": ()
-        }
-
-    def __init__(self, answer_type):
-        self.answer_type = answer_type
-        self.answer_sub_types = self.valid_types[answer_type]
-
-    @classmethod
-    def answer_types(cls):
-        return tuple(map(lambda (k, v): (k, k), cls.valid_types.iteritems()))
-
-    @classmethod
-    def answer_sub_types(cls):
-        subtypes = filter(None, [v for (k, v) in cls.valid_types.iteritems()])
-        return tuple(map(lambda v: (v, v), itertools.chain(*subtypes)))
 
 
 class QuestionOption(BaseModel):

@@ -1,12 +1,13 @@
 from datetime import date
+
 from django.contrib.auth.models import Group
+
 from questionnaire.forms.filter import UserFilterForm, ExportFilterForm, QuestionFilterForm
 from questionnaire.models import Region, Organization, Country, Theme, Questionnaire
 from questionnaire.tests.base_test import BaseTest
 
 
 class UserProfileFormTest(BaseTest):
-
     def setUp(self):
         self.region = Region.objects.create(name="Afro")
         self.organization = Organization.objects.create(name="UNICEF")
@@ -41,7 +42,6 @@ class UserProfileFormTest(BaseTest):
 
 
 class ExportFilterFormTest(BaseTest):
-
     def setUp(self):
         self.afro = Region.objects.create(name="Afro")
         self.uganda = Country.objects.create(name="Uganda", code="UGX")
@@ -96,7 +96,6 @@ class ExportFilterFormTest(BaseTest):
 
 
 class QuestionFilterFormTest(BaseTest):
-
     def setUp(self):
         self.theme = Theme.objects.create(name="Theme1")
         self.form_data = {
@@ -104,5 +103,5 @@ class QuestionFilterFormTest(BaseTest):
         }
 
     def test_post(self):
-        question_filter=QuestionFilterForm(self.form_data)
+        question_filter = QuestionFilterForm(self.form_data)
         self.assertTrue(question_filter.is_valid())

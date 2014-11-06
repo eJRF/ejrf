@@ -1,5 +1,6 @@
 from django.forms import Form
 from django import forms
+
 from questionnaire.models import Question
 
 
@@ -27,4 +28,4 @@ class AssignQuestionForm(Form):
     def _create_group_orders(self, question_group):
         max_order = question_group.max_questions_order()
         for index, question in enumerate(self.cleaned_data['questions']):
-            question.orders.create(question_group=question_group, order=max_order+index+1)
+            question.orders.create(question_group=question_group, order=max_order + index + 1)

@@ -1,6 +1,7 @@
+import factory
+
 from questionnaire.models import QuestionOption
 from questionnaire.tests.factories.question_factory import QuestionFactory
-import factory
 
 
 class QuestionOptionFactory(factory.DjangoModelFactory):

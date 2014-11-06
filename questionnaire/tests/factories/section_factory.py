@@ -1,6 +1,7 @@
+import factory
+
 from questionnaire.models import Section
 from questionnaire.tests.factories.questionnaire_factory import QuestionnaireFactory
-import factory
 
 
 class SectionFactory(factory.DjangoModelFactory):

@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import View
-from braces.views import PermissionRequiredMixin
+
 from questionnaire.forms.assign_question import AssignQuestionForm
 from questionnaire.mixins import RegionAndPermissionRequiredMixin
 from questionnaire.models import SubSection, Question

@@ -1,7 +1,8 @@
 from django.contrib.auth.models import User
+from django.test.client import RequestFactory
+
 from questionnaire.models import Questionnaire, UserProfile, Organization, Region, Country
 from questionnaire.tests.base_test import BaseTest
-from django.test.client import RequestFactory
 from questionnaire.utils.view_utils import get_country, get_questionnaire_status, get_regions
 
 
@@ -31,7 +32,8 @@ class ViewUtilTest(BaseTest):
         request.user = self.user
         questionnaire_status = get_questionnaire_status(request)
         self.assertEqual(3, len(questionnaire_status))
-        [self.assertIn(status, questionnaire_status)for status in [Questionnaire.PUBLISHED, Questionnaire.DRAFT, Questionnaire.FINALIZED]]
+        [self.assertIn(status, questionnaire_status) for status in
+         [Questionnaire.PUBLISHED, Questionnaire.DRAFT, Questionnaire.FINALIZED]]
 
     def test_gets_questionnaire_status_for_data_submitter_user(self):
         user = self.create_user(username="Ugandauser", group=self.GLOBAL_ADMIN, org="WHO")
@@ -40,7 +42,7 @@ class ViewUtilTest(BaseTest):
         request.user = user
         questionnaire_status = get_questionnaire_status(request)
         self.assertEqual(1, len(questionnaire_status))
-        [self.assertIn(status, questionnaire_status)for status in [Questionnaire.PUBLISHED]]
+        [self.assertIn(status, questionnaire_status) for status in [Questionnaire.PUBLISHED]]
 
     def test_gets_region_from_get_params(self):
         organization = Organization.objects.create(name="WHO")

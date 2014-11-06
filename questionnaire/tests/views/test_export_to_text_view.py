@@ -1,10 +1,13 @@
 from urllib import quote
+
 from django.test import Client
+
 from questionnaire.forms.filter import ExportFilterForm
 from questionnaire.models import Questionnaire, Section, SubSection, Question, QuestionGroup, Organization, Region, \
     Country, NumericalAnswer, Answer, QuestionGroupOrder, AnswerGroup, \
     MultiChoiceAnswer, QuestionOption, Theme
 from questionnaire.tests.base_test import BaseTest
+from questionnaire.utils.answer_type import AnswerTypes
 
 
 class ExportToTextViewTest(BaseTest):
@@ -33,10 +36,10 @@ class ExportToTextViewTest(BaseTest):
         self.theme = Theme.objects.create(name="Theme1", description="Some Theme")
 
         self.question1 = Question.objects.create(text='B. Number of cases tested', UID='C00003', answer_type='Number',
-                                                 theme=self.theme, answer_sub_type=Question.INTEGER)
+                                                 theme=self.theme, answer_sub_type=AnswerTypes.INTEGER)
 
         self.question2 = Question.objects.create(text='C. Number of cases positive', UID='C00004', answer_type='Number',
-                                                 theme=self.theme, answer_sub_type=Question.INTEGER)
+                                                 theme=self.theme, answer_sub_type=AnswerTypes.INTEGER)
 
         self.parent = QuestionGroup.objects.create(subsection=self.sub_section, order=1)
         self.parent.question.add(self.question1, self.question2)
@@ -131,11 +134,12 @@ class SpecificExportViewTest(BaseTest):
         self.option2 = QuestionOption.objects.create(text="TB", question=self.primary_question, UID="QO2")
 
         self.question1 = Question.objects.create(text='B. Number of cases tested', UID='C00004', answer_type='Number',
-                                                 answer_sub_type=Question.INTEGER)
+                                                 answer_sub_type=AnswerTypes.INTEGER)
 
         self.question2 = Question.objects.create(text='C. Number of cases positive',
                                                  instructions="Include only those cases found positive for the infectious agent.",
-                                                 UID='C00005', answer_type='Number', answer_sub_type=Question.INTEGER)
+                                                 UID='C00005', answer_type='Number',
+                                                 answer_sub_type=AnswerTypes.INTEGER)
 
         self.parent = QuestionGroup.objects.create(subsection=self.sub_section, order=1)
         self.parent.question.add(self.question1, self.question2, self.primary_question)

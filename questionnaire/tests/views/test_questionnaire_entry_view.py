@@ -1,11 +1,13 @@
-from django.core.urlresolvers import reverse
+from urllib import quote
+
 from django.test import Client
+
 from questionnaire.forms.sections import SectionForm, SubSectionForm
-from questionnaire.models import Questionnaire, Section, SubSection, Question, QuestionGroup, QuestionOption, MultiChoiceAnswer, NumericalAnswer, QuestionGroupOrder, AnswerGroup, Answer, Country, TextAnswer, DateAnswer, \
+from questionnaire.models import Questionnaire, Section, SubSection, Question, QuestionGroup, QuestionOption, \
+    MultiChoiceAnswer, NumericalAnswer, QuestionGroupOrder, AnswerGroup, Answer, Country, TextAnswer, DateAnswer, \
     Region
 from questionnaire.services.questionnaire_entry_form_service import QuestionnaireEntryFormService
 from questionnaire.tests.base_test import BaseTest
-from urllib import quote
 
 
 class QuestionnaireEntrySaveDraftTest(BaseTest):
@@ -28,7 +30,8 @@ class QuestionnaireEntrySaveDraftTest(BaseTest):
         self.sub_section = SubSection.objects.create(title="Reported cases for the year 2013", order=1,
                                                      section=self.section_1)
 
-        self.question1 = Question.objects.create(text='Disease', UID='C00001', answer_type='MultiChoice', is_primary=True)
+        self.question1 = Question.objects.create(text='Disease', UID='C00001', answer_type='MultiChoice',
+                                                 is_primary=True)
         self.question2 = Question.objects.create(text='B. Number of cases tested',
                                                  instructions="Enter the total number of cases for which specimens were collected, and tested in laboratory",
                                                  UID='C00003', answer_type='Number')
@@ -51,9 +54,9 @@ class QuestionnaireEntrySaveDraftTest(BaseTest):
         self.url = '/questionnaire/entry/%d/section/%d/' % (self.questionnaire.id, self.section_1.id)
 
         self.data = {u'MultiChoice-MAX_NUM_FORMS': u'1', u'MultiChoice-TOTAL_FORMS': u'1',
-                u'MultiChoice-INITIAL_FORMS': u'1', u'MultiChoice-0-response': self.option1.id,
-                u'Number-INITIAL_FORMS': u'2', u'Number-TOTAL_FORMS': u'2', u'Number-MAX_NUM_FORMS': u'2',
-                u'Number-0-response': u'2', u'Number-1-response': u'33'}
+                     u'MultiChoice-INITIAL_FORMS': u'1', u'MultiChoice-0-response': self.option1.id,
+                     u'Number-INITIAL_FORMS': u'2', u'Number-TOTAL_FORMS': u'2', u'Number-MAX_NUM_FORMS': u'2',
+                     u'Number-0-response': u'2', u'Number-1-response': u'33'}
 
     def test_get_questionnaire_entry_view(self):
         response = self.client.get(self.url)
@@ -77,10 +80,11 @@ class QuestionnaireEntrySaveDraftTest(BaseTest):
         self.assertEqual(False, response.context['preview'])
         self.assertTrue('documents' in response.context)
         self.assertIsInstance(response.context['section_form'], SectionForm)
-        self.assertEqual(response.context['new_section_action'], '/questionnaire/entry/%s/section/new/' % self.questionnaire.id)
+        self.assertEqual(response.context['new_section_action'],
+                         '/questionnaire/entry/%s/section/new/' % self.questionnaire.id)
         self.assertIsInstance(response.context['subsection_form'], SubSectionForm)
         self.assertEqual(response.context['subsection_action'], '/questionnaire/entry/%s/section/%s/subsection/new/' %
-                                                                (self.questionnaire.id, self.section_1.id))
+                         (self.questionnaire.id, self.section_1.id))
 
     def test_gets_version_if_in_get_params(self):
         response = self.client.get(self.url)
@@ -102,7 +106,8 @@ class QuestionnaireEntrySaveDraftTest(BaseTest):
         self.assertNotIn(questionnaire_2_section, response.context['ordered_sections'])
 
     def test_gets_printable_as_true_if_set_in_request(self):
-        url = '/questionnaire/entry/%d/section/%d/?printable=true&preview=1' % (self.questionnaire.id, self.section_1.id)
+        url = '/questionnaire/entry/%d/section/%d/?printable=true&preview=1' % (
+        self.questionnaire.id, self.section_1.id)
         response = self.client.get(url)
         self.assertEqual(True, response.context['printable'])
         self.assertEqual(True, response.context['preview'])
@@ -111,7 +116,8 @@ class QuestionnaireEntrySaveDraftTest(BaseTest):
         self.assert_login_required('/questionnaire/entry/%d/section/%d/' % (self.questionnaire.id, self.section_1.id))
 
     def test_permission_required(self):
-        self.assert_permission_required('/questionnaire/entry/%d/section/%d/' % (self.questionnaire.id, self.section_1.id))
+        self.assert_permission_required(
+            '/questionnaire/entry/%d/section/%d/' % (self.questionnaire.id, self.section_1.id))
 
     def test_POST_is_restricted_to_data_submitters_only(self):
         user = self.create_user(username="Global", group=self.GLOBAL_ADMIN, org="WHO")
@@ -135,9 +141,12 @@ class QuestionnaireEntrySaveDraftTest(BaseTest):
         templates = [template.name for template in response.templates]
         self.assertIn('questionnaires/entry/index.html', templates)
 
-        self.failUnless(MultiChoiceAnswer.objects.filter(response__id=int(data['MultiChoice-0-response']), question=self.question1))
-        self.failUnless(NumericalAnswer.objects.filter(response=int(data['Number-0-response']), question=self.question2))
-        self.failUnless(NumericalAnswer.objects.filter(response=int(data['Number-1-response']), question=self.question3))
+        self.failUnless(
+            MultiChoiceAnswer.objects.filter(response__id=int(data['MultiChoice-0-response']), question=self.question1))
+        self.failUnless(
+            NumericalAnswer.objects.filter(response=int(data['Number-0-response']), question=self.question2))
+        self.failUnless(
+            NumericalAnswer.objects.filter(response=int(data['Number-1-response']), question=self.question3))
 
     def test_post_groups_rows_into_answer_groups(self):
         Answer.objects.select_subclasses().delete()
@@ -149,7 +158,8 @@ class QuestionnaireEntrySaveDraftTest(BaseTest):
         response = self.client.post(self.url, data=data)
         self.assertEqual(200, response.status_code)
 
-        primary = MultiChoiceAnswer.objects.get(response__id=int(data['MultiChoice-0-response']), question=self.question1)
+        primary = MultiChoiceAnswer.objects.get(response__id=int(data['MultiChoice-0-response']),
+                                                question=self.question1)
         answer_1 = NumericalAnswer.objects.get(response=int(data['Number-0-response']), question=self.question2)
         answer_2 = NumericalAnswer.objects.get(response=int(data['Number-1-response']), question=self.question3)
 
@@ -197,7 +207,8 @@ class QuestionnaireEntrySaveDraftTest(BaseTest):
         data = self.data
         self.client.post(self.url, data=data)
 
-        old_primary = MultiChoiceAnswer.objects.get(response__id=int(data['MultiChoice-0-response']), question=self.question1)
+        old_primary = MultiChoiceAnswer.objects.get(response__id=int(data['MultiChoice-0-response']),
+                                                    question=self.question1)
         old_answer_1 = NumericalAnswer.objects.get(response=int(data['Number-0-response']), question=self.question2)
         old_answer_2 = NumericalAnswer.objects.get(response=int(data['Number-1-response']), question=self.question3)
 
@@ -207,9 +218,12 @@ class QuestionnaireEntrySaveDraftTest(BaseTest):
         response = self.client.post(self.url, data=data_modified)
         self.assertEqual(200, response.status_code)
 
-        primary = MultiChoiceAnswer.objects.get(response__id=int(data_modified['MultiChoice-0-response']), question=self.question1, version=1)
-        answer_1 = NumericalAnswer.objects.get(response=int(data_modified['Number-0-response']), question=self.question2, version=1)
-        answer_2 = NumericalAnswer.objects.get(response=int(data_modified['Number-1-response']), question=self.question3, version=1)
+        primary = MultiChoiceAnswer.objects.get(response__id=int(data_modified['MultiChoice-0-response']),
+                                                question=self.question1, version=1)
+        answer_1 = NumericalAnswer.objects.get(response=int(data_modified['Number-0-response']),
+                                               question=self.question2, version=1)
+        answer_2 = NumericalAnswer.objects.get(response=int(data_modified['Number-1-response']),
+                                               question=self.question3, version=1)
 
         self.assertEqual(old_primary.id, primary.id)
         self.assertEqual(old_answer_1.id, answer_1.id)
@@ -222,11 +236,14 @@ class QuestionnaireEntrySaveDraftTest(BaseTest):
         data = self.data.copy()
         self.client.post(self.url, data=data)
 
-        self.client.post('/submit/%d' %self.questionnaire.id)
+        self.client.post('/submit/%d' % self.questionnaire.id)
 
-        old_primary = MultiChoiceAnswer.objects.get(response__id=int(data['MultiChoice-0-response']), question=self.question1, version=1)
-        old_answer_1 = NumericalAnswer.objects.get(response=int(data['Number-0-response']), question=self.question2, version=1)
-        old_answer_2 = NumericalAnswer.objects.get(response=int(data['Number-1-response']), question=self.question3, version=1)
+        old_primary = MultiChoiceAnswer.objects.get(response__id=int(data['MultiChoice-0-response']),
+                                                    question=self.question1, version=1)
+        old_answer_1 = NumericalAnswer.objects.get(response=int(data['Number-0-response']), question=self.question2,
+                                                   version=1)
+        old_answer_2 = NumericalAnswer.objects.get(response=int(data['Number-1-response']), question=self.question3,
+                                                   version=1)
 
         self.assertEqual(Answer.SUBMITTED_STATUS, old_primary.status)
         self.assertEqual(Answer.SUBMITTED_STATUS, old_answer_1.status)
@@ -238,9 +255,12 @@ class QuestionnaireEntrySaveDraftTest(BaseTest):
         data = self.data
         self.client.post(self.url, data=data)
 
-        primary = MultiChoiceAnswer.objects.filter(response__id=int(data['MultiChoice-0-response']), question=self.question1, version=2)
-        answer_1 = NumericalAnswer.objects.filter(response=int(data['Number-0-response']), question=self.question2, version=2)
-        answer_2 = NumericalAnswer.objects.filter(response=int(data['Number-1-response']), question=self.question3, version=2)
+        primary = MultiChoiceAnswer.objects.filter(response__id=int(data['MultiChoice-0-response']),
+                                                   question=self.question1, version=2)
+        answer_1 = NumericalAnswer.objects.filter(response=int(data['Number-0-response']), question=self.question2,
+                                                  version=2)
+        answer_2 = NumericalAnswer.objects.filter(response=int(data['Number-1-response']), question=self.question3,
+                                                  version=2)
 
         self.assertEqual(1, primary.count())
         self.assertEqual(Answer.DRAFT_STATUS, primary[0].status)
@@ -265,20 +285,26 @@ class QuestionnaireEntrySaveDraftTest(BaseTest):
 
         response = self.client.post(self.url + "?preview=1", data=data)
 
-        self.failUnless(MultiChoiceAnswer.objects.filter(response__id=int(data['MultiChoice-0-response']), question=self.question1))
-        self.failUnless(NumericalAnswer.objects.filter(response=int(data['Number-0-response']), question=self.question2))
-        self.failUnless(NumericalAnswer.objects.filter(response=int(data['Number-1-response']), question=self.question3))
+        self.failUnless(
+            MultiChoiceAnswer.objects.filter(response__id=int(data['MultiChoice-0-response']), question=self.question1))
+        self.failUnless(
+            NumericalAnswer.objects.filter(response=int(data['Number-0-response']), question=self.question2))
+        self.failUnless(
+            NumericalAnswer.objects.filter(response=int(data['Number-1-response']), question=self.question3))
 
         self.assertRedirects(response, data['redirect_url'])
 
     def test_get_preview_for_version(self):
         version = 1
         country = Country.objects.create(name="Kenya")
-        url = '/questionnaire/entry/%s/section/%d/?country=%s&version=%s' % (self.questionnaire.id, self.section_1.id, country.id, version)
+        url = '/questionnaire/entry/%s/section/%d/?country=%s&version=%s' % (
+        self.questionnaire.id, self.section_1.id, country.id, version)
 
-        self.initial = {'country': country, 'status': 'Draft', 'version': 1, 'code': 'ABC123', 'questionnaire': self.questionnaire}
+        self.initial = {'country': country, 'status': 'Draft', 'version': 1, 'code': 'ABC123',
+                        'questionnaire': self.questionnaire}
 
-        version_1_primary_answer = MultiChoiceAnswer.objects.create(response=self.option1, question=self.question1, **self.initial)
+        version_1_primary_answer = MultiChoiceAnswer.objects.create(response=self.option1, question=self.question1,
+                                                                    **self.initial)
         version_1_answer_1 = NumericalAnswer.objects.create(response=4, question=self.question2, **self.initial)
         version_1_answer_2 = NumericalAnswer.objects.create(response=2, question=self.question3, **self.initial)
 
@@ -306,15 +332,16 @@ class QuestionnaireEntrySaveDraftTest(BaseTest):
 
 
 class SaveGridDraftQuestionGroupEntryTest(BaseTest):
-
     def setUp(self):
         AnswerGroup.objects.all().delete()
         self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English")
         self.section1 = Section.objects.create(title="Reported Cases of Selected Vaccine", order=1,
                                                questionnaire=self.questionnaire, name="Reported Cases")
         self.sub_section = SubSection.objects.create(title="subsection 1", order=1, section=self.section1)
-        self.question_group = QuestionGroup.objects.create(subsection=self.sub_section, order=1, grid=True, display_all=True)
-        self.question1 = Question.objects.create(text='Favorite beer 1', UID='C00001', answer_type='MultiChoice', is_primary=True)
+        self.question_group = QuestionGroup.objects.create(subsection=self.sub_section, order=1, grid=True,
+                                                           display_all=True)
+        self.question1 = Question.objects.create(text='Favorite beer 1', UID='C00001', answer_type='MultiChoice',
+                                                 is_primary=True)
         self.option1 = QuestionOption.objects.create(text='tusker lager', question=self.question1)
         self.option2 = QuestionOption.objects.create(text='tusker lager1', question=self.question1)
         self.option3 = QuestionOption.objects.create(text='tusker lager2', question=self.question1)
@@ -333,20 +360,21 @@ class SaveGridDraftQuestionGroupEntryTest(BaseTest):
         QuestionGroupOrder.objects.create(question=self.question4, question_group=self.question_group, order=4)
         self.country = Country.objects.create(name="Uganda")
         self.version = 1
-        self.initial = {'country': self.country, 'status': 'Draft', 'version': self.version, 'code': 'ABC123', 'questionnaire': self.questionnaire}
+        self.initial = {'country': self.country, 'status': 'Draft', 'version': self.version, 'code': 'ABC123',
+                        'questionnaire': self.questionnaire}
         self.data = {u'MultiChoice-MAX_NUM_FORMS': u'3', u'MultiChoice-TOTAL_FORMS': u'3',
                      u'MultiChoice-INITIAL_FORMS': u'3', u'MultiChoice-0-response': self.option1.id,
-                     u'MultiChoice-1-response': self.option2.id,  u'MultiChoice-2-response': self.option3.id,
+                     u'MultiChoice-1-response': self.option2.id, u'MultiChoice-2-response': self.option3.id,
                      u'Number-MAX_NUM_FORMS': u'3', u'Number-TOTAL_FORMS': u'3',
                      u'Number-INITIAL_FORMS': u'3', u'Number-0-response': '22',
-                     u'Number-1-response': '44',  u'Number-2-response': '33',
+                     u'Number-1-response': '44', u'Number-2-response': '33',
                      u'Text-MAX_NUM_FORMS': u'3', u'Text-TOTAL_FORMS': u'3',
                      u'Text-INITIAL_FORMS': u'3', u'Text-0-response': 'Haha',
-                     u'Text-1-response': 'Hehe',  u'Text-2-response': 'hehehe',
+                     u'Text-1-response': 'Hehe', u'Text-2-response': 'hehehe',
                      u'Date-MAX_NUM_FORMS': u'3', u'Date-TOTAL_FORMS': u'3',
                      u'Date-INITIAL_FORMS': u'3', u'Date-0-response': '2014-02-02',
-                     u'Date-1-response': '2014-10-02',  u'Date-2-response': '2014-03-02',
-                     }
+                     u'Date-1-response': '2014-10-02', u'Date-2-response': '2014-03-02',
+        }
         self.url = '/questionnaire/entry/%d/section/%d/' % (self.questionnaire.id, self.section1.id)
         self.client = Client()
         self.user = self.create_user(group=self.DATA_SUBMITTER, country="Uganda", region="AFRO")
@@ -358,9 +386,12 @@ class SaveGridDraftQuestionGroupEntryTest(BaseTest):
 
     def test_post_grid_view_saves_drafts(self):
         data = self.data
-        self.failIf(MultiChoiceAnswer.objects.filter(response__id=int(data['MultiChoice-0-response']), question=self.question1))
-        self.failIf(MultiChoiceAnswer.objects.filter(response__id=int(data['MultiChoice-1-response']), question=self.question1))
-        self.failIf(MultiChoiceAnswer.objects.filter(response__id=int(data['MultiChoice-2-response']), question=self.question1))
+        self.failIf(
+            MultiChoiceAnswer.objects.filter(response__id=int(data['MultiChoice-0-response']), question=self.question1))
+        self.failIf(
+            MultiChoiceAnswer.objects.filter(response__id=int(data['MultiChoice-1-response']), question=self.question1))
+        self.failIf(
+            MultiChoiceAnswer.objects.filter(response__id=int(data['MultiChoice-2-response']), question=self.question1))
 
         self.failIf(NumericalAnswer.objects.filter(response=int(data['Number-0-response']), question=self.question3))
         self.failIf(NumericalAnswer.objects.filter(response=int(data['Number-1-response']), question=self.question3))
@@ -376,13 +407,19 @@ class SaveGridDraftQuestionGroupEntryTest(BaseTest):
 
         response = self.client.post(self.url, data=data)
 
-        self.failUnless(MultiChoiceAnswer.objects.filter(response__id=int(data['MultiChoice-0-response']), question=self.question1))
-        self.failUnless(MultiChoiceAnswer.objects.filter(response__id=int(data['MultiChoice-1-response']), question=self.question1))
-        self.failUnless(MultiChoiceAnswer.objects.filter(response__id=int(data['MultiChoice-2-response']), question=self.question1))
+        self.failUnless(
+            MultiChoiceAnswer.objects.filter(response__id=int(data['MultiChoice-0-response']), question=self.question1))
+        self.failUnless(
+            MultiChoiceAnswer.objects.filter(response__id=int(data['MultiChoice-1-response']), question=self.question1))
+        self.failUnless(
+            MultiChoiceAnswer.objects.filter(response__id=int(data['MultiChoice-2-response']), question=self.question1))
 
-        self.failUnless(NumericalAnswer.objects.filter(response=int(data['Number-0-response']), question=self.question3))
-        self.failUnless(NumericalAnswer.objects.filter(response=int(data['Number-1-response']), question=self.question3))
-        self.failUnless(NumericalAnswer.objects.filter(response=int(data['Number-2-response']), question=self.question3))
+        self.failUnless(
+            NumericalAnswer.objects.filter(response=int(data['Number-0-response']), question=self.question3))
+        self.failUnless(
+            NumericalAnswer.objects.filter(response=int(data['Number-1-response']), question=self.question3))
+        self.failUnless(
+            NumericalAnswer.objects.filter(response=int(data['Number-2-response']), question=self.question3))
 
         self.failUnless(TextAnswer.objects.filter(response=data['Text-0-response'], question=self.question2))
         self.failUnless(TextAnswer.objects.filter(response=data['Text-1-response'], question=self.question2))
@@ -413,7 +450,8 @@ class SaveGridDraftQuestionGroupEntryTest(BaseTest):
         self.assertEqual(1, group1.count())
         group1_answers = group1[0].answer.all().select_subclasses()
         self.assertEqual(4, group1_answers.count())
-        self.assertIn(NumericalAnswer.objects.get(response=int(data['Number-0-response']), question=self.question3), group1_answers)
+        self.assertIn(NumericalAnswer.objects.get(response=int(data['Number-0-response']), question=self.question3),
+                      group1_answers)
         self.assertIn(TextAnswer.objects.get(response=data['Text-0-response'], question=self.question2), group1_answers)
         self.assertIn(DateAnswer.objects.get(response=data['Date-0-response'], question=self.question4), group1_answers)
 
@@ -422,7 +460,8 @@ class SaveGridDraftQuestionGroupEntryTest(BaseTest):
         self.assertEqual(1, group1.count())
         group2_answers = group2[0].answer.all().select_subclasses()
         self.assertEqual(4, group2_answers.count())
-        self.assertIn(NumericalAnswer.objects.get(response=int(data['Number-1-response']), question=self.question3), group2_answers)
+        self.assertIn(NumericalAnswer.objects.get(response=int(data['Number-1-response']), question=self.question3),
+                      group2_answers)
         self.assertIn(TextAnswer.objects.get(response=data['Text-1-response'], question=self.question2), group2_answers)
         self.assertIn(DateAnswer.objects.get(response=data['Date-1-response'], question=self.question4), group2_answers)
 
@@ -431,12 +470,14 @@ class SaveGridDraftQuestionGroupEntryTest(BaseTest):
         self.assertEqual(1, group3.count())
         group3_answers = group3[0].answer.all().select_subclasses()
         self.assertEqual(4, group3_answers.count())
-        self.assertIn(NumericalAnswer.objects.get(response=int(data['Number-2-response']), question=self.question3), group3_answers)
+        self.assertIn(NumericalAnswer.objects.get(response=int(data['Number-2-response']), question=self.question3),
+                      group3_answers)
         self.assertIn(TextAnswer.objects.get(response=data['Text-2-response'], question=self.question2), group3_answers)
         self.assertIn(DateAnswer.objects.get(response=data['Date-2-response'], question=self.question4), group3_answers)
 
     def given_I_have_questions_and_corresponding_submitted_answers_in_a_section(self):
-        section = Section.objects.create(title="another section", order=2, questionnaire=self.questionnaire, name="haha")
+        section = Section.objects.create(title="another section", order=2, questionnaire=self.questionnaire,
+                                         name="haha")
         sub_section = SubSection.objects.create(title="subsection in another section", order=1, section=section)
         question1 = Question.objects.create(text='q1', UID='C00011', answer_type='MultiChoice')
         question2 = Question.objects.create(text='q2', UID='C00033', answer_type='Number')
@@ -454,15 +495,17 @@ class SaveGridDraftQuestionGroupEntryTest(BaseTest):
         QuestionGroupOrder.objects.create(question_group=question_group, question=question3, order=3)
 
         data = {u'MultiChoice-MAX_NUM_FORMS': u'1', u'MultiChoice-TOTAL_FORMS': u'1',
-                     u'MultiChoice-INITIAL_FORMS': u'1', u'MultiChoice-0-response': option1.id,
-                     u'Number-INITIAL_FORMS': u'2', u'Number-TOTAL_FORMS': u'2', u'Number-MAX_NUM_FORMS': u'2',
-                     u'Number-0-response': u'2', u'Number-1-response': u'33'}
+                u'MultiChoice-INITIAL_FORMS': u'1', u'MultiChoice-0-response': option1.id,
+                u'Number-INITIAL_FORMS': u'2', u'Number-TOTAL_FORMS': u'2', u'Number-MAX_NUM_FORMS': u'2',
+                u'Number-0-response': u'2', u'Number-1-response': u'33'}
 
         initial = self.initial.copy()
         initial['status'] = Answer.SUBMITTED_STATUS
         old_primary = MultiChoiceAnswer.objects.create(response=option1, question=question1, **initial)
-        old_answer_1 = NumericalAnswer.objects.create(response=int(data['Number-0-response']), question=question2, **initial)
-        old_answer_2 = NumericalAnswer.objects.create(response=int(data['Number-1-response']), question=question3, **initial)
+        old_answer_1 = NumericalAnswer.objects.create(response=int(data['Number-0-response']), question=question2,
+                                                      **initial)
+        old_answer_2 = NumericalAnswer.objects.create(response=int(data['Number-1-response']), question=question3,
+                                                      **initial)
 
         old_primary.answergroup.create(grouped_question=question_group)
         old_answer_1.answergroup.create(grouped_question=question_group)
@@ -486,30 +529,39 @@ class SaveGridDraftQuestionGroupEntryTest(BaseTest):
         for index, option in enumerate(self.question1.options.order_by('modified')):
             question1_answer.append(MultiChoiceAnswer.objects.create(question=self.question1, country=self.country,
                                                                      status=Answer.SUBMITTED_STATUS, response=option,
-                                                                     version=self.version, questionnaire=self.questionnaire))
+                                                                     version=self.version,
+                                                                     questionnaire=self.questionnaire))
             question2_answer.append(TextAnswer.objects.create(question=self.question2, country=self.country,
-                                                              status=Answer.SUBMITTED_STATUS, response="ayoyoyo %d"%index,
+                                                              status=Answer.SUBMITTED_STATUS,
+                                                              response="ayoyoyo %d" % index,
                                                               version=self.version, questionnaire=self.questionnaire))
             question3_answer.append(NumericalAnswer.objects.create(question=self.question3, country=self.country,
                                                                    status=Answer.SUBMITTED_STATUS, response=index,
-                                                                   version=self.version, questionnaire=self.questionnaire))
-            answer_group1.append(question1_answer[index].answergroup.create(grouped_question=self.question_group, row=index))
+                                                                   version=self.version,
+                                                                   questionnaire=self.questionnaire))
+            answer_group1.append(
+                question1_answer[index].answergroup.create(grouped_question=self.question_group, row=index))
             answer_group1[index].answer.add(question2_answer[index], question3_answer[index])
 
-    def test_post_drafts_duplicates_submitted_answers_and_answer_groups_of_other_sections_and_save_draft_of_section_when_editing_submitted_questionnaire(self):
+    def test_post_drafts_duplicates_submitted_answers_and_answer_groups_of_other_sections_and_save_draft_of_section_when_editing_submitted_questionnaire(
+            self):
         questions, question_group, old_answer, data_modified, section = self.given_I_have_questions_and_corresponding_submitted_answers_in_a_section()
         self.and_given_I_have_other_questions_and_corresponding_answers_in_a_different_section()
 
         initial = self.initial.copy()
         initial['version'] = self.version + 1
 
-        response = self.client.post("/questionnaire/entry/%d/section/%d/"%(self.questionnaire.id, section.id), data=data_modified)
+        response = self.client.post("/questionnaire/entry/%d/section/%d/" % (self.questionnaire.id, section.id),
+                                    data=data_modified)
         self.assertEqual(200, response.status_code)
         self.assertIn('Draft saved.', response.content)
 
-        primary = MultiChoiceAnswer.objects.get(response__id=int(data_modified['MultiChoice-0-response']), question=questions[0], version=self.version+1)
-        answer_1 = NumericalAnswer.objects.get(response=int(data_modified['Number-0-response']), question=questions[1], version=self.version+1)
-        answer_2 = NumericalAnswer.objects.get(response=int(data_modified['Number-1-response']), question=questions[2], version=self.version+1)
+        primary = MultiChoiceAnswer.objects.get(response__id=int(data_modified['MultiChoice-0-response']),
+                                                question=questions[0], version=self.version + 1)
+        answer_1 = NumericalAnswer.objects.get(response=int(data_modified['Number-0-response']), question=questions[1],
+                                               version=self.version + 1)
+        answer_2 = NumericalAnswer.objects.get(response=int(data_modified['Number-1-response']), question=questions[2],
+                                               version=self.version + 1)
 
         self.assertNotEqual(old_answer[0].id, primary.id)
         self.assertNotEqual(old_answer[1].id, answer_1.id)
@@ -526,13 +578,15 @@ class SaveGridDraftQuestionGroupEntryTest(BaseTest):
         for index, option in enumerate(self.question1.options.order_by('modified')):
             question1_answer = MultiChoiceAnswer.objects.filter(question=self.question1, country=self.country,
                                                                 status=Answer.DRAFT_STATUS, response=option,
-                                                                version=self.version+1, questionnaire=self.questionnaire)
+                                                                version=self.version + 1,
+                                                                questionnaire=self.questionnaire)
             question2_answer = TextAnswer.objects.filter(question=self.question2, country=self.country,
-                                                         status=Answer.DRAFT_STATUS, response="ayoyoyo %d"%index,
-                                                         version=self.version+1, questionnaire=self.questionnaire)
+                                                         status=Answer.DRAFT_STATUS, response="ayoyoyo %d" % index,
+                                                         version=self.version + 1, questionnaire=self.questionnaire)
             question3_answer = NumericalAnswer.objects.filter(question=self.question3, country=self.country,
                                                               status=Answer.DRAFT_STATUS, response=index,
-                                                              version=self.version+1, questionnaire=self.questionnaire)
+                                                              version=self.version + 1,
+                                                              questionnaire=self.questionnaire)
 
             self.failUnless(question1_answer)
             self.assertEqual(1, question1_answer.count())
@@ -557,7 +611,8 @@ class QuestionnaireEntrySubmitTest(BaseTest):
         self.region = self.user.user_profile.country.regions.all()[0]
 
         self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", status=Questionnaire.PUBLISHED,
-                                                          description="From dropbox as given by Rouslan", region=self.region)
+                                                          description="From dropbox as given by Rouslan",
+                                                          region=self.region)
 
         self.section_1 = Section.objects.create(title="Reported Cases of Selected Vaccine Preventable Diseases (VPDs)",
                                                 order=1,
@@ -591,9 +646,9 @@ class QuestionnaireEntrySubmitTest(BaseTest):
         self.client.login(username=self.user.username, password='pass')
 
         self.data = {u'MultiChoice-MAX_NUM_FORMS': u'1', u'MultiChoice-TOTAL_FORMS': u'1',
-                u'MultiChoice-INITIAL_FORMS': u'1', u'MultiChoice-0-response': self.option1.id,
-                u'Number-INITIAL_FORMS': u'2', u'Number-TOTAL_FORMS': u'2', u'Number-MAX_NUM_FORMS': u'2',
-                u'Number-0-response': u'2', u'Number-1-response': u'33'}
+                     u'MultiChoice-INITIAL_FORMS': u'1', u'MultiChoice-0-response': self.option1.id,
+                     u'Number-INITIAL_FORMS': u'2', u'Number-TOTAL_FORMS': u'2', u'Number-MAX_NUM_FORMS': u'2',
+                     u'Number-0-response': u'2', u'Number-1-response': u'33'}
 
     def test_login_required(self):
         self.assert_login_required(self.url)
@@ -626,10 +681,14 @@ class QuestionnaireEntrySubmitTest(BaseTest):
         QuestionGroupOrder.objects.create(question=other_question1, order=1, question_group=other_question_group)
         QuestionGroupOrder.objects.create(question=other_question2, order=2, question_group=other_question_group)
 
-        other_answer_1 = NumericalAnswer.objects.create(response=1, question=other_question1, status=Answer.DRAFT_STATUS,
-                                                        country=self.country, version=0, questionnaire=self.questionnaire)
-        other_answer_2 = NumericalAnswer.objects.create(response=2, question=other_question2, status=Answer.DRAFT_STATUS,
-                                                        country=self.country, version=0, questionnaire=self.questionnaire)
+        other_answer_1 = NumericalAnswer.objects.create(response=1, question=other_question1,
+                                                        status=Answer.DRAFT_STATUS,
+                                                        country=self.country, version=0,
+                                                        questionnaire=self.questionnaire)
+        other_answer_2 = NumericalAnswer.objects.create(response=2, question=other_question2,
+                                                        status=Answer.DRAFT_STATUS,
+                                                        country=self.country, version=0,
+                                                        questionnaire=self.questionnaire)
 
         answer_group = AnswerGroup.objects.create(grouped_question=other_question_group)
         answer_group.answer.add(other_answer_1, other_answer_2)
@@ -649,19 +708,20 @@ class QuestionnaireEntrySubmitTest(BaseTest):
 
     def test_submit_on_success_redirect_to_referer_if_given_and_adds_preview_get_param(self):
         referer_url = '/questionnaire/entry/%d/section/%d/' % (self.questionnaire.id, self.section_1.id)
-        meta ={'HTTP_REFERER': referer_url}
+        meta = {'HTTP_REFERER': referer_url}
         response = self.client.post(self.url, **meta)
         self.assertRedirects(response, referer_url + "?preview=1")
 
     def test_submit_on_success_redirect_to_referer_if_given(self):
         referer_url = '/questionnaire/entry/%d/section/%d/?preview=1' % (self.questionnaire.id, self.section_1.id)
-        meta ={'HTTP_REFERER': referer_url}
+        meta = {'HTTP_REFERER': referer_url}
         response = self.client.post(self.url, **meta)
         self.assertRedirects(response, referer_url)
 
     def test_submit_on_success_redirect_to_referer__does_not_highlight_errors_and_shows_preview(self):
         referer_url = '/questionnaire/entry/%d/section/%d/?show=errors' % (self.questionnaire.id, self.section_1.id)
-        referer_url_no_error_yes_preview= '/questionnaire/entry/%d/section/%d/?preview=1' % (self.questionnaire.id, self.section_1.id)
+        referer_url_no_error_yes_preview = '/questionnaire/entry/%d/section/%d/?preview=1' % (
+        self.questionnaire.id, self.section_1.id)
         meta = {'HTTP_REFERER': referer_url}
         response = self.client.post(self.url, **meta)
         self.assertRedirects(response, referer_url_no_error_yes_preview)
@@ -671,22 +731,28 @@ class QuestionnaireEntrySubmitTest(BaseTest):
         success_message = 'Questionnaire Submitted.'
         self.assertIn(success_message, response.cookies['messages'].value)
 
-    def test_submit_fails_and_shows_sections_with_error_message_and_error_fields_when_a_section_has_unanswered_required_questions(self):
+    def test_submit_fails_and_shows_sections_with_error_message_and_error_fields_when_a_section_has_unanswered_required_questions(
+            self):
         data = self.data.copy()
-        initial = {'country': self.country, 'status': 'Draft', 'version':1, 'code': 'ABC123', 'questionnaire': self.questionnaire}
+        initial = {'country': self.country, 'status': 'Draft', 'version': 1, 'code': 'ABC123',
+                   'questionnaire': self.questionnaire}
         old_primary = MultiChoiceAnswer.objects.create(response=self.option1, question=self.question1, **initial)
-        old_answer_1 = NumericalAnswer.objects.create(response=int(data['Number-0-response']), question=self.question2, **initial)
-        old_answer_2 = NumericalAnswer.objects.create(response=int(data['Number-1-response']), question=self.question3, **initial)
+        old_answer_1 = NumericalAnswer.objects.create(response=int(data['Number-0-response']), question=self.question2,
+                                                      **initial)
+        old_answer_2 = NumericalAnswer.objects.create(response=int(data['Number-1-response']), question=self.question3,
+                                                      **initial)
 
         answer_group = AnswerGroup.objects.create(grouped_question=self.question_group)
         answer_group.answer.add(old_primary, old_answer_1, old_answer_2)
 
-        required_question = Question.objects.create(text='required', UID='C00330', answer_type='Number', is_required=True)
+        required_question = Question.objects.create(text='required', UID='C00330', answer_type='Number',
+                                                    is_required=True)
         self.question_group.question.add(required_question)
         QuestionGroupOrder.objects.create(question_group=self.question_group, question=required_question, order=4)
 
         response = self.client.post(self.url)
-        section_with_errrors_url = '/questionnaire/entry/%d/section/%d/?show=errors' % (self.questionnaire.id, self.section_1.id)
+        section_with_errrors_url = '/questionnaire/entry/%d/section/%d/?show=errors' % (
+        self.questionnaire.id, self.section_1.id)
 
         self.assertRedirects(response, section_with_errrors_url)
         error_message = 'Questionnaire NOT submitted. See errors below.'
@@ -695,9 +761,12 @@ class QuestionnaireEntrySubmitTest(BaseTest):
         submitted_attributes = initial.copy()
         submitted_attributes['status'] = 'Submitted'
 
-        primary = MultiChoiceAnswer.objects.filter(response=self.option1, question=self.question1, **submitted_attributes)
-        answer_1 = NumericalAnswer.objects.filter(response=int(data['Number-0-response']), question=self.question2, **submitted_attributes)
-        answer_2 = NumericalAnswer.objects.filter(response=int(data['Number-1-response']), question=self.question3, **submitted_attributes)
+        primary = MultiChoiceAnswer.objects.filter(response=self.option1, question=self.question1,
+                                                   **submitted_attributes)
+        answer_1 = NumericalAnswer.objects.filter(response=int(data['Number-0-response']), question=self.question2,
+                                                  **submitted_attributes)
+        answer_2 = NumericalAnswer.objects.filter(response=int(data['Number-1-response']), question=self.question3,
+                                                  **submitted_attributes)
 
         self.failIf(primary)
         self.failIf(answer_1)
@@ -706,14 +775,18 @@ class QuestionnaireEntrySubmitTest(BaseTest):
 
 class QuestionnaireCloneViewTest(BaseTest):
     def setUp(self):
-        self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", status=Questionnaire.FINALIZED, year=2013)
-        self.section_1 = Section.objects.create(title="Reported Cases of Selected Vaccine Preventable Diseases (VPDs)", order=1,
-                                                      questionnaire=self.questionnaire, name="Reported Cases")
+        self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", status=Questionnaire.FINALIZED,
+                                                          year=2013)
+        self.section_1 = Section.objects.create(title="Reported Cases of Selected Vaccine Preventable Diseases (VPDs)",
+                                                order=1,
+                                                questionnaire=self.questionnaire, name="Reported Cases")
         self.section_2 = Section.objects.create(title="Cured Cases of Measles", order=1,
                                                 questionnaire=self.questionnaire, name="Cured Cases")
 
-        self.sub_section1 = SubSection.objects.create(title="Reported cases for the year 2013", order=1, section=self.section_1)
-        self.sub_section2 = SubSection.objects.create(title="Reported cases for the year", order=2, section=self.section_1)
+        self.sub_section1 = SubSection.objects.create(title="Reported cases for the year 2013", order=1,
+                                                      section=self.section_1)
+        self.sub_section2 = SubSection.objects.create(title="Reported cases for the year", order=2,
+                                                      section=self.section_1)
         self.sub_section3 = SubSection.objects.create(title="Reported cures 2014", order=1, section=self.section_2)
         self.sub_section4 = SubSection.objects.create(title="Reported cures", order=2, section=self.section_2)
         self.primary_question = Question.objects.create(text='Disease', UID='C00003', answer_type='MultiChoice',
@@ -730,14 +803,17 @@ class QuestionnaireCloneViewTest(BaseTest):
                                                  UID='C00005', answer_type='Number')
         self.parent10 = QuestionGroup.objects.create(subsection=self.sub_section1, order=1)
         self.parent12 = QuestionGroup.objects.create(subsection=self.sub_section1, order=2)
-        self.question3 = Question.objects.create(text='B. Number of cases tested', UID=Question.next_uid(), answer_type='Number')
-        self.question4 = Question.objects.create(text='C. Number of cases positive', UID=Question.next_uid(), answer_type='Number')
+        self.question3 = Question.objects.create(text='B. Number of cases tested', UID=Question.next_uid(),
+                                                 answer_type='Number')
+        self.question4 = Question.objects.create(text='C. Number of cases positive', UID=Question.next_uid(),
+                                                 answer_type='Number')
         QuestionGroupOrder.objects.create(order=1, question_group=self.parent10, question=self.primary_question)
         QuestionGroupOrder.objects.create(order=2, question_group=self.parent10, question=self.question1)
         QuestionGroupOrder.objects.create(order=3, question_group=self.parent10, question=self.question2)
         QuestionGroupOrder.objects.create(order=4, question_group=self.parent12, question=self.question3)
         QuestionGroupOrder.objects.create(order=5, question_group=self.parent12, question=self.question4)
-        self.parent10.question.add(self.question3, self.question4, self.question2, self.question1, self.primary_question)
+        self.parent10.question.add(self.question3, self.question4, self.question2, self.question1,
+                                   self.primary_question)
         self.client = Client()
         self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
 
@@ -797,11 +873,14 @@ class QuestionnaireCloneViewTest(BaseTest):
 
 class DeleteAnswerGroupViewTest(BaseTest):
     def setUp(self):
-        self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", status=Questionnaire.FINALIZED, year=2013)
-        self.section_1 = Section.objects.create(title="Reported Cases of Selected Vaccine Preventable Diseases (VPDs)", order=1,
-                                                      questionnaire=self.questionnaire, name="Reported Cases")
+        self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", status=Questionnaire.FINALIZED,
+                                                          year=2013)
+        self.section_1 = Section.objects.create(title="Reported Cases of Selected Vaccine Preventable Diseases (VPDs)",
+                                                order=1,
+                                                questionnaire=self.questionnaire, name="Reported Cases")
 
-        self.sub_section1 = SubSection.objects.create(title="Reported cases for the year 2013", order=1, section=self.section_1)
+        self.sub_section1 = SubSection.objects.create(title="Reported cases for the year 2013", order=1,
+                                                      section=self.section_1)
         self.primary_question = Question.objects.create(text='Disease', UID='C00003', answer_type='Text',
                                                         is_primary=True)
 
@@ -823,7 +902,8 @@ class DeleteAnswerGroupViewTest(BaseTest):
         self.assign('can_submit_responses', self.user)
         self.client.login(username=self.user.username, password='pass')
 
-        self.url = '/questionnaire/entry/%d/section/%d/delete/%d/'%(self.questionnaire.id, self.section_1.id, self.parent10.id)
+        self.url = '/questionnaire/entry/%d/section/%d/delete/%d/' % (
+        self.questionnaire.id, self.section_1.id, self.parent10.id)
 
     def test_post_deletes_answer_group_and_answers_corresponding_to_the_primary_answer(self):
         answer_data = {'questionnaire': self.questionnaire, 'version': 1, 'country': self.country}
@@ -882,7 +962,6 @@ class DeleteAnswerGroupViewTest(BaseTest):
 
 
 class PreviewModeQuestionnaireEntryTest(BaseTest):
-
     def test_data_submitter_is_not_preview_mode_only_if_requested_from_url(self):
         self.client = Client()
         self.user = self.create_user(group=self.DATA_SUBMITTER, country="Uganda", region="AFRO")
@@ -894,14 +973,15 @@ class PreviewModeQuestionnaireEntryTest(BaseTest):
 
         self.questionnaire = Questionnaire.objects.create(name="q", status=Questionnaire.PUBLISHED, region=self.region)
 
-        self.section_1 = Section.objects.create(title="section1", order=1, questionnaire=self.questionnaire, name="section1")
+        self.section_1 = Section.objects.create(title="section1", order=1, questionnaire=self.questionnaire,
+                                                name="section1")
 
         url = '/questionnaire/entry/%d/section/%d/' % (self.questionnaire.id, self.section_1.id)
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
         self.assertFalse(response.context['preview'])
 
-        response = self.client.get(url +'?preview=1')
+        response = self.client.get(url + '?preview=1')
         self.assertEqual(200, response.status_code)
         self.assertTrue(response.context['preview'])
 
@@ -914,14 +994,15 @@ class PreviewModeQuestionnaireEntryTest(BaseTest):
         self.client.login(username=self.user.username, password='pass')
 
         self.questionnaire = Questionnaire.objects.create(name="q", status=Questionnaire.PUBLISHED, region=self.region)
-        self.section_1 = Section.objects.create(title="section1", order=1, questionnaire=self.questionnaire, name="section1")
+        self.section_1 = Section.objects.create(title="section1", order=1, questionnaire=self.questionnaire,
+                                                name="section1")
 
         url = '/questionnaire/entry/%d/section/%d/' % (self.questionnaire.id, self.section_1.id)
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
         self.assertTrue(response.context['preview'])
 
-        response = self.client.get(url +'?preview=1')
+        response = self.client.get(url + '?preview=1')
         self.assertEqual(200, response.status_code)
         self.assertTrue(response.context['preview'])
 
@@ -934,14 +1015,15 @@ class PreviewModeQuestionnaireEntryTest(BaseTest):
         self.client.login(username=self.user.username, password='pass')
 
         self.questionnaire = Questionnaire.objects.create(name="q", status=Questionnaire.FINALIZED, region=self.region)
-        self.section_1 = Section.objects.create(title="section1", order=1, questionnaire=self.questionnaire, name="section1")
+        self.section_1 = Section.objects.create(title="section1", order=1, questionnaire=self.questionnaire,
+                                                name="section1")
 
         url = '/questionnaire/entry/%d/section/%d/' % (self.questionnaire.id, self.section_1.id)
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
         self.assertTrue(response.context['preview'])
 
-        response = self.client.get(url +'?preview=1')
+        response = self.client.get(url + '?preview=1')
         self.assertEqual(200, response.status_code)
         self.assertTrue(response.context['preview'])
 
@@ -953,13 +1035,14 @@ class PreviewModeQuestionnaireEntryTest(BaseTest):
         self.client.login(username=self.user.username, password='pass')
 
         self.questionnaire = Questionnaire.objects.create(name="q", status=Questionnaire.DRAFT, region=self.region)
-        self.section_1 = Section.objects.create(title="section1", order=1, questionnaire=self.questionnaire, name="section1")
+        self.section_1 = Section.objects.create(title="section1", order=1, questionnaire=self.questionnaire,
+                                                name="section1")
 
         url = '/questionnaire/entry/%d/section/%d/' % (self.questionnaire.id, self.section_1.id)
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
         self.assertFalse(response.context['preview'])
 
-        response = self.client.get(url +'?preview=1')
+        response = self.client.get(url + '?preview=1')
         self.assertEqual(200, response.status_code)
         self.assertTrue(response.context['preview'])

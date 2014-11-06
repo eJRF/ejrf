@@ -1,4 +1,3 @@
-from django.contrib import messages
 from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -42,5 +41,6 @@ class Home(MultiplePermissionsRequiredMixin, View):
         submissions_all = country.submissions.all()
         submitted = [submission.questionnaire for submission in submissions_all]
         submitted_questionnaires = submissions_all.values_list('questionnaire', flat=True)
-        un_answered = questionnaires.exclude(Q(id__in=drafts.values_list('id', flat=True)) | Q(id__in=submitted_questionnaires))
+        un_answered = questionnaires.exclude(
+            Q(id__in=drafts.values_list('id', flat=True)) | Q(id__in=submitted_questionnaires))
         return un_answered, submitted, drafts

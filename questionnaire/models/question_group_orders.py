@@ -1,5 +1,6 @@
-from questionnaire.models.base import BaseModel
 from django.db import models
+
+from questionnaire.models.base import BaseModel
 
 
 class QuestionGroupOrder(BaseModel):
@@ -17,7 +18,7 @@ class QuestionGroupOrder(BaseModel):
 
     def first_by(self, attribute_string):
         ordered_by_attributes = QuestionGroupOrder.objects.filter(question_group=self.question_group,
-                                                                  question__answer_type=self.question.answer_type).\
+                                                                  question__answer_type=self.question.answer_type). \
             order_by(attribute_string)
         return self == ordered_by_attributes[0]
 

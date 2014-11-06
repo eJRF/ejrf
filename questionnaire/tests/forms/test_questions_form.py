@@ -5,7 +5,6 @@ from questionnaire.tests.base_test import BaseTest
 
 
 class QuestionsFormTest(BaseTest):
-
     def setUp(self):
         self.theme = Theme.objects.create(name="Another theme")
         self.form_data = {'text': 'How many kids were immunised this year?',
@@ -22,7 +21,8 @@ class QuestionsFormTest(BaseTest):
 
     def test_increments_uid_of_existing_question_by_one_upon_save_given_instance(self):
         Question.objects.create(text='B. Number of cases tested',
-                                instructions="Enter the total number of cases", UID='00001', answer_type='Number', answer_sub_type="Integer")
+                                instructions="Enter the total number of cases", UID='00001', answer_type='Number',
+                                answer_sub_type="Integer")
         question_form = QuestionForm(data=self.form_data)
         question = question_form.save(commit=True)
         self.assertEqual('00002', question.UID)
@@ -122,7 +122,6 @@ class QuestionsFormTest(BaseTest):
 
 
 class QuestionHistoryTest(BaseTest):
-
     def setUp(self):
         self.questionnaire = Questionnaire.objects.create(name="2014", description="some description")
         self.section = Section.objects.create(title="section", order=1, questionnaire=self.questionnaire)
@@ -178,12 +177,13 @@ class QuestionHistoryTest(BaseTest):
 
         self.assertEqual(region, duplicate_question.region)
 
-    def test_editing_question_used_in_a_published_questionnaire_assigns_the_duplicate_question_in_all_draft_questionnaires(self):
+    def test_editing_question_used_in_a_published_questionnaire_assigns_the_duplicate_question_in_all_draft_questionnaires(
+            self):
         self.questionnaire.status = Questionnaire.PUBLISHED
         self.questionnaire.save()
         self.question1.orders.create(order=1, question_group=self.parent_group)
 
-        draft_questionnaire = Questionnaire.objects.create(name="draft qnaire",description="haha",
+        draft_questionnaire = Questionnaire.objects.create(name="draft qnaire", description="haha",
                                                            status=Questionnaire.DRAFT)
         section_1 = Section.objects.create(title="section 1", order=1, questionnaire=draft_questionnaire, name="ha")
         sub_section_1 = SubSection.objects.create(title="subs1", order=1, section=section_1)
@@ -191,9 +191,10 @@ class QuestionHistoryTest(BaseTest):
         parent_group_d.question.add(self.question1)
         self.question1.orders.create(order=2, question_group=parent_group_d)
 
-        finalized_questionnaire = Questionnaire.objects.create(name="finalized qnaire",description="haha",
-                                                           status=Questionnaire.FINALIZED)
-        section_1_f = Section.objects.create(title="section 1", order=1, questionnaire=finalized_questionnaire, name="ha")
+        finalized_questionnaire = Questionnaire.objects.create(name="finalized qnaire", description="haha",
+                                                               status=Questionnaire.FINALIZED)
+        section_1_f = Section.objects.create(title="section 1", order=1, questionnaire=finalized_questionnaire,
+                                             name="ha")
         sub_section_1_f = SubSection.objects.create(title="subs1", order=1, section=section_1_f)
         parent_group_f = QuestionGroup.objects.create(subsection=sub_section_1_f, name="group")
         parent_group_f.question.add(self.question1)
@@ -222,7 +223,7 @@ class QuestionHistoryTest(BaseTest):
         self.questionnaire.save()
         self.question1.orders.create(order=1, question_group=self.parent_group)
 
-        draft_questionnaire = Questionnaire.objects.create(name="draft qnaire",description="haha",
+        draft_questionnaire = Questionnaire.objects.create(name="draft qnaire", description="haha",
                                                            status=Questionnaire.DRAFT)
         section_1 = Section.objects.create(title="section 1", order=1, questionnaire=draft_questionnaire, name="ha")
         sub_section_1 = SubSection.objects.create(title="subs1", order=1, section=section_1)
@@ -230,9 +231,10 @@ class QuestionHistoryTest(BaseTest):
         parent_group_d.question.add(self.question1)
         self.question1.orders.create(order=2, question_group=parent_group_d)
 
-        finalized_questionnaire = Questionnaire.objects.create(name="finalized qnaire",description="haha",
-                                                           status=Questionnaire.FINALIZED)
-        section_1_f = Section.objects.create(title="section 1", order=1, questionnaire=finalized_questionnaire, name="ha")
+        finalized_questionnaire = Questionnaire.objects.create(name="finalized qnaire", description="haha",
+                                                               status=Questionnaire.FINALIZED)
+        section_1_f = Section.objects.create(title="section 1", order=1, questionnaire=finalized_questionnaire,
+                                             name="ha")
         sub_section_1_f = SubSection.objects.create(title="subs1", order=1, section=section_1_f)
         parent_group_f = QuestionGroup.objects.create(subsection=sub_section_1_f, name="group")
         parent_group_f.question.add(self.question1)
@@ -263,7 +265,7 @@ class QuestionHistoryTest(BaseTest):
         for text in question1_options_texts:
             self.question1.options.create(text=text)
 
-        draft_questionnaire = Questionnaire.objects.create(name="draft qnaire",description="haha",
+        draft_questionnaire = Questionnaire.objects.create(name="draft qnaire", description="haha",
                                                            status=Questionnaire.DRAFT)
         section_1 = Section.objects.create(title="section 1", order=1, questionnaire=draft_questionnaire, name="ha")
         sub_section_1 = SubSection.objects.create(title="subs1", order=1, section=section_1)
@@ -271,9 +273,10 @@ class QuestionHistoryTest(BaseTest):
         parent_group_d.question.add(self.question1)
         self.question1.orders.create(order=2, question_group=parent_group_d)
 
-        finalized_questionnaire = Questionnaire.objects.create(name="finalized qnaire",description="haha",
-                                                           status=Questionnaire.FINALIZED)
-        section_1_f = Section.objects.create(title="section 1", order=1, questionnaire=finalized_questionnaire, name="ha")
+        finalized_questionnaire = Questionnaire.objects.create(name="finalized qnaire", description="haha",
+                                                               status=Questionnaire.FINALIZED)
+        section_1_f = Section.objects.create(title="section 1", order=1, questionnaire=finalized_questionnaire,
+                                             name="ha")
         sub_section_1_f = SubSection.objects.create(title="subs1", order=1, section=section_1_f)
         parent_group_f = QuestionGroup.objects.create(subsection=sub_section_1_f, name="group")
         parent_group_f.question.add(self.question1)

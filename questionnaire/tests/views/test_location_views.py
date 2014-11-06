@@ -1,11 +1,12 @@
 import json
+
 from django.test import Client
+
 from questionnaire.models import Region, Country
 from questionnaire.tests.base_test import BaseTest
 
 
 class RegionViewTest(BaseTest):
-
     def setUp(self):
         self.client = Client()
         self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
@@ -31,7 +32,6 @@ class RegionViewTest(BaseTest):
 
 
 class CountryViewTest(BaseTest):
-
     def setUp(self):
         self.client = Client()
         self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
@@ -55,7 +55,7 @@ class CountryViewTest(BaseTest):
 
     def test_login_required(self):
         region = Region.objects.create(name="AFRO")
-        self.assert_login_required('/locations/region/%d/country/'%region.id)
+        self.assert_login_required('/locations/region/%d/country/' % region.id)
 
     def test_get_json_countries_for_regions(self):
         region = Region.objects.create(name="AFRO")

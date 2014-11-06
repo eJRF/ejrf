@@ -1,15 +1,17 @@
 import os
-from braces.views import PermissionRequiredMixin, LoginRequiredMixin
+
+from braces.views import LoginRequiredMixin
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import CreateView, View
 from django.views.static import serve
+
 from questionnaire.forms.sections import SectionForm
 from questionnaire.forms.support_documents import SupportDocumentUploadForm
 from questionnaire.mixins import DeleteDocumentMixin, AdvancedMultiplePermissionsRequiredMixin
-from questionnaire.models import SupportDocument, Questionnaire, Country
+from questionnaire.models import SupportDocument, Questionnaire
 from questionnaire.services.users import UserQuestionnaireService
 from questionnaire.utils.view_utils import get_country
 
@@ -58,9 +60,11 @@ class UploadDocument(AdvancedMultiplePermissionsRequiredMixin, CreateView):
 
     def form_invalid(self, form):
         return render(self.request, self.template_name, {'upload_form': form,
-                        'button_label': 'Upload', 'id': 'id-upload-form', 'questionnaire': self.questionnaire,
-                        'documents': self.user_questionnaire_service.attachments(),
-                        'ordered_sections': self.questionnaire.sections.order_by('order')})
+                                                         'button_label': 'Upload', 'id': 'id-upload-form',
+                                                         'questionnaire': self.questionnaire,
+                                                         'documents': self.user_questionnaire_service.attachments(),
+                                                         'ordered_sections': self.questionnaire.sections.order_by(
+                                                             'order')})
 
 
 class DownloadDocument(LoginRequiredMixin, View):

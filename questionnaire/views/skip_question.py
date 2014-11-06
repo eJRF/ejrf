@@ -1,9 +1,11 @@
 import json
+
 from django.http import HttpResponse
 from django.views.generic import View
+from braces.views import PermissionRequiredMixin
+
 from questionnaire.forms.skip_question_form import SkipQuestionRuleForm
 from questionnaire.models import SkipQuestion
-from braces.views import PermissionRequiredMixin
 
 
 class SkipQuestionView(PermissionRequiredMixin, View):
@@ -16,7 +18,7 @@ class SkipQuestionView(PermissionRequiredMixin, View):
         skip_question_rule_form = SkipQuestionRuleForm(request.POST)
         if skip_question_rule_form.is_valid():
             skip_question_rule_form.save()
-            data = {'result':  'Skip rule created successfully'}
+            data = {'result': 'Skip rule created successfully'}
             return HttpResponse(json.dumps(data), content_type="application/json", status=201)
         else:
             print skip_question_rule_form.errors
@@ -25,6 +27,7 @@ class SkipQuestionView(PermissionRequiredMixin, View):
             return self.error_response(error_msgs)
 
     def get(self, request, subsection_id, *args, **kwargs):
-        data = SkipQuestion.objects.select_related('root_question', 'subsection', 'response', 'skip_question').filter(subsection_id=subsection_id)
+        data = SkipQuestion.objects.select_related('root_question', 'subsection', 'response', 'skip_question').filter(
+            subsection_id=subsection_id)
         responses = map(lambda q: q.to_dictionary(), data)
         return HttpResponse(json.dumps(responses), content_type="application/json", status=200)

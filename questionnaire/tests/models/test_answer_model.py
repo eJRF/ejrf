@@ -1,11 +1,14 @@
 from datetime import date
+
 from django.core.exceptions import ValidationError
 from django.test import TestCase
+
 from questionnaire.models import Question, Country, QuestionOption, MultiChoiceAnswer, Questionnaire
 from questionnaire.models.answers import Answer, NumericalAnswer, TextAnswer, DateAnswer
 from questionnaire.tests.base_test import BaseTest
 from questionnaire.tests.factories.answer_factory import NumericalAnswerFactory
 from questionnaire.tests.factories.question_factory import QuestionFactory
+from questionnaire.utils.answer_type import AnswerTypes
 
 
 class AnswerTest(TestCase):
@@ -79,7 +82,7 @@ class NumericalAnswerTest(BaseTest):
         self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English",
                                                           description="From dropbox as given by Rouslan")
         self.question = Question.objects.create(text='Uganda Revision 2014 what what?', UID='abc123',
-                                                answer_type='Date', answer_sub_type=Question.INTEGER)
+                                                answer_type='Date', answer_sub_type=AnswerTypes.INTEGER)
         self.country = Country.objects.create(name="Peru")
 
     def test_numerical_answer_fields(self):
@@ -107,14 +110,14 @@ class NumericalAnswerTest(BaseTest):
         self.assertRaises(ValidationError, answer.save)
 
     def test_format_response_returns_decimal_when_question_answer_sub_type_is_decimal(self):
-        question = QuestionFactory(answer_type=Question.NUMBER, answer_sub_type=Question.DECIMAL)
+        question = QuestionFactory(answer_type=AnswerTypes.NUMBER, answer_sub_type=AnswerTypes.DECIMAL)
         answer_one = NumericalAnswerFactory(question=question, response=44.6)
         answer_two = NumericalAnswerFactory(question=question, response=44)
         self.assertEqual(44.6, answer_one.format_response())
         self.assertEqual(44.0, answer_two.format_response())
 
     def test_format_response_returns_integer_when_question_answer_sub_type_is_integer(self):
-        question = QuestionFactory(answer_type=Question.NUMBER, answer_sub_type=Question.INTEGER)
+        question = QuestionFactory(answer_type=AnswerTypes.NUMBER, answer_sub_type=AnswerTypes.INTEGER)
         answer_one = NumericalAnswerFactory(question=question, response=44.6)
         answer_two = NumericalAnswerFactory(question=question, response=44)
         self.assertEqual(44, answer_one.format_response())

@@ -1,7 +1,9 @@
 from django.core.urlresolvers import reverse
-from questionnaire.models import Questionnaire, Question
-from questionnaire.models.base import BaseModel
 from django.db import models
+
+from questionnaire.models import Questionnaire
+from questionnaire.models.base import BaseModel
+from questionnaire.utils.answer_type import AnswerTypes
 
 
 class Section(BaseModel):
@@ -23,7 +25,7 @@ class Section(BaseModel):
 
     def mapped_question_orders(self):
         subsections = self.sub_sections.order_by('order')
-        _orders = {type_[0]: [] for type_ in Question.ANSWER_TYPES}
+        _orders = {type_[0]: [] for type_ in AnswerTypes.answer_types()}
         for subsection in subsections:
             for group in subsection.question_group.order_by('order'):
                 group.map_orders_with_answer_type(_orders)

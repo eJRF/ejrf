@@ -2,17 +2,19 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User, Group
 from django import forms
 from django.forms import ModelForm
+
 from questionnaire.models import Region, Country, UserProfile, Organization
 
 
 class UserProfileForm(UserCreationForm):
     groups = forms.ModelChoiceField(queryset=Group.objects.all(), empty_label=None, required=True,
                                     widget=forms.RadioSelect(attrs={'class': 'radio-roles'}), label="Roles")
-    organization = forms.ModelChoiceField(queryset=Organization.objects.all(), empty_label="Choose an Organization", required=False)
+    organization = forms.ModelChoiceField(queryset=Organization.objects.all(), empty_label="Choose an Organization",
+                                          required=False)
     region = forms.ModelChoiceField(queryset=Region.objects.all(), empty_label="Choose a Region", required=False)
 
     country = forms.ModelChoiceField(queryset=Country.objects.all(), empty_label="Choose a County", required=False,
-                                     )
+    )
 
     def __init__(self, *args, **kwargs):
         super(UserProfileForm, self).__init__(*args, **kwargs)
@@ -99,7 +101,6 @@ class UserProfileForm(UserCreationForm):
 
 
 class EditUserProfileForm(ModelForm):
-
     class Meta:
         model = User
         fields = ("username", "email", "is_active")

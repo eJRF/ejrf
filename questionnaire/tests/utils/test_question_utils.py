@@ -6,7 +6,8 @@ from questionnaire.utils.model_utils import largest_uid
 class QuestionUtilTest(BaseTest):
     def setUp(self):
         self.question1 = Question.objects.create(text='B. Number of cases tested',
-                                                 instructions="Enter the total numbe", UID='C00003', answer_type='Number')
+                                                 instructions="Enter the total numbe", UID='C00003',
+                                                 answer_type='Number')
 
     def test_get_largest_uid_returns_00001_if_no_quests_exists(self):
         Question.objects.all().delete()

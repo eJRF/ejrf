@@ -1,15 +1,17 @@
 import os
+
 from django.contrib.auth.models import User
 from django.core.files import File
 from mock import mock_open, patch
-from questionnaire.models import Questionnaire, Section, SubSection, QuestionGroup, Question, QuestionGroupOrder, Country, QuestionOption, MultiChoiceAnswer, NumericalAnswer, AnswerGroup, UserProfile, Answer, SupportDocument
+
+from questionnaire.models import Questionnaire, Section, SubSection, QuestionGroup, Question, QuestionGroupOrder, \
+    Country, QuestionOption, MultiChoiceAnswer, NumericalAnswer, AnswerGroup, UserProfile, Answer, SupportDocument
 from questionnaire.services.questionnaire_entry_form_service import QuestionnaireEntryFormService
 from questionnaire.services.users import UserQuestionnaireService
 from questionnaire.tests.base_test import BaseTest
 
 
 class UserServiceTest(BaseTest):
-
     def setUp(self):
         self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English",
                                                           description="From dropbox as given by Rouslan")
@@ -42,22 +44,25 @@ class UserServiceTest(BaseTest):
         QuestionGroupOrder.objects.create(question_group=self.question_group, question=self.question3, order=3)
 
         self.data = {u'MultiChoice-MAX_NUM_FORMS': u'1', u'MultiChoice-TOTAL_FORMS': u'1',
-                u'MultiChoice-INITIAL_FORMS': u'1', u'MultiChoice-0-response': self.option1.id,
-                u'Number-INITIAL_FORMS': u'2', u'Number-TOTAL_FORMS': u'2', u'Number-MAX_NUM_FORMS': u'2',
-                u'Number-0-response': u'2', u'Number-1-response': u'33'}
+                     u'MultiChoice-INITIAL_FORMS': u'1', u'MultiChoice-0-response': self.option1.id,
+                     u'Number-INITIAL_FORMS': u'2', u'Number-TOTAL_FORMS': u'2', u'Number-MAX_NUM_FORMS': u'2',
+                     u'Number-0-response': u'2', u'Number-1-response': u'33'}
 
         self.country = Country.objects.create(name="Uganda", code="UGA")
         self.user = User.objects.create(username="rajni")
         UserProfile.objects.create(user=self.user, country=self.country)
 
-        self.initial = {'country': self.country, 'status': 'Draft', 'version':1, 'code': 'ABC123', 'questionnaire': self.questionnaire}
+        self.initial = {'country': self.country, 'status': 'Draft', 'version': 1, 'code': 'ABC123',
+                        'questionnaire': self.questionnaire}
 
     def test_user_knows_its_country_answers(self):
         data = self.data
 
         old_primary = MultiChoiceAnswer.objects.create(response=self.option1, question=self.question1, **self.initial)
-        old_answer_1 = NumericalAnswer.objects.create(response=int(data['Number-0-response']), question=self.question2, **self.initial)
-        old_answer_2 = NumericalAnswer.objects.create(response=int(data['Number-1-response']), question=self.question3, **self.initial)
+        old_answer_1 = NumericalAnswer.objects.create(response=int(data['Number-0-response']), question=self.question2,
+                                                      **self.initial)
+        old_answer_2 = NumericalAnswer.objects.create(response=int(data['Number-1-response']), question=self.question3,
+                                                      **self.initial)
 
         answer_group = AnswerGroup.objects.create(grouped_question=self.question_group)
         answer_group.answer.add(old_primary, old_answer_1, old_answer_2)
@@ -74,24 +79,27 @@ class UserServiceTest(BaseTest):
     def test_user_knows_answers_given_questionnaire(self):
         data = self.data
         old_primary = MultiChoiceAnswer.objects.create(response=self.option1, question=self.question1, **self.initial)
-        old_answer_1 = NumericalAnswer.objects.create(response=int(data['Number-0-response']), question=self.question2, **self.initial)
-        old_answer_2 = NumericalAnswer.objects.create(response=int(data['Number-1-response']), question=self.question3, **self.initial)
+        old_answer_1 = NumericalAnswer.objects.create(response=int(data['Number-0-response']), question=self.question2,
+                                                      **self.initial)
+        old_answer_2 = NumericalAnswer.objects.create(response=int(data['Number-1-response']), question=self.question3,
+                                                      **self.initial)
 
         answer_group = AnswerGroup.objects.create(grouped_question=self.question_group)
         answer_group.answer.add(old_primary, old_answer_1, old_answer_2)
 
         other_questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English",
-                                                            description="From dropbox as given by Rouslan")
+                                                           description="From dropbox as given by Rouslan")
         other_section_1 = Section.objects.create(title="Reported Cases of Selected Vaccine Preventable Diseases (VPDs)",
-                                                order=1, questionnaire=other_questionnaire, name="Reported Cases")
+                                                 order=1, questionnaire=other_questionnaire, name="Reported Cases")
         other_sub_section = SubSection.objects.create(title="Reported cases for the year 2013", order=1,
-                                                        section=other_section_1)
+                                                      section=other_section_1)
         other_question1 = Question.objects.create(text='Disease', UID='C00011', answer_type='Number')
         other_question_group = QuestionGroup.objects.create(subsection=other_sub_section, order=1)
         other_question_group.question.add(other_question1)
         other_answer_1 = NumericalAnswer.objects.create(response=1, question=other_question1)
 
-        section_2 = Section.objects.create(title="Section 2", order=2, questionnaire=self.questionnaire, name="section2")
+        section_2 = Section.objects.create(title="Section 2", order=2, questionnaire=self.questionnaire,
+                                           name="section2")
         sub_section2 = SubSection.objects.create(title="subsection 2", order=1, section=section_2)
         question1 = Question.objects.create(text='question 1', UID='C00013', answer_type='Number')
         question2 = Question.objects.create(text='question 2', UID='C00014', answer_type='Number')
@@ -102,8 +110,10 @@ class UserServiceTest(BaseTest):
         QuestionGroupOrder.objects.create(question=question1, order=1, question_group=question_group)
         QuestionGroupOrder.objects.create(question=question2, order=2, question_group=question_group)
 
-        answer_1 = NumericalAnswer.objects.create(response=1, question=question1, status=Answer.DRAFT_STATUS, country=self.country, questionnaire=self.questionnaire)
-        answer_2 = NumericalAnswer.objects.create(response=2, question=question2, status=Answer.DRAFT_STATUS, country=self.country, questionnaire=self.questionnaire)
+        answer_1 = NumericalAnswer.objects.create(response=1, question=question1, status=Answer.DRAFT_STATUS,
+                                                  country=self.country, questionnaire=self.questionnaire)
+        answer_2 = NumericalAnswer.objects.create(response=2, question=question2, status=Answer.DRAFT_STATUS,
+                                                  country=self.country, questionnaire=self.questionnaire)
 
         answer_group = AnswerGroup.objects.create(grouped_question=question_group)
         answer_group.answer.add(answer_1, answer_2)
@@ -125,8 +135,10 @@ class UserServiceTest(BaseTest):
         data = self.data
 
         old_primary = MultiChoiceAnswer.objects.create(response=self.option1, question=self.question1, **self.initial)
-        old_answer_1 = NumericalAnswer.objects.create(response=int(data['Number-0-response']), question=self.question2, **self.initial)
-        old_answer_2 = NumericalAnswer.objects.create(response=int(data['Number-1-response']), question=self.question3, **self.initial)
+        old_answer_1 = NumericalAnswer.objects.create(response=int(data['Number-0-response']), question=self.question2,
+                                                      **self.initial)
+        old_answer_2 = NumericalAnswer.objects.create(response=int(data['Number-1-response']), question=self.question3,
+                                                      **self.initial)
 
         answer_group = AnswerGroup.objects.create(grouped_question=self.question_group)
         answer_group.answer.add(old_primary, old_answer_1, old_answer_2)
@@ -135,7 +147,8 @@ class UserServiceTest(BaseTest):
         user_service = UserQuestionnaireService(user_country, self.questionnaire)
         user_service.submit()
 
-        primary = MultiChoiceAnswer.objects.get(response__id=int(data['MultiChoice-0-response']), question=self.question1)
+        primary = MultiChoiceAnswer.objects.get(response__id=int(data['MultiChoice-0-response']),
+                                                question=self.question1)
         answer_1 = NumericalAnswer.objects.get(response=int(data['Number-0-response']), question=self.question2)
         answer_2 = NumericalAnswer.objects.get(response=int(data['Number-1-response']), question=self.question3)
 
@@ -164,8 +177,10 @@ class UserServiceTest(BaseTest):
         data = self.data
 
         old_primary = MultiChoiceAnswer.objects.create(response=self.option1, question=self.question1, **self.initial)
-        old_answer_1 = NumericalAnswer.objects.create(response=int(data['Number-0-response']), question=self.question2, **self.initial)
-        old_answer_2 = NumericalAnswer.objects.create(response=int(data['Number-1-response']), question=self.question3, **self.initial)
+        old_answer_1 = NumericalAnswer.objects.create(response=int(data['Number-0-response']), question=self.question2,
+                                                      **self.initial)
+        old_answer_2 = NumericalAnswer.objects.create(response=int(data['Number-1-response']), question=self.question3,
+                                                      **self.initial)
 
         answer_group = AnswerGroup.objects.create(grouped_question=self.question_group)
         answer_group.answer.add(old_primary, old_answer_1, old_answer_2)
@@ -179,8 +194,10 @@ class UserServiceTest(BaseTest):
         data = self.data.copy()
 
         old_primary = MultiChoiceAnswer.objects.create(response=self.option1, question=self.question1, **self.initial)
-        old_answer_1 = NumericalAnswer.objects.create(response=int(data['Number-0-response']), question=self.question2, **self.initial)
-        old_answer_2 = NumericalAnswer.objects.create(response=int(data['Number-1-response']), question=self.question3, **self.initial)
+        old_answer_1 = NumericalAnswer.objects.create(response=int(data['Number-0-response']), question=self.question2,
+                                                      **self.initial)
+        old_answer_2 = NumericalAnswer.objects.create(response=int(data['Number-1-response']), question=self.question3,
+                                                      **self.initial)
 
         answer_group = AnswerGroup.objects.create(grouped_question=self.question_group)
         answer_group.answer.add(old_primary, old_answer_1, old_answer_2)
@@ -188,22 +205,25 @@ class UserServiceTest(BaseTest):
         user_service = UserQuestionnaireService(self.user.user_profile.country, self.questionnaire)
         user_service.submit()
 
-        self.assertEqual(self.initial['version']+1, user_service.answer_version())
+        self.assertEqual(self.initial['version'] + 1, user_service.answer_version())
         user_service.set_versions()
-        self.assertEqual(self.initial['version']+1, user_service.POST_version)
+        self.assertEqual(self.initial['version'] + 1, user_service.POST_version)
         self.assertEqual(self.initial['version'], user_service.GET_version)
 
     def test_knows_unanswered_required_question_in_section(self):
         data = self.data.copy()
 
         old_primary = MultiChoiceAnswer.objects.create(response=self.option1, question=self.question1, **self.initial)
-        old_answer_1 = NumericalAnswer.objects.create(response=int(data['Number-0-response']), question=self.question2, **self.initial)
-        old_answer_2 = NumericalAnswer.objects.create(response=int(data['Number-1-response']), question=self.question3, **self.initial)
+        old_answer_1 = NumericalAnswer.objects.create(response=int(data['Number-0-response']), question=self.question2,
+                                                      **self.initial)
+        old_answer_2 = NumericalAnswer.objects.create(response=int(data['Number-1-response']), question=self.question3,
+                                                      **self.initial)
 
         answer_group = AnswerGroup.objects.create(grouped_question=self.question_group)
         answer_group.answer.add(old_primary, old_answer_1, old_answer_2)
 
-        required_question = Question.objects.create(text='required', UID='C00330', answer_type='Number', is_required=True)
+        required_question = Question.objects.create(text='required', UID='C00330', answer_type='Number',
+                                                    is_required=True)
         self.question_group.question.add(required_question)
         QuestionGroupOrder.objects.create(question_group=self.question_group, question=required_question, order=4)
 
@@ -215,13 +235,16 @@ class UserServiceTest(BaseTest):
         data = self.data.copy()
 
         old_primary = MultiChoiceAnswer.objects.create(response=self.option1, question=self.question1, **self.initial)
-        old_answer_1 = NumericalAnswer.objects.create(response=int(data['Number-0-response']), question=self.question2, **self.initial)
-        old_answer_2 = NumericalAnswer.objects.create(response=int(data['Number-1-response']), question=self.question3, **self.initial)
+        old_answer_1 = NumericalAnswer.objects.create(response=int(data['Number-0-response']), question=self.question2,
+                                                      **self.initial)
+        old_answer_2 = NumericalAnswer.objects.create(response=int(data['Number-1-response']), question=self.question3,
+                                                      **self.initial)
 
         answer_group = AnswerGroup.objects.create(grouped_question=self.question_group)
         answer_group.answer.add(old_primary, old_answer_1, old_answer_2)
 
-        required_question = Question.objects.create(text='required', UID='C00330', answer_type='Number', is_required=True)
+        required_question = Question.objects.create(text='required', UID='C00330', answer_type='Number',
+                                                    is_required=True)
         self.question_group.question.add(required_question)
         QuestionGroupOrder.objects.create(question_group=self.question_group, question=required_question, order=4)
 
@@ -231,8 +254,10 @@ class UserServiceTest(BaseTest):
         self.assertEqual(self.section_1, user_service.unanswered_section)
 
     def test_knows_all_sections_questionnaire_entry_services(self):
-        section_2 = Section.objects.create(title="section 2", order=2, questionnaire=self.questionnaire, name="section 2")
-        section_3 = Section.objects.create(title="section 3", order=3, questionnaire=self.questionnaire, name="section 3")
+        section_2 = Section.objects.create(title="section 2", order=2, questionnaire=self.questionnaire,
+                                           name="section 2")
+        section_3 = Section.objects.create(title="section 3", order=3, questionnaire=self.questionnaire,
+                                           name="section 3")
 
         user_service = UserQuestionnaireService(self.user.user_profile.country, self.questionnaire)
         all_section_questionnaires = user_service.all_sections_questionnaires()
@@ -248,8 +273,10 @@ class UserServiceTest(BaseTest):
     def test_user_knows_if_he_should_see_preview_when_status_is_submitted(self):
         data = self.data
         old_primary = MultiChoiceAnswer.objects.create(response=self.option1, question=self.question1, **self.initial)
-        old_answer_1 = NumericalAnswer.objects.create(response=int(data['Number-0-response']), question=self.question2, **self.initial)
-        old_answer_2 = NumericalAnswer.objects.create(response=int(data['Number-1-response']), question=self.question3, **self.initial)
+        old_answer_1 = NumericalAnswer.objects.create(response=int(data['Number-0-response']), question=self.question2,
+                                                      **self.initial)
+        old_answer_2 = NumericalAnswer.objects.create(response=int(data['Number-1-response']), question=self.question3,
+                                                      **self.initial)
 
         answer_group = AnswerGroup.objects.create(grouped_question=self.question_group)
         answer_group.answer.add(old_primary, old_answer_1, old_answer_2)
@@ -263,9 +290,12 @@ class UserServiceTest(BaseTest):
 
     def test_user_knows_answers_given_questionnaire_and_version(self):
         data = self.data
-        version_1_primary_answer = MultiChoiceAnswer.objects.create(response=self.option1, question=self.question1, **self.initial)
-        version_1_answer_1 = NumericalAnswer.objects.create(response=int(data['Number-0-response']), question=self.question2, **self.initial)
-        version_1_answer_2 = NumericalAnswer.objects.create(response=int(data['Number-1-response']), question=self.question3, **self.initial)
+        version_1_primary_answer = MultiChoiceAnswer.objects.create(response=self.option1, question=self.question1,
+                                                                    **self.initial)
+        version_1_answer_1 = NumericalAnswer.objects.create(response=int(data['Number-0-response']),
+                                                            question=self.question2, **self.initial)
+        version_1_answer_2 = NumericalAnswer.objects.create(response=int(data['Number-1-response']),
+                                                            question=self.question3, **self.initial)
 
         answer_group = AnswerGroup.objects.create(grouped_question=self.question_group)
         answer_group.answer.add(version_1_answer_1, version_1_answer_2, version_1_primary_answer)
@@ -287,9 +317,12 @@ class UserServiceTest(BaseTest):
         version_1_answer_2.save()
         initial = self.initial.copy()
         del initial['version']
-        version_2_primary = MultiChoiceAnswer.objects.create(response=self.option1, question=self.question1, version=2, **initial)
-        version_2_answer_1 = NumericalAnswer.objects.create(response=int(data['Number-0-response']), question=self.question2, version=2, **initial)
-        version_2_answer_2 = NumericalAnswer.objects.create(response=int(data['Number-1-response']), question=self.question3, version=2, **initial)
+        version_2_primary = MultiChoiceAnswer.objects.create(response=self.option1, question=self.question1, version=2,
+                                                             **initial)
+        version_2_answer_1 = NumericalAnswer.objects.create(response=int(data['Number-0-response']),
+                                                            question=self.question2, version=2, **initial)
+        version_2_answer_2 = NumericalAnswer.objects.create(response=int(data['Number-1-response']),
+                                                            question=self.question3, version=2, **initial)
 
         answer_group = AnswerGroup.objects.create(grouped_question=self.question_group)
         answer_group.answer.add(version_2_primary, version_2_answer_1, version_2_answer_2)
@@ -310,13 +343,11 @@ class UserServiceTest(BaseTest):
                 document.write("Some stuff")
             self.document = open(filename, 'rb')
 
-
         document_in = SupportDocument.objects.create(path=File(self.document), country=self.country,
-                                                   questionnaire=self.questionnaire)
+                                                     questionnaire=self.questionnaire)
         questionnaire_2 = Questionnaire.objects.create(name="haha", year=2013)
         document_not_in = SupportDocument.objects.create(path=File(self.document), country=self.country,
-                                                   questionnaire=questionnaire_2)
-
+                                                         questionnaire=questionnaire_2)
 
         user_service = UserQuestionnaireService(self.country, self.questionnaire)
         documents = user_service.attachments()

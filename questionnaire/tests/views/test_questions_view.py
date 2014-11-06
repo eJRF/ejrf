@@ -10,7 +10,6 @@ from questionnaire.tests.base_test import BaseTest
 
 
 class QuestionViewTest(BaseTest):
-
     def setUp(self):
         self.client = Client()
         self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
@@ -163,7 +162,8 @@ class QuestionViewTest(BaseTest):
         form_data.update({'options': []})
 
         response = self.client.post(self.url + 'new/', data=form_data)
-        self.assertRaises(Question.DoesNotExist, Question.objects.get, text=form_data['text'], instructions=form_data['instructions'], answer_type=form_data['answer_type'])
+        self.assertRaises(Question.DoesNotExist, Question.objects.get, text=form_data['text'],
+                          instructions=form_data['instructions'], answer_type=form_data['answer_type'])
         self.assertIn('Question NOT created. See errors below.', response.content)
         self.assertIsInstance(response.context['form'], QuestionForm)
         self.assertEqual("CREATE", response.context['btn_label'])
@@ -222,15 +222,15 @@ class QuestionViewTest(BaseTest):
 
 
 class RegionalQuestionsViewTest(BaseTest):
-
     def setUp(self):
-
         self.client = Client()
         self.user = self.create_user(group=self.REGIONAL_ADMIN, org="WHO", region="AFRO")
         self.region = self.user.user_profile.region
         self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013, region=self.region)
-        self.section = Section.objects.create(name="section", questionnaire=self.questionnaire, order=1, region=self.region)
-        self.subsection = SubSection.objects.create(title="subsection 1", section=self.section, order=1, region=self.region)
+        self.section = Section.objects.create(name="section", questionnaire=self.questionnaire, order=1,
+                                              region=self.region)
+        self.subsection = SubSection.objects.create(title="subsection 1", section=self.section, order=1,
+                                                    region=self.region)
         self.assign('can_edit_questionnaire', self.user)
         self.client.login(username=self.user.username, password='pass')
 
@@ -278,7 +278,8 @@ class RegionalQuestionsViewTest(BaseTest):
         self.assertIn(message, response.cookies['messages'].value)
 
     def test_delete_question_question_not_belonging_to_their_region_shows_error(self):
-        user_not_in_same_region = self.create_user(username="asian_chic", group=self.REGIONAL_ADMIN, region="ASEAN", org="WHO")
+        user_not_in_same_region = self.create_user(username="asian_chic", group=self.REGIONAL_ADMIN, region="ASEAN",
+                                                   org="WHO")
         self.assign('can_edit_questionnaire', user_not_in_same_region)
         data = {'text': 'B. Number of cases tested',
                 'instructions': "Enter the total number of cases",
@@ -304,8 +305,10 @@ class DoesNotExistExceptionViewTest(BaseTest):
         self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
         self.region = Region.objects.create(name="AFRO")
         self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013, region=self.region)
-        self.section = Section.objects.create(name="section", questionnaire=self.questionnaire, order=1, region=self.region)
-        self.subsection = SubSection.objects.create(title="subsection 1", section=self.section, order=1, region=self.region)
+        self.section = Section.objects.create(name="section", questionnaire=self.questionnaire, order=1,
+                                              region=self.region)
+        self.subsection = SubSection.objects.create(title="subsection 1", section=self.section, order=1,
+                                                    region=self.region)
         self.assign('can_edit_questionnaire', self.user)
         self.client.login(username=self.user.username, password='pass')
 
@@ -327,7 +330,6 @@ class DoesNotExistExceptionViewTest(BaseTest):
 
 
 class EditQuestionViewTest(BaseTest):
-
     def setUp(self):
         self.client = Client()
         self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
@@ -343,7 +345,7 @@ class EditQuestionViewTest(BaseTest):
         self.parent_group = QuestionGroup.objects.create(subsection=self.sub_section, name="group1")
         self.parent_group.question.add(self.question1)
         self.theme = Theme.objects.create(name="Another theme")
-        self.url = '/questions/%d/edit/'%self.question1.id
+        self.url = '/questions/%d/edit/' % self.question1.id
         self.form_data = {'text': 'How many kids were immunised this year?',
                           'instructions': 'Some instructions',
                           'export_label': 'blah',
@@ -403,18 +405,20 @@ class EditQuestionViewTest(BaseTest):
         self.assertRaises(Question.DoesNotExist, Question.objects.get, **form_data)
         form_data['options'] = []
         response = self.client.post(self.url, data=form_data)
-        self.assertRaises(Question.DoesNotExist, Question.objects.get, text=form_data['text'], instructions=form_data['instructions'], answer_type=form_data['answer_type'])
+        self.assertRaises(Question.DoesNotExist, Question.objects.get, text=form_data['text'],
+                          instructions=form_data['instructions'], answer_type=form_data['answer_type'])
         self.assertIn('Question NOT updated. See errors below.', response.content)
         self.assertIsInstance(response.context['form'], QuestionForm)
         self.assertEqual("SAVE", response.context['btn_label'])
         self.assertEqual("id-new-question-form", response.context['id'])
 
-    def test_post_edit_when_question_is_in_published_questionnaire_duplicates_question_and_assign_new_question_to_all_unpublished_questionnaires(self):
+    def test_post_edit_when_question_is_in_published_questionnaire_duplicates_question_and_assign_new_question_to_all_unpublished_questionnaires(
+            self):
         self.questionnaire.status = Questionnaire.PUBLISHED
         self.questionnaire.save()
         self.question1.orders.create(order=1, question_group=self.parent_group)
 
-        draft_questionnaire = Questionnaire.objects.create(name="draft qnaire",description="haha",
+        draft_questionnaire = Questionnaire.objects.create(name="draft qnaire", description="haha",
                                                            status=Questionnaire.DRAFT)
         section_1 = Section.objects.create(title="section 1", order=1, questionnaire=draft_questionnaire, name="ha")
         sub_section_1 = SubSection.objects.create(title="subs1", order=1, section=section_1)
@@ -422,9 +426,10 @@ class EditQuestionViewTest(BaseTest):
         parent_group_d.question.add(self.question1)
         self.question1.orders.create(order=2, question_group=parent_group_d)
 
-        finalized_questionnaire = Questionnaire.objects.create(name="finalized qnaire",description="haha",
-                                                           status=Questionnaire.FINALIZED)
-        section_1_f = Section.objects.create(title="section 1", order=1, questionnaire=finalized_questionnaire, name="ha")
+        finalized_questionnaire = Questionnaire.objects.create(name="finalized qnaire", description="haha",
+                                                               status=Questionnaire.FINALIZED)
+        section_1_f = Section.objects.create(title="section 1", order=1, questionnaire=finalized_questionnaire,
+                                             name="ha")
         sub_section_1_f = SubSection.objects.create(title="subs1", order=1, section=section_1_f)
         parent_group_f = QuestionGroup.objects.create(subsection=sub_section_1_f, name="group")
         parent_group_f.question.add(self.question1)
@@ -465,7 +470,7 @@ class EditQuestionViewTest(BaseTest):
         for text in question1_options_texts:
             self.question1.options.create(text=text)
 
-        draft_questionnaire = Questionnaire.objects.create(name="draft qnaire",description="haha",
+        draft_questionnaire = Questionnaire.objects.create(name="draft qnaire", description="haha",
                                                            status=Questionnaire.DRAFT)
         section_1 = Section.objects.create(title="section 1", order=1, questionnaire=draft_questionnaire, name="ha")
         sub_section_1 = SubSection.objects.create(title="subs1", order=1, section=section_1)
@@ -473,9 +478,10 @@ class EditQuestionViewTest(BaseTest):
         parent_group_d.question.add(self.question1)
         self.question1.orders.create(order=2, question_group=parent_group_d)
 
-        finalized_questionnaire = Questionnaire.objects.create(name="finalized qnaire",description="haha",
-                                                           status=Questionnaire.FINALIZED)
-        section_1_f = Section.objects.create(title="section 1", order=1, questionnaire=finalized_questionnaire, name="ha")
+        finalized_questionnaire = Questionnaire.objects.create(name="finalized qnaire", description="haha",
+                                                               status=Questionnaire.FINALIZED)
+        section_1_f = Section.objects.create(title="section 1", order=1, questionnaire=finalized_questionnaire,
+                                             name="ha")
         sub_section_1_f = SubSection.objects.create(title="subs1", order=1, section=section_1_f)
         parent_group_f = QuestionGroup.objects.create(subsection=sub_section_1_f, name="group")
         parent_group_f.question.add(self.question1)

@@ -1,10 +1,10 @@
 from django.forms import ModelForm
 from django import forms
+
 from questionnaire.models import Section, SubSection
 
 
 class SectionForm(ModelForm):
-
     class Meta:
         model = Section
         fields = ['questionnaire', 'name', 'title', 'description']
@@ -13,7 +13,6 @@ class SectionForm(ModelForm):
 
 
 class SubSectionForm(ModelForm):
-
     def save(self, commit=True, *args, **kwargs):
         subsection = super(SubSectionForm, self).save(commit=False, *args, **kwargs)
         if not self.instance.order:

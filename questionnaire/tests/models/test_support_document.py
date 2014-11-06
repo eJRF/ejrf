@@ -4,7 +4,6 @@ from questionnaire.tests.base_test import BaseTest
 
 
 class FileAnswerTest(BaseTest):
-
     def test_file_answer_fields(self):
         _file = SupportDocument()
         fields = [str(item.attname) for item in _file._meta.fields]

@@ -1,10 +1,10 @@
 from django.utils.datastructures import SortedDict
+
 from questionnaire.models import Answer, AnswerGroup
 from questionnaire.services.questionnaire_entry_form_service import QuestionnaireEntryFormService
 
 
 class UserQuestionnaireService(object):
-
     def __init__(self, country, questionnaire, version=None):
         self.version = version
         self.country = country
@@ -19,8 +19,10 @@ class UserQuestionnaireService(object):
         return Answer.objects.filter(country=self.country).select_subclasses()
 
     def questionnaire_answers(self):
-        answer_groups = AnswerGroup.objects.filter(grouped_question__subsection__section__questionnaire=self.questionnaire)
-        answers = Answer.objects.filter(country=self.country, answergroup__in=answer_groups, questionnaire=self.questionnaire).select_subclasses()
+        answer_groups = AnswerGroup.objects.filter(
+            grouped_question__subsection__section__questionnaire=self.questionnaire)
+        answers = Answer.objects.filter(country=self.country, answergroup__in=answer_groups,
+                                        questionnaire=self.questionnaire).select_subclasses()
         if self.version:
             return answers.filter(version=self.version)
         return answers
@@ -59,10 +61,12 @@ class UserQuestionnaireService(object):
 
     def answered_required_questions_in(self, section):
         required_question_in_section = filter(lambda question: question.is_required, section.ordered_questions())
-        return self.answers.filter(question__in=required_question_in_section).count() == len(required_question_in_section)
+        return self.answers.filter(question__in=required_question_in_section).count() == len(
+            required_question_in_section)
 
     def all_sections_questionnaires(self):
-        initial = {'country': self.country, 'status': 'Draft', 'version':  self.version or self.POST_version, 'questionnaire': self.questionnaire}
+        initial = {'country': self.country, 'status': 'Draft', 'version': self.version or self.POST_version,
+                   'questionnaire': self.questionnaire}
         questionnaires = SortedDict()
         for section in self.questionnaire.sections.order_by('order'):
             questionnaires[section] = QuestionnaireEntryFormService(section, initial=initial)

@@ -2,6 +2,7 @@ from braces.views import PermissionRequiredMixin
 from django.contrib import messages
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+
 from questionnaire.forms.theme import ThemeForm
 from questionnaire.mixins import OwnerAndPermissionRequiredMixin
 from questionnaire.models import Theme

@@ -1,13 +1,13 @@
 import json
-from django.core.urlresolvers import reverse
+
 from django.test import Client
+from django.core import serializers
+
 from questionnaire.tests.base_test import BaseTest
 from questionnaire.models import Section, SubSection, Questionnaire, Question, QuestionGroup
-from django.core import serializers
 
 
 class SubsectionQuestionsTest(BaseTest):
-
     def setUp(self):
         self.client = Client()
         user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
@@ -32,13 +32,12 @@ class SubsectionQuestionsTest(BaseTest):
         self.question_group.question.add(self.question2)
 
     def test_should_get_back_questionnaire_id_from_url(self):
-
         response = self.client.get('/questionnaire/subsection/1/questions/')
         self.assertEqual(200, response.status_code)
 
         q1 = self.obj_to_dict(self.question1)
         q1['options'] = []
-        
+
         q2 = self.obj_to_dict(self.question2)
         q2['options'] = []
 
@@ -60,7 +59,7 @@ class SubsectionQuestionsTest(BaseTest):
 
         q1 = self.obj_to_dict(self.question1)
         q1['options'] = []
-        
+
         q2 = self.obj_to_dict(self.question2)
         q2['options'] = []
 

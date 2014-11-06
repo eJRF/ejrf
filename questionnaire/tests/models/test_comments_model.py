@@ -1,14 +1,16 @@
 from django.contrib.auth.models import User
-from questionnaire.models import Question, Country, NumericalAnswer, AnswerGroup, QuestionGroup, SubSection, Section, Questionnaire
+
+from questionnaire.models import Question, Country, NumericalAnswer, AnswerGroup, QuestionGroup, SubSection, Section, \
+    Questionnaire
 from questionnaire.models.comments import Comment
 from questionnaire.tests.base_test import BaseTest
 
 
 class CommentTest(BaseTest):
-
     def setUp(self):
         self.questionnaire = Questionnaire.objects.create(name="Uganda Revision 2014", description="some description")
-        self.question = Question.objects.create(text='Uganda Revision 2014 what what?', UID='abc123', answer_type='Text')
+        self.question = Question.objects.create(text='Uganda Revision 2014 what what?', UID='abc123',
+                                                answer_type='Text')
         self.country = Country.objects.create(name="Peru")
         self.tony = User.objects.create(username="Tony")
         self.montana = User.objects.create(username="Montana")

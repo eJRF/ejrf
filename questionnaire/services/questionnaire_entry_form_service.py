@@ -1,7 +1,8 @@
 import copy
 from django.forms.formsets import formset_factory
 from questionnaire.forms.answers import NumericalAnswerForm, TextAnswerForm, DateAnswerForm, MultiChoiceAnswerForm
-from questionnaire.models import AnswerGroup, Answer, NumericalAnswer, TextAnswer, DateAnswer, MultiChoiceAnswer, QuestionOption
+from questionnaire.models import AnswerGroup, Answer, NumericalAnswer, TextAnswer, DateAnswer, MultiChoiceAnswer, \
+    QuestionOption
 from questionnaire.utils.questionnaire_entry_helpers import extra_rows, clean_data_dict, primary_answers
 
 EMPTY_ROW = ['']
@@ -15,7 +16,6 @@ ANSWER_FORM = {
 
 
 class QuestionnaireEntryFormService(object):
-
     def __init__(self, section, initial={}, data=None, highlight=False, edit_after_submit=False):
         self.initial = initial
         self.data = data
@@ -47,7 +47,7 @@ class QuestionnaireEntryFormService(object):
         for answer_type in ANSWER_FORM.keys():
             mapped_orders = self.mapped_question_orders.get(answer_type)
             if mapped_orders:
-                initial = self._get_initial(mapped_orders,  answer_type)
+                initial = self._get_initial(mapped_orders, answer_type)
                 _formset_factory = formset_factory(ANSWER_FORM[answer_type], max_num=len(initial))
                 formsets[answer_type] = _formset_factory(prefix=answer_type, initial=initial, data=self.data)
         return formsets
@@ -62,7 +62,7 @@ class QuestionnaireEntryFormService(object):
         answer = None
         if option:
             primary_answer = Answer.from_response(response=option, version=self.version, country=self.country,
-                                              questionnaire=self.questionnaire)
+                                                  questionnaire=self.questionnaire)
 
             if question.is_primary:
                 if question_group.display_all:
@@ -88,7 +88,7 @@ class QuestionnaireEntryFormService(object):
         if answer.is_draft():
             initial['answer'] = answer
 
-    #slow sometimes 0.359 seconds (called multiple times in one request)
+    # slow sometimes 0.359 seconds (called multiple times in one request)
     def _get_initial(self, orders, answer_type):
         initial = []
         for order_dict in orders:
@@ -137,13 +137,16 @@ class QuestionnaireEntryFormService(object):
         version_ = self.initial['version']
         answer_groups = AnswerGroup.objects.filter(answer__questionnaire=self.section.questionnaire,
                                                    answer__country=self.initial['country'],
-                                                   answer__version=version_-1).exclude(
+                                                   answer__version=version_ - 1).exclude(
             grouped_question__subsection__section=self.section).distinct().select_related()
         for answer_group in answer_groups:
-            new_answer_group = AnswerGroup.objects.create(grouped_question=answer_group.grouped_question, row=answer_group.row)
+            new_answer_group = AnswerGroup.objects.create(grouped_question=answer_group.grouped_question,
+                                                          row=answer_group.row)
             for answer in answer_group.answer.all().select_related().select_subclasses():
-                new_answer = eval(answer.__class__.__name__).objects.create(question=answer.question, country=answer.country, code=answer.code,
-                                                                            response=answer.response, version=version_, status=Answer.DRAFT_STATUS,
+                new_answer = eval(answer.__class__.__name__).objects.create(question=answer.question,
+                                                                            country=answer.country, code=answer.code,
+                                                                            response=answer.response, version=version_,
+                                                                            status=Answer.DRAFT_STATUS,
                                                                             questionnaire=answer.questionnaire)
                 new_answer_group.answer.add(new_answer)
 

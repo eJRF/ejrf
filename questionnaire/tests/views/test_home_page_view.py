@@ -1,13 +1,13 @@
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test import Client
+
 from questionnaire.models import Questionnaire, Section, Country, Region, Question, SubSection, QuestionGroup
 from questionnaire.models.answers import NumericalAnswer, Answer
 from questionnaire.tests.base_test import BaseTest
 
 
 class HomePageViewTest(BaseTest):
-
     def setUp(self):
         self.client = Client()
         self.user = self.create_user(group=self.DATA_SUBMITTER, country="Uganda", region="AFRO")
@@ -19,28 +19,40 @@ class HomePageViewTest(BaseTest):
                                                            status=Questionnaire.PUBLISHED)
         self.section_1 = Section.objects.create(title="Reported Cases", order=1, questionnaire=self.questionnaire1,
                                                 name="Reported Cases")
-        self.sub_section = SubSection.objects.create(title="Reported cases for the year 2013", order=1, section=self.section_1)
+        self.sub_section = SubSection.objects.create(title="Reported cases for the year 2013", order=1,
+                                                     section=self.section_1)
         question2 = Question.objects.create(text='C. Number of cases positive', UID='C00005', answer_type='Number')
 
         self.parent = QuestionGroup.objects.create(subsection=self.sub_section, order=1)
         self.parent.question.add(question2)
-        self.answer = NumericalAnswer.objects.create(question=question2, country=self.country, status=Answer.DRAFT_STATUS, response=22, questionnaire=self.questionnaire1)
+        self.answer = NumericalAnswer.objects.create(question=question2, country=self.country,
+                                                     status=Answer.DRAFT_STATUS, response=22,
+                                                     questionnaire=self.questionnaire1)
 
-        self.questionnaire2 = Questionnaire.objects.create(name="JRF 2013 Core 2", year=2013, region=self.region, status=Questionnaire.PUBLISHED)
-        self.section_2_1 = Section.objects.create(title="Reported Cases", order=1, questionnaire=self.questionnaire2, name="Reported Cases")
-        self.sub_section_2_1 = SubSection.objects.create(title="Reported cases for the year 2013", order=1, section=self.section_2_1)
+        self.questionnaire2 = Questionnaire.objects.create(name="JRF 2013 Core 2", year=2013, region=self.region,
+                                                           status=Questionnaire.PUBLISHED)
+        self.section_2_1 = Section.objects.create(title="Reported Cases", order=1, questionnaire=self.questionnaire2,
+                                                  name="Reported Cases")
+        self.sub_section_2_1 = SubSection.objects.create(title="Reported cases for the year 2013", order=1,
+                                                         section=self.section_2_1)
         question_2_1 = Question.objects.create(text='C. Number of cases positive', UID='C00006', answer_type='Number')
 
         self.parent_2_1 = QuestionGroup.objects.create(subsection=self.sub_section_2_1, order=1)
         self.parent_2_1.question.add(question_2_1)
 
-        self.questionnaire3 = Questionnaire.objects.create(name="JRF 2013 Core 3", year=2013, region=self.region, status=Questionnaire.PUBLISHED)
-        self.section_3_1 = Section.objects.create(title="Reported Cases", order=1, questionnaire=self.questionnaire3, name="Reported Cases")
-        self.question_3_1 = Question.objects.create(text='C. Number of cases positive', UID='C00007', answer_type='Number')
-        self.sub_section_3_1 = SubSection.objects.create(title="Reported cases for the year 2013", order=1, section=self.section_3_1)
+        self.questionnaire3 = Questionnaire.objects.create(name="JRF 2013 Core 3", year=2013, region=self.region,
+                                                           status=Questionnaire.PUBLISHED)
+        self.section_3_1 = Section.objects.create(title="Reported Cases", order=1, questionnaire=self.questionnaire3,
+                                                  name="Reported Cases")
+        self.question_3_1 = Question.objects.create(text='C. Number of cases positive', UID='C00007',
+                                                    answer_type='Number')
+        self.sub_section_3_1 = SubSection.objects.create(title="Reported cases for the year 2013", order=1,
+                                                         section=self.section_3_1)
         self.parent_3_1 = QuestionGroup.objects.create(subsection=self.sub_section_3_1, order=1)
         self.parent_3_1.question.add(self.question_3_1)
-        self.answer_3_1 = NumericalAnswer.objects.create(question=self.question_3_1, country=self.country, status=Answer.SUBMITTED_STATUS, response=22, questionnaire=self.questionnaire3)
+        self.answer_3_1 = NumericalAnswer.objects.create(question=self.question_3_1, country=self.country,
+                                                         status=Answer.SUBMITTED_STATUS, response=22,
+                                                         questionnaire=self.questionnaire3)
 
     def test_get(self):
         self.questionnaire3.submissions.create(country=self.country, version=1)
@@ -53,12 +65,17 @@ class HomePageViewTest(BaseTest):
         self.assertEqual({self.questionnaire3: [self.answer_3_1.version]}, response.context['submitted'])
 
     def test_new_questionnaire_with_same_question_on_submit_changes_status(self):
-        questionnaire3_2 = Questionnaire.objects.create(name="JRF 2014 Core 3", year=2014, region=self.region, status=Questionnaire.PUBLISHED)
-        section_3_2 = Section.objects.create(title="Reported Cases", order=1, questionnaire=questionnaire3_2, name="Reported Cases")
-        sub_section_3_2 = SubSection.objects.create(title="Reported cases for the year 2014", order=1, section=section_3_2)
+        questionnaire3_2 = Questionnaire.objects.create(name="JRF 2014 Core 3", year=2014, region=self.region,
+                                                        status=Questionnaire.PUBLISHED)
+        section_3_2 = Section.objects.create(title="Reported Cases", order=1, questionnaire=questionnaire3_2,
+                                             name="Reported Cases")
+        sub_section_3_2 = SubSection.objects.create(title="Reported cases for the year 2014", order=1,
+                                                    section=section_3_2)
         parent_3_2 = QuestionGroup.objects.create(subsection=sub_section_3_2, order=1)
         parent_3_2.question.add(self.question_3_1)
-        answer_3_2 = NumericalAnswer.objects.create(question=self.question_3_1, country=self.country, status=Answer.DRAFT_STATUS, response=22, questionnaire=questionnaire3_2)
+        answer_3_2 = NumericalAnswer.objects.create(question=self.question_3_1, country=self.country,
+                                                    status=Answer.DRAFT_STATUS, response=22,
+                                                    questionnaire=questionnaire3_2)
         self.questionnaire3.submissions.create(country=self.country, version=1)
         response = self.client.get("/")
         self.assertEqual(200, response.status_code)
@@ -91,7 +108,6 @@ class HomePageViewTest(BaseTest):
 
 
 class GlobalAdminHomePageViewTest(BaseTest):
-
     def setUp(self):
         self.client = Client()
         self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")

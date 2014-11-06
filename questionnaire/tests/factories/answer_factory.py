@@ -1,4 +1,5 @@
 import factory
+
 from questionnaire.models import NumericalAnswer
 from questionnaire.tests.factories.question_factory import QuestionFactory
 from questionnaire.tests.factories.questionnaire_factory import QuestionnaireFactory

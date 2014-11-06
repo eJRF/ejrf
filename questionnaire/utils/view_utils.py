@@ -1,8 +1,9 @@
-from questionnaire.models import Country, Questionnaire, UserProfile
+from questionnaire.models import Country, Questionnaire
 
-PERMS_STATUS_MAP = {'auth.can_edit_questionnaire': [Questionnaire.PUBLISHED, Questionnaire.DRAFT, Questionnaire.FINALIZED],
-                    'auth.can_view_users': [Questionnaire.PUBLISHED, Questionnaire.DRAFT, Questionnaire.FINALIZED],
-                    'auth.can_submit_responses': [Questionnaire.PUBLISHED]}
+PERMS_STATUS_MAP = {
+'auth.can_edit_questionnaire': [Questionnaire.PUBLISHED, Questionnaire.DRAFT, Questionnaire.FINALIZED],
+'auth.can_view_users': [Questionnaire.PUBLISHED, Questionnaire.DRAFT, Questionnaire.FINALIZED],
+'auth.can_submit_responses': [Questionnaire.PUBLISHED]}
 
 
 def get_country(request):

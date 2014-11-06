@@ -1,6 +1,8 @@
 from django import forms
 from django.contrib.auth.models import Group
-from questionnaire.models import Region, Organization, Country, Theme, Questionnaire, Question
+
+from questionnaire.models import Region, Organization, Country, Theme, Questionnaire
+from questionnaire.utils.answer_type import AnswerTypes
 
 
 class UserFilterForm(forms.Form):
@@ -39,9 +41,9 @@ class ExportFilterForm(forms.Form):
 class QuestionFilterForm(forms.Form):
     theme = forms.ModelChoiceField(queryset=Theme.objects.all().order_by('name'),
                                    empty_label="All",
-                                   widget=forms.Select(attrs={"class": 'form-control'}),required=False)
+                                   widget=forms.Select(attrs={"class": 'form-control'}), required=False)
     answer_type = forms.ChoiceField(widget=forms.Select(attrs={"class": 'form-control'}), required=False,
-                                    choices=Question.ANSWER_TYPES)
+                                    choices=AnswerTypes.answer_types())
 
     def __init__(self, *args, **kwargs):
         super(QuestionFilterForm, self).__init__(*args, **kwargs)

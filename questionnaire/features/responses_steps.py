@@ -4,6 +4,8 @@ from lettuce import step, world
 from questionnaire.features.pages.questionnaires import QuestionnairePage
 from questionnaire.features.pages.users import LoginPage
 from questionnaire.models import Questionnaire, Section, SubSection, Question, QuestionGroup, QuestionGroupOrder, Region, Country, UserProfile
+from questionnaire.utils.answer_type import AnswerTypes
+
 
 @step(u'Given I am a logged-in user with a user Profile')
 def given_i_am_a_logged_in_user_with_a_user_profile(step):
@@ -49,7 +51,7 @@ def given_i_have_a_questionnaire_with_questions(step):
     world.question6 = Question.objects.create(text='Name of WHO contact', UID='C00028', answer_type='Text',)
     world.question7 = Question.objects.create(text='Email address of WHO contact', UID='C00029', answer_type='Text',)
     world.question8 = Question.objects.create(text='Total number of districts in the country', UID='C00030',
-                                              answer_type='Number', answer_sub_type=Question.INTEGER,
+                                              answer_type='Number', answer_sub_type=AnswerTypes.INTEGER,
                                               instructions=""" A district is defined as the third administrative level
                                                (nation is the first, province is the second).""")
 

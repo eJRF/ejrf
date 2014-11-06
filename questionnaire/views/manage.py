@@ -4,8 +4,9 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import View
 from braces.views import MultiplePermissionsRequiredMixin, PermissionRequiredMixin
+
 from questionnaire.forms.questionnaires import QuestionnaireFilterForm
-from questionnaire.mixins import RegionAndPermissionRequiredMixin, OwnerAndPermissionRequiredMixin
+from questionnaire.mixins import RegionAndPermissionRequiredMixin
 from questionnaire.models import Questionnaire, Region
 
 
@@ -20,7 +21,8 @@ class ManageJRF(MultiplePermissionsRequiredMixin, View):
 
     def get(self, *args, **kwargs):
         core_questionnaires = self.questionnaires.filter(region__isnull=True)
-        context = {'finalized_questionnaires': core_questionnaires.filter(status__in=[Questionnaire.FINALIZED, Questionnaire.PUBLISHED]),
+        context = {'finalized_questionnaires': core_questionnaires.filter(
+            status__in=[Questionnaire.FINALIZED, Questionnaire.PUBLISHED]),
                    'draft_questionnaires': core_questionnaires.filter(status=Questionnaire.DRAFT),
                    'filter_form': QuestionnaireFilterForm(),
                    'regions_questionnaire_map': self.map_region_with_questionnaires(),
@@ -33,8 +35,10 @@ class ManageJRF(MultiplePermissionsRequiredMixin, View):
         questionnaire_region_map = {}
         regional_questionnaires = self.questionnaires.filter(region__isnull=False)
         for region in self.regions:
-            regional = {region: {'finalized': regional_questionnaires.filter(region=region, status__in=[Questionnaire.FINALIZED, Questionnaire.PUBLISHED]),
-                        'drafts': regional_questionnaires.filter(region=region, status=Questionnaire.DRAFT)}}
+            regional = {region: {'finalized': regional_questionnaires.filter(region=region,
+                                                                             status__in=[Questionnaire.FINALIZED,
+                                                                                         Questionnaire.PUBLISHED]),
+                                 'drafts': regional_questionnaires.filter(region=region, status=Questionnaire.DRAFT)}}
             questionnaire_region_map.update(regional)
         return questionnaire_region_map
 
@@ -62,6 +66,7 @@ class ManageRegionalJRF(RegionAndPermissionRequiredMixin, View):
         region = Region.objects.get(id=kwargs['region_id'])
         questionnaires = region.questionnaire.all()
         context = {'region': region,
-                   'finalized_questionnaires': questionnaires.filter(status__in=[Questionnaire.FINALIZED, Questionnaire.PUBLISHED]),
-                   'draft_questionnaires': questionnaires.filter(status=Questionnaire.DRAFT),}
+                   'finalized_questionnaires': questionnaires.filter(
+                       status__in=[Questionnaire.FINALIZED, Questionnaire.PUBLISHED]),
+                   'draft_questionnaires': questionnaires.filter(status=Questionnaire.DRAFT), }
         return render(self.request, self.template_name, context)

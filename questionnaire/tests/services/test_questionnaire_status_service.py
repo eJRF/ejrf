@@ -5,13 +5,14 @@ from questionnaire.tests.base_test import BaseTest
 
 
 class QuestionnaireStatusServiceTest(BaseTest):
-
     def setUp(self):
         self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013)
-        self.section_1 = Section.objects.create(title="Reported Cases of Selected Vaccine Preventable Diseases (VPDs)", order=1,
-                                                      questionnaire=self.questionnaire, name="Reported Cases")
+        self.section_1 = Section.objects.create(title="Reported Cases of Selected Vaccine Preventable Diseases (VPDs)",
+                                                order=1,
+                                                questionnaire=self.questionnaire, name="Reported Cases")
 
-        self.sub_section = SubSection.objects.create(title="Reported cases for the year 2013", order=1, section=self.section_1)
+        self.sub_section = SubSection.objects.create(title="Reported cases for the year 2013", order=1,
+                                                     section=self.section_1)
         self.primary_question = Question.objects.create(text='Disease', UID='C00003', answer_type='MultiChoice',
                                                         is_primary=True)
         self.option = QuestionOption.objects.create(text="Measles", question=self.primary_question, UID="QO1")

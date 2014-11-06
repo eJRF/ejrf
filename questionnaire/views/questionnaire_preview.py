@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.views.generic import View
 from braces.views import MultiplePermissionsRequiredMixin
+
 from questionnaire.models import Questionnaire, Country
 from questionnaire.services.users import UserQuestionnaireService
 
@@ -29,7 +30,7 @@ class PreviewQuestionnaire(MultiplePermissionsRequiredMixin, View):
 
     def get_questionnaire_user_service(self, questionnaire):
         get_params = self.request.GET
-        if 'country' in get_params and 'version'in get_params:
+        if 'country' in get_params and 'version' in get_params:
             country = Country.objects.get(id=get_params['country'])
-            return UserQuestionnaireService(country, questionnaire,  get_params['version'])
+            return UserQuestionnaireService(country, questionnaire, get_params['version'])
         return UserQuestionnaireService(self.request.user.user_profile.country, questionnaire)

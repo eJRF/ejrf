@@ -1,8 +1,10 @@
 import json
+
 from braces.views import LoginRequiredMixin, MultiplePermissionsRequiredMixin
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import HttpResponse
 from django.views.generic import ListView, DetailView
+
 from questionnaire.models import Region, Country, Organization
 
 
@@ -38,7 +40,6 @@ class RegionsForOrganization(MultiplePermissionsRequiredMixin, DetailView):
 
 
 class CountriesForRegion(LoginRequiredMixin, DetailView):
-
     def get(self, request, *args, **kwargs):
         regions = Region.objects.filter(id__in=request.GET.getlist('regions'))
         countries = Country.objects.filter(regions__in=regions).distinct().order_by('name').values('id', 'name')
