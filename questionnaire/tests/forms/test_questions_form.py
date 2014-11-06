@@ -2,6 +2,7 @@ from questionnaire.forms.questions import QuestionForm
 from questionnaire.models import Question, QuestionOption, Questionnaire, Section, SubSection, QuestionGroup, Region, \
     Theme
 from questionnaire.tests.base_test import BaseTest
+from questionnaire.utils.answer_type import AnswerTypes
 
 
 class QuestionFormTest(BaseTest):
@@ -40,6 +41,28 @@ class QuestionFormTest(BaseTest):
         question_form = QuestionForm(data=data)
         self.assertFalse(question_form.is_valid())
         self.assertIn("This field is required.", question_form.errors['answer_type'])
+
+    def test_clean_answer_number_sub_type(self):
+        data = self.form_data.copy()
+        data['answer_type'] = AnswerTypes.NUMBER
+        question_form = QuestionForm(data=data)
+        self.assertFalse(question_form.is_valid())
+        self.assertIn("This field is required if you select '%s'" % AnswerTypes.NUMBER, question_form.errors['answer_sub_type'])
+
+    def test_clean_answer_number_sub_type_valid(self):
+        data = self.form_data.copy()
+        data['answer_type'] = AnswerTypes.NUMBER
+        data['answer_sub_type'] = AnswerTypes.DECIMAL
+        question_form = QuestionForm(data=data)
+        self.assertTrue(question_form.is_valid())
+        self.assertTrue(len(question_form.errors) == 0)
+
+    def test_clean_answer_date_sub_type(self):
+        data = self.form_data.copy()
+        data['answer_type'] = AnswerTypes.DATE
+        question_form = QuestionForm(data=data)
+        self.assertFalse(question_form.is_valid())
+        self.assertIn("This field is required if you select '%s'" % AnswerTypes.DATE, question_form.errors['answer_sub_type'])
 
     def test_clean_export_label(self):
         data = self.form_data.copy()
