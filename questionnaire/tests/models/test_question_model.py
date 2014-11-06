@@ -2,7 +2,7 @@ from django.db import IntegrityError
 from django.core.exceptions import ValidationError
 from questionnaire.models import Questionnaire, Section, SubSection, Organization, Region, Country, QuestionGroup, \
     NumericalAnswer, Answer, QuestionGroupOrder, AnswerGroup, MultiChoiceAnswer, TextAnswer, DateAnswer
-from questionnaire.models.questions import Question, QuestionOption
+from questionnaire.models.questions import Question, QuestionOption, AnswerType
 from questionnaire.tests.base_test import BaseTest
 from questionnaire.tests.factories.question_factory import QuestionFactory
 from questionnaire.tests.factories.question_group_factory import QuestionGroupFactory
@@ -52,7 +52,7 @@ class QuestionTest(BaseTest):
         self.assertIn(parent_group_2, question_groups)
 
     def test_question_knows_all_its_questionnaire(self):
-        other_questionnaire = Questionnaire.objects.create(name="other qnaire",description="haha")
+        other_questionnaire = Questionnaire.objects.create(name="other qnaire", description="haha")
         section_1 = Section.objects.create(title="section 1", order=1, questionnaire=other_questionnaire, name="ha")
         sub_section_1 = SubSection.objects.create(title="subs1", order=1, section=section_1)
         parent_group = QuestionGroup.objects.create(subsection=sub_section_1, name="group")
@@ -94,20 +94,22 @@ class QuestionTest(BaseTest):
     def test_editing_self_does_not_raise_integrity_error(self):
         question = Question.objects.create(text='question text', UID='abc123', answer_type='Text')
         UID = question.UID
-        question.text="haha"
+        question.text = "haha"
         question.save()
         self.failUnless(question.id)
         self.assertEqual(UID, Question.objects.get(text=question.text).UID)
 
     def test_child_question_uid_is_parent_question_uid(self):
         parent_question = Question.objects.create(text='question text', UID='abc123', answer_type='Text')
-        child_question_with_same_uid = Question(text='revised text', UID='abc123', answer_type='Text', parent=parent_question)
+        child_question_with_same_uid = Question(text='revised text', UID='abc123', answer_type='Text',
+                                                parent=parent_question)
         child_question_with_same_uid.save()
         self.failUnless(child_question_with_same_uid.id)
 
     def test_parent_automatically_transfer_UID_to_child(self):
         parent_question = Question.objects.create(text='question text', UID='abc123', answer_type='Text')
-        child_question_without_uid = Question.objects.create(text='revised text', answer_type='Text', parent=parent_question)
+        child_question_without_uid = Question.objects.create(text='revised text', answer_type='Text',
+                                                             parent=parent_question)
         child_question_with_different_uid = Question.objects.create(text='revised text', answer_type='Text',
                                                                     UID='different uid', parent=parent_question)
         self.assertEqual(parent_question.UID, child_question_without_uid.UID)
@@ -235,23 +237,27 @@ class QuestionTest(BaseTest):
         self.assertFalse(question.can_be_deleted())
 
     def test_knows_multichoice(self):
-        question1 = Question.objects.create(text='ha', UID='C_2013', answer_type='MultiChoice',)
-        question2 = Question.objects.create(text='ha', UID='C_2014', answer_type='Number',)
+        question1 = Question.objects.create(text='ha', UID='C_2013', answer_type='MultiChoice', )
+        question2 = Question.objects.create(text='ha', UID='C_2014', answer_type='Number', )
 
         self.assertTrue(question1.is_multichoice())
         self.assertFalse(question2.is_multichoice())
 
     def test_question_knows_answered_options(self):
         country = Country.objects.create(name="Kenya")
-        question = Question.objects.create(text='what do you drink?', UID='C_2013', answer_type='MultiChoice', is_primary=True)
+        question = Question.objects.create(text='what do you drink?', UID='C_2013', answer_type='MultiChoice',
+                                           is_primary=True)
         option1 = QuestionOption.objects.create(text='tusker lager', question=question)
         option2 = QuestionOption.objects.create(text='tusker lite', question=question)
         option3 = QuestionOption.objects.create(text='tusker malt', question=question)
-        option1_answer = MultiChoiceAnswer.objects.create(response=option1, question=question, questionnaire=self.questionnaire, version=1, country=self.country)
-        MultiChoiceAnswer.objects.create(response=option2, question=question, questionnaire=self.questionnaire, version=1, country=country)
+        option1_answer = MultiChoiceAnswer.objects.create(response=option1, question=question,
+                                                          questionnaire=self.questionnaire, version=1,
+                                                          country=self.country)
+        MultiChoiceAnswer.objects.create(response=option2, question=question, questionnaire=self.questionnaire,
+                                         version=1, country=country)
         group = question.question_group.create(order=1, subsection=self.sub_section_1)
         option1_answer.answergroup.create(grouped_question=group)
-        data={'questionnaire': self.questionnaire, 'country': self.country}
+        data = {'questionnaire': self.questionnaire, 'country': self.country}
         answered_options = question.answered_options(question_group=group, **data)
         self.assertEqual([option1], answered_options)
         self.assertNotIn(option2, answered_options)
@@ -271,8 +277,8 @@ class QuestionTest(BaseTest):
         self.assertEquals(["text1", "text2"], answered_options)
         self.assertNotIn("text3", answered_options)
 
-class QuestionOrderTest(BaseTest):
 
+class QuestionOrderTest(BaseTest):
     def setUp(self):
         self.root_question = QuestionFactory()
         self.question_to_skip = QuestionFactory()
@@ -320,11 +326,33 @@ class QuestionOrderTest(BaseTest):
         QuestionGroupOrder.objects.create(question=self.root_question, question_group=self.question_group, order=2)
         QuestionGroupOrder.objects.create(question=self.question_to_skip, question_group=self.question_group, order=1)
 
-        self.assertRaises(ValidationError, self.question_to_skip.is_ordered_after, self.root_question, self.other_subsection)
+        self.assertRaises(ValidationError, self.question_to_skip.is_ordered_after, self.root_question,
+                          self.other_subsection)
+
+
+class AnswerSubTypeTest(BaseTest):
+    def test_returns_answer_types_as_a_tuple_of_tuples(self):
+        expected_answer_types = (
+            ("Date", 'Date'),
+            ("MultiChoice", 'MultiChoice'),
+            ("Number", 'Number'),
+            ("Text", "Text"),
+        )
+        self.assertEqual(expected_answer_types, AnswerType.answer_types())
+
+    def test_returns_answer_sub_types_as_a_tuple_of_tuples(self):
+        expected_sub_types = (
+            ('DD/MM/YYYY', 'DD/MM/YYYY'),
+            ('MM/YYYY', 'MM/YYYY'),
+            ('MultipleResponse', 'MultipleResponse'),
+            ('SingleResponse', 'SingleResponse'),
+            ('Decimal', 'Decimal'),
+            ('Integer', 'Integer')
+        )
+        self.assertEqual(expected_sub_types, AnswerType.answer_sub_types())
 
 
 class QuestionOptionTest(BaseTest):
-
     def setUp(self):
         self.question = Question.objects.create(text='what do you drink?', UID='aa123', answer_type='Text')
         self.question_option = QuestionOption.objects.create(text='tusker lager', question=self.question, UID='o_uid')

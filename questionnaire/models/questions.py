@@ -2,6 +2,7 @@ from django.core.exceptions import ValidationError
 from django.db import models, IntegrityError
 from questionnaire.models.base import BaseModel
 from questionnaire.utils.model_utils import largest_uid, stringify
+import itertools
 
 
 class Question(BaseModel):
@@ -135,6 +136,37 @@ class Question(BaseModel):
         elif not question_orders.exists():
             raise ValidationError('Both questions should belong to the same subsection')
         return False
+
+
+class AnswerType(object):
+    valid_types = {
+            "Date": (
+                "DD/MM/YYYY",
+                "MM/YYYY"
+            ),
+            "MultiChoice": (
+                "MultipleResponse",
+                "SingleResponse"
+            ),
+            "Number": (
+                'Decimal',
+                'Integer'
+            ),
+            "Text": ()
+        }
+
+    def __init__(self, answer_type):
+        self.answer_type = answer_type
+        self.answer_sub_types = self.valid_types[answer_type]
+
+    @classmethod
+    def answer_types(cls):
+        return tuple(map(lambda (k, v): (k, k), cls.valid_types.iteritems()))
+
+    @classmethod
+    def answer_sub_types(cls):
+        subtypes = filter(None, [v for (k, v) in cls.valid_types.iteritems()])
+        return tuple(map(lambda v: (v, v), itertools.chain(*subtypes)))
 
 
 class QuestionOption(BaseModel):
