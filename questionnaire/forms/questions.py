@@ -64,12 +64,8 @@ class QuestionForm(ModelForm):
     def _clean_answer_sub_type(self):
         answer_type = self.cleaned_data.get('answer_type', None)
         answer_sub_type = self.cleaned_data.get('answer_sub_type', None)
-        if answer_type == 'Number' and not AnswerTypes.VALID_TYPES[answer_type].__contains__(answer_sub_type):
-            message = "This field is required if you select number"
-            self._errors['answer_sub_type'] = self.error_class([message])
-            del self.cleaned_data['answer_sub_type']
-        if answer_type == 'Date' and not AnswerTypes.VALID_TYPES[answer_type].__contains__(answer_sub_type):
-            message = "This field is required if you select date"
+        if answer_type and AnswerTypes.has_subtype(answer_type) and not AnswerTypes.is_valid_sub_type(answer_type, answer_sub_type):
+            message = "This field is required if you select %s" % answer_type
             self._errors['answer_sub_type'] = self.error_class([message])
             del self.cleaned_data['answer_sub_type']
 

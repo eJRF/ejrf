@@ -4,7 +4,7 @@ from questionnaire.models import Question, QuestionOption, Questionnaire, Sectio
 from questionnaire.tests.base_test import BaseTest
 
 
-class QuestionsFormTest(BaseTest):
+class QuestionFormTest(BaseTest):
     def setUp(self):
         self.theme = Theme.objects.create(name="Another theme")
         self.form_data = {'text': 'How many kids were immunised this year?',

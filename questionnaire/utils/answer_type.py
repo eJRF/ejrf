@@ -15,8 +15,8 @@ class AnswerTypes(object):
             "MM/YYYY"
         ),
         MULTI_CHOICE: (
-            "MultipleResponse",
-            "SingleResponse"
+            # "MultipleResponse",
+            # "SingleResponse"
         ),
         NUMBER: (
             DECIMAL,
@@ -24,6 +24,14 @@ class AnswerTypes(object):
         ),
         "Text": ()
     }
+
+    @classmethod
+    def has_subtype(cls, answer_type):
+        return len(cls.VALID_TYPES[answer_type]) > 0
+
+    @classmethod
+    def is_valid_sub_type(cls, answer_type, answer_sub_type):
+        return cls.VALID_TYPES[answer_type].__contains__(answer_sub_type)
 
     @classmethod
     def answer_types(cls):
