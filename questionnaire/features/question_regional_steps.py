@@ -102,3 +102,13 @@ def and_that_the_questions_are_used_in_a_published_questionnaire(step):
 @step(u'Then  I should see original question')
 def then_i_should_see_original_question(step):
     world.page.is_text_present(world.question1.text)
+
+@step(u'When I fill in the regional question with valid details')
+def when_i_fill_in_the_regional_question_with_valid_details(step):
+    question_data = {'text': 'Updated Question Text',
+                     'instructions': 'Updated Question Instructions',
+                     'export_label': 'Updated Question Export Label',
+                     'theme': world.theme.id}
+    world.page.fill_form(question_data)
+    world.page.select('answer_type', 'Text')
+    world.page.submit()

@@ -137,6 +137,7 @@ class QuestionViewTest(BaseTest):
     def test_post_multichoice_question_with_options(self):
         form_data = self.form_data.copy()
         form_data['answer_type'] = 'MultiChoice'
+        form_data['answer_sub_type'] = 'MultipleResponse',
         question_options = ['yes, No, Maybe, Nr, Chill']
         del form_data['options']
         self.assertRaises(Question.DoesNotExist, Question.objects.get, **form_data)
@@ -386,6 +387,7 @@ class EditQuestionViewTest(BaseTest):
     def test_post_edit_to_multichoice_question_with_options(self):
         form_data = self.form_data.copy()
         form_data['answer_type'] = 'MultiChoice'
+        form_data['answer_sub_type'] = 'MultipleResponse'
         question_options = ['yes, No, Maybe, Nr, Chill']
         self.assertRaises(Question.DoesNotExist, Question.objects.get, **form_data)
         form_data['options'] = question_options
@@ -492,10 +494,11 @@ class EditQuestionViewTest(BaseTest):
                 'instructions': 'Some instructions',
                 'export_label': 'blah',
                 'answer_type': 'MultiChoice',
+                'answer_sub_type': 'MultipleResponse',
                 'options': changed_options,
                 'theme': self.theme.id}
 
-        response = self.client.post(self.url, data=data)
+        self.client.post(self.url, data=data)
 
         data.pop('options')
         duplicate_question = Question.objects.get(UID=self.question1.UID, **data)

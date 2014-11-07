@@ -10,19 +10,19 @@ class AnswerTypes(object):
     DATE = "Date"
 
     VALID_TYPES = {
-        DATE: (
+        DATE: [
             "DD/MM/YYYY",
             "MM/YYYY"
-        ),
-        MULTI_CHOICE: (
-            # "MultipleResponse",
-            # "SingleResponse"
-        ),
-        NUMBER: (
+        ],
+        MULTI_CHOICE: [
+            "MultipleResponse",
+            "SingleResponse"
+        ],
+        NUMBER: [
             DECIMAL,
             INTEGER
-        ),
-        "Text": ()
+        ],
+        "Text": []
     }
 
     @classmethod

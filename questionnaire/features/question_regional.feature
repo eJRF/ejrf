@@ -48,7 +48,7 @@ Feature: Regional Questions
         Then I should see the question details displayed for editing
         When I update the question with invalid details
         I should see an error message
-        When I update the question with valid details
+        When I fill in the regional question with valid details
         Then I should see a message that the question was successfully updated
         And I should see the updated details
         When I preview the submitted questionnaire where the question was used

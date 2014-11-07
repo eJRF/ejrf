@@ -9,6 +9,7 @@ from questionnaire.forms.filter import QuestionFilterForm
 from questionnaire.forms.questions import QuestionForm
 from questionnaire.mixins import DoesNotExistExceptionHandlerMixin, OwnerAndPermissionRequiredMixin
 from questionnaire.models import Question, Questionnaire
+from questionnaire.utils.answer_type import AnswerTypes
 from questionnaire.utils.service_utils import filter_empty_values
 
 
@@ -51,8 +52,10 @@ class CreateQuestion(PermissionRequiredMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super(CreateQuestion, self).get_context_data(**kwargs)
+        options = AnswerTypes.VALID_TYPES
         context.update({'btn_label': 'CREATE', 'id': 'id-new-question-form',
-                        'cancel_url': reverse('list_questions_page'), 'title': 'New Question'})
+                        'cancel_url': reverse('list_questions_page'), 'title': 'New Question',
+                        'question_options': options})
         return context
 
     def post(self, request, *args, **kwargs):
@@ -68,9 +71,11 @@ class CreateQuestion(PermissionRequiredMixin, CreateView):
         return HttpResponseRedirect(reverse('list_questions_page'))
 
     def _form_invalid(self):
+        options = AnswerTypes.VALID_TYPES
         messages.error(self.request, "Question NOT created. See errors below.")
         context = {'form': self.form, 'btn_label': "CREATE", 'id': 'id-new-question-form',
-                   'cancel_url': reverse('list_questions_page'), 'title': 'New Question'}
+                   'cancel_url': reverse('list_questions_page'), 'title': 'New Question',
+                   'question_options': options}
         return self.render_to_response(context)
 
 
@@ -86,10 +91,12 @@ class EditQuestion(OwnerAndPermissionRequiredMixin, UpdateView):
         self.pk_url_kwarg = 'question_id'
 
     def get_context_data(self, **kwargs):
+        options = AnswerTypes.VALID_TYPES
         context = super(EditQuestion, self).get_context_data(**kwargs)
         context.update({'btn_label': 'SAVE', 'id': 'id-new-question-form',
                         'cancel_url': reverse('list_questions_page'),
-                        'title': 'Edit Question'})
+                        'title': 'Edit Question',
+                        'question_options': options})
         return context
 
     def form_valid(self, form):

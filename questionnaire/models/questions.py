@@ -102,7 +102,6 @@ class Question(BaseModel):
             else:
                 return question_orders[0].question_group.order > other_question_orders[0].question_group.order
         elif not question_orders.exists():
-            print '*'*100
             raise ValidationError('Both questions should belong to the same subsection')
         return False
 

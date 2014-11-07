@@ -1,5 +1,5 @@
 {% for field in a_form.visible_fields %}
-    <p id="{{ field.auto_id }}_span" {% if field.field.widget.attrs.class %}class="{{ field.field.widget.attrs.class }}"{% endif %} {% if field.field.hidden %} style="display:none;" {% endif %} >
+    <p id="{{ field.auto_id }}_span" {% if field.field.widget.attrs.class %}class="{{ field.field.widget.attrs.class }}"{% endif %} {% if field.field.attrs %} {{ field.field.attrs | safe }} {% endif %} >
         <label for="{{ field.auto_id }}">{{ field.label }}</label>
         {{ field }} <label class="error">
                         {% if field.errors %}

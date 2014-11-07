@@ -26,17 +26,19 @@ class QuestionForm(ModelForm):
         self.fields['export_label'].label = 'Export label (Detail)'
         self.fields['theme'].empty_label = 'Select theme'
         self.fields['answer_sub_type'].label = 'Response sub type'
-        self.fields['answer_sub_type'].hidden = True
+        self.fields['answer_sub_type'].attrs = "data-ng-show='allOptions'"
         self.fields['answer_sub_type'].choices = self._set_subtype_choices()
 
     class Meta:
+        ANGULAR_OPTIONS_AND_FILTER = "option.text for option in allOptions track by option.value"
         model = Question
         fields = (
             'text', 'export_label', 'instructions', 'answer_type', 'answer_sub_type', 'options', 'theme', 'is_primary')
         widgets = {'text': forms.Textarea(attrs={"rows": 6, "cols": 50}),
                    'instructions': forms.Textarea(attrs={"rows": 6, "cols": 50}),
-                   'answer_type': forms.Select(),
-                   'answer_sub_type': forms.Select(),
+                   'answer_type': forms.Select(attrs={"data-ng-model": "answerType"}),
+                   'answer_sub_type': forms.Select(attrs={"data-ng-model": "answerSubType",
+                                                          "data-ng-options": ANGULAR_OPTIONS_AND_FILTER}),
                    'theme': forms.Select(),
                    'export_label': forms.Textarea(attrs={"rows": 2, "cols": 50})}
 
@@ -64,7 +66,8 @@ class QuestionForm(ModelForm):
     def _clean_answer_sub_type(self):
         answer_type = self.cleaned_data.get('answer_type', None)
         answer_sub_type = self.cleaned_data.get('answer_sub_type', None)
-        if answer_type and AnswerTypes.has_subtype(answer_type) and not AnswerTypes.is_valid_sub_type(answer_type, answer_sub_type):
+        if answer_type and AnswerTypes.has_subtype(answer_type) and not AnswerTypes.is_valid_sub_type(answer_type,
+                                                                                                      answer_sub_type):
             message = "This field is required if you select '%s'" % answer_type
             self._errors['answer_sub_type'] = self.error_class([message])
             del self.cleaned_data['answer_sub_type']

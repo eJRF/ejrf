@@ -10,22 +10,12 @@ jQuery(function ($) {
         assignOptionNumbers($form);
     }
 
-    if (answerTypeSelect.val() == 'MultiChoice') {
-        $('#option-choices').addClass('show').removeClass('hide');
-    } else if (answerTypeSelect.val() == 'Date' || answerTypeSelect.val() == 'Number' ) {
-        showResponseSubType(answerTypeSelect.val());
-    }
-
     answerTypeSelect.on('change', function () {
         $('#option-choices').removeClass('show').addClass('hide');
         removeOptions();
 
-        $("#id_answer_sub_type_span").hide();
-
         if ($(this).val() == 'MultiChoice') {
             $('#option-choices').addClass('show').removeClass('hide');
-        } else if ($(this).val() == 'Date' || $(this).val() == 'Number') {
-            showResponseSubType($(this).val());
         }
     });
 
@@ -49,18 +39,6 @@ jQuery(function ($) {
     });
 });
 
-function showResponseSubType(selectedResponseType) {
-    var answer_sub_type_template =
-            {
-                Date:   $("#date-subtype-template").html(),
-                Number: $("#number-subtype-template").html()
-            };
-    var selectedResponseSubType = $('#id_answer_sub_type').val();
-    var template = answer_sub_type_template[selectedResponseType];
-    $("#id_answer_sub_type_span").show();
-    $("#id_answer_sub_type").html(template);
-    $('#id_answer_sub_type').val(selectedResponseSubType);
-}
 
 function assignOptionNumbers($form) {
     assignOptionNumbersUsing($form, "span.number");
