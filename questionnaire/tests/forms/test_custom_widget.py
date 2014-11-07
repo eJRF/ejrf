@@ -1,7 +1,7 @@
 from django.core import serializers
 
 from questionnaire.forms.custom_widgets import MultiChoiceAnswerSelectWidget, MultiChoiceQuestionSelectWidget, \
-    SkipRuleSelectWidget, DataRuleRadioFieldRenderer
+    SkipRuleRadioWidget, DataRuleRadioFieldRenderer
 from questionnaire.models import Question, QuestionOption, Theme
 from questionnaire.tests.base_test import BaseTest
 from questionnaire.tests.factories.skip_question_rule_factory import SkipQuestionFactory
@@ -16,11 +16,10 @@ class MultiChoiceAnswerSelectWidgetTest(BaseTest):
         skip_rule = SkipQuestionFactory(root_question=question, response=option1)
 
         widget = MultiChoiceAnswerSelectWidget(choices=choices, question_options=question.options.all())
-        expected_skip_rule = serializers.serialize('json', [skip_rule])
 
         expected_option_1 = '<option value="%d" selected="selected" data-instructions="%s" data-skip-rule="%s">%s</option>' % (
-            option1.id, option1.instructions, expected_skip_rule, option1.text)
-        expected_option_2 = '<option value="%d" data-instructions="%s" data-skip-rule="[]">%s</option>' % (
+            option1.id, option1.instructions, skip_rule.skip_question.id, option1.text)
+        expected_option_2 = '<option value="%d" data-instructions="%s" data-skip-rule="">%s</option>' % (
             option2.id, option2.instructions, option2.text)
 
         self.assertEqual(expected_option_1,
@@ -66,12 +65,12 @@ class SkipRuleSelectWidgetTest(BaseTest):
         question = Question.objects.create(text='what do you drink?', UID='C_2013', answer_type='MultiChoice')
         option1 = QuestionOption.objects.create(text='tusker lager', question=question, instructions="yeah yeah")
 
-        widget = SkipRuleSelectWidget()
+        widget = SkipRuleRadioWidget()
 
-        expected_stuff = '<ul>\n<li data-skip-rules="">' \
-                         '<label><input checked="checked" name="name" type="radio" value="%s" /> %s</label></li>\n' \
-                         '<li data-skip-rules=""' \
-                         '><label><input name="name" type="radio" value="2" /> Really</label></li>\n</ul>' \
+        expected_stuff = '<ul>\n<li>'\
+                         '<label><input checked="checked" data-skip-rules="" name="name" type="radio" value="%s" /> %s</label></li>' \
+                         '<li'\
+                         '><label><input data-skip-rules="" name="name" type="radio" value="2" /> Really</label></li>\n</ul>' \
                          % (option1.id, option1.text)
 
         self.assertEqual(expected_stuff,

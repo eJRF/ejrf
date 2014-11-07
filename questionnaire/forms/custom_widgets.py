@@ -3,7 +3,6 @@ from django.forms.widgets import RadioFieldRenderer
 from django.utils.encoding import force_text
 from django.utils.html import format_html, format_html_join
 from django.utils.safestring import mark_safe
-from django.core import serializers
 
 from questionnaire.models import Question, QuestionOption
 
@@ -17,15 +16,20 @@ class MultiChoiceAnswerSelectWidget(forms.Select):
         option_value = force_text(option_value)
         data_instruction = ''
         data_skip_rule = ''
+        skip_question = ''
+
         if option_value:
             question_option = self.question_options.get(id=int(option_value))
             data_instruction = mark_safe(' data-instructions="%s"' % question_option.instructions)
-            data_skip_rule = mark_safe(
-                ' data-skip-rule="%s"' % serializers.serialize('json', question_option.skip_rules.all()))
+            rules_all = question_option.skip_rules.all()
+            if rules_all.exists():
+                skip_question = rules_all[0].skip_question.id
+            data_skip_rule = mark_safe(' data-skip-rule="%s"' % skip_question)
         if option_value in selected_choices:
             selected_html = mark_safe(' selected="selected"')
         else:
             selected_html = ''
+
         return format_html('<option value="{0}"{1}{2}{3}>{4}</option>',
                            option_value,
                            selected_html,
@@ -69,10 +73,15 @@ class DataRuleRadioFieldRenderer(RadioFieldRenderer):
     def __init__(self, name, value, attrs, choices):
         super(DataRuleRadioFieldRenderer, self).__init__(name, value, attrs, choices)
 
+    # self.attrs.update({"data-skip-rule":self._get_rules(w.choice_value)})
     def render(self):
+        inputs = map(lambda option: self._add_attr(option), self)
         return format_html('<ul>\n{0}\n</ul>',
-                           format_html_join('\n', '<li data-skip-rules="{0}">{1}</li>',
-                                            [(self._get_rules(w.choice_value), force_text(w),) for w in self]))
+                           format_html_join("", '<li>{0}</li>', [(force_text(w),) for w in inputs]))
+
+    def _add_attr(self, option):
+        option.attrs.update({'data-skip-rules': self._get_rules(option.choice_value)})
+        return option
 
     def _get_rules(self, option):
         options = QuestionOption.objects.filter(id=option, skip_rules__isnull=False)
@@ -83,8 +92,10 @@ class DataRuleRadioFieldRenderer(RadioFieldRenderer):
         return blank
 
 
-class SkipRuleSelectWidget(forms.RadioSelect):
+class SkipRuleRadioWidget(forms.RadioSelect):
     renderer = DataRuleRadioFieldRenderer
 
     def __init__(self, *args, **kwargs):
-        super(SkipRuleSelectWidget, self).__init__(*args, **kwargs)
+        super(SkipRuleRadioWidget, self).__init__(*args, **kwargs)
+
+

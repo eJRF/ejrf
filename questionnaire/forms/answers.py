@@ -4,7 +4,7 @@ from django import forms
 from django.forms.util import ErrorDict
 from django.forms import ModelForm, ModelChoiceField
 
-from questionnaire.forms.custom_widgets import MultiChoiceAnswerSelectWidget, SkipRuleSelectWidget
+from questionnaire.forms.custom_widgets import MultiChoiceAnswerSelectWidget, SkipRuleRadioWidget
 from questionnaire.models import NumericalAnswer, TextAnswer, DateAnswer, MultiChoiceAnswer, QuestionOption
 from questionnaire.utils.answer_type import AnswerTypes
 
@@ -133,8 +133,8 @@ class MultiChoiceAnswerForm(AnswerForm):
         if 'option' in self.initial.keys() and self.initial['question'].is_primary:
             return forms.Select(attrs={'class': 'hide'})
         if self.widget_is_radio_button(query_set):
-            return SkipRuleSelectWidget()
-        if query_set.exclude(instructions=None).exists():
+            return SkipRuleRadioWidget()
+        if query_set.exclude(instructions=None).exists() or query_set.exclude(skip_rules=None).exists():
             return MultiChoiceAnswerSelectWidget(question_options=query_set)
         return forms.Select()
 

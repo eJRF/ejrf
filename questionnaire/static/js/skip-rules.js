@@ -1,5 +1,10 @@
 jQuery(function ($) {
-    var allRadiosAndSelects = $("select, :radio");
+    var allRadios = $(":radio");
+
+    var allOptions = $("select");
+
+    var allQuestionsToSkipFromSelects = [];
+    var allQuestionsToSkipFromRadios = [];
 
     var skipRuleScope = {
         questions: [],
@@ -26,39 +31,123 @@ jQuery(function ($) {
     };
 
     var hideQuestion = function (element) {
-        var skipQuestionId = $(element).parent('label').parent('li').attr('data-skip-rules');
+
+        var skipQuestionId = getIdToHide(element);
         if (skipQuestionId) {
             skipRuleScope.add({element: element, skipQuestion: skipQuestionId});
-            var qnGroupFormDiv = $('.form-group-question-' + skipQuestionId);
-            qnGroupFormDiv.removeClass('show');
-            qnGroupFormDiv.addClass('hide');
+            hideQuestionById(skipQuestionId);
         }
     };
+
+    var hideQuestionById = function (id) {
+        var qnGroupFormDiv = $('.form-group-question-' + id);
+        qnGroupFormDiv.removeClass('show');
+        qnGroupFormDiv.addClass('hide');
+
+    };
+    var showQuestionById = function (id) {
+        var qnFormGroupDiv = $('.form-group-question-' + id);
+        qnFormGroupDiv.removeClass('hide');
+        qnFormGroupDiv.addClass('show');
+    }
 
     var showQuestion = function (element) {
-        var skipQuestionId = $(element).parent('label').parent('li').attr('data-skip-rules');
+        var skipQuestionId = getIdToHide(element)
         if (skipQuestionId) {
             skipRuleScope.drop({element: element, skipQuestion: skipQuestionId});
-            var qnFormGroupDiv = $('.form-group-question-' + skipQuestionId);
-            qnFormGroupDiv.removeClass('hide');
-            qnFormGroupDiv.addClass('show');
         }
     };
 
-    allRadiosAndSelects.map(function () {
-        var element = this;
+    allRadios.map(function (_, element) {
         $(this).on('change', function () {
-            var allSiblings = $(element).parent('label').parent('li').siblings().andSelf();
-            allSiblings.map(function (_, item) {
-                var inputElement = $(item).children('label').children('input');
-                if (inputElement.length) {
-                    var el = inputElement[0];
-                    if (skipRuleScope.isElem({element: el, skipQuestion: $(item).attr('data-skip-rules')})) {
-                        showQuestion(el);
-                    }
+            var allRadios = $('[type="radio"]:checked');
+            var currentSkipQuestions = allRadios.map(function (index, val) {
+                if (val.attributes['data-skip-rules']) {
+                    return val.attributes['data-skip-rules'].value;
+                } else {
+                    return false;
                 }
-            });
-            hideQuestion(element);
+//                if (this.selected && this.attributes['data-skip-rule']) {
+//                    return this.attributes['data-skip-rule'].value;
+//                } else {
+//                    return false;
+//                }
+            })
+                .filter(function (index, val) {
+                    return val !== false;
+                })
+
+            allQuestionsToSkipFromRadios.map(function (index, val) {
+                if ($.inArray(val, currentSkipQuestions) == -1) {
+                    showQuestionById(val);
+                }
+            })
+            allQuestionsToSkipFromRadios = currentSkipQuestions;
+            //diff with allQuestionsToSkipFromSelects and hide or show based on the diff
+            currentSkipQuestions.extend(allQuestionsToSkipFromSelects).map(function (index, val) {
+                hideQuestionById(val);
+            })
+
+
+//            var allSiblings = $(element).parent('label').parent('li').siblings().andSelf();
+//            var el = $(element)[0];
+//            console.log($(el).children());
+//            allSiblings.map(function (_, item) {
+//                var inputElement = $(item).children('label').children('input');
+//                if (inputElement.length) {
+//                    var el = inputElement[0];
+//                    if (skipRuleScope.isElem({element: el, skipQuestion: $(item).attr('data-skip-rules')})) {
+//                        showQuestion(el);
+//                    }
+//                }
+//            });
+//            hideQuestion(element);
         });
-    })
-});
+    });
+
+
+    allOptions.map(function (_, element) {
+        $(this).on('change', function (element) {
+
+            var currentQuestionsToSkip = $('option')
+                .map(function () {
+                    if (this.selected && this.attributes['data-skip-rule']) {
+                        return this.attributes['data-skip-rule'].value;
+                    } else {
+                        return false;
+                    }
+                })
+                .filter(function (index, val) {
+                    return val !== false;
+                })
+
+            allQuestionsToSkipFromSelects.map(function (index, val) {
+                if ($.inArray(val, currentQuestionsToSkip) == -1) {
+                    showQuestionById(val);
+                }
+            })
+            allQuestionsToSkipFromSelects = currentQuestionsToSkip;
+            //diff with allQuestionsToSkipFromSelects and hide or show based on the diff
+            currentQuestionsToSkip.extend(allQuestionsToSkipFromRadios).map(function (index, val) {
+                hideQuestionById(val);
+            })
+        });
+
+    });
+
+    function getIdToHide(element) {
+        if ($(element).is('select')) {
+            return $('#' + $(element).attr('id') + ' :selected').data('skip-rule');
+        } else {
+            return $(element).parent('label').parent('li').attr('data-skip-rules');
+        }
+    }
+
+    function getIdToShow(element) {
+
+    }
+
+})
+;
+//when select an option we add root-question, response, question to skip to array, remove old rules
+//when any select or radio changes we hide all of the the questions in the array
