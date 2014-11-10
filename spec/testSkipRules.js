@@ -24,4 +24,26 @@ describe("skip rules", function() {
 			expect(actualResult[0]).toEqual('23');
     	});
     });
+    describe("showQuestions", function() {
+    	it("should not call show if both lists are empty", function() {
+    		spyOn($.fn, 'show');
+    		SkipRules.showQuestions([],[]);
+    		expect($.fn.show.calls).toEqual([]);
+    	});
+    	it("should call show once if currently hidden questions has an id that is not in the questions to hide", function() {
+    		spyOn($.fn, 'show');
+    		SkipRules.showQuestions(["23"],[]);
+    		expect($.fn.show).toHaveBeenCalled();
+    	});
+    	it("should not call show currently hidden questions no ids", function() {
+    		spyOn($.fn, 'show');
+    		SkipRules.showQuestions([],["23","43"]);
+    		expect($.fn.show.calls.length).toEqual(0);
+    	});
+    	it("should not call show if both lists contain the same elements", function() {
+    		spyOn($.fn, 'show');
+    		SkipRules.showQuestions(["23","43"],["23","43"]);
+    		expect($.fn.show.calls.length).toEqual(0);
+    	});
+    });
 });

@@ -19,34 +19,39 @@ var SkipRules = (function () {
     });
 
     var getQuestionIdsToSkip = function (selectedElements) {
-        return selectedElements
-            .map(function (index, val) {
-                if (val.attributes['data-skip-rules']) {
-                    return val.attributes['data-skip-rules'].value.split(",");
-                } else {
-                    return '';
-                }
-            })
-            .filter(function (index, val) {
+        var elements = $.map(selectedElements, function (val) {
+                            if (val.attributes['data-skip-rules']) {
+                                return val.attributes['data-skip-rules'].value.split(",");
+                            } else {
+                                return '';
+                            }
+                        });
+        return $.grep(elements, function (val, index) {
                 return val !== '';
             });
+    }
+
+    var showQuestions = function(currentlyHiddenQuestions, questionsToBeHidden) {
+        $.map(currentlyHiddenQuestions, function (val, index) {
+            if ($.inArray(val, questionsToBeHidden) === -1) {
+                showQuestionById(val);
+            }
+        })
     }
 
     var hideBasedOnRadios = function () {
         var checkedRadios = $('[type="radio"]:checked');
         var currentSkipQuestions = getQuestionIdsToSkip(checkedRadios);
 
-        allQuestionsToSkipFromRadios.map(function (index, val) {
-            if ($.inArray(val, currentSkipQuestions) == -1) {
-                showQuestionById(val);
-            }
-        })
+        showQuestions(allQuestionsToSkipFromRadios, currentSkipQuestions);
+        
         allQuestionsToSkipFromRadios = currentSkipQuestions;
 
-        $.merge([], currentSkipQuestions, allQuestionsToSkipFromSelects).map(function (val, index) {
+        $.map($.merge([], currentSkipQuestions, allQuestionsToSkipFromSelects), function (val, index) {
             hideQuestionById(val);
         });
     }
+
     allRadios.map(function (_, element) {
         $(this).on('change', function () {
             hideBasedOnRadios();
@@ -57,14 +62,10 @@ var SkipRules = (function () {
         var selectedOptions = $('option:selected');
         var currentQuestionsToSkip = getQuestionIdsToSkip(selectedOptions);
 
-        allQuestionsToSkipFromSelects.map(function (index, val) {
-            if ($.inArray(val, currentQuestionsToSkip) == -1) {
-                showQuestionById(val);
-            }
-        })
+        showQuestions(allQuestionsToSkipFromSelects, currentQuestionsToSkip);
         allQuestionsToSkipFromSelects = currentQuestionsToSkip;
         
-        $.merge([], currentQuestionsToSkip, allQuestionsToSkipFromRadios).map(function (val, index) {
+        $.map($.merge([], currentQuestionsToSkip, allQuestionsToSkipFromRadios), function (val, index) {
             hideQuestionById(val);
         });
     }
@@ -75,5 +76,7 @@ var SkipRules = (function () {
         });
 
     });
-    return {getQuestionIdsToSkip: getQuestionIdsToSkip}
+    return {getQuestionIdsToSkip: getQuestionIdsToSkip,
+            showQuestions:        showQuestions,
+            showQuestionById:     showQuestionById}
 })();
