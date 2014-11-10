@@ -88,7 +88,6 @@ class DataRuleRadioFieldRenderer(RadioFieldRenderer):
 
     def _get_rules(self, option):
         all_rules = SkipQuestion.objects.filter(response_id=option, subsection=self.subsection)
-        print all_rules
         blank = ''
         if all_rules.exists():
             return ",".join(map(lambda rule: str(rule.skip_question.id), all_rules))

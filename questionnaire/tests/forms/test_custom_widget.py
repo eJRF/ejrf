@@ -4,22 +4,28 @@ from questionnaire.forms.custom_widgets import MultiChoiceAnswerSelectWidget, Mu
     SkipRuleRadioWidget, DataRuleRadioFieldRenderer
 from questionnaire.models import Question, QuestionOption, Theme
 from questionnaire.tests.base_test import BaseTest
+from questionnaire.tests.factories.question_factory import QuestionFactory
+from questionnaire.tests.factories.question_group_factory import QuestionGroupFactory
 from questionnaire.tests.factories.skip_question_rule_factory import SkipQuestionFactory
+from questionnaire.tests.factories.sub_section_factory import SubSectionFactory
 
 
 class MultiChoiceAnswerSelectWidgetTest(BaseTest):
     def test_option_has_data_attributes_on_top_of_normal_attributes(self):
-        question = Question.objects.create(text='what do you drink?', UID='C_2013', answer_type='MultiChoice')
+        subsection = SubSectionFactory()
+        question_group = QuestionGroupFactory(subsection=subsection)
+        question = QuestionFactory(text='what do you drink?', UID='C_2013', answer_type='MultiChoice')
+        question_group.question.add(question)
         option1 = QuestionOption.objects.create(text='tusker lager', question=question, instructions="yeah yeah")
         option2 = QuestionOption.objects.create(text='club', question=question, instructions="Are you crazy?")
         choices = ((option1.id, option1.text), (option2.id, option2.text))
-        skip_rule = SkipQuestionFactory(root_question=question, response=option1)
+        skip_rule = SkipQuestionFactory(root_question=question, response=option1, subsection=subsection)
 
-        widget = MultiChoiceAnswerSelectWidget(choices=choices, question_options=question.options.all())
+        widget = MultiChoiceAnswerSelectWidget(subsection, choices=choices, question_options=question.options.all())
 
-        expected_option_1 = '<option value="%d" selected="selected" data-instructions="%s" data-skip-rule="%s">%s</option>' % (
+        expected_option_1 = '<option value="%d" selected="selected" data-instructions="%s" data-skip-rules="%s">%s</option>' % (
             option1.id, option1.instructions, skip_rule.skip_question.id, option1.text)
-        expected_option_2 = '<option value="%d" data-instructions="%s" data-skip-rule="">%s</option>' % (
+        expected_option_2 = '<option value="%d" data-instructions="%s" data-skip-rules="">%s</option>' % (
             option2.id, option2.instructions, option2.text)
 
         self.assertEqual(expected_option_1,
@@ -65,7 +71,7 @@ class SkipRuleSelectWidgetTest(BaseTest):
         question = Question.objects.create(text='what do you drink?', UID='C_2013', answer_type='MultiChoice')
         option1 = QuestionOption.objects.create(text='tusker lager', question=question, instructions="yeah yeah")
 
-        widget = SkipRuleRadioWidget()
+        widget = SkipRuleRadioWidget(SubSectionFactory())
 
         expected_stuff = '<ul>\n<li>'\
                          '<label><input checked="checked" data-skip-rules="" name="name" type="radio" value="%s" /> %s</label></li>' \
@@ -82,13 +88,19 @@ class DataRuleRadioFieldRendererTest(BaseTest):
         question = Question.objects.create(text='what do you drink?', UID='C_2013', answer_type='MultiChoice')
         option1 = QuestionOption.objects.create(text='tusker lager', question=question, instructions="yeah yeah")
 
-        skip_rule = SkipQuestionFactory(root_question=question, response=option1)
+        subsection = SubSectionFactory()
+
+        question_group = QuestionGroupFactory(subsection=subsection)
+
+        question_group.question.add(question)
+
+        skip_rule = SkipQuestionFactory(root_question=question, response=option1, subsection=subsection)
 
         renderer = DataRuleRadioFieldRenderer('name', 1, attrs={},
-                                              choices=((option1.id, option1.text), ('2', 'Really'),))
+                                              choices=((option1.id, option1.text), ('2', 'Really'),), subsection=subsection)
 
         rules_for_option_1 = renderer._get_rules(option1.id)
-        expected_rule = skip_rule.skip_question.id
+        expected_rule = str(skip_rule.skip_question.id)
 
         self.assertEqual(expected_rule, rules_for_option_1)
 
