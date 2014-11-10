@@ -1,13 +1,11 @@
 import itertools
 
-MULTIPLE_RESPONSE = "MultipleResponse"
-
 
 class AnswerTypes(object):
     NUMBER = "Number"
     INTEGER = "Integer"
     DECIMAL = "Decimal"
-
+    MULTIPLE_RESPONSE = "MultipleResponse"
     MULTI_CHOICE = "MultiChoice"
     DATE = "Date"
 

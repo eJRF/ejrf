@@ -61,7 +61,6 @@ def and_i_click_save_question_button(step):
 @step(u'And I select Multi-choice answer type')
 def and_i_select_multi_choice_answer_type(step):
     world.page.select('answer_type', 'MultiChoice')
-    world.page.select('answer_sub_type', 'MultipleResponse')
 
 
 @step(u'Then I should see the option field')
@@ -201,7 +200,6 @@ def when_i_update_the_question_with_valid_details(step):
                      'theme': world.theme.id}
     world.page.fill_form(question_data)
     world.page.select('answer_type', 'MultiChoice')
-    world.page.select('answer_sub_type', 'MultipleResponse')
     world.page.submit()
 
 @step(u'Then I should see a message that the question was successfully updated')

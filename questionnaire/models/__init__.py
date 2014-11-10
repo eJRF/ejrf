@@ -1,4 +1,5 @@
-from questionnaire.models.answers import NumericalAnswer, Answer, TextAnswer, DateAnswer, MultiChoiceAnswer
+from questionnaire.models.answers import NumericalAnswer, Answer, TextAnswer, DateAnswer, MultiChoiceAnswer, \
+    MultipleResponseAnswer
 from questionnaire.models.answers import NumericalAnswer, Answer
 from questionnaire.models.comments import Comment
 from questionnaire.models.answer_groups import AnswerGroup
@@ -36,4 +37,5 @@ __all__ = [
     'SupportDocument',
     'SkipQuestion',
     'Theme',
+    'MultipleResponseAnswer'
 ]

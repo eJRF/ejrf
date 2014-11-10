@@ -1,3 +1,6 @@
+from questionnaire.utils.answer_type import AnswerTypes
+
+
 def extra_rows(data, given_key, group_id):
     related_keys = filter(lambda key: same_group_data_keys(key, given_key, data, group_id), data.keys())
     row_numbers = []
@@ -25,7 +28,10 @@ def clean_list(dirty_list):
 def clean_data_dict(data):
     new_data = {}
     for key, value in data.items():
-        new_data[key] = clean_list(value)
+        if key.startswith(AnswerTypes.MULTIPLE_RESPONSE):
+            new_data[key] = value
+        else:
+            new_data[key] = clean_list(value)
     return new_data
 
 

@@ -72,6 +72,9 @@ class MultiChoiceAnswer(Answer):
 class MultipleResponseAnswer(Answer):
     response = models.ManyToManyField(QuestionOption, null=True, related_name="answers")
 
+    def format_response(self):
+        return self.response.all()
+
 
 class AnswerStatus(object):
     options = {
