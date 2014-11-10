@@ -24,7 +24,7 @@ class MultiChoiceAnswerSelectWidget(forms.Select):
             rules_all = question_option.skip_rules.all()
             if rules_all.exists():
                 skip_question = rules_all[0].skip_question.id
-            data_skip_rule = mark_safe(' data-skip-rule="%s"' % skip_question)
+            data_skip_rule = mark_safe(' data-skip-rules="%s"' % skip_question)
         if option_value in selected_choices:
             selected_html = mark_safe(' selected="selected"')
         else:
