@@ -4,10 +4,12 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from questionnaire.models import Question, Country, QuestionOption, MultiChoiceAnswer, Questionnaire
-from questionnaire.models.answers import Answer, NumericalAnswer, TextAnswer, DateAnswer
+from questionnaire.models.answers import Answer, NumericalAnswer, TextAnswer, DateAnswer, MultipleResponseAnswer
 from questionnaire.tests.base_test import BaseTest
 from questionnaire.tests.factories.answer_factory import NumericalAnswerFactory
 from questionnaire.tests.factories.question_factory import QuestionFactory
+from questionnaire.tests.factories.question_option_factory import QuestionOptionFactory
+from questionnaire.tests.factories.region_factory import CountryFactory
 from questionnaire.utils.answer_type import AnswerTypes
 
 
@@ -208,3 +210,33 @@ class MultiChoiceAnswerTest(TestCase):
         self.assertEqual(self.questionnaire, answer.questionnaire)
         self.assertEqual(option, answer.response)
         self.assertEqual(option, answer.format_response())
+
+
+class MultipleResponseAnswerTest(TestCase):
+    def setUp(self):
+        self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English",
+                                                          description="From dropbox as given by Rouslan")
+
+    def test_multipleresponseanswer_fields(self):
+        answer = MultipleResponseAnswer()
+
+        fields = [str(item.attname) for item in answer._meta.fields]
+        self.assertEqual(10, len(fields))
+
+        for field in ['id', 'created', 'modified', 'question_id', 'country_id', 'code',
+                      'questionnaire_id']:
+            self.assertIn(field, fields)
+
+    def test_multi_response_answer_store(self):
+        question = QuestionFactory()
+        country = CountryFactory()
+        option_1 = QuestionOptionFactory(question=question, text='No')
+        option_2 = QuestionOptionFactory(question=question, text='Yes')
+        answer = MultipleResponseAnswer.objects.create(question=question, country=country,
+                                                       questionnaire=self.questionnaire)
+        answer.response.add(option_1)
+        answer.response.add(option_2)
+        self.failUnless(answer.id)
+
+        all_options = answer.response.all()
+        [self.assertIn(option, [option_1, option_2]) for option in all_options]

@@ -69,6 +69,10 @@ class MultiChoiceAnswer(Answer):
         return self.response
 
 
+class MultipleResponseAnswer(Answer):
+    response = models.ManyToManyField(QuestionOption, null=True, related_name="answers")
+
+
 class AnswerStatus(object):
     options = {
         Answer.SUBMITTED_STATUS: Answer.SUBMITTED_STATUS,
