@@ -133,9 +133,9 @@ class MultiChoiceAnswerForm(AnswerForm):
         if 'option' in self.initial.keys() and self.initial['question'].is_primary:
             return forms.Select(attrs={'class': 'hide'})
         if self.widget_is_radio_button(query_set):
-            return SkipRuleRadioWidget()
+            return SkipRuleRadioWidget(self.question_group.subsection)
         if query_set.exclude(instructions=None).exists() or query_set.exclude(skip_rules=None).exists():
-            return MultiChoiceAnswerSelectWidget(question_options=query_set)
+            return MultiChoiceAnswerSelectWidget(self.question_group.subsection, question_options=query_set)
         return forms.Select()
 
     def _get_response_choices(self, kwargs):

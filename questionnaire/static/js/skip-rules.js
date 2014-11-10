@@ -22,7 +22,7 @@ jQuery(function ($) {
         return selectedElements
             .map(function (index, val) {
                 if (val.attributes['data-skip-rules']) {
-                    return val.attributes['data-skip-rules'].value;
+                    return val.attributes['data-skip-rules'].value.split(",");
                 } else {
                     return false;
                 }
