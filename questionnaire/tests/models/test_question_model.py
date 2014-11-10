@@ -334,19 +334,18 @@ class QuestionOrderTest(BaseTest):
 class AnswerSubTypeTest(BaseTest):
     def test_returns_answer_types_as_a_tuple_of_tuples(self):
         expected_answer_types = (
-            ("Date", 'Date'),
-            ("MultiChoice", 'MultiChoice'),
-            ("Number", 'Number'),
-            ("Text", "Text"),
+            ('Date', 'Date'),
+            ('MultiChoice', 'MultiChoice'),
+            ('Text', 'Text'), ('Number', 'Number'),
+            ('MultipleResponse', 'MultipleResponse')
         )
+
         self.assertEqual(expected_answer_types, AnswerTypes.answer_types())
 
     def test_returns_answer_sub_types_as_a_tuple_of_tuples(self):
         expected_sub_types = (
             ('DD/MM/YYYY', 'DD/MM/YYYY'),
             ('MM/YYYY', 'MM/YYYY'),
-            ('MultipleResponse', 'MultipleResponse'),
-            ('SingleResponse', 'SingleResponse'),
             ('Decimal', 'Decimal'),
             ('Integer', 'Integer')
         )

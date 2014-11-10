@@ -90,7 +90,6 @@ class QuestionFormTest(BaseTest):
                 'short_instruction': 'short version',
                 'export_label': 'blah',
                 'answer_type': 'MultiChoice',
-                'answer_sub_type': 'MultipleResponse',
                 'options': options,
                 'theme': self.theme.id}
 
@@ -108,7 +107,6 @@ class QuestionFormTest(BaseTest):
                 'short_instruction': 'short version',
                 'export_label': 'blah',
                 'answer_type': 'MultiChoice',
-                'answer_sub_type': 'MultipleResponse',
                 'options': options,
                 'theme': self.theme.id}
 
@@ -312,7 +310,6 @@ class QuestionHistoryTest(BaseTest):
                 'instructions': 'Some instructions',
                 'export_label': 'blah',
                 'answer_type': 'MultiChoice',
-                'answer_sub_type': 'MultipleResponse',
                 'theme': self.theme.id,
                 'options': changed_options}
 

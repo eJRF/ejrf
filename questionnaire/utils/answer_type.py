@@ -1,5 +1,7 @@
 import itertools
 
+MULTIPLE_RESPONSE = "MultipleResponse"
+
 
 class AnswerTypes(object):
     NUMBER = "Number"
@@ -14,10 +16,8 @@ class AnswerTypes(object):
             "DD/MM/YYYY",
             "MM/YYYY"
         ],
-        MULTI_CHOICE: [
-            "MultipleResponse",
-            "SingleResponse"
-        ],
+        MULTI_CHOICE: [],
+        MULTIPLE_RESPONSE: [],
         NUMBER: [
             DECIMAL,
             INTEGER
