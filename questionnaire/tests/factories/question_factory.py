@@ -1,5 +1,4 @@
 import factory
-
 from questionnaire.models import Question
 from questionnaire.utils.answer_type import AnswerTypes
 

@@ -1,11 +1,18 @@
 from django.forms import Select
 
-from questionnaire.forms.answers import NumericalAnswerForm, TextAnswerForm, DateAnswerForm, MultiChoiceAnswerForm
+from questionnaire.forms.answers import NumericalAnswerForm, TextAnswerForm, DateAnswerForm, MultiChoiceAnswerForm, \
+    MultipleResponseForm
 from questionnaire.forms.custom_widgets import MultiChoiceAnswerSelectWidget
 from questionnaire.models import Question, Country, QuestionOption, QuestionGroup, Section, Questionnaire, SubSection, \
     MultiChoiceAnswer
 from questionnaire.tests.base_test import BaseTest
 from questionnaire.tests.factories.question_factory import QuestionFactory
+from questionnaire.tests.factories.question_group_factory import QuestionGroupFactory
+from questionnaire.tests.factories.question_option_factory import QuestionOptionFactory
+from questionnaire.tests.factories.questionnaire_factory import QuestionnaireFactory
+from questionnaire.tests.factories.region_factory import CountryFactory
+from questionnaire.tests.factories.section_factory import SectionFactory
+from questionnaire.tests.factories.sub_section_factory import SubSectionFactory
 from questionnaire.utils.answer_type import AnswerTypes
 
 
@@ -247,3 +254,39 @@ class MultiChoiceAnswerFormTest(BaseTest):
         answer_form = MultiChoiceAnswerForm(initial=initial)
         self.assertIsInstance(answer_form.fields['response'].widget, Select)
         self.assertEqual(answer_form.fields['response'].widget.attrs, {'class': 'hide'})
+
+
+class MultipleResponseFormTest(BaseTest):
+    def setUp(self):
+        self.country = CountryFactory()
+        self.question = QuestionFactory()
+        self.sub_section = SubSectionFactory()
+        self.question_group = QuestionGroupFactory()
+        self.question_group.question.add(self.question)
+        self.female_option = QuestionOptionFactory(text='Female', question=self.question)
+        self.male_option = QuestionOptionFactory(text='Male', question=self.question)
+
+        self.form_data = {
+            'response': [self.female_option.id, self.male_option.id],
+        }
+
+        self.initial = {
+            'question': self.question,
+            'country': self.country,
+            'status': 'DRAFT',
+            'version': 1,
+            'code': 'HAHA123',
+            'group': self.question_group,
+            'questionnaire': self.sub_section.section.questionnaire,
+        }
+
+    def test_valid(self):
+        answer_form = MultipleResponseForm(self.form_data, initial=self.initial)
+        self.assertTrue(answer_form.is_valid())
+
+    def test_save_all_selected_options(self):
+        answer_form = MultipleResponseForm(self.form_data, initial=self.initial)
+        answer = answer_form.save()
+        response_all = answer.response.all()
+        self.assertEqual(2, response_all.count())
+        [self.assertIn(option, response_all) for option in [self.male_option, self.female_option]]

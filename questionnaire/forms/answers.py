@@ -2,10 +2,11 @@ import copy
 
 from django import forms
 from django.forms.util import ErrorDict
-from django.forms import ModelForm, ModelChoiceField
+from django.forms import ModelForm, ModelChoiceField, ModelMultipleChoiceField
 
 from questionnaire.forms.custom_widgets import MultiChoiceAnswerSelectWidget, SkipRuleRadioWidget
 from questionnaire.models import NumericalAnswer, TextAnswer, DateAnswer, MultiChoiceAnswer, QuestionOption
+from questionnaire.models.answers import MultipleResponseAnswer
 from questionnaire.utils.answer_type import AnswerTypes
 
 
@@ -162,3 +163,21 @@ class MultiChoiceAnswerForm(AnswerForm):
     class Meta:
         model = MultiChoiceAnswer
         exclude = ('question', 'status', 'country', 'version', 'code', 'questionnaire')
+
+
+class MultipleResponseForm(MultiChoiceAnswerForm):
+    response = ModelMultipleChoiceField(queryset=None, widget=forms.CheckboxSelectMultiple(), required=False)
+
+    def __init__(self, *args, **kwargs):
+        super(MultipleResponseForm, self).__init__(*args, **kwargs)
+        self.fields['response'].queryset = self._get_response_choices(kwargs)
+
+    class Meta:
+        model = MultipleResponseAnswer
+        exclude = ('question', 'status', 'country', 'version', 'code', 'questionnaire')
+
+    def save(self, commit=True, *args, **kwargs):
+        answer = super(MultipleResponseForm, self).save(commit=commit, *args, **kwargs)
+        if commit:
+            self.save_m2m()
+        return answer
