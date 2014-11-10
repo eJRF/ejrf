@@ -39,17 +39,20 @@ var SkipRules = (function () {
         })
     }
 
+    var hideQuestions = function(radioQuestionsToSkip, selectQuestionsToSkip) {
+        $.map($.merge($.merge([], radioQuestionsToSkip), selectQuestionsToSkip), function (val) {
+            hideQuestionById(val);
+        });
+    }
+
     var hideBasedOnRadios = function () {
         var checkedRadios = $('[type="radio"]:checked');
         var currentSkipQuestions = getQuestionIdsToSkip(checkedRadios);
 
-        showQuestions(allQuestionsToSkipFromRadios, currentSkipQuestions);
-        
+        showQuestions(allQuestionsToSkipFromRadios, currentSkipQuestions);        
         allQuestionsToSkipFromRadios = currentSkipQuestions;
 
-        $.map($.merge([], currentSkipQuestions, allQuestionsToSkipFromSelects), function (val, index) {
-            hideQuestionById(val);
-        });
+        hideQuestions(currentSkipQuestions, allQuestionsToSkipFromSelects);
     }
 
     allRadios.map(function (_, element) {
@@ -65,9 +68,7 @@ var SkipRules = (function () {
         showQuestions(allQuestionsToSkipFromSelects, currentQuestionsToSkip);
         allQuestionsToSkipFromSelects = currentQuestionsToSkip;
         
-        $.map($.merge([], currentQuestionsToSkip, allQuestionsToSkipFromRadios), function (val, index) {
-            hideQuestionById(val);
-        });
+        hideQuestions(currentQuestionsToSkip, allQuestionsToSkipFromRadios);
     }
 
     allOptions.map(function (_, element) {
@@ -78,5 +79,6 @@ var SkipRules = (function () {
     });
     return {getQuestionIdsToSkip: getQuestionIdsToSkip,
             showQuestions:        showQuestions,
-            showQuestionById:     showQuestionById}
+            showQuestionById:     showQuestionById,
+            hideQuestions:        hideQuestions}
 })();
