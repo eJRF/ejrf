@@ -1,4 +1,4 @@
-jQuery(function ($) {
+var SkipRules = (function () {
     var allRadios = $(":radio");
 
     var allOptions = $("select");
@@ -24,11 +24,11 @@ jQuery(function ($) {
                 if (val.attributes['data-skip-rules']) {
                     return val.attributes['data-skip-rules'].value.split(",");
                 } else {
-                    return false;
+                    return '';
                 }
             })
             .filter(function (index, val) {
-                return val !== false;
+                return val !== '';
             });
     }
 
@@ -75,4 +75,5 @@ jQuery(function ($) {
         });
 
     });
-});
+    return {getQuestionIdsToSkip: getQuestionIdsToSkip}
+})();
