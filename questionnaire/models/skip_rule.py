@@ -4,7 +4,7 @@ from questionnaire.models.base import BaseModel
 from questionnaire.models import Question, QuestionOption, SubSection
 
 
-class SkipQuestion(BaseModel):
+class SkipRule(BaseModel):
     class Meta:
         unique_together = ("root_question", "response", "skip_question", "subsection")
         app_label = 'questionnaire'

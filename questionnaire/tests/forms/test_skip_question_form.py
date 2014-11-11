@@ -1,5 +1,5 @@
-from questionnaire.forms.skip_question_form import SkipQuestionRuleForm
-from questionnaire.models import SkipQuestion, QuestionGroupOrder
+from questionnaire.forms.skip_rule_form import SkipRuleForm
+from questionnaire.models import SkipRule, QuestionGroupOrder
 from questionnaire.tests.base_test import BaseTest
 from questionnaire.tests.factories.question_factory import QuestionFactory
 from questionnaire.tests.factories.question_group_factory import QuestionGroupFactory
@@ -28,11 +28,19 @@ class SkipQuestionRuleFormTest(BaseTest):
 
 
     def test_save(self):
-        skip_question_form = SkipQuestionRuleForm(data=self.form_data)
-
+        skip_question_form = SkipRuleForm(data=self.form_data)
         skip_question_form.save()
-        skip_question_rules = SkipQuestion.objects.filter(**self.form_data)
+        skip_question_rules = SkipRule.objects.filter(**self.form_data)
         self.assertEqual(skip_question_rules.count(), 1)
+
+    def test_invalid_if_no_skip_question(self):
+        data = {'root_question': self.root_question.id,
+                'response': self.response.id,
+                'subsection': self.subsection.id}
+
+        skip_question_form = SkipRuleForm(data=data)
+        self.assertFalse(skip_question_form.is_valid())
+        self.assertEqual({'skip_question':[u'This field is required.']},skip_question_form.errors)
 
     def test_invalid_if_skip_question_is_same_as_root_question(self):
         data = {'root_question': self.root_question.id,
@@ -40,7 +48,7 @@ class SkipQuestionRuleFormTest(BaseTest):
                 'skip_question': self.root_question.id,
                 'subsection': self.subsection.id}
 
-        skip_question_form = SkipQuestionRuleForm(data=data)
+        skip_question_form = SkipRuleForm(data=data)
         self.assertFalse(skip_question_form.is_valid())
 
     def test_invalid_if_root_question_and_root_question_does_not_belong_to_subsection(self):
@@ -55,7 +63,7 @@ class SkipQuestionRuleFormTest(BaseTest):
                 'response': self.response.id,
                 'skip_question': self.question_to_skip.id,
                 'subsection': self.subsection.id}
-        skip_question_rule_form = SkipQuestionRuleForm(data=data)
+        skip_question_rule_form = SkipRuleForm(data=data)
         self.assertFalse(skip_question_rule_form.is_valid())
 
     def test_is_invalid_if_question_option_is_not_valid_option(self):
@@ -66,7 +74,7 @@ class SkipQuestionRuleFormTest(BaseTest):
                 'skip_question': self.question_to_skip.id,
                 'subsection': self.subsection.id}
 
-        skip_question_rule_form = SkipQuestionRuleForm(data=data)
+        skip_question_rule_form = SkipRuleForm(data=data)
         self.assertFalse(skip_question_rule_form.is_valid())
 
     def test_is_invalid_if_root_question_order_is_greater_than_skip_question(self):
@@ -80,5 +88,5 @@ class SkipQuestionRuleFormTest(BaseTest):
                 'skip_question': self.question_to_skip.id,
                 'subsection': self.subsection.id}
 
-        skip_question_rule_form = SkipQuestionRuleForm(data=data)
+        skip_question_rule_form = SkipRuleForm(data=data)
         self.assertFalse(skip_question_rule_form.is_valid())

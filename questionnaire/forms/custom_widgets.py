@@ -5,7 +5,7 @@ from django.utils.encoding import force_text
 from django.utils.html import format_html, format_html_join
 from django.utils.safestring import mark_safe
 
-from questionnaire.models import Question, SkipQuestion
+from questionnaire.models import Question, SkipRule
 
 
 class MultiChoiceAnswerSelectWidget(forms.Select):
@@ -87,7 +87,7 @@ class DataRuleRadioFieldRenderer(RadioFieldRenderer):
         return option
 
     def _get_rules(self, option):
-        all_rules = SkipQuestion.objects.filter(response_id=option, subsection=self.subsection)
+        all_rules = SkipRule.objects.filter(response_id=option, subsection=self.subsection)
         blank = ''
         if all_rules.exists():
             return ",".join(map(lambda rule: str(rule.skip_question.id), all_rules))

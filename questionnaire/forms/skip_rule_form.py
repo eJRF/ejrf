@@ -1,12 +1,12 @@
 from django import forms
 from django.core.exceptions import ValidationError
 
-from questionnaire.models import SkipQuestion
+from questionnaire.models import SkipRule
 
 
-class SkipQuestionRuleForm(forms.ModelForm):
+class SkipRuleForm(forms.ModelForm):
     class Meta:
-        model = SkipQuestion
+        model = SkipRule
 
     def _clean_root_question(self):
         root_question = self.cleaned_data.get('root_question', None)
@@ -32,7 +32,7 @@ class SkipQuestionRuleForm(forms.ModelForm):
     def clean(self):
         self._clean_root_question()
         self._clean_response()
-        return super(SkipQuestionRuleForm, self).clean()
+        return super(SkipRuleForm, self).clean()
 
     def _is_same_question(self, root_question, skip_question):
         return root_question and root_question == skip_question and skip_question

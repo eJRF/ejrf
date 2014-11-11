@@ -3,7 +3,7 @@ import json
 from django.test import Client
 
 from questionnaire.tests.base_test import BaseTest
-from questionnaire.models import Question, SkipQuestion, QuestionOption, Questionnaire, Section, SubSection, \
+from questionnaire.models import Question, SkipRule, QuestionOption, Questionnaire, Section, SubSection, \
     QuestionGroup, QuestionGroupOrder
 from questionnaire.tests.factories.skip_question_rule_factory import SkipQuestionFactory
 
@@ -52,67 +52,67 @@ class SkipQuestionPostTest(BaseTest):
                           'subsection': str(self.subsection_id)}
 
     def test_post_skip_question(self):
-        self.assertEqual(SkipQuestion.objects.all().count(), 0)
+        self.assertEqual(SkipRule.objects.all().count(), 0)
         response = self.client.post(self.url, data=self.form_data)
         self.assertEqual(201, response.status_code)
-        self.assertEqual(SkipQuestion.objects.all().count(), 1)
+        self.assertEqual(SkipRule.objects.all().count(), 1)
 
     def test_post_skip_question_for_root_question_not_existing(self):
-        self.assertEqual(SkipQuestion.objects.all().count(), 0)
+        self.assertEqual(SkipRule.objects.all().count(), 0)
         data = self.form_data
         data['root_question'] = '341543'
         response = self.client.post(self.url, data=data)
         self.assertEqual(400, response.status_code)
-        self.assertEqual(SkipQuestion.objects.all().count(), 0)
+        self.assertEqual(SkipRule.objects.all().count(), 0)
         expected_errors = [u'Select a valid choice. That choice is not one of the available choices.']
 
         self.assertEqual(json.loads(response.content)['result'], expected_errors)
 
     def test_post_skip_question_for_response_not_existing(self):
-        self.assertEqual(SkipQuestion.objects.all().count(), 0)
+        self.assertEqual(SkipRule.objects.all().count(), 0)
         data = self.form_data
         data['response'] = '341543'
         response = self.client.post(self.url, data=data)
         self.assertEqual(400, response.status_code)
-        self.assertEqual(SkipQuestion.objects.all().count(), 0)
+        self.assertEqual(SkipRule.objects.all().count(), 0)
         expected_error_message = [u'The selected option is not a valid option for the root question']
         self.assertEqual(json.loads(response.content)['result'], expected_error_message)
 
     def test_post_skip_question_for_skip_question_not_existing(self):
-        self.assertEqual(SkipQuestion.objects.all().count(), 0)
+        self.assertEqual(SkipRule.objects.all().count(), 0)
         data = self.form_data
         data['skip_question'] = '341543'
         response = self.client.post(self.url, data=data)
         self.assertEqual(400, response.status_code)
 
-        self.assertEqual(SkipQuestion.objects.all().count(), 0)
+        self.assertEqual(SkipRule.objects.all().count(), 0)
         expected_error_message = [u'Select a valid choice. That choice is not one of the available choices.']
         self.assertEqual(json.loads(response.content)['result'], expected_error_message)
 
     def test_post_skip_question_for_root_question_not_being_part_of_subsection(self):
-        self.assertEqual(SkipQuestion.objects.all().count(), 0)
+        self.assertEqual(SkipRule.objects.all().count(), 0)
         data = self.form_data
         data['subsection'] = self.subsection_with_only_skip_question
         response = self.client.post(self.url, data=self.form_data)
         self.assertEqual(400, response.status_code)
 
-        self.assertEqual(SkipQuestion.objects.all().count(), 0)
+        self.assertEqual(SkipRule.objects.all().count(), 0)
         self.assertEqual(json.loads(response.content)['result'],
                          [u'Both questions should belong to the same subsection'])
 
     def test_post_skip_question_for_skip_question_not_being_part_of_subsection(self):
-        self.assertEqual(SkipQuestion.objects.all().count(), 0)
+        self.assertEqual(SkipRule.objects.all().count(), 0)
         data = self.form_data
         data['subsection'] = self.subsection_with_only_root_question
         response = self.client.post(self.url, data=self.form_data)
         self.assertEqual(400, response.status_code)
 
-        self.assertEqual(SkipQuestion.objects.all().count(), 0)
+        self.assertEqual(SkipRule.objects.all().count(), 0)
         self.assertEqual(json.loads(response.content)['result'],
                          [u'Both questions should belong to the same subsection'])
 
     def test_post_skip_question_for_response_one_of_root_questions_options(self):
-        self.assertEqual(SkipQuestion.objects.all().count(), 0)
+        self.assertEqual(SkipRule.objects.all().count(), 0)
         data = self.form_data
         data['response'] = str(int(data['response']) + 10)
         response = self.client.post(self.url, data=data)
@@ -120,16 +120,16 @@ class SkipQuestionPostTest(BaseTest):
 
         expected_error_message = [u'The selected option is not a valid option for the root question']
         self.assertEqual(json.loads(response.content)['result'], expected_error_message)
-        self.assertEqual(SkipQuestion.objects.all().count(), 0)
+        self.assertEqual(SkipRule.objects.all().count(), 0)
 
     def test_post_skip_question_root_question_is_not_equal_to_skip_question(self):
-        self.assertEqual(SkipQuestion.objects.all().count(), 0)
+        self.assertEqual(SkipRule.objects.all().count(), 0)
         data = self.form_data
         data['skip_question'] = data['root_question']
         response = self.client.post(self.url, data=data)
         self.assertEqual(400, response.status_code)
 
-        self.assertEqual(SkipQuestion.objects.all().count(), 0)
+        self.assertEqual(SkipRule.objects.all().count(), 0)
         self.assertEqual(json.loads(response.content)['result'], [u'Root question cannot be the same as skip question'])
 
 
@@ -143,6 +143,6 @@ class SkipQuestionGetTest(BaseTest):
         self.url = "/questionnaire/subsection/%d/skiprules/" % self.skip_rule.id
 
     def test_get_existing_skip_rules(self):
-        self.assertTrue(SkipQuestion.objects.all().count() == 1)
+        self.assertTrue(SkipRule.objects.all().count() == 1)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
