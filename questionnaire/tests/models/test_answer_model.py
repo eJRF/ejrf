@@ -6,7 +6,8 @@ from django.test import TestCase
 from questionnaire.models import Question, Country, QuestionOption, MultiChoiceAnswer, Questionnaire
 from questionnaire.models.answers import Answer, NumericalAnswer, TextAnswer, DateAnswer, MultipleResponseAnswer
 from questionnaire.tests.base_test import BaseTest
-from questionnaire.tests.factories.answer_factory import NumericalAnswerFactory
+from questionnaire.tests.factories.answer_factory import NumericalAnswerFactory, TextAnswerFactory, DateAnswerFactory, \
+    MultiChoiceAnswerFactory, MultipleResponseAnswerFactory
 from questionnaire.tests.factories.question_factory import QuestionFactory
 from questionnaire.tests.factories.question_option_factory import QuestionOptionFactory
 from questionnaire.tests.factories.region_factory import CountryFactory
@@ -125,6 +126,10 @@ class NumericalAnswerTest(BaseTest):
         self.assertEqual(44, answer_one.format_response())
         self.assertEqual(44, answer_two.format_response())
 
+    def test_unicode(self):
+        answer = NumericalAnswerFactory(response=1)
+        self.assertEqual("1", str(answer))
+
 
 class TextAnswerTest(TestCase):
     def setUp(self):
@@ -156,6 +161,10 @@ class TextAnswerTest(TestCase):
                                            questionnaire=self.questionnaire)
         self.assertEqual("this is a text response", answer.format_response())
 
+    def test_unicode(self):
+        answer = TextAnswerFactory(response='Haha')
+        self.assertEqual('Haha', str(answer))
+
 
 class DateAnswerTest(TestCase):
     def setUp(self):
@@ -182,6 +191,11 @@ class DateAnswerTest(TestCase):
         self.assertEqual(self.questionnaire, answer.questionnaire)
         self.assertEqual(some_date, answer.response)
         self.assertEqual(some_date, answer.format_response())
+
+    def test_unicode_dd_mm_yyyy(self):
+        date_as_str = '01/02/2014'
+        answer = DateAnswerFactory(response=date_as_str)
+        self.assertEqual(date_as_str, str(answer))
 
 
 class MultiChoiceAnswerTest(TestCase):
@@ -210,6 +224,13 @@ class MultiChoiceAnswerTest(TestCase):
         self.assertEqual(self.questionnaire, answer.questionnaire)
         self.assertEqual(option, answer.response)
         self.assertEqual(option, answer.format_response())
+
+    def test_unicode(self):
+        option_text = 'Yes'
+        option = QuestionOptionFactory(text=option_text)
+        answer = MultiChoiceAnswerFactory(response=option)
+
+        self.assertEqual(option_text, str(answer))
 
 
 class MultipleResponseAnswerTest(TestCase):
@@ -240,3 +261,15 @@ class MultipleResponseAnswerTest(TestCase):
 
         all_options = answer.response.all()
         [self.assertIn(option, [option_1, option_2]) for option in all_options]
+
+    def test_unicode(self):
+        yes_option_text = 'Yes'
+        no_option_text = 'No'
+        option_1 = QuestionOptionFactory(text=no_option_text)
+        option_2 = QuestionOptionFactory(text=yes_option_text)
+        answer = MultipleResponseAnswerFactory()
+
+        answer.response.add(option_1)
+        answer.response.add(option_2)
+
+        self.assertEqual('%s, %s' % (no_option_text, yes_option_text), str(answer))

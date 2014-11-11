@@ -1,8 +1,9 @@
 from questionnaire.models import Question, QuestionGroup, Questionnaire, SubSection, Section, Answer, Country, \
     Organization, Region, NumericalAnswer, QuestionOption, MultiChoiceAnswer, AnswerGroup, TextAnswer, \
-    QuestionGroupOrder, Theme
+    QuestionGroupOrder, Theme, MultipleResponseAnswer
 from questionnaire.services.export_data_service import ExportToTextService
 from questionnaire.tests.base_test import BaseTest
+from questionnaire.tests.factories.question_option_factory import QuestionOptionFactory
 from questionnaire.utils.answer_type import AnswerTypes
 
 
@@ -24,16 +25,28 @@ class ExportToTextServiceTest(BaseTest):
                                                  , answer_sub_type='INTEGER')
 
         self.question2 = Question.objects.create(text='C. Number of cases positive',
-                                                 instructions="Include only those cases found positive for the infectious agent.",
+                                                 instructions="Include only those cases found positive...",
                                                  UID='C00005', answer_type='Number', answer_sub_type='INTEGER')
+        self.question3 = Question.objects.create(text='which of the genders live in your area',
+                                                 UID='C00006', answer_type=AnswerTypes.MULTIPLE_RESPONSE)
+
+        self.male_option = QuestionOptionFactory(question=self.question3, text='Female')
+        self.female_option = QuestionOptionFactory(question=self.question3, text='Male')
+        self.none_option = QuestionOptionFactory(question=self.question3, text='None')
 
         self.parent = QuestionGroup.objects.create(subsection=self.sub_section, order=1)
-        self.parent.question.add(self.question1, self.question2, self.question)
+        self.parent.question.add(self.question1, self.question2, self.question, self.question3)
+
         self.organisation = Organization.objects.create(name="WHO")
         self.regions = Region.objects.create(name="The Afro", organization=self.organisation)
         self.country = Country.objects.create(name="Uganda", code="UGX")
         self.regions.countries.add(self.country)
         self.headings = "ISO\tCountry\tYear\tField code\tQuestion text\tValue"
+
+        QuestionGroupOrder.objects.create(question=self.question, question_group=self.parent, order=1)
+        QuestionGroupOrder.objects.create(question=self.question1, question_group=self.parent, order=2)
+        QuestionGroupOrder.objects.create(question=self.question2, question_group=self.parent, order=3)
+        QuestionGroupOrder.objects.create(question=self.question3, question_group=self.parent, order=4)
 
         self.primary_question_answer = MultiChoiceAnswer.objects.create(question=self.question,
                                                                         country=self.country,
@@ -46,28 +59,38 @@ class ExportToTextServiceTest(BaseTest):
         self.question2_answer = NumericalAnswer.objects.create(question=self.question2, country=self.country,
                                                                status=Answer.SUBMITTED_STATUS, response=1,
                                                                questionnaire=self.questionnaire)
+        self.question3_answer = MultipleResponseAnswer.objects.create(question=self.question3, country=self.country,
+                                                                      status=Answer.SUBMITTED_STATUS,
+                                                                      questionnaire=self.questionnaire)
+
+        self.question3_answer.response.add(self.female_option, self.male_option)
+
         self.answer_group1 = self.primary_question_answer.answergroup.create(grouped_question=self.parent, row=1)
         self.answer_group_1 = self.question1_answer.answergroup.create(grouped_question=self.parent, row=1)
         self.answer_group_2 = self.question2_answer.answergroup.create(grouped_question=self.parent, row=1)
-
-        QuestionGroupOrder.objects.create(question=self.question, question_group=self.parent, order=1)
-        QuestionGroupOrder.objects.create(question=self.question1, question_group=self.parent, order=2)
-        QuestionGroupOrder.objects.create(question=self.question2, question_group=self.parent, order=3)
+        self.answer_group_3 = self.question3_answer.answergroup.create(grouped_question=self.parent, row=1)
 
     def test_exports_questions_with_normal_group(self):
         question_text = "%s | %s" % (self.section_1.name, self.question.text)
         question_text1 = "%s | %s" % (self.section_1.name, self.question1.text)
         question_text_2 = "%s | %s" % (self.section_1.name, self.question2.text)
+        question_text_3 = "%s | %s" % (self.section_1.name, self.question3.text)
+
         answer_id = "C_%s_%s_%s" % (self.question.UID, self.question.UID, self.option.UID)
         answer_id_1 = "C_%s_%s" % (self.question.UID, self.question1.UID)
         answer_id_2 = "C_%s_%s" % (self.question.UID, self.question2.UID)
+        answer_id_3 = "C_%s_%s" % (self.question.UID, self.question3.UID)
+        options_as_comma_separated_text = (self.male_option.text, self.female_option.text)
         expected_data = [self.headings,
                          "UGX\t%s\t2013\t%s\t%s\t%s" % (
                              self.country.name, answer_id.encode('base64').strip(), question_text, self.option.text),
                          "UGX\t%s\t2013\t%s\t%s\t%s" % (
                              self.country.name, answer_id_1.encode('base64').strip(), question_text1, '23'),
                          "UGX\t%s\t2013\t%s\t%s\t%s" % (
-                             self.country.name, answer_id_2.encode('base64').strip(), question_text_2, '1')]
+                             self.country.name, answer_id_2.encode('base64').strip(), question_text_2, '1'),
+                         "UGX\t%s\t2013\t%s\t%s\t%s" % (
+                             self.country.name, answer_id_3.encode('base64').strip(), question_text_3,
+                             '%s, %s' % options_as_comma_separated_text)]
 
         export_to_text_service = ExportToTextService([self.questionnaire])
         actual_data = export_to_text_service.get_formatted_responses()
@@ -78,6 +101,7 @@ class ExportToTextServiceTest(BaseTest):
         self.assertIn(expected_data[1], actual_data)
         self.assertIn(expected_data[2], actual_data)
         self.assertIn(expected_data[3], actual_data)
+        self.assertIn(expected_data[4], actual_data)
 
     def test_exports_questions_with_two_versions(self):
         primary_question_answer2 = MultiChoiceAnswer.objects.create(question=self.question,
@@ -98,12 +122,17 @@ class ExportToTextServiceTest(BaseTest):
         question_text = "%s | %s" % (self.section_1.name, self.question.text)
         question_text1 = "%s | %s" % (self.section_1.name, self.question1.text)
         question_text_2 = "%s | %s" % (self.section_1.name, self.question2.text)
+        question_text_3 = "%s | %s" % (self.section_1.name, self.question3.text)
+
         answer_id = "C_%s_%s_%s" % (self.question.UID, self.question.UID, self.option.UID)
         answer_id_1 = "C_%s_%s" % (self.question.UID, self.question1.UID)
         answer_id_2 = "C_%s_%s" % (self.question.UID, self.question2.UID)
         answer_id_10 = "C_%s_%s_%s" % (self.question.UID, self.question.UID, self.option2.UID)
         answer_id_11 = "C_%s_%s" % (self.question.UID, self.question1.UID)
         answer_id_21 = "C_%s_%s" % (self.question.UID, self.question2.UID)
+        answer_id_3 = "C_%s_%s" % (self.question.UID, self.question3.UID)
+        options_as_comma_separated_text = (self.male_option.text, self.female_option.text)
+
         expected_data = [self.headings,
                          "UGX\t%s\t2013\t%s\t%s\t%s" % (
                              self.country.name, answer_id.encode('base64').strip(), question_text, self.option.text),
@@ -111,13 +140,16 @@ class ExportToTextServiceTest(BaseTest):
                              self.country.name, answer_id_1.encode('base64').strip(), question_text1, '23'),
                          "UGX\t%s\t2013\t%s\t%s\t%s" % (
                              self.country.name, answer_id_2.encode('base64').strip(), question_text_2, '1'),
+                         "UGX\t%s\t2013\t%s\t%s\t%s" % (self.country.name, answer_id_3.encode('base64').strip(),
+                                                        question_text_3, '%s, %s' % options_as_comma_separated_text),
                          "UGX\t%s\t2013\t%s\t%s\t%s" % (
                              self.country.name, answer_id_10.encode('base64').strip(), question_text,
                              self.option2.text),
                          "UGX\t%s\t2013\t%s\t%s\t%s" % (
                              self.country.name, answer_id_11.encode('base64').strip(), question_text1, '4'),
                          "UGX\t%s\t2013\t%s\t%s\t%s" % (
-                             self.country.name, answer_id_21.encode('base64').strip(), question_text_2, '55')]
+                             self.country.name, answer_id_21.encode('base64').strip(), question_text_2, '55')
+        ]
 
         export_to_text_service = ExportToTextService([self.questionnaire])
         actual_data = export_to_text_service.get_formatted_responses()
@@ -129,6 +161,7 @@ class ExportToTextServiceTest(BaseTest):
         self.assertIn(expected_data[3], actual_data)
         self.assertIn(expected_data[4], actual_data)
         self.assertIn(expected_data[5], actual_data)
+        self.assertIn(expected_data[6], actual_data)
 
     def test_exports_specific_version(self):
         primary_question_answer2 = MultiChoiceAnswer.objects.create(question=self.question,
