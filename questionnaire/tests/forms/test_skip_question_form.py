@@ -40,7 +40,7 @@ class SkipQuestionRuleFormTest(BaseTest):
 
         skip_question_form = SkipRuleForm(data=data)
         self.assertFalse(skip_question_form.is_valid())
-        self.assertEqual({'skip_question':[u'This field is required.']},skip_question_form.errors)
+        self.assertEqual({'skip_question':[u'This field is required.'],'skip_subsection':[u'This field is required.']},skip_question_form.errors)
 
     def test_invalid_if_skip_question_is_same_as_root_question(self):
         data = {'root_question': self.root_question.id,

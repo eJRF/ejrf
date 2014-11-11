@@ -491,3 +491,7 @@ class RegionalSubSectionsViewTest(BaseTest):
         response = client.post(url)
         self.failUnless(SubSection.objects.filter(id=subsection.id))
         self.assertRedirects(response, expected_url='/accounts/login/?next=%s' % quote(url))
+
+class SectionGetSubSectionsTest(BaseTest):
+    def test_gets_subsections_for_a_section(self):
+        pass

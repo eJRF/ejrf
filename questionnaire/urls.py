@@ -12,7 +12,7 @@ from questionnaire.views.manage import ManageJRF, ManageRegionalJRF, EditQuestio
 from questionnaire.views.questionnaire_preview import PreviewQuestionnaire
 from questionnaire.views.sections import NewSection, NewSubSection, EditSection, EditSubSection, DeleteSection, \
     DeleteSubSection, \
-    ReOrderQuestions
+    ReOrderQuestions, GetSubSections
 from questionnaire.views.questions import QuestionList, CreateQuestion, DeleteQuestion, EditQuestion
 from questionnaire.views.questionnaires import Entry, SubmitQuestionnaire, DuplicateQuestionnaire, \
     FinalizeQuestionnaire, UnfinalizeQuestionnaire, PublishQuestionnaire, ApproveQuestionnaire, DeleteAnswerRow
@@ -66,6 +66,8 @@ urlpatterns = patterns('',
 
                        url(r'^questionnaire/subsection/(?P<subsection_id>\d+)/questions/$',
                            SubsectionQuestions.as_view(), name="subsection_questions"),
+                       url(r'^questionnaire/section/(?P<section_id>\d+)/subsections/$',
+                           GetSubSections.as_view(), name="section_subsections"),
                        url(r'^questionnaire/subsection/(?P<subsection_id>\d+)/skiprules/$', SkipRuleView.as_view(),
                            name="get_skip_rules"),
                        url(r'^questionnaire/subsection/skiprules/$', SkipRuleView.as_view(), name="skip_rules"),

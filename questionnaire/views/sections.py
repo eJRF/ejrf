@@ -167,6 +167,9 @@ class DeleteSubSection(OwnerAndPermissionRequiredMixin, DeleteView):
         messages.success(request, message)
         return response
 
+class GetSubSections(OwnerAndPermissionRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        pass
 
 class ReOrderQuestions(PermissionRequiredMixin, View):
     permission_required = 'auth.can_edit_questionnaire'

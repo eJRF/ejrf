@@ -29,7 +29,17 @@ class SkipRuleForm(forms.ModelForm):
         if root_question and not response in root_question.options.all():
             self._errors['response'] = ["The selected option is not a valid option for the root question"]
 
+    def _clean_item_to_skip(self):
+        subsection = self.cleaned_data.get('skip_subsection', None)
+        question = self.cleaned_data.get('skip_question', None)
+        if subsection is None and question is None:
+            self._errors['skip_question'] = ["This field is required."]
+            self._errors['skip_subsection'] = ["This field is required."]
+
+
     def clean(self):
+        if len(self._errors) == 0:
+            self._clean_item_to_skip()
         self._clean_root_question()
         self._clean_response()
         return super(SkipRuleForm, self).clean()

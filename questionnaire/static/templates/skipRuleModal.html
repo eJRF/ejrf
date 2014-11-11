@@ -1,7 +1,9 @@
 <div>
     <ul class="nav nav-tabs" role="tablist">
         <li role="presentation" class="active"><a id="selectNewRuleTab" href="#newRule" role="tab" data-toggle="tab"
-                                                  data-ng-click="setActiveTab('newRuleTab')">New Rule</a></li>
+                                                  data-ng-click="setActiveTab('newRuleTab')">New Question Rule</a></li>
+        <li role="presentation"><a id="selectNewSubsectiongRuleTab" href="#newSubsectionRules" role="tab" data-toggle="tab"
+                                   data-ng-click="setActiveTab('newSubsectionRuleTab')">New Subsection Rule</a></li>
         <li role="presentation"><a id="selectExistingRuleTab" href="#existingRules" role="tab" data-toggle="tab"
                                    data-ng-click="setActiveTab('existingRulesTab')">Existing Rules</a></li>
     </ul>
@@ -47,7 +49,7 @@
                     <div class="col-sm-7 center-fields">
                         <select name="skip_question" required data-ng-model="skipRule.skipQuestion"
                                 data-ng-options="q.fields.text for q in questions | filter:matchSelectedQuestion">
-                            <option value="">Select Skip Question</option>
+                            <option value="">Select Question</option>
                         </select>
                     </div>
                 </div>
@@ -57,6 +59,63 @@
                     <span class="red bold"><i class="glyphicon glyphicon-remove"></i> Cancel</span>
                 </a>
                 <button tyep="button" class="btn btn-default" id="save-skip-rule-button"
+                        data-ng-click="fns.createRule()">
+                    <span class="green bold"><i class="glyphicon glyphicon-ok"></i> Done</span></button>
+            </div>
+        </form>
+    </div>
+    <div id="newSubsectionRuleTab" data-ng-show="activeTab == 'newSubsectionRuleTab'">
+        <form method="post" class="form-horizontal" name="skipForm" data-ng-submit="submitForm()">
+            <div class="modal-body question-group indent">
+                <div data-ng-class="skipResult.className" class="alert" data-ng-show="skipResult.show">
+                    {{skipResult.message}}
+                </div>
+
+                <input name="subsection_id" type="hidden" data-ng-model="skipRule.subsectionId"
+                       value="{{subsectionId}}"/>
+
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Select Root Question</label>
+
+                    <div class="col-sm-7 center-fields">
+                        <select required name="root_question"
+                                data-ng-model="skipRule.rootQuestion"
+                                data-ng-options="q.fields.text for q in questions | filter: {fields:{answer_type: 'MultiChoice'}}">
+                            <option value="">Select Root Question</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Select Response</label>
+
+                    <div class="col-sm-7 center-fields">
+                        <ul>
+                            <li data-ng-repeat="option in skipRule.rootQuestion.options">
+                                <label style="display:block;">
+                                    <input type="radio" name="response" required
+                                           data-ng-model="skipRule.questionResponse"
+                                           ng-value="option.pk"/>&nbsp;{{option.fields.text}}
+                                </label>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Select Subsection To Skip</label>
+
+                    <div class="col-sm-7 center-fields">
+                        <select name="skip_question" required data-ng-model="skipRule.skipQuestion"
+                                data-ng-options="q.fields.text for q in subsections">
+                            <option value="">Select SubSection</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a type="cancel" class="btn btn-default" data-dismiss="modal">
+                    <span class="red bold"><i class="glyphicon glyphicon-remove"></i> Cancel</span>
+                </a>
+                <button tyep="button" class="btn btn-default"
                         data-ng-click="fns.createRule()">
                     <span class="green bold"><i class="glyphicon glyphicon-ok"></i> Done</span></button>
             </div>
@@ -85,4 +144,3 @@
         </div>
     </div>
 </div>
-
