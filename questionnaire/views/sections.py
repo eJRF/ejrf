@@ -1,7 +1,8 @@
+import json
 from braces.views import PermissionRequiredMixin
 from django.contrib import messages
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.views.generic import CreateView, UpdateView, DeleteView, View
 
 from questionnaire.forms.sections import SectionForm, SubSectionForm
@@ -167,9 +168,16 @@ class DeleteSubSection(OwnerAndPermissionRequiredMixin, DeleteView):
         messages.success(request, message)
         return response
 
+
 class GetSubSections(OwnerAndPermissionRequiredMixin, View):
+    permission_required = 'auth.can_edit_questionnaire'
+
     def get(self, request, *args, **kwargs):
-        pass
+        section_id = kwargs.get("section_id")
+        subsections = SubSection.objects.filter(section_id=section_id)
+        subsections_dict = map(lambda subsection: subsection.to_dict(), subsections)
+        return HttpResponse(json.dumps(subsections_dict), content_type="application/json", status=200)
+
 
 class ReOrderQuestions(PermissionRequiredMixin, View):
     permission_required = 'auth.can_edit_questionnaire'

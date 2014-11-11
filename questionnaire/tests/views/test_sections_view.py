@@ -1,3 +1,4 @@
+import json
 from urllib import quote
 
 from django.core.urlresolvers import reverse
@@ -493,5 +494,28 @@ class RegionalSubSectionsViewTest(BaseTest):
         self.assertRedirects(response, expected_url='/accounts/login/?next=%s' % quote(url))
 
 class SectionGetSubSectionsTest(BaseTest):
-    def test_gets_subsections_for_a_section(self):
-        pass
+    def setUp(self):
+        self.user = self.create_user(group=self.REGIONAL_ADMIN, org="WHO", region="AFRO")
+        self.user = self.assign('can_edit_questionnaire', self.user)
+
+        self.client = Client()
+        self.client.login(username=self.user.username, password='pass')
+
+        self.region = self.user.user_profile.region
+        self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013, region=self.region)
+        self.section = Section.objects.create(name="section", questionnaire=self.questionnaire, order=1,
+                                                region=self.region)
+        self.url = '/questionnaire/section/%d/subsections/' % self.section.id
+
+    def test_gets_subsections_for_a_section_with_no_subsections(self):
+        response = self.client.get(self.url)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual([], json.loads(response.content))
+
+    def test_gets_subsections_for_a_section_with_one_subsection(self):
+        subsection = SubSection.objects.create(title="subsection 1", section=self.section, order=1,
+                                                    region=self.region)
+
+        response = self.client.get(self.url)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual([{'title':'subsection 1', 'id': subsection.id, 'order': 1}], json.loads(response.content))

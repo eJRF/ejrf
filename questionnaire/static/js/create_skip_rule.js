@@ -25,9 +25,7 @@ angular.module('questionnaireApp', [])
                 $scope.existingRules = data;
             });
         };
-
-        $scope.updateSkipRuleModal = function(subsectionId) {
-            updateRules(subsectionId);
+        var updateCreateQuestionRuleForm = function(subsectionId) {
             $http.get( "/questionnaire/subsection/" + subsectionId + "/questions/").
                 success(function(data, status, headers, config) {
                     var questions = data.questions;
@@ -36,6 +34,23 @@ angular.module('questionnaireApp', [])
                     $scope.skipRule.subsectionId = subsectionId;
                     $scope.skipResult = {show: false};
                 });
+        };
+
+        var updateCreateSubsectionRuleForm = function(subsectionId) {
+            $http.get( "/questionnaire/section/" + window.sectionId + "/subsections/").
+                success(function(data, status, headers, config) {
+                    $scope.subsections = data;
+
+                    resetSkipRule();
+                    $scope.skipRule.subsectionId = subsectionId;
+                    $scope.skipResult = {show: false};
+                });
+        };
+
+        $scope.updateSkipRuleModal = function(subsectionId) {
+            updateRules(subsectionId);
+            updateCreateQuestionRuleForm(subsectionId);
+            updateCreateSubsectionRuleForm(subsectionId);
         };
         $scope.fns = {};
         $scope.fns.createRule = function() {
