@@ -3,6 +3,7 @@ from lettuce import step, world
 from questionnaire.features.pages.questionnaires import QuestionnairePage
 from questionnaire.features.pages.questions import QuestionListingPage, CreateQuestionPage
 from questionnaire.models import Question, Theme, Questionnaire, Section, SubSection, QuestionGroup, QuestionGroupOrder, QuestionOption, TextAnswer, Answer, AnswerGroup
+from questionnaire.utils.answer_type import AnswerTypes
 
 
 @step(u'And I have 100 questions')
@@ -363,3 +364,21 @@ def then_i_should_see_the_default_questions_displayed(step):
     world.page.is_text_present(world.question1.export_label)
     world.page.is_text_present(world.question2.export_label)
     world.page.is_text_present(world.question3.export_label)
+
+@step(u'And I fill in the multiple response question form data')
+def and_i_fill_in_the_multiple_response_question_form_data(step):
+    data = {'text': 'How many measles cases did you find this year',
+        'instructions': 'Just give an answer',
+        'export_label': 'blah',
+        'theme': world.theme2.id}
+    world.page.fill_form(data)
+
+@step(u'And I select multiple-choice answer type')
+def and_i_select_multiple_choice_answer_type(step):
+    world.page.select('answer_type', 'MultipleResponse')
+
+
+@step(u'Then I should see errors that I need to choose atleast one option')
+def then_i_should_see_errors_that_i_need_to_choose_atleast_one_option(step):
+    message = "%s questions must have at least one option" % AnswerTypes.MULTIPLE_RESPONSE
+    world.page.is_text_present(message)

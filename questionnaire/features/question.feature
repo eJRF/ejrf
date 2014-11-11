@@ -31,6 +31,27 @@ Feature: Questions feature
         And I click save question button
         Then I should see the question created
       
+
+    Scenario: Create a simple multipleResponse question
+        Given I am logged in as a global admin
+        And I have two themes
+        And I visit the question listing page
+        And I click add new question page
+        And I fill in the multiple response question form data
+        And I select multiple-choice answer type
+        And I submit the form
+        Then I should see errors that I need to choose atleast one option
+        And I select multiple-choice answer type
+        And I check custom option
+        Then I should see the option field
+        When Fill in the option
+        When I click add more button
+        Then I should see another option field
+        When I click remove the added option field
+        Then I should not see that option field
+        And I click save question button
+        Then I should see the question created
+
     Scenario: Delete a simple question
         Given I am logged in as a global admin
         And I have two themes
