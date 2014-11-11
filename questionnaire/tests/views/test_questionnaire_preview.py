@@ -171,8 +171,8 @@ class QuestionnairePreviewTest(BaseTest):
         self.assertEqual(self.question3, section1_formsets['Number'][1].initial['question'])
 
         self.assertEqual(version_1_primary_answer.response, section1_formsets['MultiChoice'][0].initial['response'])
-        self.assertEqual(version_1_answer_1.response, section1_formsets['Number'][0].initial['response'])
-        self.assertEqual(version_1_answer_2.response, section1_formsets['Number'][1].initial['response'])
+        self.assertEqual(str(version_1_answer_1), section1_formsets['Number'][0].initial['response'])
+        self.assertEqual(str(version_1_answer_2), section1_formsets['Number'][1].initial['response'])
 
         self.assertEqual(version_1_answer_1, section1_formsets['Number'][0].initial['answer'])
         self.assertEqual(version_1_answer_2, section1_formsets['Number'][1].initial['answer'])

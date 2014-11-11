@@ -1,6 +1,7 @@
 from datetime import date
 
 from django.core.exceptions import ValidationError
+from django.db import DatabaseError
 from django.test import TestCase
 
 from questionnaire.models import Question, Country, QuestionOption, MultiChoiceAnswer, Questionnaire
@@ -59,7 +60,7 @@ class AnswerTest(TestCase):
 
         textanswer = TextAnswer.objects.create(response="text", **data)
         dateanswer = DateAnswer.objects.create(response="2014-04-08", **data)
-        numberanswer = NumericalAnswer.objects.create(response=1, **data)
+        numberanswer = NumericalAnswer.objects.create(response='1', **data)
         option = QuestionOption.objects.create(text="haha", question=data['question'])
         multichoiceanswer = MultiChoiceAnswer.objects.create(response=option, **data)
 
@@ -67,7 +68,7 @@ class AnswerTest(TestCase):
         self.assertEqual(1, text_answers.count())
         self.assertIn(textanswer, text_answers)
 
-        numerical_answers = Answer.from_response(1, **data)
+        numerical_answers = Answer.from_response('1', **data)
         self.assertEqual(1, numerical_answers.count())
         self.assertIn(numberanswer, numerical_answers)
 
@@ -107,10 +108,10 @@ class NumericalAnswerTest(BaseTest):
                                                     questionnaire=self.questionnaire)
         self.assertEqual(11, int_answer.format_response())
 
-    def test_numerical_answer_cannot_be_text(self):
+    def test_numerical_answer_cannot_be_longer_than_9_chars(self):
         answer = NumericalAnswer(question=self.question, country=self.country, response='not a decimal number',
                                  questionnaire=self.questionnaire)
-        self.assertRaises(ValidationError, answer.save)
+        self.assertRaises(DatabaseError, answer.save)
 
     def test_format_response_returns_decimal_when_question_answer_sub_type_is_decimal(self):
         question = QuestionFactory(answer_type=AnswerTypes.NUMBER, answer_sub_type=AnswerTypes.DECIMAL)

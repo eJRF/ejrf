@@ -618,7 +618,7 @@ class GridQuestionGroupEntryServiceTest(BaseTest):
         self.assertEqual(self.question4, formsets['Date'][0].initial['question'])
 
         self.assertEqual(question2_answer.response, formsets['Text'][0].initial['response'])
-        self.assertEqual(question3_answer.response, formsets['Number'][0].initial['response'])
+        self.assertEqual('%s' % question3_answer.response, formsets['Number'][0].initial['response'])
 
         self.assertIn('response', formsets['MultiChoice'][0].initial.keys())
         self.assertIn('response', formsets['Number'][0].initial.keys())
@@ -627,7 +627,7 @@ class GridQuestionGroupEntryServiceTest(BaseTest):
 
         self.assertEqual(question1_answer.response, formsets['MultiChoice'][0].initial['response'])
         self.assertEqual(question2_answer.response, formsets['Text'][0].initial['response'])
-        self.assertEqual(question3_answer.response, formsets['Number'][0].initial['response'])
+        self.assertEqual('%s' % question3_answer.response, formsets['Number'][0].initial['response'])
 
         self.assertIn('answer', formsets['MultiChoice'][0].initial.keys())
         self.assertIn('answer', formsets['Number'][0].initial.keys())
@@ -668,10 +668,10 @@ class GridQuestionGroupEntryServiceTest(BaseTest):
             self.assertEqual(option, formsets[self.question1.answer_type][index].initial['option'])
 
             for index1, question in enumerate([self.question2, self.question3]):
-                self.assertEqual(eval("question%d_answer[index].response" % (index1 + 2)),
-                                 formsets[question.answer_type][index].initial['response'])
-                self.assertEqual(eval("question%d_answer[index]" % (index1 + 2)),
-                                 formsets[question.answer_type][index].initial['answer'])
+                response = eval("question%d_answer[index].response" % (index1 + 2))
+                self.assertEqual(str(response), formsets[question.answer_type][index].initial['response'])
+                answer = eval("question%d_answer[index]" % (index1 + 2))
+                self.assertEqual(answer, formsets[question.answer_type][index].initial['answer'])
 
     def test_initial_gets_answers_and_responses_after_draft_saved(self):
         question5 = Question.objects.create(text='question 5', instructions="instruction 5", UID='C00055',
@@ -1316,7 +1316,7 @@ class AllowMultiplesGridEntryServiceTest(BaseTest):
             self.assertEqual(self.question4, formsets['Date'][index].initial['question'])
 
         for index, answer in enumerate(number_answers):
-            self.assertEqual(answer.response, formsets['Number'][index].initial['response'])
+            self.assertEqual(answer.format_response(), formsets['Number'][index].initial['response'])
             self.assertEqual(self.question3, formsets['Number'][index].initial['question'])
 
     def test_with_text_primary_question_should_retrieve_answers_and_answer_groups_back_in_the_initial(self):
@@ -1414,7 +1414,7 @@ class AllowMultiplesGridEntryServiceTest(BaseTest):
             self.assertEqual(self.question4, formsets['Date'][index].initial['question'])
 
         for index, answer in enumerate(number_answers):
-            self.assertEqual(answer.response, formsets['Number'][index].initial['response'])
+            self.assertEqual(answer.format_response(), formsets['Number'][index].initial['response'])
             self.assertEqual(self.question3, formsets['Number'][index].initial['question'])
 
         for index, answer in enumerate(text_answers):

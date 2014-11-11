@@ -36,7 +36,7 @@ class NumericalAnswerFormTest(BaseTest):
         self.question_group.question.add(self.question)
 
         self.form_data = {
-            'response': 100,
+            'response': '100',
         }
 
         self.initial = {
@@ -52,26 +52,39 @@ class NumericalAnswerFormTest(BaseTest):
         answer_form = NumericalAnswerForm(self.form_data, initial=self.initial)
         self.assertTrue(answer_form.is_valid())
 
-    def test_text_response_is_invalid(self):
+    def test_text_response_is_valid_if_response_is_nr(self):
         form_data = self.form_data.copy()
-        form_data['response'] = 'some text which is not number'
+        form_data['response'] = 'NR'
+        answer_form = NumericalAnswerForm(form_data, initial=self.initial)
+        self.assertTrue(answer_form.is_valid())
+
+    def test_text_response_is_invalid_if_response_text_and_not_nr(self):
+        form_data = self.form_data.copy()
+        form_data['response'] = 'MR'
         answer_form = NumericalAnswerForm(form_data, initial=self.initial)
         self.assertFalse(answer_form.is_valid())
-        message = 'Enter a number.'
+        message = 'Enter a number or Either NR or ND if this question is irrelevant'
         self.assertEqual([message], answer_form.errors['response'])
+
+    def test_text_response_is_valid_if_response_is_nd(self):
+        form_data = self.form_data.copy()
+        form_data['response'] = 'ND'
+        answer_form = NumericalAnswerForm(form_data, initial=self.initial)
+        self.assertTrue(answer_form.is_valid())
 
     def test_decimal_response_is_invalid_if_question_answer_subtype_is_integer(self):
         form_data = self.form_data.copy()
-        form_data['response'] = 33.4
+        form_data['response'] = '33.4'
         answer_form = NumericalAnswerForm(form_data, initial=self.initial)
         self.assertFalse(answer_form.is_valid())
         message = 'Response should be a whole number.'
+
         self.assertEqual([message], answer_form.errors['response'])
 
     def test_integer_response_is_valid_if_question_answer_subtype_is_decimal(self):
         question = QuestionFactory(answer_type=AnswerTypes.NUMBER, answer_sub_type=AnswerTypes.DECIMAL)
         form_data = self.form_data.copy()
-        form_data['response'] = 33
+        form_data['response'] = '33.3'
         initial = self.initial.copy()
         initial['question'] = question
         answer_form = NumericalAnswerForm(form_data, initial=initial)

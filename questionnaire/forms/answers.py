@@ -1,5 +1,4 @@
 import copy
-
 from django import forms
 from django.forms.util import ErrorDict
 from django.forms import ModelForm, ModelChoiceField, ModelMultipleChoiceField
@@ -8,6 +7,7 @@ from questionnaire.forms.custom_widgets import MultiChoiceAnswerSelectWidget, Sk
 from questionnaire.models import NumericalAnswer, TextAnswer, DateAnswer, MultiChoiceAnswer, QuestionOption
 from questionnaire.models.answers import MultipleResponseAnswer
 from questionnaire.utils.answer_type import AnswerTypes
+from questionnaire.utils.model_utils import number_from
 
 
 class AnswerForm(ModelForm):
@@ -67,12 +67,14 @@ class NumericalAnswerForm(AnswerForm):
 
     def _clean_response(self):
         response = self.cleaned_data.get('response', None)
-        if self._matches_answer_sub_type(response):
+
+        if response and not (response == 'NR' or response == 'ND' or number_from(response)):
+            self._errors['response'] = ['Enter a number or Either NR or ND if this question is irrelevant']
+        elif number_from(response) and self._matches_answer_sub_type(response):
             self._errors['response'] = ["Response should be a whole number."]
 
     def _matches_answer_sub_type(self, response):
-        return self.question.answer_sub_type and self.question.answer_sub_type.lower() == AnswerTypes.INTEGER.lower() and response and not float(
-            response).is_integer()
+        return AnswerTypes.is_integer(self.question.answer_sub_type) and not float(number_from(response)).is_integer()
 
 
 class TextAnswerForm(AnswerForm):
@@ -166,7 +168,7 @@ class MultiChoiceAnswerForm(AnswerForm):
 
 
 class MultipleResponseForm(AnswerForm):
-    response = ModelMultipleChoiceField(queryset=None, widget=forms.CheckboxSelectMultiple(), required=False,)
+    response = ModelMultipleChoiceField(queryset=None, widget=forms.CheckboxSelectMultiple(), required=False, )
 
     def __init__(self, *args, **kwargs):
         super(MultipleResponseForm, self).__init__(*args, **kwargs)

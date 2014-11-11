@@ -4,6 +4,7 @@ from django.db import models
 from questionnaire.models.questions import Question, QuestionOption
 from questionnaire.models.base import BaseModel
 from questionnaire.utils.answer_type import AnswerTypes
+from questionnaire.utils.model_utils import number_from
 
 
 class Answer(BaseModel):
@@ -37,14 +38,14 @@ class Answer(BaseModel):
 
 
 class NumericalAnswer(Answer):
-    response = models.DecimalField(max_digits=9, decimal_places=2, null=True)
+    response = models.CharField(max_length=9, null=True)
 
     def __unicode__(self):
         return '%s' % self.format_response()
 
     def format_response(self):
-        if self._answer_sub_type_is_integer():
-            return int(self.response)
+        if AnswerTypes.is_integer(self.question.answer_sub_type) and number_from(self.response):
+            return int(number_from(self.response))
         return self.response
 
     def _answer_sub_type_is_integer(self):

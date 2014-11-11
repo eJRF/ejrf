@@ -43,3 +43,7 @@ class AnswerTypes(object):
     @classmethod
     def is_mutlichoice_or_multiple(cls, answer_type):
         return answer_type == cls.MULTI_CHOICE or answer_type == cls.MULTIPLE_RESPONSE
+
+    @classmethod
+    def is_integer(cls, answer_type):
+        return answer_type == cls.INTEGER

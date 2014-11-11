@@ -1,4 +1,6 @@
 import re
+from decimal import Decimal, InvalidOperation
+
 
 INITIAL_UID = 1
 MAX_UID_LENGTH = 5
@@ -27,3 +29,12 @@ def reindex_orders_in(cls, **kwargs):
     for index, object_ in enumerate(objects):
         object_.order = index
         object_.save()
+
+
+def number_from(chars):
+    num = None
+    try:
+        num = Decimal(chars)
+    except InvalidOperation:
+        pass
+    return num
