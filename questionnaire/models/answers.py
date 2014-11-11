@@ -39,6 +39,9 @@ class Answer(BaseModel):
 class NumericalAnswer(Answer):
     response = models.DecimalField(max_digits=9, decimal_places=2, null=True)
 
+    def __unicode__(self):
+        return '%s' % self.format_response()
+
     def format_response(self):
         if self._answer_sub_type_is_integer():
             return int(self.response)
@@ -51,12 +54,18 @@ class NumericalAnswer(Answer):
 class TextAnswer(Answer):
     response = models.CharField(max_length=100, null=True)
 
+    def __unicode__(self):
+        return '%s' % self.format_response()
+
     def format_response(self):
         return self.response
 
 
 class DateAnswer(Answer):
     response = models.CharField(null=True, max_length=10)
+
+    def __unicode__(self):
+        return '%s' % self.format_response()
 
     def format_response(self):
         return self.response
@@ -65,12 +74,18 @@ class DateAnswer(Answer):
 class MultiChoiceAnswer(Answer):
     response = models.ForeignKey(QuestionOption, null=True, related_name="answer")
 
+    def __unicode__(self):
+        return '%s' % self.format_response()
+
     def format_response(self):
         return self.response
 
 
 class MultipleResponseAnswer(Answer):
     response = models.ManyToManyField(QuestionOption, null=True, related_name="answers")
+
+    def __unicode__(self):
+        return ', '.join(self.format_response().values_list('text', flat=True))
 
     def format_response(self):
         return self.response.all()
