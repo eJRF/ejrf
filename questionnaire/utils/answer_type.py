@@ -39,3 +39,7 @@ class AnswerTypes(object):
     def answer_sub_types(cls):
         subtypes = filter(None, [v for (k, v) in cls.VALID_TYPES.iteritems()])
         return tuple(map(lambda v: (v, v), itertools.chain(*subtypes)))
+
+    @classmethod
+    def is_mutlichoice_or_multiple(cls, answer_type):
+        return answer_type == cls.MULTI_CHOICE or answer_type == cls.MULTIPLE_RESPONSE

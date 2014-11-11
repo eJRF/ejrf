@@ -56,9 +56,9 @@ class QuestionForm(ModelForm):
     def _clean_options(self):
         answer_type = self.cleaned_data.get('answer_type', None)
         options = dict(self.data).get('options', [])
-        options = [option for option in options if option]
-        if (answer_type and answer_type == AnswerTypes.MULTI_CHOICE) and len(options) < 1:
-            message = "MultiChoice questions must have at least one option"
+        options = filter(None, options)
+        if (answer_type and AnswerTypes.is_mutlichoice_or_multiple(answer_type)) and len(options) < 1:
+            message = "%s questions must have at least one option" % answer_type
             self._errors['answer_type'] = self.error_class([message])
             del self.cleaned_data['answer_type']
         return options
@@ -131,7 +131,7 @@ class QuestionForm(ModelForm):
     def _save_options_if_multichoice(self, question):
         options = dict(self.data).get('options', [])
         options = filter(lambda text: text.strip(), options)
-        if options and question.answer_type == AnswerTypes.MULTI_CHOICE:
+        if options and AnswerTypes.is_mutlichoice_or_multiple(question.answer_type):
             for grouped_option in options:
                 for option in grouped_option.split(','):
                     QuestionOption.objects.get_or_create(text=option.strip(), question=question)

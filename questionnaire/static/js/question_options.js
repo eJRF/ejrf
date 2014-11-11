@@ -14,7 +14,7 @@ jQuery(function ($) {
         $('#option-choices').removeClass('show').addClass('hide');
         removeOptions();
 
-        if ($(this).val() == 'MultiChoice') {
+        if ($(this).val() == 'MultiChoice' || $(this).val() == 'MultipleResponse' ) {
             $('#option-choices').addClass('show').removeClass('hide');
         }
     });
