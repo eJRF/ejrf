@@ -1,4 +1,4 @@
-from django.forms import Select
+from django.forms import Select, CheckboxSelectMultiple
 
 from questionnaire.forms.answers import NumericalAnswerForm, TextAnswerForm, DateAnswerForm, MultiChoiceAnswerForm, \
     MultipleResponseForm
@@ -286,7 +286,25 @@ class MultipleResponseFormTest(BaseTest):
 
     def test_save_all_selected_options(self):
         answer_form = MultipleResponseForm(self.form_data, initial=self.initial)
+
         answer = answer_form.save()
         response_all = answer.response.all()
         self.assertEqual(2, response_all.count())
         [self.assertIn(option, response_all) for option in [self.male_option, self.female_option]]
+
+    def test_renders_multiselect_widget(self):
+        data = {'response': []}
+
+        answer_form = MultipleResponseForm(data=data, initial=self.initial)
+
+        expected_widget = answer_form.fields['response'].widget
+        self.assertIsInstance(expected_widget, CheckboxSelectMultiple)
+
+    def test_response_options_are_question_otpions(self):
+
+        answer_form = MultipleResponseForm(data=self.form_data, initial=self.initial)
+
+        expected_choices = [(self.female_option.id, '%s' % self.female_option.text),
+                            (self.male_option.id, '%s' % self.male_option.text)]
+
+        self.assertEqual(expected_choices, list(answer_form.fields['response'].choices))

@@ -165,19 +165,33 @@ class MultiChoiceAnswerForm(AnswerForm):
         exclude = ('question', 'status', 'country', 'version', 'code', 'questionnaire')
 
 
-class MultipleResponseForm(MultiChoiceAnswerForm):
+class MultipleResponseForm(AnswerForm):
     response = ModelMultipleChoiceField(queryset=None, widget=forms.CheckboxSelectMultiple(), required=False)
 
     def __init__(self, *args, **kwargs):
         super(MultipleResponseForm, self).__init__(*args, **kwargs)
-        self.fields['response'].queryset = self._get_response_choices(kwargs)
+        options_all = self.question.options.all()
+        self.fields['response'].queryset = options_all
+        self.options = options_all
 
     class Meta:
         model = MultipleResponseAnswer
         exclude = ('question', 'status', 'country', 'version', 'code', 'questionnaire')
 
+    def _clean_response(self):
+        response = self.cleaned_data.get('response', [])
+        selected_options = [option in self.options for option in response]
+        if len(response) != selected_options.count(True):
+            message = 'Select a valid choice. The selected option is not one of the available choices.'
+            self._errors['response'] = self.error_class([message])
+
+    def clean(self):
+        self._clean_response()
+        return super(MultipleResponseForm, self).clean()
+
     def save(self, commit=True, *args, **kwargs):
-        answer = super(MultipleResponseForm, self).save(commit=commit, *args, **kwargs)
+        answer = super(MultipleResponseForm, self).save(commit=False, *args, **kwargs)
+        answer.save()
         if commit:
             self.save_m2m()
         return answer
