@@ -166,7 +166,7 @@ class MultiChoiceAnswerForm(AnswerForm):
 
 
 class MultipleResponseForm(AnswerForm):
-    response = ModelMultipleChoiceField(queryset=None, widget=forms.CheckboxSelectMultiple(), required=False)
+    response = ModelMultipleChoiceField(queryset=None, widget=forms.CheckboxSelectMultiple(), required=False,)
 
     def __init__(self, *args, **kwargs):
         super(MultipleResponseForm, self).__init__(*args, **kwargs)

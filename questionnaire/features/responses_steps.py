@@ -4,6 +4,7 @@ from lettuce import step, world
 from questionnaire.features.pages.questionnaires import QuestionnairePage
 from questionnaire.features.pages.users import LoginPage
 from questionnaire.models import Questionnaire, Section, SubSection, Question, QuestionGroup, QuestionGroupOrder, Region, Country, UserProfile
+from questionnaire.tests.factories.question_option_factory import QuestionOptionFactory
 from questionnaire.utils.answer_type import AnswerTypes
 
 
@@ -49,14 +50,19 @@ def given_i_have_a_questionnaire_with_questions(step):
     world.question4 = Question.objects.create(text='Name of UNICEF contact', UID='C00026', answer_type='Text',)
     world.question5 = Question.objects.create(text='Email address of UNICEF contact', UID='C00027', answer_type='Text',)
     world.question6 = Question.objects.create(text='Name of WHO contact', UID='C00028', answer_type='Text',)
-    world.question7 = Question.objects.create(text='Email address of WHO contact', UID='C00029', answer_type='Text',)
+    world.question7 = Question.objects.create(text='Email address of WHO contact', UID='C00029', answer_type='Text')
     world.question8 = Question.objects.create(text='Total number of districts in the country', UID='C00030',
                                               answer_type='Number', answer_sub_type=AnswerTypes.INTEGER,
                                               instructions=""" A district is defined as the third administrative level
                                                (nation is the first, province is the second).""")
+    world.question9 = Question.objects.create(text='Email address of WHO contact', UID='C00031',
+                                              answer_type=AnswerTypes.MULTIPLE_RESPONSE)
+    world.option_1 = QuestionOptionFactory(question=world.question9, text='Yes')
+    world.option_2 = QuestionOptionFactory(question=world.question9, text='No')
 
     parent = QuestionGroup.objects.create(subsection=world.sub_section, order=1)
-    parent.question.add(world.question1, world.question2, world.question3, world.question4, world.question5, world.question6, world.question7, world.question8)
+    parent.question.add(world.question1, world.question2, world.question3, world.question4, world.question5,
+                        world.question6, world.question7, world.question8, world.question9)
 
     QuestionGroupOrder.objects.create(question=world.question1, question_group=parent, order=1)
     QuestionGroupOrder.objects.create(question=world.question2, question_group=parent, order=2)
@@ -66,6 +72,7 @@ def given_i_have_a_questionnaire_with_questions(step):
     QuestionGroupOrder.objects.create(question=world.question6, question_group=parent, order=6)
     QuestionGroupOrder.objects.create(question=world.question7, question_group=parent, order=7)
     QuestionGroupOrder.objects.create(question=world.question8, question_group=parent, order=8)
+    QuestionGroupOrder.objects.create(question=world.question9, question_group=parent, order=9)
 
 
 @step(u'And I navigate to the section of the questionnaire to be filled in')
@@ -85,6 +92,8 @@ def and_i_enter_valid_responses_to_the_questions(step):
         'Text-6-response': 'brad.wolfstrom@who.org',
         'Number-0-response': '200'}
     world.page.fill_form(world.valid_responses)
+    world.page.click_label_by_for_attribute('id_MultipleResponse-0-response_0')
+    world.page.click_label_by_for_attribute('id_MultipleResponse-0-response_1')
 
 @step(u'I click the save button')
 def when_i_click_the_save_button(step):
@@ -179,3 +188,8 @@ def when_i_choose_to_submit_my_modified_responses(step):
 def then_i_should_see_a_new_submitted_version_listed_in_my_home_page(step):
     step.given('When I am viewing the home page')
     assert world.page.is_element_present_by_id('view-version-%s' % world.questionnaire.id)
+
+@step(u'And the checkboxes should be checked')
+def and_the_checkboxes_should_be_checked(step):
+    world.page.validate_check_box_ischecked_by_id('id_MultipleResponse-0-response_0')
+    world.page.validate_check_box_ischecked_by_id('id_MultipleResponse-0-response_1')

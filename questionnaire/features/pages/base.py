@@ -133,3 +133,7 @@ class PageObject(object):
     def choose_this_value_in_this_select_order_by_this_name(self, value, select_order, name):
         script = "document.getElementsByName('%s')[%s].value = %s" % (name, select_order, value)
         self.browser.execute_script(script)
+
+    def click_label_by_for_attribute(self, for_attr):
+        script = '$($("label[for=%s]")[0]).click()' % for_attr
+        self.browser.execute_script(script)

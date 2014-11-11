@@ -52,3 +52,7 @@ class QuestionnairePage(PageObject):
 
     def validate_updated_numbering(self, question, question_number):
         assert self.get_text_of_element_by_id('label-question-%s' % question.id) == '%s%s' % (question_number, question.text)
+
+    def validate_check_box_ischecked_by_id(self, element_id):
+        script = '$($("#%s")[0]).is(":checked")' % element_id
+        assert_true(self.browser.evaluate_script(script))
