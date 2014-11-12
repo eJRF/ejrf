@@ -9,3 +9,6 @@ Vagrantfile
 screenshots/
 .ejrf-env
 node_modules
+media/
+sample_file.zip
+data-backup.json

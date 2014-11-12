@@ -64,7 +64,7 @@ class NumericalAnswerFormTest(BaseTest):
         answer_form = NumericalAnswerForm(form_data, initial=self.initial)
         self.assertFalse(answer_form.is_valid())
         message = 'Enter a number or Either NR or ND if this question is irrelevant'
-        self.assertEqual([message], answer_form.errors['response'])
+        self.assertEqual(message, answer_form.errors['response'])
 
     def test_text_response_is_valid_if_response_is_nd(self):
         form_data = self.form_data.copy()
@@ -79,7 +79,7 @@ class NumericalAnswerFormTest(BaseTest):
         self.assertFalse(answer_form.is_valid())
         message = 'Response should be a whole number.'
 
-        self.assertEqual([message], answer_form.errors['response'])
+        self.assertEqual(message, answer_form.errors['response'])
 
     def test_valid_if_response_is_zero(self):
         form_data = self.form_data.copy()
