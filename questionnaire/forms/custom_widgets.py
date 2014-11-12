@@ -10,6 +10,7 @@ from questionnaire.models import Question, SkipRule
 
 def get_rules(option_id, subsection):
         all_rules = SkipRule.objects.filter(response_id=option_id, subsection=subsection)
+        print all_rules
         question_rules = ''
         subsection_rules = ''
         if all_rules.exists():
@@ -95,12 +96,14 @@ class DataRuleRadioFieldRenderer(RadioFieldRenderer):
                            format_html_join("", '<li>{0}</li>', [(force_text(w),) for w in inputs]))
 
     def _add_attr(self, option):
-        option.attrs.update({'data-skip-rules': self._get_rules(option.choice_value)})
+        (question_rules, subsection_rules) = self._get_rules(option.choice_value)
+        option.attrs.update({'data-skip-rules': question_rules})
+        option.attrs.update({'data-skip-subsection': subsection_rules})
         return option
 
     def _get_rules(self, option):
-        (question_rules, subsection_rules) = get_rules(option, self.subsection)
-        return question_rules
+        return get_rules(option, self.subsection)
+
 
 
 class SkipRuleRadioWidget(forms.RadioSelect):
