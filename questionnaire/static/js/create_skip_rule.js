@@ -56,28 +56,26 @@ angular.module('questionnaireApp', [])
         $scope.fns.createRule = function() {
         };
 
-        var getFormData = function() {
-            return {
-                root_question: $scope.skipRule.rootQuestion.pk,
-                response: $scope.skipRule.questionResponse,
-                subsection: $scope.skipRule.subsectionId,
-                skip_question: $scope.skipRule.skipQuestion.pk,
-                csrfmiddlewaretoken: $scope.skipRule.csrfToken
+        var getSkipRuleFormdata = function(keyWord,value){
+             var formData = {
+                "root_question": $scope.skipRule.rootQuestion.pk,
+                "response": $scope.skipRule.questionResponse,
+                "subsection": $scope.skipRule.subsectionId,
+                "csrfmiddlewaretoken": $scope.skipRule.csrfToken
             };
+            formData[keyWord] = value;
+            return formData;
+        };
+
+        var getQuestionFormData = function() {
+            return getSkipRuleFormdata("skip_question", $scope.skipRule.skipQuestion.pk)
         };
 
         var getSubsectionFormData = function() {
-            return {
-                root_question: $scope.skipRule.rootQuestion.pk,
-                response: $scope.skipRule.questionResponse,
-                subsection: $scope.skipRule.subsectionId,
-                skip_subsection: $scope.skipRule.subsection.id,
-                csrfmiddlewaretoken: $scope.skipRule.csrfToken
-            };
+             return getSkipRuleFormdata("skip_subsection", $scope.skipRule.subsection.id)
         };
 
-        $scope.submitQuestionForm = function() {
-            var postData = getFormData();
+        var createSkipRule = function(postData) {
             $.post(window.url, postData)
                 .done(function(data) {
                     resetSkipRule();
@@ -98,31 +96,17 @@ angular.module('questionnaireApp', [])
                         });
                     }
                 });
+        };
+
+        $scope.submitQuestionForm = function() {
+            var postData = getQuestionFormData();
+            createSkipRule(postData);
         };
 
 
         $scope.submitSubsectionForm = function() {
             var postData = getSubsectionFormData();
-            $.post(window.url, postData)
-                .done(function(data) {
-                    resetSkipRule();
-                    $scope.$apply(function() {
-                        $scope.skipResult = { className: "alert-success", message: data.result, show: true};
-                    });
-                    $scope.skipRule.subsectionId = postData.subsection;
-                    updateRules(postData.subsection);
-                })
-                .fail(function(data) {
-                    if(data.result){
-                        $scope.$apply(function() {
-                            $scope.skipResult = { className: "alert-danger", message: data.result, show: true};
-                        });
-                    } else {
-                        $scope.$apply(function() {
-                            $scope.skipResult = { className: "alert-danger", message: data.responseJSON.result.join(","), show: true};
-                        });
-                    }
-                });
+            createSkipRule(postData);
         };
     }]);
 

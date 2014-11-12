@@ -5,6 +5,7 @@ var SkipRules = (function () {
 
     var allQuestionsToSkipFromSelects = [];
     var allQuestionsToSkipFromRadios = [];
+    var allHiddenQuestions = [];
 
     var hideQuestionById = function (id) {
         $('.form-group-question-' + id).hide();
@@ -14,8 +15,7 @@ var SkipRules = (function () {
     };
 
     $(document).ready(function() {
-        hideBasedOnRadios();
-        hideBasedOnSelects();
+        hideAllQuestions();
     });
 
     var getQuestionIdsToSkip = function (selectedElements) {
@@ -39,46 +39,32 @@ var SkipRules = (function () {
         });
     };
 
-    var hideQuestions = function(radioQuestionsToSkip, selectQuestionsToSkip) {
-        $.map($.merge($.merge([], radioQuestionsToSkip), selectQuestionsToSkip), function (val) {
-            hideQuestionById(val);
-        });
-    };
-
-    var hideBasedOnRadios = function () {
+    var hideAllQuestions = function() {
         var checkedRadios = $('[type="radio"]:checked');
-        var currentSkipQuestions = getQuestionIdsToSkip(checkedRadios);
-
-        showQuestions(allQuestionsToSkipFromRadios, currentSkipQuestions);
-        allQuestionsToSkipFromRadios = currentSkipQuestions;
-
-        hideQuestions(currentSkipQuestions, allQuestionsToSkipFromSelects);
+        var selectedOptions = $('option:selected');
+        var allSelectedResponses = [];
+        $.merge(allSelectedResponses, checkedRadios);
+        $.merge(allSelectedResponses, selectedOptions);
+        questionIdsToHide = getQuestionIdsToSkip(allSelectedResponses);
+        
+        showQuestions(allHiddenQuestions, questionIdsToHide);
+        $.map(questionIdsToHide, function(val) {hideQuestionById(val);});
+        allHiddenQuestions = questionIdsToHide; 
     };
 
-    allRadios.map(function (_, element) {
-        $(this).on('change', function () {
-            hideBasedOnRadios();
+    $.map(allRadios, function (element) {
+        $(element).on('change', function () {
+            hideAllQuestions();
         });
     });
 
-    var hideBasedOnSelects = function() {
-        var selectedOptions = $('option:selected');
-        var currentQuestionsToSkip = getQuestionIdsToSkip(selectedOptions);
-
-        showQuestions(allQuestionsToSkipFromSelects, currentQuestionsToSkip);
-        allQuestionsToSkipFromSelects = currentQuestionsToSkip;
-
-        hideQuestions(currentQuestionsToSkip, allQuestionsToSkipFromRadios);
-    };
-
-    allOptions.map(function (_, element) {
-        $(this).on('change', function () {
-            hideBasedOnSelects();
+    $.map(allOptions, function (element) {
+        $(element).on('change', function () {
+            hideAllQuestions();
         });
 
     });
     return {getQuestionIdsToSkip: getQuestionIdsToSkip,
             showQuestions:        showQuestions,
-            showQuestionById:     showQuestionById,
-            hideQuestions:        hideQuestions};
+            showQuestionById:     showQuestionById};
 })();

@@ -16,9 +16,13 @@ class MultiChoiceAnswerSelectWidget(forms.Select):
 
     def render_option(self, selected_choices, option_value, option_label):
         option_value = force_text(option_value)
+        print "*"*100
+        print option_value
         data_instruction = ''
         data_skip_rule = ''
         skip_question = ''
+        data_subsection_skip_rule = ''
+        skip_subsections = ''
 
         if option_value:
             question_option = self.question_options.get(id=int(option_value))
@@ -26,18 +30,22 @@ class MultiChoiceAnswerSelectWidget(forms.Select):
             rules_all = question_option.skip_rules.filter(subsection=self.subsection)
             if rules_all.exists():
                 rules_skipping_questions = filter(lambda rule: rule.skip_question is not None, rules_all)
+                rules_skipping_subsections = filter(lambda rule: rule.skip_subsection is not None, rules_all)
                 skip_question = ",".join(map(lambda rule: str(rule.skip_question.id), rules_skipping_questions))
+                skip_subsections = ",".join(map(lambda rule: str(rule.skip_subsection.id), rules_skipping_subsections))
             data_skip_rule = mark_safe(' data-skip-rules="%s"' % skip_question)
+            data_subsection_skip_rule = mark_safe(' data-skip-subsection="%s"' % skip_subsections)
         if option_value in selected_choices:
             selected_html = mark_safe(' selected="selected"')
         else:
             selected_html = ''
 
-        return format_html('<option value="{0}"{1}{2}{3}>{4}</option>',
+        return format_html('<option value="{0}"{1}{2}{3}{4}>{5}</option>',
                            option_value,
                            selected_html,
                            data_instruction,
                            data_skip_rule,
+                           data_subsection_skip_rule,
                            force_text(option_label))
 
 

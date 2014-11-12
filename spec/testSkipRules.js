@@ -19,7 +19,6 @@ describe("skip rules", function() {
     	
     	it("should return an single element collection when one elements has a data-skip-rule attribute", function(){
     		var actualResult = SkipRules.getQuestionIdsToSkip($('.singleElementWithAttr'));
-    		// console.log($('.singleElementWithAttr'));
 			expect(actualResult.length).toEqual(1);
 			expect(actualResult[0]).toEqual('23');
     	});
@@ -44,30 +43,6 @@ describe("skip rules", function() {
     		spyOn($.fn, 'show');
     		SkipRules.showQuestions(["23","43"],["23","43"]);
     		expect($.fn.show.calls.length).toEqual(0);
-    	});
-    });
-
-    describe("hideQuestions", function() {
-    	it("should not hide any questions when no radios or selects have been seleceted", function() {
-			spyOn($.fn, 'hide');
-			SkipRules.hideQuestions([],[]);
-			expect($.fn.hide.calls.length).toEqual(0);
-    	});
-    	it("should call hide once hide for one radio being selected", function() {
-			spyOn($.fn, 'hide');
-			SkipRules.hideQuestions(["1"],[]);
-			expect($.fn.hide.calls.length).toEqual(1);
-    	});
-    	it("should call hide once hide for one select being selected", function() {
-			spyOn($.fn, 'hide');
-			SkipRules.hideQuestions([],["2"]);
-			expect($.fn.hide.calls.length).toEqual(1);
-    	});
-
-    	it("should call hide twice hide for one select being selected and one radio buttun being selected", function() {
-			spyOn($.fn, 'hide');
-			SkipRules.hideQuestions(["1"],["2"]);
-			expect($.fn.hide.calls.length).toEqual(2);
     	});
     });
 });

@@ -23,9 +23,9 @@ class MultiChoiceAnswerSelectWidgetTest(BaseTest):
 
         widget = MultiChoiceAnswerSelectWidget(subsection, choices=choices, question_options=question.options.all())
 
-        expected_option_1 = '<option value="%d" selected="selected" data-instructions="%s" data-skip-rules="%s">%s</option>' % (
+        expected_option_1 = '<option value="%d" selected="selected" data-instructions="%s" data-skip-rules="%s" data-skip-subsection="">%s</option>' % (
             option1.id, option1.instructions, skip_rule.skip_question.id, option1.text)
-        expected_option_2 = '<option value="%d" data-instructions="%s" data-skip-rules="">%s</option>' % (
+        expected_option_2 = '<option value="%d" data-instructions="%s" data-skip-rules="" data-skip-subsection="">%s</option>' % (
             option2.id, option2.instructions, option2.text)
 
         self.assertEqual(expected_option_1,
