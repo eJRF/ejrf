@@ -57,6 +57,10 @@ class AnswerForm(ModelForm):
 
 
 class NumericalAnswerForm(AnswerForm):
+    ZERO = '0'
+    NR = 'NR'
+    ND = 'ND'
+
     class Meta:
         model = NumericalAnswer
         exclude = ('question', 'status', 'country', 'version', 'code', 'questionnaire')
@@ -67,14 +71,14 @@ class NumericalAnswerForm(AnswerForm):
 
     def _clean_response(self):
         response = self.cleaned_data.get('response', None)
-
-        if response and not (response == 'NR' or response == 'ND' or number_from(response)):
+        a_valid_number = number_from(response)
+        if not (response == self.ZERO or response == self.NR or response == self.ND or a_valid_number):
             self._errors['response'] = ['Enter a number or Either NR or ND if this question is irrelevant']
-        elif number_from(response) and self._matches_answer_sub_type(response):
+        elif a_valid_number and self._matches_answer_sub_type(a_valid_number):
             self._errors['response'] = ["Response should be a whole number."]
 
-    def _matches_answer_sub_type(self, response):
-        return AnswerTypes.is_integer(self.question.answer_sub_type) and not float(number_from(response)).is_integer()
+    def _matches_answer_sub_type(self, num):
+        return AnswerTypes.is_integer(self.question.answer_sub_type) and not float(num).is_integer()
 
 
 class TextAnswerForm(AnswerForm):

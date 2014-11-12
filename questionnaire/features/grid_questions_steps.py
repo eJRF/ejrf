@@ -85,4 +85,5 @@ def when_i_hover_the_errored_cell(step):
 
 @step(u'Then I should see the cell error message')
 def then_i_should_see_the_cell_error_message(step):
-    world.page.is_text_present('Enter a number.')
+    error_message = 'Enter a number or Either NR or ND if this question is irrelevant'
+    world.page.is_text_present(error_message)

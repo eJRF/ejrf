@@ -81,6 +81,12 @@ class NumericalAnswerFormTest(BaseTest):
 
         self.assertEqual([message], answer_form.errors['response'])
 
+    def test_valid_if_response_is_zero(self):
+        form_data = self.form_data.copy()
+        form_data['response'] = '0'
+        answer_form = NumericalAnswerForm(form_data, initial=self.initial)
+        self.assertTrue(answer_form.is_valid())
+
     def test_integer_response_is_valid_if_question_answer_subtype_is_decimal(self):
         question = QuestionFactory(answer_type=AnswerTypes.NUMBER, answer_sub_type=AnswerTypes.DECIMAL)
         form_data = self.form_data.copy()
