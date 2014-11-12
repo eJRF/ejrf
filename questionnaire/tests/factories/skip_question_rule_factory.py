@@ -12,5 +12,4 @@ class SkipQuestionFactory(factory.DjangoModelFactory):
 
     root_question = factory.SubFactory(QuestionFactory)
     response = factory.SubFactory(QuestionOptionFactory)
-    skip_question = factory.SubFactory(QuestionFactory)
     subsection = factory.SubFactory(SubSectionFactory)

@@ -19,14 +19,18 @@ class MultiChoiceAnswerSelectWidgetTest(BaseTest):
         option1 = QuestionOption.objects.create(text='tusker lager', question=question, instructions="yeah yeah")
         option2 = QuestionOption.objects.create(text='club', question=question, instructions="Are you crazy?")
         choices = ((option1.id, option1.text), (option2.id, option2.text))
-        skip_rule = SkipQuestionFactory(root_question=question, response=option1, subsection=subsection)
+        skip_question = QuestionFactory()
+        skip_rule = SkipQuestionFactory(root_question=question, response=option1, subsection=subsection,
+                                        skip_question=skip_question)
+        skip_rule2 = SkipQuestionFactory(root_question=question, response=option2, subsection=subsection,
+                                         skip_subsection=subsection)
 
         widget = MultiChoiceAnswerSelectWidget(subsection, choices=choices, question_options=question.options.all())
 
         expected_option_1 = '<option value="%d" selected="selected" data-instructions="%s" data-skip-rules="%s" data-skip-subsection="">%s</option>' % (
             option1.id, option1.instructions, skip_rule.skip_question.id, option1.text)
-        expected_option_2 = '<option value="%d" data-instructions="%s" data-skip-rules="" data-skip-subsection="">%s</option>' % (
-            option2.id, option2.instructions, option2.text)
+        expected_option_2 = '<option value="%d" data-instructions="%s" data-skip-rules="" data-skip-subsection="%s">%s</option>' % (
+            option2.id, option2.instructions, skip_rule2.skip_subsection.id, option2.text)
 
         self.assertEqual(expected_option_1,
                          widget.render_option(selected_choices=[str(option1.id)], option_value=option1.id,
@@ -73,9 +77,9 @@ class SkipRuleSelectWidgetTest(BaseTest):
 
         widget = SkipRuleRadioWidget(SubSectionFactory())
 
-        expected_stuff = '<ul>\n<li>'\
+        expected_stuff = '<ul>\n<li>' \
                          '<label><input checked="checked" data-skip-rules="" name="name" type="radio" value="%s" /> %s</label></li>' \
-                         '<li'\
+                         '<li' \
                          '><label><input data-skip-rules="" name="name" type="radio" value="2" /> Really</label></li>\n</ul>' \
                          % (option1.id, option1.text)
 
@@ -86,6 +90,8 @@ class SkipRuleSelectWidgetTest(BaseTest):
 class DataRuleRadioFieldRendererTest(BaseTest):
     def test_get_rules_for_option(self):
         question = Question.objects.create(text='what do you drink?', UID='C_2013', answer_type='MultiChoice')
+        skip_question = QuestionFactory()
+
         option1 = QuestionOption.objects.create(text='tusker lager', question=question, instructions="yeah yeah")
 
         subsection = SubSectionFactory()
@@ -94,10 +100,12 @@ class DataRuleRadioFieldRendererTest(BaseTest):
 
         question_group.question.add(question)
 
-        skip_rule = SkipQuestionFactory(root_question=question, response=option1, subsection=subsection)
+        skip_rule = SkipQuestionFactory(root_question=question, response=option1, subsection=subsection,
+                                        skip_question=skip_question)
 
         renderer = DataRuleRadioFieldRenderer('name', 1, attrs={},
-                                              choices=((option1.id, option1.text), ('2', 'Really'),), subsection=subsection)
+                                              choices=((option1.id, option1.text), ('2', 'Really'),),
+                                              subsection=subsection)
 
         rules_for_option_1 = renderer._get_rules(option1.id)
         expected_rule = str(skip_rule.skip_question.id)

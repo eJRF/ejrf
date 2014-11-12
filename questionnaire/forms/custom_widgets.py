@@ -16,8 +16,6 @@ class MultiChoiceAnswerSelectWidget(forms.Select):
 
     def render_option(self, selected_choices, option_value, option_label):
         option_value = force_text(option_value)
-        print "*"*100
-        print option_value
         data_instruction = ''
         data_skip_rule = ''
         skip_question = ''
