@@ -8,6 +8,17 @@ from django.utils.safestring import mark_safe
 from questionnaire.models import Question, SkipRule
 
 
+def get_rules(option_id, subsection):
+        all_rules = SkipRule.objects.filter(response_id=option_id, subsection=subsection)
+        question_rules = ''
+        subsection_rules = ''
+        if all_rules.exists():
+            rules_skipping_questions = filter(lambda rule: rule.skip_question is not None, all_rules)
+            rules_skipping_subsections = filter(lambda rule: rule.skip_subsection is not None, all_rules)
+            question_rules = ",".join(map(lambda rule: str(rule.skip_question.id), rules_skipping_questions))
+            subsection_rules = ",".join(map(lambda rule: str(rule.skip_subsection.id), rules_skipping_subsections))
+        return (question_rules, subsection_rules)
+
 class MultiChoiceAnswerSelectWidget(forms.Select):
     def __init__(self, subsection, attrs=None, choices=(), question_options=None):
         super(MultiChoiceAnswerSelectWidget, self).__init__(attrs, choices)
@@ -18,21 +29,15 @@ class MultiChoiceAnswerSelectWidget(forms.Select):
         option_value = force_text(option_value)
         data_instruction = ''
         data_skip_rule = ''
-        skip_question = ''
         data_subsection_skip_rule = ''
-        skip_subsections = ''
 
         if option_value:
             question_option = self.question_options.get(id=int(option_value))
             data_instruction = mark_safe(' data-instructions="%s"' % question_option.instructions)
-            rules_all = question_option.skip_rules.filter(subsection=self.subsection)
-            if rules_all.exists():
-                rules_skipping_questions = filter(lambda rule: rule.skip_question is not None, rules_all)
-                rules_skipping_subsections = filter(lambda rule: rule.skip_subsection is not None, rules_all)
-                skip_question = ",".join(map(lambda rule: str(rule.skip_question.id), rules_skipping_questions))
-                skip_subsections = ",".join(map(lambda rule: str(rule.skip_subsection.id), rules_skipping_subsections))
-            data_skip_rule = mark_safe(' data-skip-rules="%s"' % skip_question)
-            data_subsection_skip_rule = mark_safe(' data-skip-subsection="%s"' % skip_subsections)
+
+            (question_rules, subsection_rules) = get_rules(question_option, self.subsection)
+            data_skip_rule = mark_safe(' data-skip-rules="%s"' % question_rules)
+            data_subsection_skip_rule = mark_safe(' data-skip-subsection="%s"' % subsection_rules)
         if option_value in selected_choices:
             selected_html = mark_safe(' selected="selected"')
         else:
@@ -94,13 +99,8 @@ class DataRuleRadioFieldRenderer(RadioFieldRenderer):
         return option
 
     def _get_rules(self, option):
-        all_rules = SkipRule.objects.filter(response_id=option, subsection=self.subsection)
-        blank = ''
-        if all_rules.exists():
-            rules_skipping_questions = filter(lambda rule: rule.skip_question is not None, all_rules)
-            skip_question = ",".join(map(lambda rule: str(rule.skip_question.id), rules_skipping_questions))
-            return skip_question
-        return blank
+        (question_rules, subsection_rules) = get_rules(option, self.subsection)
+        return question_rules
 
 
 class SkipRuleRadioWidget(forms.RadioSelect):
