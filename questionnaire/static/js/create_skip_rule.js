@@ -66,8 +66,43 @@ angular.module('questionnaireApp', [])
             };
         };
 
-        $scope.submitForm = function() {
+        var getSubsectionFormData = function() {
+            return {
+                root_question: $scope.skipRule.rootQuestion.pk,
+                response: $scope.skipRule.questionResponse,
+                subsection: $scope.skipRule.subsectionId,
+                skip_subsection: $scope.skipRule.subsection.id,
+                csrfmiddlewaretoken: $scope.skipRule.csrfToken
+            };
+        };
+
+        $scope.submitQuestionForm = function() {
             var postData = getFormData();
+            $.post(window.url, postData)
+                .done(function(data) {
+                    resetSkipRule();
+                    $scope.$apply(function() {
+                        $scope.skipResult = { className: "alert-success", message: data.result, show: true};
+                    });
+                    $scope.skipRule.subsectionId = postData.subsection;
+                    updateRules(postData.subsection);
+                })
+                .fail(function(data) {
+                    if(data.result){
+                        $scope.$apply(function() {
+                            $scope.skipResult = { className: "alert-danger", message: data.result, show: true};
+                        });
+                    } else {
+                        $scope.$apply(function() {
+                            $scope.skipResult = { className: "alert-danger", message: data.responseJSON.result.join(","), show: true};
+                        });
+                    }
+                });
+        };
+
+
+        $scope.submitSubsectionForm = function() {
+            var postData = getSubsectionFormData();
             $.post(window.url, postData)
                 .done(function(data) {
                     resetSkipRule();

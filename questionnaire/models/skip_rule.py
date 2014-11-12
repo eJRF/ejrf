@@ -16,6 +16,13 @@ class SkipRule(BaseModel):
     subsection = models.ForeignKey(SubSection, blank=False, null=False, related_name="skip_rules")
 
     def to_dictionary(self):
-        return {'id': self.id, 'skip_question': self.skip_question.text,
-                'root_question': self.root_question.text,
-                'response': self.response.text}
+        if self.skip_question is not None:
+            return {'id': self.id,
+                    'skip_question': self.skip_question.text,
+                    'root_question': self.root_question.text,
+                    'response': self.response.text}
+        else:
+            return {'id': self.id,
+                    'skip_subsection': (" %s. %s" % (self.skip_subsection.order, self.skip_subsection.title)),
+                    'root_question': self.root_question.text,
+                    'response': self.response.text}

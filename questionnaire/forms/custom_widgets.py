@@ -25,7 +25,8 @@ class MultiChoiceAnswerSelectWidget(forms.Select):
             data_instruction = mark_safe(' data-instructions="%s"' % question_option.instructions)
             rules_all = question_option.skip_rules.filter(subsection=self.subsection)
             if rules_all.exists():
-                skip_question = ",".join(map(lambda rule: str(rule.skip_question.id), rules_all))
+                rules_skipping_questions = filter(lambda rule: rule.skip_question is not None, rules_all)
+                skip_question = ",".join(map(lambda rule: str(rule.skip_question.id), rules_skipping_questions))
             data_skip_rule = mark_safe(' data-skip-rules="%s"' % skip_question)
         if option_value in selected_choices:
             selected_html = mark_safe(' selected="selected"')
@@ -90,7 +91,9 @@ class DataRuleRadioFieldRenderer(RadioFieldRenderer):
         all_rules = SkipRule.objects.filter(response_id=option, subsection=self.subsection)
         blank = ''
         if all_rules.exists():
-            return ",".join(map(lambda rule: str(rule.skip_question.id), all_rules))
+            rules_skipping_questions = filter(lambda rule: rule.skip_question is not None, all_rules)
+            skip_question = ",".join(map(lambda rule: str(rule.skip_question.id), rules_skipping_questions))
+            return skip_question
         return blank
 
 

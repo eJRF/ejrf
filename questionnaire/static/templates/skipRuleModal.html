@@ -8,7 +8,7 @@
                                    data-ng-click="setActiveTab('existingRulesTab')">Existing Rules</a></li>
     </ul>
     <div id="newRuleTab" data-ng-show="activeTab == 'newRuleTab'">
-        <form method="post" class="form-horizontal" id="sumbit-skip-rule" name="skipForm" data-ng-submit="submitForm()">
+        <form method="post" class="form-horizontal" id="sumbit-skip-rule" name="skipForm" data-ng-submit="submitQuestionForm()">
             <div class="modal-body question-group indent">
                 <div data-ng-class="skipResult.className" class="alert" data-ng-show="skipResult.show">
                     {{skipResult.message}}
@@ -65,7 +65,7 @@
         </form>
     </div>
     <div id="newSubsectionRuleTab" data-ng-show="activeTab == 'newSubsectionRuleTab'">
-        <form method="post" class="form-horizontal" name="skipForm" data-ng-submit="submitForm()">
+        <form method="post" class="form-horizontal" name="skipForm" data-ng-submit="submitSubsectionForm()">
             <div class="modal-body question-group indent">
                 <div data-ng-class="skipResult.className" class="alert" data-ng-show="skipResult.show">
                     {{skipResult.message}}
@@ -131,7 +131,9 @@
                     </div>
                     <div class="form-group"><label class="col-sm-2 control-label">Response</label>{{rule.response}}
                     </div>
-                    <div class="form-group"><label class="col-sm-2 control-label">Question to Skip</label>{{rule.skip_question}}
+                    <div class="form-group" data-ng-show="rule.skip_question !== Null"><label class="col-sm-2 control-label">Question to Skip</label>{{rule.skip_question}}
+                    </div>
+                    <div class="form-group" data-ng-show="rule.skip_subsection !== Null"><label class="col-sm-2 control-label">Subsection to Skip</label>{{rule.skip_subsection}}
                     </div>
                     <hr/>
                 </div>
