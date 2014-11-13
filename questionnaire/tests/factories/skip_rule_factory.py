@@ -6,7 +6,7 @@ from questionnaire.tests.factories.question_option_factory import QuestionOption
 from questionnaire.tests.factories.sub_section_factory import SubSectionFactory
 
 
-class SkipQuestionFactory(factory.DjangoModelFactory):
+class SkipRuleFactory(factory.DjangoModelFactory):
     class Meta:
         model = SkipRule
 

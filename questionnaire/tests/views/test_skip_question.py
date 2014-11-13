@@ -5,7 +5,7 @@ from django.test import Client
 from questionnaire.tests.base_test import BaseTest
 from questionnaire.models import Question, SkipRule, QuestionOption, Questionnaire, Section, SubSection, \
     QuestionGroup, QuestionGroupOrder
-from questionnaire.tests.factories.skip_question_rule_factory import SkipQuestionFactory
+from questionnaire.tests.factories.skip_rule_factory import SkipRuleFactory
 
 
 class SkipQuestionPostTest(BaseTest):
@@ -135,7 +135,7 @@ class SkipQuestionPostTest(BaseTest):
 
 class SkipQuestionGetTest(BaseTest):
     def setUp(self):
-        self.skip_rule = SkipQuestionFactory()
+        self.skip_rule = SkipRuleFactory()
         self.client = Client()
         user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
         self.assign('can_edit_questionnaire', user)

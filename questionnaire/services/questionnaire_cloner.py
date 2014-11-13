@@ -20,6 +20,7 @@ class QuestionnaireClonerService(object):
         self.questionnaire.save()
         self.sections = self._clone_sections()
         self.sub_sections = self._clone_sub_sections()
+        self._clone_skip_rules()
         self.question_groups = self._clone_question_groups()
         self._assign_sub_groups()
         self._assign_questions_to_groups()
@@ -35,6 +36,14 @@ class QuestionnaireClonerService(object):
         sections = self.original_questionnaire.sections.all()
         fields = ['name', 'title', 'description', 'order']
         return create_copies(sections, self.region, fields, questionnaire=self.questionnaire)
+
+    def _clone_skip_rules_for_subsection(self, rules, new_subsection):
+        map(lambda rule: new_subsection.skip_rules.create(skip_question=rule.skip_question, response=rule.response,
+                                                          root_question=rule.root_question, skip_subsection=rule.skip_subsection), rules)
+
+    def _clone_skip_rules(self):
+        map(lambda (old, new): self._clone_skip_rules_for_subsection(old.skip_rules.all(), new),
+            self.sub_sections.iteritems())
 
     def _clone_sub_sections(self):
         sub_sections_map = {}

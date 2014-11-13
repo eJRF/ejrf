@@ -6,7 +6,7 @@ from questionnaire.models import Question, QuestionOption, Theme
 from questionnaire.tests.base_test import BaseTest
 from questionnaire.tests.factories.question_factory import QuestionFactory
 from questionnaire.tests.factories.question_group_factory import QuestionGroupFactory
-from questionnaire.tests.factories.skip_question_rule_factory import SkipQuestionFactory
+from questionnaire.tests.factories.skip_rule_factory import SkipRuleFactory
 from questionnaire.tests.factories.sub_section_factory import SubSectionFactory
 
 
@@ -20,9 +20,9 @@ class MultiChoiceAnswerSelectWidgetTest(BaseTest):
         option2 = QuestionOption.objects.create(text='club', question=question, instructions="Are you crazy?")
         choices = ((option1.id, option1.text), (option2.id, option2.text))
         skip_question = QuestionFactory()
-        skip_rule = SkipQuestionFactory(root_question=question, response=option1, subsection=subsection,
+        skip_rule = SkipRuleFactory(root_question=question, response=option1, subsection=subsection,
                                         skip_question=skip_question)
-        skip_rule2 = SkipQuestionFactory(root_question=question, response=option2, subsection=subsection,
+        skip_rule2 = SkipRuleFactory(root_question=question, response=option2, subsection=subsection,
                                          skip_subsection=subsection)
 
         widget = MultiChoiceAnswerSelectWidget(subsection, choices=choices, question_options=question.options.all())
@@ -79,9 +79,9 @@ class SkipRuleSelectWidgetTest(BaseTest):
         option2 = QuestionOption.objects.create(text='tusker lager 2', question=question, instructions="ok yeah yeah")
         question_group.question.add(question)
         skip_question = QuestionFactory()
-        skip_rule = SkipQuestionFactory(root_question=question, response=option1, subsection=subsection,
+        skip_rule = SkipRuleFactory(root_question=question, response=option1, subsection=subsection,
                                         skip_question=skip_question)
-        skip_rule2 = SkipQuestionFactory(root_question=question, response=option1, subsection=subsection,
+        skip_rule2 = SkipRuleFactory(root_question=question, response=option1, subsection=subsection,
                                          skip_subsection=subsection)
         widget = SkipRuleRadioWidget(subsection)
 
@@ -109,10 +109,10 @@ class DataRuleRadioFieldRendererTest(BaseTest):
 
         question_group.question.add(question)
 
-        skip_rule = SkipQuestionFactory(root_question=question, response=option1, subsection=subsection,
+        skip_rule = SkipRuleFactory(root_question=question, response=option1, subsection=subsection,
                                         skip_question=skip_question)
 
-        skip_rule2 = SkipQuestionFactory(root_question=question, response=option1, subsection=subsection,
+        skip_rule2 = SkipRuleFactory(root_question=question, response=option1, subsection=subsection,
                                          skip_subsection=subsection)
 
         renderer = DataRuleRadioFieldRenderer('name', 1, attrs={},
