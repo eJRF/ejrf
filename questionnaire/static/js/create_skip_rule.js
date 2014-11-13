@@ -12,6 +12,16 @@ angular.module('questionnaireApp', [])
             $scope.skipRule = {selectedQuestion: {}, rootQuestion: {}, csrfToken: window.csrfToken};
         };
 
+        $scope.getSubsectionTile = function(subsection) {
+            var res = subsection.order + ". ";
+            if (subsection.title !== '') {
+                res += subsection.title;
+            } else {
+                res += "[Un-named subsection]";
+            }
+            return res;
+        };
+
         resetSkipRule();
         $scope.questions = [];
         $scope.existingRules = [];
