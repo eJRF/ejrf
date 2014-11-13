@@ -190,9 +190,10 @@ class QuestionnaireClonerServiceTest(BaseTest):
 
         new, old = QuestionnaireClonerService(self.questionnaire).clone()
         new_subsection = new.sub_sections().filter(title=self.sub_section1.title, order=self.sub_section1.order)
+        new_skipped_subsection = new.sub_sections().filter(title=self.sub_section2.title, order=self.sub_section2.order)
         self.assertEqual(new_subsection.count(), 1)
         cloned_rules = new_subsection[0].skip_rules.all()
         self.assertEqual(cloned_rules.count(), 1)
-        self.assertEqual(cloned_rules[0].skip_subsection, rule.skip_subsection)
+        self.assertEqual(cloned_rules[0].skip_subsection, new_skipped_subsection[0])
         self.assertEqual(cloned_rules[0].root_question, rule.root_question)
         self.assertEqual(cloned_rules[0].response, rule.response)

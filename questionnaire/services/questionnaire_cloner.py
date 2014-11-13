@@ -39,7 +39,11 @@ class QuestionnaireClonerService(object):
 
     def _clone_skip_rules_for_subsection(self, rules, new_subsection):
         map(lambda rule: new_subsection.skip_rules.create(skip_question=rule.skip_question, response=rule.response,
-                                                          root_question=rule.root_question, skip_subsection=rule.skip_subsection), rules)
+                                                          root_question=rule.root_question,
+                                                          skip_subsection=self._get_new_subsection_by(rule)), rules)
+
+    def _get_new_subsection_by(self, rule):
+        return self.sub_sections.get(rule.skip_subsection, None)
 
     def _clone_skip_rules(self):
         map(lambda (old, new): self._clone_skip_rules_for_subsection(old.skip_rules.all(), new),
