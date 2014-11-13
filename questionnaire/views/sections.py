@@ -1,4 +1,5 @@
 import json
+
 from braces.views import PermissionRequiredMixin
 from django.contrib import messages
 from django.core.urlresolvers import reverse
@@ -9,7 +10,7 @@ from questionnaire.forms.sections import SectionForm, SubSectionForm
 from questionnaire.mixins import RegionAndPermissionRequiredMixin, DoesNotExistExceptionHandlerMixin, \
     OwnerAndPermissionRequiredMixin
 from questionnaire.models import Section, SubSection
-from questionnaire.services.question_re_indexer import QuestionReIndexer
+from questionnaire.services.question_re_indexer import QuestionReIndexer, SubSectionReIndexer
 from questionnaire.utils.model_utils import reindex_orders_in
 
 
@@ -188,19 +189,11 @@ class ReOrderQuestions(PermissionRequiredMixin, View):
         return HttpResponseRedirect(sub_section.get_absolute_url())
 
 
-class MoveSubsection(View):
-    def post(self, request, subsection_id, *args, **kwargs):
-        subsection_id = request.POST['subsection']
-        subsection = SubSection.objects.get(id=subsection_id)
-        section = subsection.section
-        url = '/questionnaire/entry/%d/section/%d/' % (section.questionnaire.id, section.id)
-        order = request.POST['order']
-        to_swap = section.sub_sections.filter(order=order)
-        old_order = subsection.order
-        if to_swap.exists():
-            to_swap_ = to_swap[0]
-            to_swap_.order = old_order
-            to_swap_.save()
-        subsection.order = order
-        subsection.save()
-        return HttpResponseRedirect(url)
+class MoveSubsection(PermissionRequiredMixin, View):
+    permission_required = 'auth.can_edit_questionnaire'
+
+    def post(self, request, *args, **kwargs):
+        subsection = SubSection.objects.get(id=kwargs.get('subsection_id'))
+        order = request.POST.get('order')
+        SubSectionReIndexer(subsection, order)
+        return HttpResponseRedirect(subsection.get_absolute_url())

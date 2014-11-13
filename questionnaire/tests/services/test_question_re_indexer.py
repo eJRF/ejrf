@@ -128,20 +128,33 @@ class TestQuestionReIndexer(BaseTest):
 
 
 class SubsectionReIndexerServiceTest(BaseTest):
+
     def setUp(self):
         self.section = SectionFactory()
+        self.subsection1 = SubSectionFactory(order=1, section=self.section)
+        self.subsection2 = SubSectionFactory(order=2, section=self.section)
+        self.subsection3 = SubSectionFactory(order=3, section=self.section)
+        self.subsection4 = SubSectionFactory(order=4, section=self.section)
+        self.subsection5 = SubSectionFactory(order=5, section=self.section)
+        self.subsection6 = SubSectionFactory(order=6, section=self.section)
 
-    def test_move_sub_section_displaces_other_subsections(self):
-
-        subsection1 = SubSectionFactory(order=1, section=self.section)
-        subsection2 = SubSectionFactory(order=2, section=self.section)
-        subsection3 = SubSectionFactory(order=3, section=self.section)
-        subsection4 = SubSectionFactory(order=4, section=self.section)
-        subsection5 = SubSectionFactory(order=5, section=self.section)
-        subsection6 = SubSectionFactory(order=6, section=self.section)
-
-        subsection_indexer = SubSectionReIndexer(subsection3, 5)
+    def test_swap_for_the_first_two_subsections(self):
+        subsection_indexer = SubSectionReIndexer(self.subsection1, 2)
         section_objects_order_by = subsection_indexer.reorder()
-        subsections_in_new_orders = [subsection1, subsection2, subsection4, subsection5, subsection3, subsection6]
+        subsections_in_new_orders = [self.subsection2, self.subsection1, self.subsection3, self.subsection4, self.subsection5, self.subsection6]
+        self.assertEqual(section_objects_order_by, subsections_in_new_orders)
+
+    def test_move_sub_section_displaces_other_subsections_forwards(self):
+        subsection_indexer = SubSectionReIndexer(self.subsection3, 5)
+        section_objects_order_by = subsection_indexer.reorder()
+        subsections_in_new_orders = [self.subsection1, self.subsection2, self.subsection4, self.subsection5, self.subsection3, self.subsection6]
 
         self.assertEqual(section_objects_order_by, subsections_in_new_orders)
+
+    def test_move_sub_section_displaces_other_subsection_backwards(self):
+        subsection_indexer = SubSectionReIndexer(self.subsection6, 2)
+        section_objects_order_by = subsection_indexer.reorder()
+        subsections_in_new_orders = [self.subsection1, self.subsection6, self.subsection2, self.subsection3, self.subsection4, self.subsection5]
+
+        self.assertEqual(section_objects_order_by, subsections_in_new_orders)
+

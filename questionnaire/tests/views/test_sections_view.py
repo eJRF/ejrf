@@ -1,11 +1,15 @@
 import json
+
 from urllib import quote
 
 from django.core.urlresolvers import reverse
+
 from django.test import Client
+from mock import MagicMock, patch
 
 from questionnaire.forms.sections import SectionForm, SubSectionForm
 from questionnaire.models import Questionnaire, Section, SubSection, Region
+from questionnaire.services.question_re_indexer import SubSectionReIndexer
 from questionnaire.tests.base_test import BaseTest
 from questionnaire.tests.factories.sub_section_factory import SubSectionFactory
 
@@ -363,68 +367,26 @@ class MoveSubsectionTest(BaseTest):
 
         self.assign('can_edit_questionnaire', self.user)
         self.client.login(username=self.user.username, password='pass')
+
         self.subsection = SubSectionFactory(order=1)
-        self.url = '/subsection/%d/move/' % self.subsection.id
+
         self.section = self.subsection.section
 
-    def test_moves_to_new_position(self):
-        section = self.subsection.section
+        self.subsection2 = SubSectionFactory(order=2, section=self.section)
+        self.subsection3 = SubSectionFactory(order=3, section=self.section)
 
+        self.url = '/subsection/%d/move/' % self.subsection.id
+
+
+    @patch("questionnaire.services.question_re_indexer.SubSectionReIndexer")
+    def test_that_reorder_service_gets_called(self, mock_sub_section_indexder):
         new_order = 2
+        mock_sub_section_indexder.reorder = MagicMock('reorder')
+
         response = self.client.post(self.url, data={'subsection': self.subsection.id, 'order': new_order})
-        self.assertRedirects(response, expected_url='/questionnaire/entry/%d/section/%d/' % (
-        section.questionnaire.id, self.section.id))
-        changed_subsection = SubSection.objects.get(id=self.subsection.id)
-        self.assertEqual(changed_subsection.order, new_order)
-
-    def test_move_other_subsection_one_order_lower(self):
-        subsection2 = SubSectionFactory(order=2, section=self.section)
-        subsection3 = SubSectionFactory(order=3, section=self.section)
-        new_order_for_section_1 = 2
-        new_order_for_section_2 = 1
-        new_order_for_section_3 = 3
-
-        response = self.client.post(self.url, data={'subsection': self.subsection.id, 'order': new_order_for_section_1})
-        expected_redirect_url = '/questionnaire/entry/%d/section/%d/' % (self.section.questionnaire.id, self.section.id)
-
-        self.assertRedirects(response, expected_url=expected_redirect_url)
-
-        changed_subsection = SubSection.objects.get(id=self.subsection.id)
-        changed_subsection2 = SubSection.objects.get(id=subsection2.id)
-        changed_subsection3 = SubSection.objects.get(id=subsection3.id)
-
-        self.assertEqual(changed_subsection.order, new_order_for_section_1)
-        self.assertEqual(changed_subsection2.order, new_order_for_section_2)
-        self.assertEqual(changed_subsection3.order, new_order_for_section_3)
-
-    def test_move_section_displaces_other_subsections(self):
-        subsection2 = SubSectionFactory(order=2, section=self.section)
-        subsection3 = SubSectionFactory(order=3, section=self.section)
-        subsection4 = SubSectionFactory(order=4, section=self.section)
-        subsection5 = SubSectionFactory(order=5, section=self.section)
-        subsection6 = SubSectionFactory(order=6, section=self.section)
-
-        new_order_for_section_1 = 2
-        new_order_for_section_2 = 1
-        new_order_for_section_3 = 5
-
-        new_order_for_section_4 = 4
-
-        new_order_for_section_5 = 5
-        new_order_for_section_6 = 6
-
-        response = self.client.post(self.url, data={'subsection': self.subsection.id, 'order': new_order_for_section_1})
-        expected_redirect_url = '/questionnaire/entry/%d/section/%d/' % (self.section.questionnaire.id, self.section.id)
-
-        self.assertRedirects(response, expected_url=expected_redirect_url)
-
-        changed_subsection = SubSection.objects.get(id=self.subsection.id)
-        changed_subsection2 = SubSection.objects.get(id=subsection2.id)
-        changed_subsection3 = SubSection.objects.get(id=subsection3.id)
-
-        self.assertEqual(changed_subsection.order, new_order_for_section_1)
-        self.assertEqual(changed_subsection2.order, new_order_for_section_2)
-        self.assertEqual(changed_subsection3.order, new_order_for_section_3)
+        print response
+        self.assertEqual(302, response.status_code)
+        mock_sub_section_indexder.assert_called(mock_sub_section_indexder.reorder)
 
 
 class DeleteSubSectionsViewTest(BaseTest):
@@ -577,7 +539,7 @@ class SectionGetSubSectionsTest(BaseTest):
         self.region = self.user.user_profile.region
         self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013, region=self.region)
         self.section = Section.objects.create(name="section", questionnaire=self.questionnaire, order=1,
-                                                region=self.region)
+                                              region=self.region)
         self.url = '/questionnaire/section/%d/subsections/' % self.section.id
 
     def test_gets_subsections_for_a_section_with_no_subsections(self):
@@ -587,8 +549,8 @@ class SectionGetSubSectionsTest(BaseTest):
 
     def test_gets_subsections_for_a_section_with_one_subsection(self):
         subsection = SubSection.objects.create(title="subsection 1", section=self.section, order=1,
-                                                    region=self.region)
+                                               region=self.region)
 
         response = self.client.get(self.url)
         self.assertEqual(200, response.status_code)
-        self.assertEqual([{'title':'subsection 1', 'id': subsection.id, 'order': 1}], json.loads(response.content))
+        self.assertEqual([{'title': 'subsection 1', 'id': subsection.id, 'order': 1}], json.loads(response.content))
