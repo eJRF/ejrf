@@ -1,7 +1,6 @@
 import factory
 
 from questionnaire.models import Questionnaire
-from questionnaire.tests.factories.region_factory import RegionFactory
 
 
 class QuestionnaireFactory(factory.DjangoModelFactory):
@@ -12,4 +11,3 @@ class QuestionnaireFactory(factory.DjangoModelFactory):
     description = 'description'
     year = 2014
     status = Questionnaire.DRAFT
-    region = factory.SubFactory(RegionFactory)

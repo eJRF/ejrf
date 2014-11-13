@@ -186,3 +186,21 @@ class ReOrderQuestions(PermissionRequiredMixin, View):
         sub_section = SubSection.objects.get(id=kwargs.get('subsection_id'))
         QuestionReIndexer(self.request.POST).reorder_questions()
         return HttpResponseRedirect(sub_section.get_absolute_url())
+
+
+class MoveSubsection(View):
+    def post(self, request, subsection_id, *args, **kwargs):
+        subsection_id = request.POST['subsection']
+        subsection = SubSection.objects.get(id=subsection_id)
+        section = subsection.section
+        url = '/questionnaire/entry/%d/section/%d/' % (section.questionnaire.id, section.id)
+        order = request.POST['order']
+        to_swap = section.sub_sections.filter(order=order)
+        old_order = subsection.order
+        if to_swap.exists():
+            to_swap_ = to_swap[0]
+            to_swap_.order = old_order
+            to_swap_.save()
+        subsection.order = order
+        subsection.save()
+        return HttpResponseRedirect(url)

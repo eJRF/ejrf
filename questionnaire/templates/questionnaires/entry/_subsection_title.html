@@ -22,6 +22,10 @@
             <a data-href="{% url 'reorder_page' subsection.id %}" id="reorder-{{ subsection.id }}-subsection" href="#" class="btn btn-sm btn-default reorder-subsection" >
                 <span class="cyan"><span class="glyphicon glyphicon-sort-by-order"></span> ReOrder</span>
             </a>
+              <a href="" id="id--{{ subsection.id }}" class="btn btn-sm btn-default"
+               data-toggle="modal" data-target="#create-skip-rule" onClick="skipRules.updateSubsection({{ subsection.id }})">
+                <span class="cyan"><span class="glyphicon glyphicon-plus-sign"></span> Add Skip Rule</span>
+            </a>
 
             {% if perms.auth.can_edit_questionnaire and user.user_profile.region == subsection.region %}
                 <a href="" id="edit-subsection-{{ subsection.id }}" class="btn btn-sm btn-default" data-toggle="modal"

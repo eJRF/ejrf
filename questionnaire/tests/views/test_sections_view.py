@@ -7,6 +7,7 @@ from django.test import Client
 from questionnaire.forms.sections import SectionForm, SubSectionForm
 from questionnaire.models import Questionnaire, Section, SubSection, Region
 from questionnaire.tests.base_test import BaseTest
+from questionnaire.tests.factories.sub_section_factory import SubSectionFactory
 
 
 class SectionsViewTest(BaseTest):
@@ -352,6 +353,78 @@ class EditSubSectionsViewTest(BaseTest):
         section = SubSection.objects.filter(**form_data)
         self.failUnless(section)
         self.assertEqual('', section[0].title)
+
+
+class MoveSubsectionTest(BaseTest):
+    def setUp(self):
+        self.client = Client()
+        self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
+        self.region = None
+
+        self.assign('can_edit_questionnaire', self.user)
+        self.client.login(username=self.user.username, password='pass')
+        self.subsection = SubSectionFactory(order=1)
+        self.url = '/subsection/%d/move/' % self.subsection.id
+        self.section = self.subsection.section
+
+    def test_moves_to_new_position(self):
+        section = self.subsection.section
+
+        new_order = 2
+        response = self.client.post(self.url, data={'subsection': self.subsection.id, 'order': new_order})
+        self.assertRedirects(response, expected_url='/questionnaire/entry/%d/section/%d/' % (
+        section.questionnaire.id, self.section.id))
+        changed_subsection = SubSection.objects.get(id=self.subsection.id)
+        self.assertEqual(changed_subsection.order, new_order)
+
+    def test_move_other_subsection_one_order_lower(self):
+        subsection2 = SubSectionFactory(order=2, section=self.section)
+        subsection3 = SubSectionFactory(order=3, section=self.section)
+        new_order_for_section_1 = 2
+        new_order_for_section_2 = 1
+        new_order_for_section_3 = 3
+
+        response = self.client.post(self.url, data={'subsection': self.subsection.id, 'order': new_order_for_section_1})
+        expected_redirect_url = '/questionnaire/entry/%d/section/%d/' % (self.section.questionnaire.id, self.section.id)
+
+        self.assertRedirects(response, expected_url=expected_redirect_url)
+
+        changed_subsection = SubSection.objects.get(id=self.subsection.id)
+        changed_subsection2 = SubSection.objects.get(id=subsection2.id)
+        changed_subsection3 = SubSection.objects.get(id=subsection3.id)
+
+        self.assertEqual(changed_subsection.order, new_order_for_section_1)
+        self.assertEqual(changed_subsection2.order, new_order_for_section_2)
+        self.assertEqual(changed_subsection3.order, new_order_for_section_3)
+
+    def test_move_section_displaces_other_subsections(self):
+        subsection2 = SubSectionFactory(order=2, section=self.section)
+        subsection3 = SubSectionFactory(order=3, section=self.section)
+        subsection4 = SubSectionFactory(order=4, section=self.section)
+        subsection5 = SubSectionFactory(order=5, section=self.section)
+        subsection6 = SubSectionFactory(order=6, section=self.section)
+
+        new_order_for_section_1 = 2
+        new_order_for_section_2 = 1
+        new_order_for_section_3 = 5
+
+        new_order_for_section_4 = 4
+
+        new_order_for_section_5 = 5
+        new_order_for_section_6 = 6
+
+        response = self.client.post(self.url, data={'subsection': self.subsection.id, 'order': new_order_for_section_1})
+        expected_redirect_url = '/questionnaire/entry/%d/section/%d/' % (self.section.questionnaire.id, self.section.id)
+
+        self.assertRedirects(response, expected_url=expected_redirect_url)
+
+        changed_subsection = SubSection.objects.get(id=self.subsection.id)
+        changed_subsection2 = SubSection.objects.get(id=subsection2.id)
+        changed_subsection3 = SubSection.objects.get(id=subsection3.id)
+
+        self.assertEqual(changed_subsection.order, new_order_for_section_1)
+        self.assertEqual(changed_subsection2.order, new_order_for_section_2)
+        self.assertEqual(changed_subsection3.order, new_order_for_section_3)
 
 
 class DeleteSubSectionsViewTest(BaseTest):

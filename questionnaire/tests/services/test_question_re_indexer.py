@@ -1,7 +1,9 @@
 from questionnaire.models import Questionnaire, Section, SubSection, Question, QuestionOption, QuestionGroup, \
     QuestionGroupOrder
-from questionnaire.services.question_re_indexer import QuestionReIndexer
+from questionnaire.services.question_re_indexer import QuestionReIndexer, SubSectionReIndexer
 from questionnaire.tests.base_test import BaseTest
+from questionnaire.tests.factories.section_factory import SectionFactory
+from questionnaire.tests.factories.sub_section_factory import SubSectionFactory
 
 
 class TestQuestionReIndexer(BaseTest):
@@ -123,3 +125,23 @@ class TestQuestionReIndexer(BaseTest):
         self.assertEqual(order2, updated_orders.get(order=2))
         self.assertIn(self.question1, question_group1.ordered_questions())
         self.assertNotIn(self.question1, self.question_group.ordered_questions())
+
+
+class SubsectionReIndexerServiceTest(BaseTest):
+    def setUp(self):
+        self.section = SectionFactory()
+
+    def test_move_sub_section_displaces_other_subsections(self):
+
+        subsection1 = SubSectionFactory(order=1, section=self.section)
+        subsection2 = SubSectionFactory(order=2, section=self.section)
+        subsection3 = SubSectionFactory(order=3, section=self.section)
+        subsection4 = SubSectionFactory(order=4, section=self.section)
+        subsection5 = SubSectionFactory(order=5, section=self.section)
+        subsection6 = SubSectionFactory(order=6, section=self.section)
+
+        subsection_indexer = SubSectionReIndexer(subsection3, 5)
+        section_objects_order_by = subsection_indexer.reorder()
+        subsections_in_new_orders = [subsection1, subsection2, subsection4, subsection5, subsection3, subsection6]
+
+        self.assertEqual(section_objects_order_by, subsections_in_new_orders)

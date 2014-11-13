@@ -90,3 +90,6 @@ class SubSection(BaseModel):
         if subsections.exists():
             return subsections.latest('order').order + 1
         return 0
+
+    def __unicode__(self):
+        return "%s ,%s" % (str(self.order), self.title)

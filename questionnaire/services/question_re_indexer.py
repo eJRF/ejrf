@@ -1,6 +1,6 @@
 import copy
 
-from questionnaire.models import QuestionGroupOrder, QuestionGroup
+from questionnaire.models import QuestionGroupOrder, QuestionGroup, SubSection
 
 
 class QuestionReIndexer(object):
@@ -50,3 +50,17 @@ class QuestionReIndexer(object):
     def clean_values(self, value):
         value = filter(None, value)
         return value.split(",")
+
+
+class SubSectionReIndexer:
+    def __init__(self, subsection, new_order):
+        self.subsection = subsection
+        self.new_order = new_order
+
+    def reorder(self):
+        sub_sections = list(SubSection.objects.filter(section=self.subsection.section).order_by('order'))
+        subsection_to_swap = sub_sections.pop(self.subsection.order - 1)
+        sub_sections.insert(self.new_order - 1, subsection_to_swap)
+        return sub_sections
+
+
