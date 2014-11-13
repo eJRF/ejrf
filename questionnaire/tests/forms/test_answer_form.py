@@ -185,6 +185,8 @@ class DateAnswerFormTest(BaseTest):
 
     def test_valid(self):
         answer_form = DateAnswerForm(self.form_data, initial=self.initial)
+        answer_form.is_valid()
+        print answer_form.errors
         self.assertTrue(answer_form.is_valid())
 
 

@@ -63,7 +63,7 @@ class NumericalAnswerForm(AnswerForm):
 
     class Meta:
         model = NumericalAnswer
-        exclude = ('question', 'status', 'country', 'version', 'code', 'questionnaire')
+        exclude = ('question', 'status', 'country', 'version', 'code', 'questionnaire', 'old_response')
 
     def clean(self):
         self._clean_response()
@@ -96,7 +96,7 @@ class DateAnswerForm(AnswerForm):
 
     class Meta:
         model = DateAnswer
-        exclude = ('question', 'status', 'country', 'version', 'code', 'questionnaire')
+        exclude = ('question', 'status', 'country', 'version', 'code', 'questionnaire', 'old_response')
 
     def _get_date_widget(self, date_answer_sub_type):
         if date_answer_sub_type == "MM/YYYY":

@@ -1,21 +1,24 @@
 # -*- coding: utf-8 -*-
 import datetime
 from south.db import db
-from south.v2 import SchemaMigration
+from south.v2 import DataMigration
 from django.db import models
 
-
-class Migration(SchemaMigration):
+class Migration(DataMigration):
 
     def forwards(self, orm):
-        # Adding unique constraint on 'SkipQuestion', fields ['skip_question', 'root_question', 'response', 'subsection']
-        db.create_unique(u'questionnaire_skipquestion', ['skip_question_id', 'root_question_id', 'response_id', 'subsection_id'])
+        "Write your forwards methods here."
+        # Note: Remember to use orm['appname.ModelName'] rather than "from appname.models..."
+        for na in orm.numericalanswer.objects.all():
+            na.response = na.old_response
+            na.save()
 
+        for na in orm.dateanswer.objects.all():
+            na.response = na.old_response
+            na.save()
 
     def backwards(self, orm):
-        # Removing unique constraint on 'SkipQuestion', fields ['skip_question', 'root_question', 'response', 'subsection']
-        db.delete_unique(u'questionnaire_skipquestion', ['skip_question_id', 'root_question_id', 'response_id', 'subsection_id'])
-
+        "Write your backwards methods here."
 
     models = {
         u'auth.group': {
@@ -105,6 +108,7 @@ class Migration(SchemaMigration):
         'questionnaire.dateanswer': {
             'Meta': {'object_name': 'DateAnswer', '_ormbases': ['questionnaire.Answer']},
             u'answer_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['questionnaire.Answer']", 'unique': 'True', 'primary_key': 'True'}),
+            'old_response': ('django.db.models.fields.DateField', [], {'null': 'True'}),
             'response': ('django.db.models.fields.CharField', [], {'max_length': '10', 'null': 'True'})
         },
         'questionnaire.multichoiceanswer': {
@@ -112,10 +116,16 @@ class Migration(SchemaMigration):
             u'answer_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['questionnaire.Answer']", 'unique': 'True', 'primary_key': 'True'}),
             'response': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'answer'", 'null': 'True', 'to': "orm['questionnaire.QuestionOption']"})
         },
+        'questionnaire.multipleresponseanswer': {
+            'Meta': {'object_name': 'MultipleResponseAnswer', '_ormbases': ['questionnaire.Answer']},
+            u'answer_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['questionnaire.Answer']", 'unique': 'True', 'primary_key': 'True'}),
+            'response': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "'answers'", 'null': 'True', 'to': "orm['questionnaire.QuestionOption']"})
+        },
         'questionnaire.numericalanswer': {
             'Meta': {'object_name': 'NumericalAnswer', '_ormbases': ['questionnaire.Answer']},
             u'answer_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['questionnaire.Answer']", 'unique': 'True', 'primary_key': 'True'}),
-            'response': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '9', 'decimal_places': '2'})
+            'old_response': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '9', 'decimal_places': '2'}),
+            'response': ('django.db.models.fields.CharField', [], {'max_length': '9', 'null': 'True'})
         },
         'questionnaire.organization': {
             'Meta': {'object_name': 'Organization'},
@@ -208,15 +218,16 @@ class Migration(SchemaMigration):
             'region': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'sections'", 'null': 'True', 'to': "orm['questionnaire.Region']"}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '256'})
         },
-        'questionnaire.skipquestion': {
-            'Meta': {'unique_together': "(('root_question', 'response', 'skip_question', 'subsection'),)", 'object_name': 'SkipQuestion'},
+        'questionnaire.skiprule': {
+            'Meta': {'object_name': 'SkipRule'},
             'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
-            'response': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'response_option'", 'to': "orm['questionnaire.QuestionOption']"}),
-            'root_question': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'root_question'", 'to': "orm['questionnaire.Question']"}),
-            'skip_question': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'skip_question'", 'to': "orm['questionnaire.Question']"}),
-            'subsection': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'subsection'", 'to': "orm['questionnaire.SubSection']"})
+            'response': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'skip_rules'", 'to': "orm['questionnaire.QuestionOption']"}),
+            'root_question': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'root_skip_rules'", 'to': "orm['questionnaire.Question']"}),
+            'skip_question': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'skip_rules'", 'null': 'True', 'to': "orm['questionnaire.Question']"}),
+            'skip_subsection': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['questionnaire.SubSection']", 'null': 'True', 'blank': 'True'}),
+            'subsection': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'skip_rules'", 'to': "orm['questionnaire.SubSection']"})
         },
         'questionnaire.subsection': {
             'Meta': {'ordering': "('order',)", 'object_name': 'SubSection'},
@@ -265,3 +276,4 @@ class Migration(SchemaMigration):
     }
 
     complete_apps = ['questionnaire']
+    symmetrical = True

@@ -92,7 +92,7 @@ class NumericalAnswerTest(BaseTest):
     def test_numerical_answer_fields(self):
         answer = NumericalAnswer()
         fields = [str(item.attname) for item in answer._meta.fields]
-        self.assertEqual(11, len(fields))
+        self.assertEqual(12, len(fields))
         for field in ['id', 'created', 'modified', 'question_id', 'country_id', 'response', 'code', 'questionnaire_id']:
             self.assertIn(field, fields)
 
@@ -178,7 +178,7 @@ class DateAnswerTest(TestCase):
     def test_date_answer_fields(self):
         answer = DateAnswer()
         fields = [str(item.attname) for item in answer._meta.fields]
-        self.assertEqual(11, len(fields))
+        self.assertEqual(12, len(fields))
         for field in ['id', 'created', 'modified', 'question_id', 'country_id', 'response', 'code', 'questionnaire_id']:
             self.assertIn(field, fields)
 

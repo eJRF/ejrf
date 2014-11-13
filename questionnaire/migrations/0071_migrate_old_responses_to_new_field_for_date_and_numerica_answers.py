@@ -1,41 +1,31 @@
 # -*- coding: utf-8 -*-
 import datetime
 from south.db import db
-from south.v2 import SchemaMigration
+from south.v2 import DataMigration
 from django.db import models
 
-
-class Migration(SchemaMigration):
+class Migration(DataMigration):
 
     def forwards(self, orm):
-        # Removing unique constraint on 'SkipRule', fields ['skip_question', 'root_question', 'response', 'subsection']
-        db.delete_unique(u'questionnaire_skiprule', ['skip_question_id', 'root_question_id', 'response_id', 'subsection_id'])
+        "Write your forwards methods here."
+        # Note: Remember to use orm['appname.ModelName'] rather than "from appname.models..."
+        for na in orm.numericalanswer.objects.all():
+            na.old_response = na.response
+            na.save()
 
-        # Adding field 'SkipRule.skip_subsection'
-        db.add_column(u'questionnaire_skiprule', 'skip_subsection',
-                      self.gf('django.db.models.fields.related.ForeignKey')(to=orm['questionnaire.SubSection'], null=True, blank=True),
-                      keep_default=False)
-
-
-        # Changing field 'SkipRule.skip_question'
-        db.alter_column(u'questionnaire_skiprule', 'skip_question_id', self.gf('django.db.models.fields.related.ForeignKey')(null=True, to=orm['questionnaire.Question']))
-        # Adding unique constraint on 'SkipRule', fields ['skip_subsection', 'skip_question', 'root_question', 'response', 'subsection']
-        db.create_unique(u'questionnaire_skiprule', ['skip_subsection_id', 'skip_question_id', 'root_question_id', 'response_id', 'subsection_id'])
-
+        for na in orm.dateanswer.objects.all():
+            na.old_response = na.response
+            na.save()
 
     def backwards(self, orm):
-        # Removing unique constraint on 'SkipRule', fields ['skip_subsection', 'skip_question', 'root_question', 'response', 'subsection']
-        db.delete_unique(u'questionnaire_skiprule', ['skip_subsection_id', 'skip_question_id', 'root_question_id', 'response_id', 'subsection_id'])
+        "Write your backwards methods here."
+        for na in orm.numericalanswer.objects.all():
+            na.response = na.old_response
+            na.save()
 
-        # Deleting field 'SkipRule.skip_subsection'
-        db.delete_column(u'questionnaire_skiprule', 'skip_subsection_id')
-
-
-        # Changing field 'SkipRule.skip_question'
-        db.alter_column(u'questionnaire_skiprule', 'skip_question_id', self.gf('django.db.models.fields.related.ForeignKey')(default=None, to=orm['questionnaire.Question']))
-        # Adding unique constraint on 'SkipRule', fields ['skip_question', 'root_question', 'response', 'subsection']
-        db.create_unique(u'questionnaire_skiprule', ['skip_question_id', 'root_question_id', 'response_id', 'subsection_id'])
-
+        for na in orm.dateanswer.objects.all():
+            na.response = na.old_response
+            na.save()
 
     models = {
         u'auth.group': {
@@ -125,7 +115,8 @@ class Migration(SchemaMigration):
         'questionnaire.dateanswer': {
             'Meta': {'object_name': 'DateAnswer', '_ormbases': ['questionnaire.Answer']},
             u'answer_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['questionnaire.Answer']", 'unique': 'True', 'primary_key': 'True'}),
-            'response': ('django.db.models.fields.CharField', [], {'max_length': '10', 'null': 'True'})
+            'old_response': ('django.db.models.fields.DateField', [], {'null': 'True'}),
+            'response': ('django.db.models.fields.DateField', [], {'null': 'True'})
         },
         'questionnaire.multichoiceanswer': {
             'Meta': {'object_name': 'MultiChoiceAnswer', '_ormbases': ['questionnaire.Answer']},
@@ -140,6 +131,7 @@ class Migration(SchemaMigration):
         'questionnaire.numericalanswer': {
             'Meta': {'object_name': 'NumericalAnswer', '_ormbases': ['questionnaire.Answer']},
             u'answer_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['questionnaire.Answer']", 'unique': 'True', 'primary_key': 'True'}),
+            'old_response': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '9', 'decimal_places': '2'}),
             'response': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '9', 'decimal_places': '2'})
         },
         'questionnaire.organization': {
@@ -234,7 +226,7 @@ class Migration(SchemaMigration):
             'title': ('django.db.models.fields.CharField', [], {'max_length': '256'})
         },
         'questionnaire.skiprule': {
-            'Meta': {'unique_together': "(('root_question', 'response', 'skip_question', 'skip_subsection', 'subsection'),)", 'object_name': 'SkipRule'},
+            'Meta': {'object_name': 'SkipRule'},
             'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
@@ -291,3 +283,4 @@ class Migration(SchemaMigration):
     }
 
     complete_apps = ['questionnaire']
+    symmetrical = True

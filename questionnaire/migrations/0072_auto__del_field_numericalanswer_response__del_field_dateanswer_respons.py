@@ -8,14 +8,24 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
+        # Deleting field 'NumericalAnswer.response'
+        db.delete_column(u'questionnaire_numericalanswer', 'response')
 
-        # Changing field 'NumericalAnswer.response'
-        db.alter_column(u'questionnaire_numericalanswer', 'response', self.gf('django.db.models.fields.CharField')(max_length=9, null=True))
+        # Deleting field 'DateAnswer.response'
+        db.delete_column(u'questionnaire_dateanswer', 'response')
+
 
     def backwards(self, orm):
+        # Adding field 'NumericalAnswer.response'
+        db.add_column(u'questionnaire_numericalanswer', 'response',
+                      self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=9, decimal_places=2),
+                      keep_default=False)
 
-        # Changing field 'NumericalAnswer.response'
-        db.alter_column(u'questionnaire_numericalanswer', 'response', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=9, decimal_places=2))
+        # Adding field 'DateAnswer.response'
+        db.add_column(u'questionnaire_dateanswer', 'response',
+                      self.gf('django.db.models.fields.DateField')(null=True),
+                      keep_default=False)
+
 
     models = {
         u'auth.group': {
@@ -105,7 +115,7 @@ class Migration(SchemaMigration):
         'questionnaire.dateanswer': {
             'Meta': {'object_name': 'DateAnswer', '_ormbases': ['questionnaire.Answer']},
             u'answer_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['questionnaire.Answer']", 'unique': 'True', 'primary_key': 'True'}),
-            'response': ('django.db.models.fields.CharField', [], {'max_length': '10', 'null': 'True'})
+            'old_response': ('django.db.models.fields.DateField', [], {'null': 'True'})
         },
         'questionnaire.multichoiceanswer': {
             'Meta': {'object_name': 'MultiChoiceAnswer', '_ormbases': ['questionnaire.Answer']},
@@ -120,7 +130,7 @@ class Migration(SchemaMigration):
         'questionnaire.numericalanswer': {
             'Meta': {'object_name': 'NumericalAnswer', '_ormbases': ['questionnaire.Answer']},
             u'answer_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['questionnaire.Answer']", 'unique': 'True', 'primary_key': 'True'}),
-            'response': ('django.db.models.fields.CharField', [], {'max_length': '9', 'null': 'True'})
+            'old_response': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '9', 'decimal_places': '2'})
         },
         'questionnaire.organization': {
             'Meta': {'object_name': 'Organization'},
@@ -214,13 +224,14 @@ class Migration(SchemaMigration):
             'title': ('django.db.models.fields.CharField', [], {'max_length': '256'})
         },
         'questionnaire.skiprule': {
-            'Meta': {'unique_together': "(('root_question', 'response', 'skip_question', 'subsection'),)", 'object_name': 'SkipRule'},
+            'Meta': {'object_name': 'SkipRule'},
             'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
             'response': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'skip_rules'", 'to': "orm['questionnaire.QuestionOption']"}),
             'root_question': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'root_skip_rules'", 'to': "orm['questionnaire.Question']"}),
-            'skip_question': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'skip_rules'", 'to': "orm['questionnaire.Question']"}),
+            'skip_question': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'skip_rules'", 'null': 'True', 'to': "orm['questionnaire.Question']"}),
+            'skip_subsection': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['questionnaire.SubSection']", 'null': 'True', 'blank': 'True'}),
             'subsection': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'skip_rules'", 'to': "orm['questionnaire.SubSection']"})
         },
         'questionnaire.subsection': {

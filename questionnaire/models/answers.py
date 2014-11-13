@@ -38,6 +38,8 @@ class Answer(BaseModel):
 
 
 class NumericalAnswer(Answer):
+
+    old_response = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True)
     response = models.CharField(max_length=9, null=True)
 
     def __unicode__(self):
@@ -63,6 +65,8 @@ class TextAnswer(Answer):
 
 
 class DateAnswer(Answer):
+
+    old_response = models.DateField(null=True, blank=True)
     response = models.CharField(null=True, max_length=10)
 
     def __unicode__(self):

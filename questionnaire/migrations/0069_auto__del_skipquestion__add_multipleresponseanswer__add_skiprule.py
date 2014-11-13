@@ -8,11 +8,22 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Removing unique constraint on 'SkipQuestion', fields ['root_question', 'response', 'skip_question', 'subsection']
-        db.delete_unique(u'questionnaire_skipquestion', ['root_question_id', 'response_id', 'skip_question_id', 'subsection_id'])
-
         # Deleting model 'SkipQuestion'
         db.delete_table(u'questionnaire_skipquestion')
+
+        # Adding model 'MultipleResponseAnswer'
+        db.create_table(u'questionnaire_multipleresponseanswer', (
+            (u'answer_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['questionnaire.Answer'], unique=True, primary_key=True)),
+        ))
+        db.send_create_signal('questionnaire', ['MultipleResponseAnswer'])
+
+        # Adding M2M table for field response on 'MultipleResponseAnswer'
+        db.create_table(u'questionnaire_multipleresponseanswer_response', (
+            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+            ('multipleresponseanswer', models.ForeignKey(orm['questionnaire.multipleresponseanswer'], null=False)),
+            ('questionoption', models.ForeignKey(orm['questionnaire.questionoption'], null=False))
+        ))
+        db.create_unique(u'questionnaire_multipleresponseanswer_response', ['multipleresponseanswer_id', 'questionoption_id'])
 
         # Adding model 'SkipRule'
         db.create_table(u'questionnaire_skiprule', (
@@ -21,33 +32,31 @@ class Migration(SchemaMigration):
             ('modified', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, blank=True)),
             ('root_question', self.gf('django.db.models.fields.related.ForeignKey')(related_name='root_skip_rules', to=orm['questionnaire.Question'])),
             ('response', self.gf('django.db.models.fields.related.ForeignKey')(related_name='skip_rules', to=orm['questionnaire.QuestionOption'])),
-            ('skip_question', self.gf('django.db.models.fields.related.ForeignKey')(related_name='skip_rules', to=orm['questionnaire.Question'])),
+            ('skip_question', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='skip_rules', null=True, to=orm['questionnaire.Question'])),
+            ('skip_subsection', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['questionnaire.SubSection'], null=True, blank=True)),
             ('subsection', self.gf('django.db.models.fields.related.ForeignKey')(related_name='skip_rules', to=orm['questionnaire.SubSection'])),
         ))
         db.send_create_signal('questionnaire', ['SkipRule'])
 
-        # Adding unique constraint on 'SkipRule', fields ['root_question', 'response', 'skip_question', 'subsection']
-        db.create_unique(u'questionnaire_skiprule', ['root_question_id', 'response_id', 'skip_question_id', 'subsection_id'])
-
 
     def backwards(self, orm):
-        # Removing unique constraint on 'SkipRule', fields ['root_question', 'response', 'skip_question', 'subsection']
-        db.delete_unique(u'questionnaire_skiprule', ['root_question_id', 'response_id', 'skip_question_id', 'subsection_id'])
-
         # Adding model 'SkipQuestion'
         db.create_table(u'questionnaire_skipquestion', (
-            ('skip_question', self.gf('django.db.models.fields.related.ForeignKey')(related_name='skip_rules', to=orm['questionnaire.Question'])),
-            ('subsection', self.gf('django.db.models.fields.related.ForeignKey')(related_name='skip_rules', to=orm['questionnaire.SubSection'])),
+            ('skip_question', self.gf('django.db.models.fields.related.ForeignKey')(related_name='skip_question', to=orm['questionnaire.Question'])),
+            ('subsection', self.gf('django.db.models.fields.related.ForeignKey')(related_name='subsection', to=orm['questionnaire.SubSection'])),
             ('created', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, blank=True)),
-            ('response', self.gf('django.db.models.fields.related.ForeignKey')(related_name='skip_rules', to=orm['questionnaire.QuestionOption'])),
+            ('response', self.gf('django.db.models.fields.related.ForeignKey')(related_name='response_option', to=orm['questionnaire.QuestionOption'])),
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('root_question', self.gf('django.db.models.fields.related.ForeignKey')(related_name='root_skip_rules', to=orm['questionnaire.Question'])),
+            ('root_question', self.gf('django.db.models.fields.related.ForeignKey')(related_name='root_question', to=orm['questionnaire.Question'])),
             ('modified', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, blank=True)),
         ))
         db.send_create_signal('questionnaire', ['SkipQuestion'])
 
-        # Adding unique constraint on 'SkipQuestion', fields ['root_question', 'response', 'skip_question', 'subsection']
-        db.create_unique(u'questionnaire_skipquestion', ['root_question_id', 'response_id', 'skip_question_id', 'subsection_id'])
+        # Deleting model 'MultipleResponseAnswer'
+        db.delete_table(u'questionnaire_multipleresponseanswer')
+
+        # Removing M2M table for field response on 'MultipleResponseAnswer'
+        db.delete_table('questionnaire_multipleresponseanswer_response')
 
         # Deleting model 'SkipRule'
         db.delete_table(u'questionnaire_skiprule')
@@ -141,7 +150,7 @@ class Migration(SchemaMigration):
         'questionnaire.dateanswer': {
             'Meta': {'object_name': 'DateAnswer', '_ormbases': ['questionnaire.Answer']},
             u'answer_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['questionnaire.Answer']", 'unique': 'True', 'primary_key': 'True'}),
-            'response': ('django.db.models.fields.CharField', [], {'max_length': '10', 'null': 'True'})
+            'response': ('django.db.models.fields.DateField', [], {'null': 'True'})
         },
         'questionnaire.multichoiceanswer': {
             'Meta': {'object_name': 'MultiChoiceAnswer', '_ormbases': ['questionnaire.Answer']},
@@ -250,13 +259,14 @@ class Migration(SchemaMigration):
             'title': ('django.db.models.fields.CharField', [], {'max_length': '256'})
         },
         'questionnaire.skiprule': {
-            'Meta': {'unique_together': "(('root_question', 'response', 'skip_question', 'subsection'),)", 'object_name': 'SkipRule'},
+            'Meta': {'object_name': 'SkipRule'},
             'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
             'response': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'skip_rules'", 'to': "orm['questionnaire.QuestionOption']"}),
             'root_question': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'root_skip_rules'", 'to': "orm['questionnaire.Question']"}),
-            'skip_question': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'skip_rules'", 'to': "orm['questionnaire.Question']"}),
+            'skip_question': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'skip_rules'", 'null': 'True', 'to': "orm['questionnaire.Question']"}),
+            'skip_subsection': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['questionnaire.SubSection']", 'null': 'True', 'blank': 'True'}),
             'subsection': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'skip_rules'", 'to': "orm['questionnaire.SubSection']"})
         },
         'questionnaire.subsection': {
