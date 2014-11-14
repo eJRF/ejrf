@@ -70,7 +70,15 @@ class SkipSubsectionForm(SkipRuleForm):
     def clean(self):
         self._clean_is_unique()
         self._clean_root_question()
+        self._clean_subsection()
         return super(SkipSubsectionForm, self).clean()
+
+    def _clean_subsection(self):
+        skip_subsection = self.cleaned_data.get('skip_subsection', None)
+        subsection = self.cleaned_data.get('subsection', None)
+        if skip_subsection and subsection and skip_subsection.order < subsection.order:
+            self.errors['skip_subsection'] = [
+                'The subsection you have specified to skip comes before the root question.']
 
     def _clean_is_unique(self):
         root_question = self.cleaned_data.get('root_question', None)
@@ -85,6 +93,5 @@ class SkipSubsectionForm(SkipRuleForm):
     def _clean_root_question(self):
         skip_subsection = self.cleaned_data.get('skip_subsection', None)
         subsection = self.cleaned_data.get('subsection', None)
-
         if skip_subsection == subsection:
             self.errors['skip_subsection'] = ['You cannot skip the subsection which the root question is in.']

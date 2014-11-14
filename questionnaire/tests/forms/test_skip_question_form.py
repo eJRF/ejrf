@@ -134,3 +134,17 @@ class SkipSubsectionRuleFormTest(BaseTest):
         self.assertFalse(skip_subsection_rule_form.is_valid())
         errors = 'You cannot skip the subsection which the root question is in.'
         self.assertIn(errors, skip_subsection_rule_form.errors['skip_subsection'])
+
+    def test_is_invalid_if_root_question_subsection_has_order_greater_than_subsection_to_skip(self):
+        subsection = SubSectionFactory(order=1)
+        question_group = QuestionGroupFactory()
+        root_question = QuestionFactory(text='Another question')
+        root_question.question_group.add(question_group)
+        subsection.question_group.add(question_group)
+
+        data = self.form_data
+        data['skip_subsection'] = subsection.id
+        skip_subsection_rule_form = SkipSubsectionForm(data=data)
+        self.assertFalse(skip_subsection_rule_form.is_valid())
+        errors = 'The subsection you have specified to skip comes before the root question.'
+        self.assertIn(errors, skip_subsection_rule_form.errors['skip_subsection'])
