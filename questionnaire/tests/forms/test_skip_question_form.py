@@ -5,6 +5,7 @@ from questionnaire.tests.base_test import BaseTest
 from questionnaire.tests.factories.question_factory import QuestionFactory
 from questionnaire.tests.factories.question_group_factory import QuestionGroupFactory
 from questionnaire.tests.factories.question_option_factory import QuestionOptionFactory
+from questionnaire.tests.factories.skip_rule_factory import SkipQuestionRuleFactory
 from questionnaire.tests.factories.sub_section_factory import SubSectionFactory
 
 
@@ -90,3 +91,13 @@ class SkipQuestionRuleFormTest(BaseTest):
 
         skip_question_rule_form = SkipRuleForm(data=data)
         self.assertFalse(skip_question_rule_form.is_valid())
+
+    def test_is_skip_question_unique(self):
+        SkipQuestionRuleFactory(subsection=self.subsection, root_question=self.root_question, response=self.response,
+                                skip_question=self.question_to_skip)
+        skip_question_form = SkipQuestionForm(data=self.form_data)
+        is_valid = skip_question_form.is_valid()
+        self.assertFalse(is_valid)
+        errors = 'This rule already exists'
+        self.assertIn(errors, skip_question_form.errors['root_question'])
+

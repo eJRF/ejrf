@@ -32,7 +32,17 @@ class SkipQuestionForm(SkipRuleForm):
 
     def clean(self):
         self._clean_root_question()
+        self._clean_is_unique()
         return super(SkipQuestionForm, self).clean()
+
+    def _clean_is_unique(self):
+        root_question = self.cleaned_data.get('root_question', None)
+        skip_question = self.cleaned_data.get('skip_question', None)
+        subsection = self.cleaned_data.get('subsection', None)
+        response = self.cleaned_data.get('response', None)
+        rules = SkipQuestion.objects.filter(root_question=root_question,skip_question=skip_question,subsection=subsection,response=response)
+        if rules.exists():
+            self._errors['root_question'] = ["This rule already exists"]
 
     def _clean_root_question(self):
         root_question = self.cleaned_data.get('root_question', None)
