@@ -1,8 +1,9 @@
 from questionnaire.models import Question, QuestionGroup, Questionnaire, SubSection, Section, QuestionOption, \
     QuestionGroupOrder
+from questionnaire.models.skip_rule import SkipQuestion, SkipSubsection
 from questionnaire.services.questionnaire_cloner import QuestionnaireClonerService
 from questionnaire.tests.base_test import BaseTest
-from questionnaire.tests.factories.skip_rule_factory import SkipRuleFactory
+from questionnaire.tests.factories.skip_rule_factory import SkipQuestionRuleFactory, SkipSubsectionRuleFactory
 
 
 class QuestionnaireClonerServiceTest(BaseTest):
@@ -163,7 +164,7 @@ class QuestionnaireClonerServiceTest(BaseTest):
         QuestionGroupOrder.objects.create(order=1, question_group=self.parent10, question=self.primary_question)
         QuestionGroupOrder.objects.create(order=2, question_group=self.parent10, question=self.question1)
         QuestionGroupOrder.objects.create(order=3, question_group=self.parent10, question=self.question2)
-        skip_question_2_rule = SkipRuleFactory(root_question=self.primary_question, skip_question=self.question1,
+        skip_question_2_rule = SkipQuestionRuleFactory(root_question=self.primary_question, skip_question=self.question1,
                                                     subsection=self.sub_section1, response=self.option)
 
         self.assertEqual(3, Question.objects.all().count())
@@ -171,7 +172,7 @@ class QuestionnaireClonerServiceTest(BaseTest):
         new, old = QuestionnaireClonerService(self.questionnaire).clone()
         new_subsection = new.sub_sections().filter(title=self.sub_section1.title, order=self.sub_section1.order)
         self.assertEqual(new_subsection.count(), 1)
-        cloned_rules = new_subsection[0].skip_rules.all()
+        cloned_rules = SkipQuestion.objects.filter(subsection=new_subsection)
         self.assertEqual(cloned_rules.count(), 1)
         self.assertEqual(cloned_rules[0].skip_question, skip_question_2_rule.skip_question)
         self.assertEqual(cloned_rules[0].root_question, skip_question_2_rule.root_question)
@@ -183,7 +184,7 @@ class QuestionnaireClonerServiceTest(BaseTest):
         QuestionGroupOrder.objects.create(order=2, question_group=self.parent10, question=self.question1)
         QuestionGroupOrder.objects.create(order=3, question_group=self.parent10, question=self.question2)
 
-        rule = SkipRuleFactory(subsection=self.sub_section1, root_question=self.question1, response=self.option,
+        rule = SkipSubsectionRuleFactory(subsection=self.sub_section1, root_question=self.question1, response=self.option,
                                skip_subsection=self.sub_section2)
 
         self.assertEqual(3, Question.objects.all().count())
@@ -192,7 +193,7 @@ class QuestionnaireClonerServiceTest(BaseTest):
         new_subsection = new.sub_sections().filter(title=self.sub_section1.title, order=self.sub_section1.order)
         new_skipped_subsection = new.sub_sections().filter(title=self.sub_section2.title, order=self.sub_section2.order)
         self.assertEqual(new_subsection.count(), 1)
-        cloned_rules = new_subsection[0].skip_rules.all()
+        cloned_rules = SkipSubsection.objects.filter(subsection=new_subsection)
         self.assertEqual(cloned_rules.count(), 1)
         self.assertEqual(cloned_rules[0].skip_subsection, new_skipped_subsection[0])
         self.assertEqual(cloned_rules[0].root_question, rule.root_question)

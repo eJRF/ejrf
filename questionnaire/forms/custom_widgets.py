@@ -6,6 +6,7 @@ from django.utils.html import format_html, format_html_join
 from django.utils.safestring import mark_safe
 
 from questionnaire.models import Question, SkipRule
+from questionnaire.models.skip_rule import SkipQuestion, SkipSubsection
 
 
 def get_rules(option_id, subsection):
@@ -14,11 +15,11 @@ def get_rules(option_id, subsection):
         question_rules = ''
         subsection_rules = ''
         if all_rules.exists():
-            rules_skipping_questions = filter(lambda rule: rule.skip_question is not None, all_rules)
-            rules_skipping_subsections = filter(lambda rule: rule.skip_subsection is not None, all_rules)
+            rules_skipping_questions = SkipQuestion.objects.filter(subsection=subsection, response_id=option_id)
+            rules_skipping_subsections = SkipSubsection.objects.filter(subsection=subsection, response_id=option_id)
             question_rules = ",".join(map(lambda rule: str(rule.skip_question.id), rules_skipping_questions))
             subsection_rules = ",".join(map(lambda rule: str(rule.skip_subsection.id), rules_skipping_subsections))
-        return (question_rules, subsection_rules)
+        return question_rules, subsection_rules
 
 class MultiChoiceAnswerSelectWidget(forms.Select):
     def __init__(self, subsection, attrs=None, choices=(), question_options=None):

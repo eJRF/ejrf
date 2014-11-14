@@ -1,6 +1,7 @@
 import copy
 
-from questionnaire.models import QuestionGroupOrder, Questionnaire
+from questionnaire.models import QuestionGroupOrder, Questionnaire, SkipRule, SubSection
+from questionnaire.models.skip_rule import SkipQuestion, SkipSubsection
 from questionnaire.utils.cloner_util import create_copies
 
 
@@ -38,15 +39,17 @@ class QuestionnaireClonerService(object):
         return create_copies(sections, self.region, fields, questionnaire=self.questionnaire)
 
     def _clone_skip_rules_for_subsection(self, rules, new_subsection):
-        map(lambda rule: new_subsection.skip_rules.create(skip_question=rule.skip_question, response=rule.response,
-                                                          root_question=rule.root_question,
-                                                          skip_subsection=self._get_new_subsection_by(rule)), rules)
+        map(lambda rule: rule.copy_to(new_subsection, self._get_new_subsection_by(rule)), rules)
 
     def _get_new_subsection_by(self, rule):
-        return self.sub_sections.get(rule.skip_subsection, None)
+        skip_subsection_id = rule.__dict__.get('skip_subsection_id', None)
+        if skip_subsection_id:
+            subsection = SubSection.objects.get(id=skip_subsection_id)
+            return self.sub_sections.get(subsection, None)
+        return None
 
     def _clone_skip_rules(self):
-        map(lambda (old, new): self._clone_skip_rules_for_subsection(old.skip_rules.all(), new),
+        map(lambda (old, new): self._clone_skip_rules_for_subsection(old.skip_rules.all().select_subclasses(), new),
             self.sub_sections.iteritems())
 
     def _clone_sub_sections(self):
