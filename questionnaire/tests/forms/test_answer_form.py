@@ -72,6 +72,12 @@ class NumericalAnswerFormTest(BaseTest):
         answer_form = NumericalAnswerForm(form_data, initial=self.initial)
         self.assertTrue(answer_form.is_valid())
 
+    def test_text_response_is_valid_if_response_is_blank_space(self):
+        form_data = self.form_data.copy()
+        form_data['response'] = ' '
+        answer_form = NumericalAnswerForm(form_data, initial=self.initial)
+        self.assertTrue(answer_form.is_valid())
+
     def test_decimal_response_is_invalid_if_question_answer_subtype_is_integer(self):
         form_data = self.form_data.copy()
         form_data['response'] = '33.4'

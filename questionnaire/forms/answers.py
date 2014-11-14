@@ -70,7 +70,7 @@ class NumericalAnswerForm(AnswerForm):
         return super(NumericalAnswerForm, self).clean()
 
     def _clean_response(self):
-        response = self.cleaned_data.get('response', None)
+        response = self.cleaned_data.get('response', '').strip()
         a_valid_number = number_from(response)
         if response and not (response == self.ZERO or response == self.NR or response == self.ND or a_valid_number):
             self._errors['response'] = 'Enter a number or Either NR or ND if this question is irrelevant'

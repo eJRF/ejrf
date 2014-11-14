@@ -3,7 +3,7 @@ from django.forms.formsets import formset_factory
 from questionnaire.forms.answers import NumericalAnswerForm, TextAnswerForm, DateAnswerForm, MultiChoiceAnswerForm, \
     MultipleResponseForm
 from questionnaire.models import AnswerGroup, Answer, NumericalAnswer, TextAnswer, DateAnswer, MultiChoiceAnswer, \
-    QuestionOption
+    QuestionOption, MultipleResponseAnswer
 from questionnaire.utils.questionnaire_entry_helpers import extra_rows, clean_data_dict, primary_answers
 
 EMPTY_ROW = ['']
