@@ -11,7 +11,6 @@ from questionnaire.models.skip_rule import SkipQuestion, SkipSubsection
 
 def get_rules(option_id, subsection):
         all_rules = SkipRule.objects.filter(response_id=option_id, subsection=subsection)
-        print all_rules
         question_rules = ''
         subsection_rules = ''
         if all_rules.exists():

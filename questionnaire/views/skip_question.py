@@ -16,10 +16,8 @@ class SkipRuleView(PermissionRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
         if 'skip_question' in request.POST.keys():
-            print "validating skip question"
             skip_question_rule_form = SkipQuestionForm(request.POST)
         else:
-            print "validating skip subsection"
             skip_question_rule_form = SkipSubsectionForm(request.POST)
 
         if skip_question_rule_form.is_valid():
