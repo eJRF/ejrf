@@ -40,7 +40,8 @@ class SkipQuestionForm(SkipRuleForm):
         skip_question = self.cleaned_data.get('skip_question', None)
         subsection = self.cleaned_data.get('subsection', None)
         response = self.cleaned_data.get('response', None)
-        rules = SkipQuestion.objects.filter(root_question=root_question,skip_question=skip_question,subsection=subsection,response=response)
+        rules = SkipQuestion.objects.filter(root_question=root_question, skip_question=skip_question,
+                                            subsection=subsection, response=response)
         if rules.exists():
             self._errors['root_question'] = ["This rule already exists"]
 
@@ -65,3 +66,25 @@ class SkipQuestionForm(SkipRuleForm):
 class SkipSubsectionForm(SkipRuleForm):
     class Meta:
         model = SkipSubsection
+
+    def clean(self):
+        self._clean_is_unique()
+        self._clean_root_question()
+        return super(SkipSubsectionForm, self).clean()
+
+    def _clean_is_unique(self):
+        root_question = self.cleaned_data.get('root_question', None)
+        skip_subsection = self.cleaned_data.get('skip_subsection', None)
+        subsection = self.cleaned_data.get('subsection', None)
+        response = self.cleaned_data.get('response', None)
+        rules = SkipSubsection.objects.filter(root_question=root_question, skip_subsection=skip_subsection,
+                                              subsection=subsection, response=response)
+        if rules.exists():
+            self._errors['root_question'] = ["This rule already exists"]
+
+    def _clean_root_question(self):
+        skip_subsection = self.cleaned_data.get('skip_subsection', None)
+        subsection = self.cleaned_data.get('subsection', None)
+
+        if skip_subsection == subsection:
+            self.errors['skip_subsection'] = ['You cannot skip the subsection which the root question is in.']

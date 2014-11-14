@@ -1,11 +1,11 @@
-from questionnaire.forms.skip_rule_form import SkipRuleForm, SkipQuestionForm
+from questionnaire.forms.skip_rule_form import SkipRuleForm, SkipQuestionForm, SkipSubsectionForm
 from questionnaire.models import SkipRule, QuestionGroupOrder
 from questionnaire.models.skip_rule import SkipQuestion
 from questionnaire.tests.base_test import BaseTest
 from questionnaire.tests.factories.question_factory import QuestionFactory
 from questionnaire.tests.factories.question_group_factory import QuestionGroupFactory
 from questionnaire.tests.factories.question_option_factory import QuestionOptionFactory
-from questionnaire.tests.factories.skip_rule_factory import SkipQuestionRuleFactory
+from questionnaire.tests.factories.skip_rule_factory import SkipQuestionRuleFactory, SkipSubsectionRuleFactory
 from questionnaire.tests.factories.sub_section_factory import SubSectionFactory
 
 
@@ -101,3 +101,36 @@ class SkipQuestionRuleFormTest(BaseTest):
         errors = 'This rule already exists'
         self.assertIn(errors, skip_question_form.errors['root_question'])
 
+class SkipSubsectionRuleFormTest(BaseTest):
+    def setUp(self):
+        self.root_question = QuestionFactory()
+        self.response = QuestionOptionFactory(question=self.root_question)
+        self.subsection = SubSectionFactory(title="outside subsection", order=2)
+        self.subsection_to_skip = SubSectionFactory()
+        self.question_group = QuestionGroupFactory()
+
+        self.root_question.question_group.add(self.question_group)
+        self.subsection.question_group.add(self.question_group)
+
+        self.form_data = {'root_question': self.root_question.id,
+                          'response': self.response.id,
+                          'skip_subsection': self.subsection_to_skip.id,
+                          'subsection': self.subsection.id}
+        QuestionGroupOrder.objects.create(question=self.root_question, question_group=self.question_group, order=1)
+
+    def test_is_skip_subsection_is_unique(self):
+        SkipSubsectionRuleFactory(subsection=self.subsection, root_question=self.root_question,
+                                  response=self.response, skip_subsection=self.subsection_to_skip)
+        skip_question_form = SkipSubsectionForm(data=self.form_data)
+        is_valid = skip_question_form.is_valid()
+        self.assertFalse(is_valid)
+        errors = 'This rule already exists'
+        self.assertIn(errors, skip_question_form.errors['root_question'])
+
+    def test_is_invalid_if_root_question_is_in_the_subsection_to_skip(self):
+        data = self.form_data
+        data['skip_subsection'] = self.subsection.id
+        skip_subsection_rule_form = SkipSubsectionForm(data=data)
+        self.assertFalse(skip_subsection_rule_form.is_valid())
+        errors = 'You cannot skip the subsection which the root question is in.'
+        self.assertIn(errors, skip_subsection_rule_form.errors['skip_subsection'])
