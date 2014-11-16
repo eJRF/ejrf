@@ -16,7 +16,7 @@
     <hr/>
     {% include 'base/naked_form.html' with a_form=form %}
     {% include 'base/_question_options.html' %}
-    {% if form.instance.id and form.instance.is_multichoice %}
+    {% if form.instance.id and form.instance.is_multichoice or form.instance.is_multi_response %}
 
         <div id="option-choices" class="show">
             <label id="option-choices-label">Options</label>
@@ -56,21 +56,5 @@
                     class="glyphicon glyphicon-remove"></i></a>
         </div>
     </script>
-
-    <script type="text/template" id="date-subtype-template">
-      <select id="id_answer_sub_type" name="answer_sub_type">
-        <option value="" selected="selected">Select a Sub-Type</option>
-        <option value="DD/MM/YYYY">DD/MM/YYYY</option>
-        <option value="MM/YYYY">MM/YYYY</option>
-      </select>
-    </script>
-    <script type="text/template" id="number-subtype-template">
-      <select id="id_answer_sub_type" name="answer_sub_type">
-        <option value="" selected="selected">Select a Sub-Type</option>
-        <option value="Decimal">Decimal</option>
-        <option value="Integer">Integer</option>
-      </select>
-    </script>
-
 </div>
 {% endblock %}

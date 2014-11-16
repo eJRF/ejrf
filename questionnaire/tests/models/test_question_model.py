@@ -244,6 +244,13 @@ class QuestionTest(BaseTest):
         self.assertTrue(question1.is_multichoice())
         self.assertFalse(question2.is_multichoice())
 
+    def test_knows_multi_response(self):
+        question1 = Question.objects.create(text='ha', UID='C_2013', answer_type='MultipleResponse', )
+        question2 = Question.objects.create(text='ha', UID='C_2014', answer_type='Number', )
+
+        self.assertTrue(question1.is_multi_response())
+        self.assertFalse(question2.is_multichoice())
+
     def test_question_knows_answered_options(self):
         country = Country.objects.create(name="Kenya")
         question = Question.objects.create(text='what do you drink?', UID='C_2013', answer_type='MultiChoice',
@@ -329,27 +336,6 @@ class QuestionOrderTest(BaseTest):
 
         self.assertRaises(ValidationError, self.question_to_skip.is_ordered_after, self.root_question,
                           self.other_subsection)
-
-
-class AnswerSubTypeTest(BaseTest):
-    def test_returns_answer_types_as_a_tuple_of_tuples(self):
-        expected_answer_types = (
-            ('Date', 'Date'),
-            ('MultiChoice', 'MultiChoice'),
-            ('Text', 'Text'), ('Number', 'Number'),
-            ('MultipleResponse', 'MultipleResponse')
-        )
-
-        self.assertEqual(expected_answer_types, AnswerTypes.answer_types())
-
-    def test_returns_answer_sub_types_as_a_tuple_of_tuples(self):
-        expected_sub_types = (
-            ('DD/MM/YYYY', 'DD/MM/YYYY'),
-            ('MM/YYYY', 'MM/YYYY'),
-            ('Decimal', 'Decimal'),
-            ('Integer', 'Integer')
-        )
-        self.assertEqual(expected_sub_types, AnswerTypes.answer_sub_types())
 
 
 class QuestionOptionTest(BaseTest):

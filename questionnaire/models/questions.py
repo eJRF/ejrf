@@ -84,6 +84,9 @@ class Question(BaseModel):
     def is_multichoice(self):
         return self.answer_type == AnswerTypes.MULTI_CHOICE
 
+    def is_multi_response(self):
+        return self.answer_type == AnswerTypes.MULTIPLE_RESPONSE
+
     def answered_options(self, question_group, **kwargs):
         all_answers = self.answers.filter(answergroup__grouped_question=question_group, **kwargs). \
             order_by('modified').distinct().select_subclasses()
