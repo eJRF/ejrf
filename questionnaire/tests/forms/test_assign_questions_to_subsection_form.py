@@ -64,9 +64,10 @@ class AssignQuestionFormTest(BaseTest):
         self.assertEqual(some_arbitrary_order + 1, self.question1.orders.get(question_group=question_group[0]).order)
         self.assertEqual(some_arbitrary_order + 2, self.question2.orders.get(question_group=question_group[0]).order)
 
-    def test_adding_question_to_subsection_with_two_groups_adds_to_the_last_group(self):
-        existing_group1 = QuestionGroup.objects.create(subsection=self.subsection, order=1)
+    def test_adding_question_to_subsection_with_two_groups_adds_to_the_last_parent_group(self):
+        QuestionGroup.objects.create(subsection=self.subsection, order=1)
         existing_group2 = QuestionGroup.objects.create(subsection=self.subsection, order=2)
+        QuestionGroup.objects.create(subsection=self.subsection, order=3, parent=existing_group2)
 
         assign_question_form = AssignQuestionForm(self.form_data, subsection=self.subsection)
         self.assertTrue(assign_question_form.is_valid())
@@ -74,6 +75,21 @@ class AssignQuestionFormTest(BaseTest):
         question_group = self.question1.question_group.all()[0]
         self.assertEqual(existing_group2, question_group)
         self.assertEqual(2, existing_group2.all_questions().count())
+
+    def test_adding_question_creates_a_new_group_if_last_group_in_subsection_is_a_grid(self):
+        QuestionGroup.objects.create(subsection=self.subsection, order=1)
+        existing_group2 = QuestionGroup.objects.create(subsection=self.subsection, order=2)
+        QuestionGroup.objects.create(subsection=self.subsection, order=3, grid=True)
+
+        assign_question_form = AssignQuestionForm(self.form_data, subsection=self.subsection)
+        self.assertTrue(assign_question_form.is_valid())
+        assign_question_form.save()
+        question_groups = self.subsection.question_group.all()
+        self.assertEqual(4, question_groups.count())
+        new_question_group = question_groups.order_by('-order')[0]
+
+        self.assertIn(new_question_group, self.question1.question_group.all())
+        self.assertIn(new_question_group, self.question2.question_group.all())
 
     def test_if_subsection_is_regionnal_then_only_regional_questions_can_be_added_to_it(self):
         region = Region.objects.create(name="AFR")
@@ -89,4 +105,4 @@ class AssignQuestionFormTest(BaseTest):
 
         form_data = {'questions': [question1.id, question2.id]}
         assign_question_form = AssignQuestionForm(form_data, region=region)
-
+        self.assertTrue(assign_question_form.is_valid())
