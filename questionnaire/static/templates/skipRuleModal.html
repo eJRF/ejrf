@@ -2,7 +2,7 @@
     <ul class="nav nav-tabs" role="tablist">
         <li role="presentation" class="active"><a id="selectNewRuleTab" href="#newRule" role="tab" data-toggle="tab"
                                                   data-ng-click="setActiveTab('newRuleTab')">New Question Rule</a></li>
-        <li role="presentation"><a id="selectNewSubsectiongRuleTab" href="#newSubsectionRules" role="tab" data-toggle="tab"
+        <li role="presentation"><a id="selectNewSubsectiongRuleTab" href="#newSubsectionRules" role="tab" data-toggle="tab" data-ng-hide="subsectionTabHidden"
                                    data-ng-click="setActiveTab('newSubsectionRuleTab')">New Subsection Rule</a></li>
         <li role="presentation"><a id="selectExistingRuleTab" href="#existingRules" role="tab" data-toggle="tab"
                                    data-ng-click="setActiveTab('existingRulesTab')">Existing Rules</a></li>
@@ -23,7 +23,7 @@
                     <div class="col-sm-7 center-fields">
                         <select required name="root_question" id="root-question"
                                 data-ng-model="skipRule.rootQuestion"
-                                data-ng-options="q.fields.text for q in questions | filter: {fields:{answer_type: 'MultiChoice'}}">
+                                data-ng-options="q.fields.text for q in questions | filter: {fields:{answer_type: 'MultiChoice'}} | filter:filterRootQuestions">
                             <option value="">Select Root Question</option>
                         </select>
                     </div>

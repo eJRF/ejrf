@@ -33,6 +33,25 @@ class QuestionGroup(BaseModel):
     def sub_groups(self):
         return self.sub_group.all()
 
+    def is_in_grid(self):
+        if self.parent is not None:
+            return self.grid or self.parent.is_in_grid()
+        else:
+            return self.grid
+
+    def parent_group_id(self):
+        if self.parent is not None:
+            return self.parent.parent_group_id()
+        else:
+            return self.id
+
+    def is_in_hybrid_grid(self):
+        if self.parent is not None:
+            return self.hybrid or self.parent.is_in_hybrid_grid()
+        else:
+            return self.hybrid
+
+
     def and_sub_group_questions(self):
         questions = list(self.all_questions())
         for sub_group in self.sub_groups():

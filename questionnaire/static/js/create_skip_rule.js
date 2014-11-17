@@ -57,10 +57,20 @@ angular.module('questionnaireApp', [])
                 });
         };
 
-        $scope.updateSkipRuleModal = function(subsectionId) {
+        $scope.filterRootQuestions = function(question) {
+            return true;
+        };
+
+        $scope.updateSkipRuleModal = function(subsectionId, gridId) {
             updateRules(subsectionId);
             updateCreateQuestionRuleForm(subsectionId);
             updateCreateSubsectionRuleForm(subsectionId);
+            if(gridId != undefined) {
+                $scope.subsectionTabHidden = true;
+                $scope.filterRootQuestions = function(question) {
+                    return question.parentQuestionGroup == gridId;
+                };
+            }
         };
         $scope.fns = {};
         $scope.fns.createRule = function() {
@@ -122,4 +132,8 @@ angular.module('questionnaireApp', [])
 
 skipRules.updateSubsection = function(subsectionId) {
     angular.element(document.getElementById('skip-rule-controller')).scope().updateSkipRuleModal(subsectionId);
+};
+
+skipRules.updateGrid = function(subsectionId, gridId) {
+    angular.element(document.getElementById('skip-rule-controller')).scope().updateSkipRuleModal(subsectionId, gridId);
 };

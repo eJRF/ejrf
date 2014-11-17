@@ -21,8 +21,8 @@ class SubsectionQuestionsTest(BaseTest):
 
         self.subsection = SubSection.objects.create(title="subsection 1", section=self.section, order=1, pk=1)
 
-        self.question_group = QuestionGroup.objects.create(subsection_id=self.subsection.id)
-        self.question_group2 = QuestionGroup.objects.create(subsection_id=self.subsection.id)
+        self.question_group = QuestionGroup.objects.create(subsection_id=self.subsection.id, grid=False)
+        self.question_group2 = QuestionGroup.objects.create(subsection_id=self.subsection.id, grid=False)
 
         self.question1 = Question.objects.create(text='Q1', UID='C00003', answer_type='Number', region=self.region)
         self.question2 = Question.objects.create(text='Q2', UID='C00002', answer_type='Number', region=self.region)
@@ -37,14 +37,15 @@ class SubsectionQuestionsTest(BaseTest):
 
         q1 = self.obj_to_dict(self.question1)
         q1['options'] = []
+        q1['parentQuestionGroup'] = self.question_group.id
 
         q2 = self.obj_to_dict(self.question2)
         q2['options'] = []
+        q2['parentQuestionGroup'] = self.question_group.id
 
         actualResponse = json.loads(response.content)['questions']
         self.assertTrue(q1 in actualResponse)
         self.assertTrue(q2 in actualResponse)
-
 
     def obj_to_dict(self, question):
         return json.loads(serializers.serialize('json', [question]))[0]
@@ -56,14 +57,18 @@ class SubsectionQuestionsTest(BaseTest):
 
         q3 = self.obj_to_dict(self.question3)
         q3['options'] = []
+        q3['parentQuestionGroup'] = self.question_group2.id
 
         q1 = self.obj_to_dict(self.question1)
         q1['options'] = []
+        q1['parentQuestionGroup'] = self.question_group.id
 
         q2 = self.obj_to_dict(self.question2)
         q2['options'] = []
+        q2['parentQuestionGroup'] = self.question_group.id
 
         actualResponse = json.loads(response.content)['questions']
+        print actualResponse
         self.assertTrue(q1 in actualResponse)
         self.assertTrue(q2 in actualResponse)
         self.assertTrue(q3 in actualResponse)      
