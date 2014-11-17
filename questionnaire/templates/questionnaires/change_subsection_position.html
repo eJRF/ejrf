@@ -4,17 +4,19 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title cyan" id="preview_modal_label">Move Position of subsection</h4>
+                <h4 class="modal-title cyan" id="move_modal_label"></h4>
             </div>
-            <form action="" method="post"
-                  accept-charset="utf-8" class="form-horizontal">
+            <form action="{% url 'move_subsection' %}" method="post"
+                  accept-charset="utf-8" class="form-horizontal" id="move_subsection_form">
                 <div class="modal-body">
+                    {% csrf_token %}
                     <label for="modal-subsection-id">Position
                         <select name="modal-subsection-position" id="modal-subsection-id" >
 
 
                         </select>
                     </label>
+                    <input name="subsection" type="hidden" id="subsection"/>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal"><i

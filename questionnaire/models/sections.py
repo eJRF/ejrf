@@ -72,7 +72,7 @@ class SubSection(BaseModel):
         return all_questions
 
     def to_dict(self):
-        return {'title': self.title or '', 'id': self.id, 'order': self.order}
+        return {'title': self.title or 'Un-titled subsection %s' % self.order, 'id': self.id, 'order': self.order}
 
     def parent_question_groups(self):
         return self.question_group.filter(parent=None).exclude(question=None)

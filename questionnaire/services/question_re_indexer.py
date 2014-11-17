@@ -1,6 +1,7 @@
 import copy
 
 from questionnaire.models import QuestionGroupOrder, QuestionGroup, SubSection
+from questionnaire.utils.model_utils import number_from
 
 
 class QuestionReIndexer(object):
@@ -53,14 +54,17 @@ class QuestionReIndexer(object):
 
 
 class SubSectionReIndexer:
+    SUCCESS_MESSAGE = 'The subsections were reordered successfully!'
+
     def __init__(self, subsection, new_order):
         self.subsection = subsection
-        self.new_order = new_order
+        self.new_order = number_from(new_order)
 
     def reorder(self):
         sub_sections = list(SubSection.objects.filter(section=self.subsection.section).order_by('order'))
         subsection_to_swap = sub_sections.pop(self.subsection.order - 1)
         sub_sections.insert(self.new_order - 1, subsection_to_swap)
-        return sub_sections
-
-
+        for index, sub_section in enumerate(sub_sections):
+            sub_section.order = index + 1
+            sub_section.save()
+        return self.SUCCESS_MESSAGE

@@ -37,7 +37,10 @@
             {% endfor %}
             <div id='section-content'>
                 {% for subsection in section.sub_sections.all %}
-                <div class="subsection-content" id="subsection-{{ subsection.id }}-content" data-attribute-subsection-order="{{ subsection.order }}" data-attribute-subsection-name="{{ subsection.title }}">
+                <div class="subsection-content" id="subsection-{{ subsection.id }}-content"
+                     data-attribute-subsection-order="{{ subsection.order }}"
+                     data-attribute-subsection-name="{{ subsection.title }}"
+                     data-attribute-subsection-id="{{ subsection.id }}">
                     {% include 'questionnaires/entry/_subsection_title.html' %}
                     {% for group in subsection.parent_question_groups %}
                     {% if group and group.grid %}

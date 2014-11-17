@@ -193,7 +193,8 @@ class MoveSubsection(PermissionRequiredMixin, View):
     permission_required = 'auth.can_edit_questionnaire'
 
     def post(self, request, *args, **kwargs):
-        subsection = SubSection.objects.get(id=kwargs.get('subsection_id'))
-        order = request.POST.get('order')
-        SubSectionReIndexer(subsection, order)
+        subsection = SubSection.objects.get(id=request.POST.get('subsection'))
+        order = request.POST.get('modal-subsection-position')
+        indexer_response = SubSectionReIndexer(subsection, order).reorder()
+        messages.success(request, indexer_response)
         return HttpResponseRedirect(subsection.get_absolute_url())

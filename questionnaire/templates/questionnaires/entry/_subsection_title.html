@@ -8,7 +8,7 @@
     <div class="btn-group pull-right">
 
         <a href="" id="id-change-position-{{ subsection.id }}" class="btn btn-sm btn-default" data-toggle="modal"
-           data-target="#change-position" onClick="subsectionPositions.getSubSections()")>
+           data-target="#change-position" onClick="subsectionPositions.getSubSections({{ subsection.order }})">
                 <span class=" cyan"><span class="glyphicon glyphicon-move"></span> Change Position</span>
         </a>
 

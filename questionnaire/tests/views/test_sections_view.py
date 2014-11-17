@@ -375,18 +375,15 @@ class MoveSubsectionTest(BaseTest):
         self.subsection2 = SubSectionFactory(order=2, section=self.section)
         self.subsection3 = SubSectionFactory(order=3, section=self.section)
 
-        self.url = '/subsection/%d/move/' % self.subsection.id
+        self.url = '/subsection/move/'
 
-
-    @patch("questionnaire.services.question_re_indexer.SubSectionReIndexer")
-    def test_that_reorder_service_gets_called(self, mock_sub_section_indexder):
+    def test_that_reorder_service_gets_called(self):
         new_order = 2
-        mock_sub_section_indexder.reorder = MagicMock('reorder')
 
-        response = self.client.post(self.url, data={'subsection': self.subsection.id, 'order': new_order})
-        print response
+        response = self.client.post(self.url, data={'subsection': self.subsection.id,
+                                                    'modal-subsection-position': new_order})
         self.assertEqual(302, response.status_code)
-        mock_sub_section_indexder.assert_called(mock_sub_section_indexder.reorder)
+        self.assertIn("",response.cookies['messages'].value)
 
 
 class DeleteSubSectionsViewTest(BaseTest):
@@ -527,6 +524,7 @@ class RegionalSubSectionsViewTest(BaseTest):
         response = client.post(url)
         self.failUnless(SubSection.objects.filter(id=subsection.id))
         self.assertRedirects(response, expected_url='/accounts/login/?next=%s' % quote(url))
+
 
 class SectionGetSubSectionsTest(BaseTest):
     def setUp(self):

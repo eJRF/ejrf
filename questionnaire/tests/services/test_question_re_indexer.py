@@ -140,21 +140,36 @@ class SubsectionReIndexerServiceTest(BaseTest):
 
     def test_swap_for_the_first_two_subsections(self):
         subsection_indexer = SubSectionReIndexer(self.subsection1, 2)
-        section_objects_order_by = subsection_indexer.reorder()
+        subsection_indexer.reorder()
+        re_ordered = SubSection.objects.filter(section=self.section).order_by('order')
         subsections_in_new_orders = [self.subsection2, self.subsection1, self.subsection3, self.subsection4, self.subsection5, self.subsection6]
-        self.assertEqual(section_objects_order_by, subsections_in_new_orders)
+        self.assertEqual(list(re_ordered), subsections_in_new_orders)
 
     def test_move_sub_section_displaces_other_subsections_forwards(self):
         subsection_indexer = SubSectionReIndexer(self.subsection3, 5)
-        section_objects_order_by = subsection_indexer.reorder()
+        subsection_indexer.reorder()
         subsections_in_new_orders = [self.subsection1, self.subsection2, self.subsection4, self.subsection5, self.subsection3, self.subsection6]
-
-        self.assertEqual(section_objects_order_by, subsections_in_new_orders)
+        re_ordered = SubSection.objects.filter(section=self.section).order_by('order')
+        self.assertEqual(list(re_ordered), subsections_in_new_orders)
 
     def test_move_sub_section_displaces_other_subsection_backwards(self):
         subsection_indexer = SubSectionReIndexer(self.subsection6, 2)
-        section_objects_order_by = subsection_indexer.reorder()
+        subsection_indexer.reorder()
+        re_ordered = SubSection.objects.filter(section=self.section).order_by('order')
         subsections_in_new_orders = [self.subsection1, self.subsection6, self.subsection2, self.subsection3, self.subsection4, self.subsection5]
 
-        self.assertEqual(section_objects_order_by, subsections_in_new_orders)
+        self.assertEqual(list(re_ordered), subsections_in_new_orders)
 
+    def test_move_sub_section_to_position_1_displaces_other_subsection_backwards(self):
+        subsection_indexer = SubSectionReIndexer(self.subsection6, 1)
+        subsection_indexer.reorder()
+        subsections_in_new_orders = [self.subsection6, self.subsection1, self.subsection2, self.subsection3, self.subsection4, self.subsection5]
+        re_ordered = SubSection.objects.filter(section=self.section).order_by('order')
+
+        self.assertEqual(list(re_ordered), subsections_in_new_orders)
+
+    def test_moved_subsection_order_is_persisted(self):
+        subsection_indexer = SubSectionReIndexer(self.subsection1, 3)
+        subsection_indexer.reorder()
+        subsection_order = SubSection.objects.get(id=self.subsection1.id)
+        self.assertEqual(3, subsection_order.order)
