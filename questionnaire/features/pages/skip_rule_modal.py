@@ -20,6 +20,13 @@ class SkipRuleModalPage(PageObject):
         time.sleep(2)
         self.click_by_id("selectNewRuleTab")
 
+    def create_new_subsection_rule(self):
+        time.sleep(2)
+        self.click_by_id('selectNewSubsectiongRuleTab')
+
     def number_of_rules(self):
         element = self.browser.find_by_id("existingRulesTab")[0]
         return len(element.find_by_css(".existingRule"))
+
+    def skip_tab_is_present_for(self, element):
+        self.is_text_present("New %s Rule" % element)

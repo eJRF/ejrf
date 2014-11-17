@@ -21,7 +21,20 @@ Feature: Subsection feature
     Then I should see a message that the subsection was updated
     And I should see the changes I made to the subsection in the questionnaire
 
-  Scenario: Add skip Rules to a Subsection in Core Questionnaire
+  Scenario: Questions and subsections are displayed when creating skip rules
+    Given I am logged in as a global admin
+    And I have a questionnaire with sections and subsections
+    And I have questions and responses in the correct section
+    And I visit that questionnaires section page
+    And I click to add a skip rule
+    Then I should see options to add skip rules for skipping 'Question'
+    Then I should see options to add skip rules for skipping 'Subsection'
+    When I select to add skip rules for skipping questions
+    Then I should see the questions in that subsection listed for skipping
+    When I select to add skip rules for skipping subsections
+    Then I should see the subsections in that section listed for skipping
+
+  Scenario: Create and view skip rule
     Given I am logged in as a global admin
     And I have a questionnaire with sections and subsections
     And I have questions and responses in the correct section

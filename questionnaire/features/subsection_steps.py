@@ -137,3 +137,25 @@ def then_i_should_see_group1_existing_skip_rules(step, number_of_rules):
 @step(u'When I create a new skip rule')
 def when_i_create_a_new_skip_rule(step):
     world.skip_rule_page.create_new_rule()
+
+@step(u'Then I should see options to add skip rules for skipping \'([^\']*)\'')
+def then_i_should_see_options_to_add_skip_rules_for_skipping_group1(step, element_to_skip):
+    world.skip_rule_page.skip_tab_is_present_for(element_to_skip)
+
+@step(u'When I select to add skip rules for skipping questions')
+def when_i_select_to_add_skip_rules_for_skipping_questions(step):
+    world.skip_rule_page.view_create_new_rules()
+
+@step(u'When I select to add skip rules for skipping subsections')
+def when_i_select_to_add_skip_rules_for_skipping_subsections(step):
+    world.skip_rule_page.create_new_subsection_rule()
+
+@step(u'I should see the questions in that subsection listed')
+def i_should_see_the_questions_in_that_subsection_listed(step):
+    world.browser.find_by_name('skip_question')[0].click()
+    world.page.is_text_present('question 2')
+
+@step(u'I should see the subsections in that section listed')
+def i_should_see_the_subsections_in_that_section_listed(step):
+    world.browser.find_by_name('skip_subsection')[0].click()
+    world.page.is_text_present('Subsection Title Sample')
