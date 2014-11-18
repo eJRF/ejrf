@@ -1,11 +1,10 @@
-from time import sleep, time
-from IPython import embed
+from time import sleep
 from lettuce import step, world
 from questionnaire.features.pages.questionnaires import QuestionnairePage
 from questionnaire.features.pages.sections import CreateSubSectionPage
 from questionnaire.features.pages.skip_rule_modal import SkipRuleModalPage
-from questionnaire.models import SubSection, Section, Questionnaire, Question, QuestionGroupOrder
-from questionnaire.models.skip_rule import SkipQuestion, SkipRule, SkipSubsection
+from questionnaire.models import SubSection, Section, Questionnaire, QuestionGroupOrder
+from questionnaire.models.skip_rule import SkipQuestion, SkipSubsection
 from questionnaire.tests.factories.question_factory import QuestionFactory
 from questionnaire.tests.factories.question_group_factory import QuestionGroupFactory
 from questionnaire.tests.factories.question_option_factory import QuestionOptionFactory
@@ -201,3 +200,35 @@ def when_i_create_a_new_subsection_skip_rule(step):
 def and_that_subsection_should_no_longer_be_displayed(step):
     world.page.click_by_id('save_draft_button')
     world.page._is_text_present(world.sub_section_2.title, False)
+
+@step(u'Then I should see the subsections numbered according to their respective orders')
+def then_i_should_see_the_subsections_numbered_according_to_their_respective_orders(step):
+    world.page.validate_numbering_of_subsection('1.1.', world.sub_section)
+    world.page.validate_numbering_of_subsection('1.2.', world.sub_section_2)
+    world.page.validate_numbering_of_subsection('1.3.', world.sub_section_3)
+
+@step(u'When I select the option to change the position of the second subsection')
+def when_i_select_the_option_to_change_the_position_of_the_second_subsection(step):
+    world.page.click_by_id("id-change-position-%s" % world.sub_section_2.id)
+
+@step(u'Then I should see its current position marked as such')
+def then_i_should_see_its_current_position_marked_as_such(step):
+    sleep(1)
+    world.browser.find_by_name('modal-subsection-position')[0].click()
+    world.page.is_text_present('2 (Current)')
+
+@step(u'And I should see the other positions available')
+def and_i_should_see_the_other_positions_available(step):
+    world.page.is_text_present('1')
+    world.page.is_text_present('3')
+
+@step(u'When I move the second subsection to the first position')
+def when_i_move_the_second_subsection_to_the_first_position(step):
+    world.page.select('modal-subsection-position', 1)
+    world.page.click_by_id('submit_subsection_position_button')
+
+@step(u'Then the numbering of all the other subsections should be updated')
+def then_the_numbering_of_all_the_other_subsections_should_be_updated(step):
+    world.page.validate_numbering_of_subsection('1.1.', world.sub_section_2)
+    world.page.validate_numbering_of_subsection('1.2.', world.sub_section)
+    world.page.validate_numbering_of_subsection('1.3.', world.sub_section_3)

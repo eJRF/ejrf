@@ -95,3 +95,14 @@ Feature: Subsection feature
     When I select a response that skips a question and a subsection
     Then that question should no longer be displayed
     And that subsection should no longer be displayed
+
+  Scenario: Change position of subsection
+    Given I am logged in as a global admin
+    And I have a questionnaire with sections and subsections
+    And I visit that questionnaires section page
+    Then I should see the subsections numbered according to their respective orders
+    When I select the option to change the position of the second subsection
+    Then I should see its current position marked as such
+    And I should see the other positions available
+    When I move the second subsection to the first position
+    Then the numbering of all the other subsections should be updated
