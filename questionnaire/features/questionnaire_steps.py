@@ -4,7 +4,7 @@ from questionnaire.features.pages.questionnaires import QuestionnairePage
 from questionnaire.models import Questionnaire, Section, SubSection, Question, QuestionGroup, QuestionGroupOrder, QuestionOption, Region
 
 
-@step(u'And I have a questionnaire with sections and subsections')
+@step(u'I have a questionnaire with sections and subsections')
 def and_i_have_a_questionnaire_with_sections_and_subsections(step):
     world.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", description="ha", status=Questionnaire.DRAFT)
     world.section_1 = Section.objects.create(title="Section 1 Title Sample", order=1, questionnaire=world.questionnaire, name="Section 1 Name Sample",

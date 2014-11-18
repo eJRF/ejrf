@@ -1,9 +1,11 @@
 from time import sleep, time
+from IPython import embed
 from lettuce import step, world
 from questionnaire.features.pages.questionnaires import QuestionnairePage
 from questionnaire.features.pages.sections import CreateSubSectionPage
 from questionnaire.features.pages.skip_rule_modal import SkipRuleModalPage
 from questionnaire.models import SubSection, Section, Questionnaire, Question, QuestionGroupOrder
+from questionnaire.models.skip_rule import SkipQuestion, SkipRule
 from questionnaire.tests.factories.question_factory import QuestionFactory
 from questionnaire.tests.factories.question_group_factory import QuestionGroupFactory
 from questionnaire.tests.factories.question_option_factory import QuestionOptionFactory
@@ -109,15 +111,15 @@ def and_i_have_a_questionnaire_in_a_region_with_sections_and_subsections(step):
 
 @step(u'And I have questions and responses in the correct section')
 def and_i_have_questions_and_responses_in_the_correct_section(step):
-    root_question = QuestionFactory()
-    question_to_skip = QuestionFactory(text="question 2")
-    response = QuestionOptionFactory(question=root_question)
+    world.root_question = QuestionFactory()
+    world.question_to_skip = QuestionFactory(text="question 2")
+    world.response = QuestionOptionFactory(question=world.root_question)
     question_group = QuestionGroupFactory(subsection=world.sub_section, order=1)
-    QuestionGroupOrder.objects.create(question=root_question, order=1, question_group=question_group)
-    QuestionGroupOrder.objects.create(question=question_to_skip, order=2, question_group=question_group)
+    QuestionGroupOrder.objects.create(question=world.root_question, order=1, question_group=question_group)
+    QuestionGroupOrder.objects.create(question=world.question_to_skip, order=2, question_group=question_group)
 
-    root_question.question_group.add(question_group)
-    question_to_skip.question_group.add(question_group)
+    world.root_question.question_group.add(question_group)
+    world.question_to_skip.question_group.add(question_group)
 
 
 @step(u'And I click to add a skip rule')
@@ -160,3 +162,27 @@ def i_should_see_the_questions_in_that_subsection_listed(step):
 def i_should_see_the_subsections_in_that_section_listed(step):
     world.browser.find_by_name('skip_subsection')[0].click()
     world.page.is_text_present('Subsection Title Sample')
+
+@step(u'And I have skip rules applied to a question')
+def and_i_have_skip_rules_applied_to_a_question(step):
+    SkipQuestion.objects.create(skip_question=world.question_to_skip, response=world.response,
+                                root_question=world.root_question, subsection=world.sub_section)
+
+@step(u'And the questionnaire has been published to the data submitter')
+def and_the_questionnaire_has_been_published_to_the_data_submitter(step):
+    world.questionnaire.region = world.region
+    world.questionnaire.status = Questionnaire.PUBLISHED
+    world.questionnaire.save()
+
+@step(u'Then I should see the all the questions in that section and subsection')
+def then_i_should_see_the_all_the_questions_in_that_section_and_subsection(step):
+    world.page._is_text_present(world.question_to_skip.text)
+    world.page._is_text_present(world.root_question.text)
+
+@step(u'When I select a response that skips a question')
+def when_i_select_a_response_that_skips_a_question(step):
+    world.page.choose('MultiChoice-0-response', '1')
+
+@step(u'Then that question should no longer be displayed')
+def then_that_question_should_no_longer_be_displayed(step):
+    world.page._is_text_present(world.question_to_skip.text, False)

@@ -79,6 +79,9 @@ class PageObject(object):
     def select(self, name, value):
         self.browser.select(name, value)
 
+    def choose(self, name, value):
+        self.browser.choose(name, value)
+
     def is_element_present_by_css(self, css_selector):
         self.browser.is_element_present_by_css(css_selector)
 
