@@ -12,7 +12,6 @@ class SectionForm(ModelForm):
         super(SectionForm, self).__init__(*args, **kwargs)
         self.fields['order'].choices = self._get_options()
         self.fields['order'].label = 'Position'
-
     class Meta:
         model = Section
         fields = ['questionnaire', 'name', 'title', 'description', 'order']
