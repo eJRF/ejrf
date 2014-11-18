@@ -78,7 +78,7 @@
                     <label class="col-sm-3 control-label">Select Root Question</label>
 
                     <div class="col-sm-7 center-fields">
-                        <select required name="root_question"
+                        <select required name="subsection_root_question"
                                 data-ng-model="skipRule.rootQuestion"
                                 data-ng-options="q.fields.text for q in questions | filter: {fields:{answer_type: 'MultiChoice'}}">
                             <option value="">Select Root Question</option>
@@ -92,7 +92,7 @@
                         <ul>
                             <li data-ng-repeat="option in skipRule.rootQuestion.options">
                                 <label style="display:block;">
-                                    <input type="radio" name="response" required
+                                    <input type="radio" name="subsection_response" required
                                            data-ng-model="skipRule.questionResponse"
                                            ng-value="option.pk"/>&nbsp;{{option.fields.text}}
                                 </label>
@@ -115,7 +115,7 @@
                 <a type="cancel" class="btn btn-default" data-dismiss="modal">
                     <span class="red bold"><i class="glyphicon glyphicon-remove"></i> Cancel</span>
                 </a>
-                <button tyep="button" class="btn btn-default"
+                <button tyep="button" class="btn btn-default" id="save-subsection-skip-rule-button"
                         data-ng-click="fns.createRule()">
                     <span class="green bold"><i class="glyphicon glyphicon-ok"></i> Done</span></button>
             </div>

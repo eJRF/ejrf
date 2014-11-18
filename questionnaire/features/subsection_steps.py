@@ -137,9 +137,9 @@ def then_i_should_see_group1_existing_skip_rules(step, number_of_rules):
     sleep(2)
     assert (actual_number == int(number_of_rules)), 'Expecting %s number of rules, got %s number of rules' % (int(number_of_rules), actual_number)
 
-@step(u'When I create a new skip rule')
+@step(u'When I create a new question skip rule')
 def when_i_create_a_new_skip_rule(step):
-    world.skip_rule_page.create_new_rule()
+    world.skip_rule_page.create_new_qn_rule()
 
 @step(u'Then I should see options to add skip rules for skipping \'([^\']*)\'')
 def then_i_should_see_options_to_add_skip_rules_for_skipping_group1(step, element_to_skip):
@@ -147,11 +147,11 @@ def then_i_should_see_options_to_add_skip_rules_for_skipping_group1(step, elemen
 
 @step(u'When I select to add skip rules for skipping questions')
 def when_i_select_to_add_skip_rules_for_skipping_questions(step):
-    world.skip_rule_page.view_create_new_rules()
+    world.skip_rule_page.view_create_new_qn_rules()
 
 @step(u'When I select to add skip rules for skipping subsections')
 def when_i_select_to_add_skip_rules_for_skipping_subsections(step):
-    world.skip_rule_page.create_new_subsection_rule()
+    world.skip_rule_page.view_create_new_sub_rules()
 
 @step(u'I should see the questions in that subsection listed')
 def i_should_see_the_questions_in_that_subsection_listed(step):
@@ -186,3 +186,7 @@ def when_i_select_a_response_that_skips_a_question(step):
 @step(u'Then that question should no longer be displayed')
 def then_that_question_should_no_longer_be_displayed(step):
     world.page._is_text_present(world.question_to_skip.text, False)
+
+@step(u'When I create a new subsection skip rule')
+def when_i_create_a_new_subsection_skip_rule(step):
+    world.skip_rule_page.create_new_sub_rule()

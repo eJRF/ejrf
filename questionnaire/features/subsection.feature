@@ -21,41 +21,6 @@ Feature: Subsection feature
     Then I should see a message that the subsection was updated
     And I should see the changes I made to the subsection in the questionnaire
 
-  Scenario: Questions and subsections are displayed when creating skip rules
-    Given I am logged in as a global admin
-    And I have a questionnaire with sections and subsections
-    And I have questions and responses in the correct section
-    And I visit that questionnaires section page
-    And I click to add a skip rule
-    Then I should see options to add skip rules for skipping 'Question'
-    Then I should see options to add skip rules for skipping 'Subsection'
-    When I select to add skip rules for skipping questions
-    Then I should see the questions in that subsection listed for skipping
-    When I select to add skip rules for skipping subsections
-    Then I should see the subsections in that section listed for skipping
-
-  Scenario: Create and view skip rule
-    Given I am logged in as a global admin
-    And I have a questionnaire with sections and subsections
-    And I have questions and responses in the correct section
-    And I visit that questionnaires section page
-    And I click to add a skip rule
-    And I choose to see existing skip rules
-    Then I should see '0' existing skip rules
-    When I create a new skip rule
-    Then I should see '1' existing skip rules
-
-  Scenario: Skip rules are applied when responses are selected
-    Given I have a questionnaire with sections and subsections
-    And I have questions and responses in the correct section
-    And I have skip rules applied to a question
-    Given I am logged in as a data submitter
-    And the questionnaire has been published to the data submitter
-    And I navigate to the section of the questionnaire to be filled in
-    Then I should see the all the questions in that section and subsection
-    When I select a response that skips a question
-    Then that question should no longer be displayed
-
   Scenario: Delete Regional Subsection from a regional Questionnaire
     Given I am a Regional Admin
     And I have a questionnaire for my region with sections and subsections
@@ -91,3 +56,40 @@ Feature: Subsection feature
     And I save the changes to the subsection
     Then I should see a success message that the subsection was updated
     And I should see those changes to the regional subsection in the questionnaire
+
+  Scenario: Questions and subsections are displayed when creating skip rules
+    Given I am logged in as a global admin
+    And I have a questionnaire with sections and subsections
+    And I have questions and responses in the correct section
+    And I visit that questionnaires section page
+    And I click to add a skip rule
+    Then I should see options to add skip rules for skipping 'Question'
+    Then I should see options to add skip rules for skipping 'Subsection'
+    When I select to add skip rules for skipping questions
+    Then I should see the questions in that subsection listed for skipping
+    When I select to add skip rules for skipping subsections
+    Then I should see the subsections in that section listed for skipping
+
+  Scenario: Create and view skip rule
+    Given I am logged in as a global admin
+    And I have a questionnaire with sections and subsections
+    And I have questions and responses in the correct section
+    And I visit that questionnaires section page
+    And I click to add a skip rule
+    And I choose to see existing skip rules
+    Then I should see '0' existing skip rules
+    When I create a new question skip rule
+    Then I should see '1' existing skip rules
+    When I create a new subsection skip rule
+    Then I should see '2' existing skip rules
+
+  Scenario: Skip rules are applied when responses are selected
+    Given I have a questionnaire with sections and subsections
+    And I have questions and responses in the correct section
+    And I have skip rules applied to a question
+    Given I am logged in as a data submitter
+    And the questionnaire has been published to the data submitter
+    And I navigate to the section of the questionnaire to be filled in
+    Then I should see the all the questions in that section and subsection
+    When I select a response that skips a question
+    Then that question should no longer be displayed
