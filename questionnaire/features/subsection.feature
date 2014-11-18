@@ -87,9 +87,11 @@ Feature: Subsection feature
     Given I have a questionnaire with sections and subsections
     And I have questions and responses in the correct section
     And I have skip rules applied to a question
+    And I have skip rules applied to a subsection
     Given I am logged in as a data submitter
     And the questionnaire has been published to the data submitter
     And I navigate to the section of the questionnaire to be filled in
-    Then I should see the all the questions in that section and subsection
-    When I select a response that skips a question
+    Then I should see the all the questions and subsections in that section
+    When I select a response that skips a question and a subsection
     Then that question should no longer be displayed
+    And that subsection should no longer be displayed

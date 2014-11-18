@@ -5,7 +5,7 @@ from questionnaire.features.pages.questionnaires import QuestionnairePage
 from questionnaire.features.pages.sections import CreateSubSectionPage
 from questionnaire.features.pages.skip_rule_modal import SkipRuleModalPage
 from questionnaire.models import SubSection, Section, Questionnaire, Question, QuestionGroupOrder
-from questionnaire.models.skip_rule import SkipQuestion, SkipRule
+from questionnaire.models.skip_rule import SkipQuestion, SkipRule, SkipSubsection
 from questionnaire.tests.factories.question_factory import QuestionFactory
 from questionnaire.tests.factories.question_group_factory import QuestionGroupFactory
 from questionnaire.tests.factories.question_option_factory import QuestionOptionFactory
@@ -168,16 +168,22 @@ def and_i_have_skip_rules_applied_to_a_question(step):
     SkipQuestion.objects.create(skip_question=world.question_to_skip, response=world.response,
                                 root_question=world.root_question, subsection=world.sub_section)
 
+@step(u'And I have skip rules applied to a subsection')
+def and_i_have_skip_rules_applied_to_a_subsection(step):
+    SkipSubsection.objects.create(skip_subsection=world.sub_section_2, response=world.response,
+                                root_question=world.root_question, subsection=world.sub_section)
+
 @step(u'And the questionnaire has been published to the data submitter')
 def and_the_questionnaire_has_been_published_to_the_data_submitter(step):
     world.questionnaire.region = world.region
     world.questionnaire.status = Questionnaire.PUBLISHED
     world.questionnaire.save()
 
-@step(u'Then I should see the all the questions in that section and subsection')
+@step(u'Then I should see the all the questions and subsections in that section')
 def then_i_should_see_the_all_the_questions_in_that_section_and_subsection(step):
     world.page._is_text_present(world.question_to_skip.text)
     world.page._is_text_present(world.root_question.text)
+    world.page._is_text_present(world.sub_section_2.title)
 
 @step(u'When I select a response that skips a question')
 def when_i_select_a_response_that_skips_a_question(step):
@@ -190,3 +196,7 @@ def then_that_question_should_no_longer_be_displayed(step):
 @step(u'When I create a new subsection skip rule')
 def when_i_create_a_new_subsection_skip_rule(step):
     world.skip_rule_page.create_new_sub_rule()
+
+@step(u'And that subsection should no longer be displayed')
+def and_that_subsection_should_no_longer_be_displayed(step):
+    world.page._is_text_present(world.sub_section_2.title, False)
