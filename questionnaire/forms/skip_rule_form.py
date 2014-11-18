@@ -33,6 +33,7 @@ class SkipQuestionForm(SkipRuleForm):
     def clean(self):
         self._clean_root_question()
         self._clean_is_unique()
+
         return super(SkipQuestionForm, self).clean()
 
     def _clean_is_unique(self):
@@ -45,10 +46,18 @@ class SkipQuestionForm(SkipRuleForm):
         if rules.exists():
             self._errors['root_question'] = ["This rule already exists"]
 
+    def _clean_skip_question(self, root_question, skip_question, subsection):
+        groups = filter(lambda group: root_question in group.question.all(), subsection.all_question_groups())
+        if len(groups) == 1 and groups[0].is_in_hybrid_grid():
+            if not groups[0].contains_or_sub_group_contains(skip_question):
+                self._errors['skip_question'] = ["Question to skip must be in the same hybrid grid"]
+
     def _clean_root_question(self):
         root_question = self.cleaned_data.get('root_question', None)
         skip_question = self.cleaned_data.get('skip_question', None)
         subsection = self.cleaned_data.get('subsection', None)
+
+        self._clean_skip_question(root_question, skip_question, subsection)
 
         if self._is_same_question(root_question, skip_question):
             raise ValidationError("Root question cannot be the same as skip question")

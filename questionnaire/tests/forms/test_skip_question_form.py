@@ -101,6 +101,49 @@ class SkipQuestionRuleFormTest(BaseTest):
         errors = 'This rule already exists'
         self.assertIn(errors, skip_question_form.errors['root_question'])
 
+
+class SkipQuestionInHybridGridFormTest(BaseTest):
+    def setUp(self):
+        root_question = QuestionFactory()
+        question_to_skip = QuestionFactory()
+        response = QuestionOptionFactory(question=root_question)
+
+        self.subsection = SubSectionFactory()
+        hybrid_grid_group = QuestionGroupFactory(hybrid=True, order=1)
+
+        root_question.question_group.add(hybrid_grid_group)
+        question_to_skip.question_group.add(hybrid_grid_group)
+
+        self.subsection.question_group.add(hybrid_grid_group)
+
+        self.form_data = {'root_question': root_question.id,
+                          'response': response.id,
+                          'skip_question': question_to_skip.id,
+                          'subsection': self.subsection.id}
+
+        QuestionGroupOrder.objects.create(question=root_question, question_group=hybrid_grid_group, order=1)
+        QuestionGroupOrder.objects.create(question=question_to_skip, question_group=hybrid_grid_group, order=2)
+
+    def test_invalid_if_root_question_is_in_hybrid_grid_and_skip_question_not(self):
+        question_to_skip = QuestionFactory()
+        question_group = QuestionGroupFactory(order=2)
+        question_to_skip.question_group.add(question_group)
+        self.subsection.question_group.add(question_group)
+        QuestionGroupOrder.objects.create(question=question_to_skip, question_group=question_group, order=2)
+
+        form_data = self.form_data
+        form_data['skip_question'] = question_to_skip.id
+
+        skip_question_rule_form = SkipQuestionForm(data=form_data)
+        self.assertFalse(skip_question_rule_form.is_valid())
+        self.assertEqual({'skip_question': [u'Question to skip must be in the same hybrid grid']},
+                         skip_question_rule_form.errors)
+
+    def test_valid_if_root_question_and_skip_question_are_in_hybrid_grid(self):
+        skip_question_form = SkipQuestionForm(data=self.form_data)
+        self.assertTrue(skip_question_form.is_valid())
+
+
 class SkipSubsectionRuleFormTest(BaseTest):
     def setUp(self):
         self.root_question = QuestionFactory()

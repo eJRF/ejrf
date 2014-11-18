@@ -57,7 +57,7 @@ angular.module('questionnaireApp', [])
                 });
         };
 
-        $scope.filterRootQuestions = function(question) {
+        $scope.filterQuestions = function(question) {
             return true;
         };
 
@@ -67,7 +67,7 @@ angular.module('questionnaireApp', [])
             updateCreateSubsectionRuleForm(subsectionId);
             if(gridId != undefined) {
                 $scope.subsectionTabHidden = true;
-                $scope.filterRootQuestions = function(question) {
+                $scope.filterQuestions = function(question) {
                     return question.parentQuestionGroup == gridId;
                 };
             }

@@ -2,6 +2,7 @@ from questionnaire.models import Questionnaire, Section, SubSection, Question, Q
     Region
 from questionnaire.models.question_groups import QuestionGroup
 from questionnaire.tests.base_test import BaseTest
+from questionnaire.tests.factories.question_factory import QuestionFactory
 
 
 class QuestionGroupTest(BaseTest):
@@ -15,6 +16,21 @@ class QuestionGroupTest(BaseTest):
         self.sub_grouped_question = QuestionGroup.objects.create(subsection=self.sub_section,
                                                                  parent=self.parent_question_group, order=2)
         self.sub_grouped_question.question.add(self.question)
+
+    def test_contains_or_sub_group_contains_where_question_is_in_parent(self):
+        question = QuestionFactory()
+        self.parent_question_group.question.add(question)
+        self.assertTrue(self.parent_question_group.contains_or_sub_group_contains(question))
+
+
+    def test_contains_or_sub_group_contains_where_question_is_in_sub_group(self):
+        self.assertTrue(self.parent_question_group.contains_or_sub_group_contains(self.question))
+
+
+    def test_contains_or_sub_group_contains_where_question_is_not_in_groups(self):
+        question = QuestionFactory()
+        self.assertFalse(self.parent_question_group.contains_or_sub_group_contains(question))
+
 
     def test_grouped_questions_field(self):
         grouped_question = QuestionGroup()

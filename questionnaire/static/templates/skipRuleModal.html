@@ -23,7 +23,7 @@
                     <div class="col-sm-7 center-fields">
                         <select required name="root_question" id="root-question"
                                 data-ng-model="skipRule.rootQuestion"
-                                data-ng-options="q.fields.text for q in questions | filter: {fields:{answer_type: 'MultiChoice'}} | filter:filterRootQuestions">
+                                data-ng-options="q.fields.text for q in questions | filter: {fields:{answer_type: 'MultiChoice'}} | filter:filterQuestions">
                             <option value="">Select Root Question</option>
                         </select>
                     </div>
@@ -48,7 +48,7 @@
 
                     <div class="col-sm-7 center-fields">
                         <select name="skip_question" required data-ng-model="skipRule.skipQuestion"
-                                data-ng-options="q.fields.text for q in questions | filter:matchSelectedQuestion">
+                                data-ng-options="q.fields.text for q in questions | filter:matchSelectedQuestion | filter:filterQuestions">
                             <option value="">Select Question</option>
                         </select>
                     </div>

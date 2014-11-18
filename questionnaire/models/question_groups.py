@@ -30,6 +30,12 @@ class QuestionGroup(BaseModel):
     def all_questions(self):
         return self.question.all()
 
+    def contains_or_sub_group_contains(self, question):
+        if question in self.all_questions():
+            return True
+        else:
+            return True in map(lambda group: group.contains_or_sub_group_contains(question), self.sub_groups())
+
     def sub_groups(self):
         return self.sub_group.all()
 
