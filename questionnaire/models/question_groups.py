@@ -45,11 +45,14 @@ class QuestionGroup(BaseModel):
         else:
             return self.grid
 
-    def parent_group_id(self):
+    def parent_group(self):
         if self.parent is not None:
-            return self.parent.parent_group_id()
+            return self.parent.parent_group()
         else:
-            return self.id
+            return self
+
+    def parent_group_id(self):
+        return self.parent_group().id
 
     def is_in_hybrid_grid(self):
         if self.parent is not None:

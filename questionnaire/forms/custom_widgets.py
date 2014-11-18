@@ -13,12 +13,16 @@ def get_rules(option_id, subsection):
         all_rules = SkipRule.objects.filter(response_id=option_id, subsection=subsection)
         question_rules = ''
         subsection_rules = ''
+        hybrid_grid_rules = ''
         if all_rules.exists():
-            rules_skipping_questions = SkipQuestion.objects.filter(subsection=subsection, response_id=option_id)
+            rules_skipping_questions = filter(lambda rule: not rule.is_in_hybrid_grid(),SkipQuestion.objects.filter(subsection=subsection, response_id=option_id))
+            rules_skipping_questions_in_hybrid_grids = filter(lambda rule: rule.is_in_hybrid_grid(),SkipQuestion.objects.filter(subsection=subsection, response_id=option_id))
             rules_skipping_subsections = SkipSubsection.objects.filter(subsection=subsection, response_id=option_id)
             question_rules = ",".join(map(lambda rule: str(rule.skip_question.id), rules_skipping_questions))
+            hybrid_grid_rules =  ",".join(map(lambda rule: str(rule.skip_question.id), rules_skipping_questions_in_hybrid_grids))
             subsection_rules = ",".join(map(lambda rule: str(rule.skip_subsection.id), rules_skipping_subsections))
-        return question_rules, subsection_rules
+
+        return question_rules, subsection_rules, hybrid_grid_rules
 
 class MultiChoiceAnswerSelectWidget(forms.Select):
     def __init__(self, subsection, attrs=None, choices=(), question_options=None):
@@ -36,7 +40,7 @@ class MultiChoiceAnswerSelectWidget(forms.Select):
             question_option = self.question_options.get(id=int(option_value))
             data_instruction = mark_safe(' data-instructions="%s"' % question_option.instructions)
 
-            (question_rules, subsection_rules) = get_rules(question_option, self.subsection)
+            (question_rules, subsection_rules, _) = get_rules(question_option, self.subsection)
             data_skip_rule = mark_safe(' data-skip-rules="%s"' % question_rules)
             data_subsection_skip_rule = mark_safe(' data-skip-subsection="%s"' % subsection_rules)
         if option_value in selected_choices:
@@ -96,7 +100,7 @@ class DataRuleRadioFieldRenderer(RadioFieldRenderer):
                            format_html_join("", '<li>{0}</li>', [(force_text(w),) for w in inputs]))
 
     def _add_attr(self, option):
-        (question_rules, subsection_rules) = self._get_rules(option.choice_value)
+        (question_rules, subsection_rules, _) = self._get_rules(option.choice_value)
         option.attrs.update({'data-skip-rules': question_rules})
         option.attrs.update({'data-skip-subsection': subsection_rules})
         return option

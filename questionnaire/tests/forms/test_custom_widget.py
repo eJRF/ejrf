@@ -1,7 +1,7 @@
 from django.core import serializers
 
 from questionnaire.forms.custom_widgets import MultiChoiceAnswerSelectWidget, MultiChoiceQuestionSelectWidget, \
-    SkipRuleRadioWidget, DataRuleRadioFieldRenderer
+    SkipRuleRadioWidget, DataRuleRadioFieldRenderer, get_rules
 from questionnaire.models import Question, QuestionOption, Theme
 from questionnaire.tests.base_test import BaseTest
 from questionnaire.tests.factories.question_factory import QuestionFactory
@@ -96,31 +96,36 @@ class SkipRuleSelectWidgetTest(BaseTest):
                          widget.render('name', option1.id, choices=((option1.id, option1.text), (option2.id, option2.text), ('2', 'Really'))))
 
 
-class DataRuleRadioFieldRendererTest(BaseTest):
-    def test_get_rules_for_option(self):
+class DataRuleTest(BaseTest):
+
+    def set_up(self, question_group, subsection):
         question = Question.objects.create(text='what do you drink?', UID='C_2013', answer_type='MultiChoice')
         skip_question = QuestionFactory()
-
         option1 = QuestionOption.objects.create(text='tusker lager', question=question, instructions="yeah yeah")
 
-        subsection = SubSectionFactory()
-
-        question_group = QuestionGroupFactory(subsection=subsection)
-
         question_group.question.add(question)
-
         skip_rule = SkipQuestionRuleFactory(root_question=question, response=option1, subsection=subsection,
-                                        skip_question=skip_question)
-
+                                            skip_question=skip_question)
         skip_rule2 = SkipSubsectionRuleFactory(root_question=question, response=option1, subsection=subsection,
-                                         skip_subsection=subsection)
+                                               skip_subsection=subsection)
+        return option1, skip_rule, skip_rule2, subsection
 
-        renderer = DataRuleRadioFieldRenderer('name', 1, attrs={},
-                                              choices=((option1.id, option1.text), ('2', 'Really'),),
-                                              subsection=subsection)
 
-        rules_for_option_1 = renderer._get_rules(option1.id)
-        expected_rule = (str(skip_rule.skip_question.id), str(skip_rule2.skip_subsection.id))
+    def test_get_rules_for_option_with_no_hybrid_grid_rules(self):
+        subsection = SubSectionFactory()
+        option1, skip_rule, skip_rule2, subsection = self.set_up(QuestionGroupFactory(subsection=subsection), subsection)
+
+        rules_for_option_1 = get_rules(option1.id, subsection)
+        expected_rule = (str(skip_rule.skip_question.id), str(skip_rule2.skip_subsection.id), "")
+        self.assertEqual(expected_rule, rules_for_option_1)
+
+
+    def test_get_rules_for_option_in_a_hybrid_grid(self):
+        subsection = SubSectionFactory()
+        option1, skip_rule, skip_rule2, subsection = self.set_up(QuestionGroupFactory(subsection=subsection, hybrid=True), subsection)
+
+        rules_for_option_1 = get_rules(option1.id, subsection)
+        expected_rule = ("", str(skip_rule2.skip_subsection.id), str(skip_rule.skip_question.id))
 
         self.assertEqual(expected_rule, rules_for_option_1)
 
