@@ -35,25 +35,31 @@ class MultiChoiceAnswerSelectWidget(forms.Select):
         data_instruction = ''
         data_skip_rule = ''
         data_subsection_skip_rule = ''
+        data_hybrid_grid_rules = ''
 
         if option_value:
             question_option = self.question_options.get(id=int(option_value))
             data_instruction = mark_safe(' data-instructions="%s"' % question_option.instructions)
 
-            (question_rules, subsection_rules, _) = get_rules(question_option, self.subsection)
-            data_skip_rule = mark_safe(' data-skip-rules="%s"' % question_rules)
-            data_subsection_skip_rule = mark_safe(' data-skip-subsection="%s"' % subsection_rules)
+            (question_rules, subsection_rules, hybrid_grid_rules) = get_rules(question_option, self.subsection)
+            if question_rules != "":
+                data_skip_rule = mark_safe(' data-skip-rules="%s"' % question_rules)
+            if subsection_rules != "":
+                data_subsection_skip_rule = mark_safe(' data-skip-subsection="%s"' % subsection_rules)
+            if hybrid_grid_rules != "":
+                data_hybrid_grid_rules = mark_safe(' data-skip-hybrid-grid-rules="%s"' % hybrid_grid_rules)
         if option_value in selected_choices:
             selected_html = mark_safe(' selected="selected"')
         else:
             selected_html = ''
 
-        return format_html('<option value="{0}"{1}{2}{3}{4}>{5}</option>',
+        return format_html('<option value="{0}"{1}{2}{3}{4}{5}>{6}</option>',
                            option_value,
                            selected_html,
                            data_instruction,
                            data_skip_rule,
                            data_subsection_skip_rule,
+                           data_hybrid_grid_rules,
                            force_text(option_label))
 
 
@@ -93,16 +99,19 @@ class DataRuleRadioFieldRenderer(RadioFieldRenderer):
         super(DataRuleRadioFieldRenderer, self).__init__(name, value, attrs, choices)
         self.subsection = subsection
 
-    # self.attrs.update({"data-skip-rule":self._get_rules(w.choice_value)})
     def render(self):
         inputs = map(lambda option: self._add_attr(option), self)
         return format_html('<ul>\n{0}\n</ul>',
                            format_html_join("", '<li>{0}</li>', [(force_text(w),) for w in inputs]))
 
     def _add_attr(self, option):
-        (question_rules, subsection_rules, _) = self._get_rules(option.choice_value)
-        option.attrs.update({'data-skip-rules': question_rules})
-        option.attrs.update({'data-skip-subsection': subsection_rules})
+        (question_rules, subsection_rules, hybrid_grid_rules) = self._get_rules(option.choice_value)
+        if question_rules != "":
+            option.attrs.update({'data-skip-rules': question_rules})
+        if subsection_rules != "":
+            option.attrs.update({'data-skip-subsection': subsection_rules})
+        if hybrid_grid_rules != "":
+            option.attrs.update({'data-skip-hybrid-grid-rules': hybrid_grid_rules})
         return option
 
     def _get_rules(self, option):

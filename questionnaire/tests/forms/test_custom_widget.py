@@ -1,7 +1,7 @@
 from django.core import serializers
 
 from questionnaire.forms.custom_widgets import MultiChoiceAnswerSelectWidget, MultiChoiceQuestionSelectWidget, \
-    SkipRuleRadioWidget, DataRuleRadioFieldRenderer, get_rules
+    SkipRuleRadioWidget, get_rules
 from questionnaire.models import Question, QuestionOption, Theme
 from questionnaire.tests.base_test import BaseTest
 from questionnaire.tests.factories.question_factory import QuestionFactory
@@ -27,9 +27,9 @@ class MultiChoiceAnswerSelectWidgetTest(BaseTest):
 
         widget = MultiChoiceAnswerSelectWidget(subsection, choices=choices, question_options=question.options.all())
 
-        expected_option_1 = '<option value="%d" selected="selected" data-instructions="%s" data-skip-rules="%s" data-skip-subsection="">%s</option>' % (
+        expected_option_1 = '<option value="%d" selected="selected" data-instructions="%s" data-skip-rules="%s">%s</option>' % (
             option1.id, option1.instructions, skip_rule.skip_question.id, option1.text)
-        expected_option_2 = '<option value="%d" data-instructions="%s" data-skip-rules="" data-skip-subsection="%s">%s</option>' % (
+        expected_option_2 = '<option value="%d" data-instructions="%s" data-skip-subsection="%s">%s</option>' % (
             option2.id, option2.instructions, skip_rule2.skip_subsection.id, option2.text)
 
         self.assertEqual(expected_option_1,
@@ -88,10 +88,31 @@ class SkipRuleSelectWidgetTest(BaseTest):
 
         expected_stuff = '<ul>\n' \
                          '<li><label><input checked="checked" data-skip-rules="%s" data-skip-subsection="%s" name="name" type="radio" value="%s" /> %s</label></li>' \
-                         '<li><label><input data-skip-rules="" data-skip-subsection="" name="name" type="radio" value="%s" /> %s</label></li>' \
-                         '<li><label><input data-skip-rules="" data-skip-subsection="" name="name" type="radio" value="2" /> Really</label></li>\n' \
+                         '<li><label><input name="name" type="radio" value="%s" /> %s</label></li>' \
+                         '<li><label><input name="name" type="radio" value="2" /> Really</label></li>\n' \
                          '</ul>' \
                          % (skip_rule.skip_question.id, skip_rule2.skip_subsection.id, option1.id, option1.text, option2.id, option2.text)
+        self.assertEqual(expected_stuff,
+                         widget.render('name', option1.id, choices=((option1.id, option1.text), (option2.id, option2.text), ('2', 'Really'))))
+    def test_render_with_skip_hybrid_grid_question_rule(self):
+        subsection = SubSectionFactory()
+        question_group = QuestionGroupFactory(subsection=subsection, hybrid=True)
+        question = Question.objects.create(text='what do you drink?', UID='C_2013', answer_type='MultiChoice')
+        option1 = QuestionOption.objects.create(text='tusker lager', question=question, instructions="yeah yeah")
+        option2 = QuestionOption.objects.create(text='tusker lager 2', question=question, instructions="ok yeah yeah")
+        question_group.question.add(question)
+        skip_question = QuestionFactory()
+        skip_rule = SkipQuestionRuleFactory(root_question=question, response=option1, subsection=subsection,
+                                        skip_question=skip_question)
+        widget = SkipRuleRadioWidget(subsection)
+
+
+        expected_stuff = '<ul>\n' \
+                         '<li><label><input checked="checked" data-skip-hybrid-grid-rules="%s" name="name" type="radio" value="%s" /> %s</label></li>' \
+                         '<li><label><input name="name" type="radio" value="%s" /> %s</label></li>' \
+                         '<li><label><input name="name" type="radio" value="2" /> Really</label></li>\n' \
+                         '</ul>' \
+                         % (skip_rule.skip_question.id, option1.id, option1.text, option2.id, option2.text)
         self.assertEqual(expected_stuff,
                          widget.render('name', option1.id, choices=((option1.id, option1.text), (option2.id, option2.text), ('2', 'Really'))))
 
