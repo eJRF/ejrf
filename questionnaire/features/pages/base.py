@@ -1,5 +1,5 @@
 from lettuce.django import django_url
-from nose.tools import assert_equals, assert_true
+from nose.tools import assert_equals, assert_true, assert_in
 
 
 class PageObject(object):
@@ -140,3 +140,7 @@ class PageObject(object):
     def click_label_by_for_attribute(self, for_attr):
         script = '$($("label[for=%s]")[0]).click()' % for_attr
         self.browser.execute_script(script)
+
+    def is_text_present_in_element_by_id(self, text_to_check_for, element_id):
+        text_in_element = self.get_text_of_element_by_id(element_id)
+        assert_in(text_to_check_for, text_in_element)

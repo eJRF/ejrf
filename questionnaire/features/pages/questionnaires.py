@@ -56,3 +56,8 @@ class QuestionnairePage(PageObject):
     def validate_check_box_ischecked_by_id(self, element_id):
         script = '$($("#%s")[0]).is(":checked")' % element_id
         assert_true(self.browser.evaluate_script(script))
+
+    def validate_numbering_of_subsection(self, subsection_numbering, subsection):
+        subsection_title_with_numbering = "%s %s" % (subsection_numbering, subsection.title)
+        subsection_element_id = "subsection-%s-content" % subsection.id
+        self.is_text_present_in_element_by_id(subsection_title_with_numbering, subsection_element_id)
