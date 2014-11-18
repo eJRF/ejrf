@@ -199,4 +199,5 @@ def when_i_create_a_new_subsection_skip_rule(step):
 
 @step(u'And that subsection should no longer be displayed')
 def and_that_subsection_should_no_longer_be_displayed(step):
+    world.page.click_by_id('save_draft_button')
     world.page._is_text_present(world.sub_section_2.title, False)
