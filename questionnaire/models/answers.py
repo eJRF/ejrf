@@ -40,7 +40,7 @@ class Answer(BaseModel):
 class NumericalAnswer(Answer):
 
     old_response = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True)
-    response = models.CharField(max_length=9, null=True)
+    response = models.CharField(max_length=20, null=True)
 
     def __unicode__(self):
         return '%s' % self.format_response()

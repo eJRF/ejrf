@@ -109,8 +109,8 @@ class NumericalAnswerTest(BaseTest):
         self.assertEqual(11, int_answer.format_response())
 
     def test_numerical_answer_cannot_be_longer_than_9_chars(self):
-        answer = NumericalAnswer(question=self.question, country=self.country, response='not a decimal number',
-                                 questionnaire=self.questionnaire)
+        answer = NumericalAnswer(question=self.question, country=self.country,
+                                 response='93939393939393939393939393993.39393', questionnaire=self.questionnaire)
         self.assertRaises(DatabaseError, answer.save)
 
     def test_format_response_returns_decimal_when_question_answer_sub_type_is_decimal(self):
