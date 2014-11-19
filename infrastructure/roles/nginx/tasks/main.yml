@@ -1,0 +1,15 @@
+---
+# tasks file for basic-setup
+- apt: update_cache=yes cache_valid_time=3600
+
+- apt: name={{item}} state=present
+  with_items:
+    - nginx
+
+- template: src=ejrf.nginx.conf.j2 dest=/etc/nginx/sites-available/ejrf
+
+- file: src=/etc/nginx/sites-available/ejrf dest=/etc/nginx/sites-enabled/ejrf state=link force=yes
+
+- file: path=/etc/nginx/sites-available/default state=absent
+
+- file: path=/etc/nginx/sites-enabled/default state=absent

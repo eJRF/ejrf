@@ -1,0 +1,7 @@
+---
+- hosts: server
+  sudo: true
+  roles:
+     - nginx
+     - postgres
+     - uwsgi

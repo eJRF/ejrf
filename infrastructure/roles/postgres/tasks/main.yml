@@ -1,0 +1,32 @@
+---
+- name: postgreql
+  apt: name={{ item }} state=present
+  with_items:
+    - postgresql
+    - postgresql-contrib
+    - pgadmin3
+    - python-psycopg2
+    - libpq-dev
+
+- postgresql_user: name=ejrf password=ejrf
+  sudo_user: postgres
+
+- name: pg_hba.conf localhost md5
+  lineinfile: dest=/etc/postgresql/9.3/main/pg_hba.conf regexp="^local[\s]+all[\s]+all[\s]+[\w]+$" line="local    all             all                                     md5"
+  register: confchange
+
+- command: ./postgresql reload
+  when: confchange|changed
+  args:
+    chdir: /etc/init.d/
+
+- postgresql_db: name=ejrf owner=ejrf state=present
+  sudo_user: postgres
+
+- command: ./postgresql reload
+  when: confchange|changed
+  args:
+    chdir: /etc/init.d/
+
+- postgresql_db: name=ejrf owner=ejrf state=present
+  sudo_user: postgres
