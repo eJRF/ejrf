@@ -1,4 +1,5 @@
 server {
+<<<<<<< HEAD
     listen          80 default_server;
     server_name     localhost;
 
@@ -14,6 +15,14 @@ server {
     #ssl_certificate_key /etc/nginx/ssl/e-jrf_org.key;
 
     error_page 497 https://$host:$server_port$request_uri;
+=======
+    listen 80;
+    charset utf-8;
+    access_log /var/log/nginx/ejrf.access.log;
+    error_log /var/log/nginx/ejrf.error.log;
+    # max upload size
+    client_max_body_size 50M;   # adjust to taste
+>>>>>>> [Remo] Added various playbooks to enable nginx for test and prod environments
 
     location / {
         uwsgi_pass unix:///tmp/ejrf.sock;
@@ -21,6 +30,14 @@ server {
     }
 
     location /static {
+<<<<<<< HEAD
         alias   /srv/checkout/app/static/;
     }
 }
+=======
+        alias   /srv/checkout/static/;
+
+    }
+
+}
+>>>>>>> [Remo] Added various playbooks to enable nginx for test and prod environments

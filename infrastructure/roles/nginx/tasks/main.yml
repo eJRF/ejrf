@@ -16,8 +16,6 @@
 
 - file: path=/etc/nginx/sites-available/default state=absent
 
-- file: path=/etc/nginx/sites-enabled/default state=absent
-
 - file: path=/etc/nginx/ssl owner=ubuntu  mode=0755 state=directory
 
 - copy: src={{ server_stage }}.crt dest=/etc/nginx/ssl/e-jrf_org.crt

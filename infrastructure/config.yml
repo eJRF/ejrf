@@ -1,61 +1,44 @@
 ---
 - hosts: all
+  sudo: yes
   tasks:
     - apt: name=git state=present update_cache=yes
-      sudo: yes
 
     - apt: name={{ item }} state=present
-      sudo: yes
       with_items:
         - python-pip
         - python-dev
 
-    - name: postgreql
-      apt: name={{ item }} state=present
-      sudo: yes
-      with_items:
-        - postgresql
-        - postgresql-contrib
-        - pgadmin3
-        - python-psycopg2
-        - libpq-dev
+
 
     - pip: name={{ item }}
-      sudo: yes
       with_items:
         - psycopg2
         - virtualenv
 
     - postgresql_user: name=ejrf password=ejrf
-      sudo: yes
       sudo_user: postgres
 
     - name: pg_hba.conf localhost md5
       lineinfile: dest=/etc/postgresql/9.3/main/pg_hba.conf regexp="^local[\s]+all[\s]+all[\s]+[\w]+$" line="local    all             all                                     md5"
-      sudo: yes
       register: confchange
 
     - service: name=postgresql state=reloaded
-      sudo: yes
       when: confchange|changed
 
     - command: ./postgresql reload
-      sudo: yes
       when: confchange|changed
       args:
         chdir: /etc/init.d/
 
     - postgresql_db: name=ejrf owner=ejrf state=present
-      sudo: yes
       sudo_user: postgres
 
 
     - file: path=/srv/checkout owner=ubuntu  mode=0755 state=directory
-      sudo: yes
 
     - name: ejrf repo
       git: repo=https://github.com/eJRF/ejrf.git dest=/srv/checkout version=HEAD
-      sudo: yes
 
     - name: ejrf requirements
       pip: requirements=/srv/checkout/pip-requirements.txt virtualenv=/srv/checkout/ejrfvenv
@@ -72,7 +55,6 @@
 
     - name: copy service config
       copy: src=djangoservice.conf dest=/etc/init/djangoservice.conf
-      sudo: yes
 
     - name: copy run server
       copy: src=run-server.sh dest=/srv/checkout/run-server.sh mode=777
