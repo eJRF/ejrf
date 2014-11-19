@@ -180,9 +180,9 @@ def and_the_questionnaire_has_been_published_to_the_data_submitter(step):
 
 @step(u'Then I should see the all the questions and subsections in that section')
 def then_i_should_see_the_all_the_questions_in_that_section_and_subsection(step):
-    world.page._is_text_present(world.question_to_skip.text)
-    world.page._is_text_present(world.root_question.text)
-    world.page._is_text_present(world.sub_section_2.title)
+    world.page.is_text_present(world.question_to_skip.text)
+    world.page.is_text_present(world.root_question.text)
+    world.page.is_text_present(world.sub_section_2.title)
 
 @step(u'When I select a response that skips a question')
 def when_i_select_a_response_that_skips_a_question(step):
@@ -190,7 +190,7 @@ def when_i_select_a_response_that_skips_a_question(step):
 
 @step(u'Then that question should no longer be displayed')
 def then_that_question_should_no_longer_be_displayed(step):
-    world.page._is_text_present(world.question_to_skip.text, False)
+    world.page.is_text_present(world.question_to_skip.text, status=False)
 
 @step(u'When I create a new subsection skip rule')
 def when_i_create_a_new_subsection_skip_rule(step):
@@ -199,7 +199,7 @@ def when_i_create_a_new_subsection_skip_rule(step):
 @step(u'And that subsection should no longer be displayed')
 def and_that_subsection_should_no_longer_be_displayed(step):
     world.page.click_by_id('save_draft_button')
-    world.page._is_text_present(world.sub_section_2.title, False)
+    world.page.is_text_present(world.sub_section_2.title, status=False)
 
 @step(u'Then I should see the subsections numbered according to their respective orders')
 def then_i_should_see_the_subsections_numbered_according_to_their_respective_orders(step):
@@ -213,12 +213,11 @@ def when_i_select_the_option_to_change_the_position_of_the_second_subsection(ste
 
 @step(u'Then I should see its current position marked as such')
 def then_i_should_see_its_current_position_marked_as_such(step):
-    sleep(1)
-    world.browser.find_by_name('modal-subsection-position')[0].click()
     world.page.is_text_present('2 (Current)')
 
 @step(u'And I should see the other positions available')
 def and_i_should_see_the_other_positions_available(step):
+    world.browser.find_by_name('modal-subsection-position')[0].click()
     world.page.is_text_present('1')
     world.page.is_text_present('3')
 

@@ -68,7 +68,6 @@ class SubsectionQuestionsTest(BaseTest):
         q2['parentQuestionGroup'] = self.question_group.id
 
         actualResponse = json.loads(response.content)['questions']
-        print actualResponse
         self.assertTrue(q1 in actualResponse)
         self.assertTrue(q2 in actualResponse)
         self.assertTrue(q3 in actualResponse)      
