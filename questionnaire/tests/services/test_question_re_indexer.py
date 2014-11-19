@@ -1,7 +1,8 @@
 from questionnaire.models import Questionnaire, Section, SubSection, Question, QuestionOption, QuestionGroup, \
     QuestionGroupOrder
-from questionnaire.services.question_re_indexer import QuestionReIndexer, SubSectionReIndexer
+from questionnaire.services.question_re_indexer import QuestionReIndexer, OrderBasedReIndexer
 from questionnaire.tests.base_test import BaseTest
+from questionnaire.tests.factories.questionnaire_factory import QuestionnaireFactory
 from questionnaire.tests.factories.section_factory import SectionFactory
 from questionnaire.tests.factories.sub_section_factory import SubSectionFactory
 
@@ -139,21 +140,21 @@ class SubsectionReIndexerServiceTest(BaseTest):
         self.subsection6 = SubSectionFactory(order=6, section=self.section)
 
     def test_swap_for_the_first_two_subsections(self):
-        subsection_indexer = SubSectionReIndexer(self.subsection1, 2)
+        subsection_indexer = OrderBasedReIndexer(self.subsection1, 2, section=self.section)
         subsection_indexer.reorder()
         re_ordered = SubSection.objects.filter(section=self.section).order_by('order')
         subsections_in_new_orders = [self.subsection2, self.subsection1, self.subsection3, self.subsection4, self.subsection5, self.subsection6]
         self.assertEqual(list(re_ordered), subsections_in_new_orders)
 
     def test_move_sub_section_displaces_other_subsections_forwards(self):
-        subsection_indexer = SubSectionReIndexer(self.subsection3, 5)
+        subsection_indexer = OrderBasedReIndexer(self.subsection3, 5, section=self.section)
         subsection_indexer.reorder()
         subsections_in_new_orders = [self.subsection1, self.subsection2, self.subsection4, self.subsection5, self.subsection3, self.subsection6]
         re_ordered = SubSection.objects.filter(section=self.section).order_by('order')
         self.assertEqual(list(re_ordered), subsections_in_new_orders)
 
     def test_move_sub_section_displaces_other_subsection_backwards(self):
-        subsection_indexer = SubSectionReIndexer(self.subsection6, 2)
+        subsection_indexer = OrderBasedReIndexer(self.subsection6, 2, section=self.section)
         subsection_indexer.reorder()
         re_ordered = SubSection.objects.filter(section=self.section).order_by('order')
         subsections_in_new_orders = [self.subsection1, self.subsection6, self.subsection2, self.subsection3, self.subsection4, self.subsection5]
@@ -161,7 +162,7 @@ class SubsectionReIndexerServiceTest(BaseTest):
         self.assertEqual(list(re_ordered), subsections_in_new_orders)
 
     def test_move_sub_section_to_position_1_displaces_other_subsection_backwards(self):
-        subsection_indexer = SubSectionReIndexer(self.subsection6, 1)
+        subsection_indexer = OrderBasedReIndexer(self.subsection6, 1, section=self.section)
         subsection_indexer.reorder()
         subsections_in_new_orders = [self.subsection6, self.subsection1, self.subsection2, self.subsection3, self.subsection4, self.subsection5]
         re_ordered = SubSection.objects.filter(section=self.section).order_by('order')
@@ -169,7 +170,33 @@ class SubsectionReIndexerServiceTest(BaseTest):
         self.assertEqual(list(re_ordered), subsections_in_new_orders)
 
     def test_moved_subsection_order_is_persisted(self):
-        subsection_indexer = SubSectionReIndexer(self.subsection1, 3)
+        subsection_indexer = OrderBasedReIndexer(self.subsection1, 3, section=self.section)
         subsection_indexer.reorder()
         subsection_order = SubSection.objects.get(id=self.subsection1.id)
         self.assertEqual(3, subsection_order.order)
+
+
+class SectionReIndexerTest(BaseTest):
+    def setUp(self):
+        self.questionnaire = QuestionnaireFactory()
+        self.section1 = SectionFactory(order=1, questionnaire=self.questionnaire)
+        self.section2 = SectionFactory(order=2, questionnaire=self.questionnaire)
+        self.section3 = SectionFactory(order=3, questionnaire=self.questionnaire)
+        self.section4 = SectionFactory(order=4, questionnaire=self.questionnaire)
+        self.section5 = SectionFactory(order=5, questionnaire=self.questionnaire)
+        self.section6 = SectionFactory(order=6, questionnaire=self.questionnaire)
+        self.section7 = SectionFactory(order=1)
+
+    def test_move_sub_section_displaces_other_sections_forwards(self):
+        section_indexer = OrderBasedReIndexer(self.section3, 5, questionnaire=self.questionnaire)
+        section_indexer.reorder()
+        sections_in_new_orders = [self.section1, self.section2, self.section4, self.section5, self.section3, self.section6]
+        re_ordered = Section.objects.filter(questionnaire=self.questionnaire).order_by('order')
+        self.assertEqual(list(re_ordered), sections_in_new_orders)
+
+    def test_move_sub_section_displaces_other_sections_backwards(self):
+        section_indexer = OrderBasedReIndexer(self.section5, 1, questionnaire=self.questionnaire)
+        section_indexer.reorder()
+        sections_in_new_orders = [self.section5, self.section1, self.section2, self.section3, self.section4, self.section6]
+        re_ordered = Section.objects.filter(questionnaire=self.questionnaire).order_by('order')
+        self.assertEqual(list(re_ordered), sections_in_new_orders)

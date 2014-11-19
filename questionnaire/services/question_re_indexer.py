@@ -1,6 +1,6 @@
 import copy
 
-from questionnaire.models import QuestionGroupOrder, QuestionGroup, SubSection
+from questionnaire.models import QuestionGroupOrder, QuestionGroup, SubSection, Section
 from questionnaire.utils.model_utils import number_from
 
 
@@ -53,18 +53,20 @@ class QuestionReIndexer(object):
         return value.split(",")
 
 
-class SubSectionReIndexer:
-    SUCCESS_MESSAGE = 'The subsections were reordered successfully!'
+class OrderBasedReIndexer:
 
-    def __init__(self, subsection, new_order):
-        self.subsection = subsection
+    def __init__(self, obj, new_order, **kwargs):
+        self.obj = obj
+        self.kwargs = kwargs
         self.new_order = number_from(new_order)
+        self.klass = eval(self.obj.__class__.__name__)
+        self.SUCCESS_MESSAGE = 'The %ss were reordered successfully!' % self.obj.__class__.__name__
 
     def reorder(self):
-        sub_sections = list(SubSection.objects.filter(section=self.subsection.section).order_by('order'))
-        subsection_to_swap = sub_sections.pop(self.subsection.order - 1)
-        sub_sections.insert(self.new_order - 1, subsection_to_swap)
-        for index, sub_section in enumerate(sub_sections):
-            sub_section.order = index + 1
-            sub_section.save()
+        all_objects = list(self.klass.objects.filter(**self.kwargs).order_by('order', '-modified'))
+        object_to_swap = all_objects.pop(self.obj.order - 1)
+        all_objects.insert(self.new_order - 1, object_to_swap)
+        for index, obj in enumerate(all_objects):
+            obj.order = index + 1
+            obj.save()
         return self.SUCCESS_MESSAGE

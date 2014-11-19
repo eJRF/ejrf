@@ -10,7 +10,7 @@ from questionnaire.forms.sections import SectionForm, SubSectionForm
 from questionnaire.mixins import RegionAndPermissionRequiredMixin, DoesNotExistExceptionHandlerMixin, \
     OwnerAndPermissionRequiredMixin
 from questionnaire.models import Section, SubSection
-from questionnaire.services.question_re_indexer import QuestionReIndexer, SubSectionReIndexer
+from questionnaire.services.question_re_indexer import QuestionReIndexer, OrderBasedReIndexer
 from questionnaire.utils.model_utils import reindex_orders_in
 
 
@@ -30,7 +30,6 @@ class NewSection(RegionAndPermissionRequiredMixin, CreateView):
 
     def form_valid(self, form):
         section = form.save(commit=False)
-        section.order = Section.get_next_order(form.cleaned_data['questionnaire'])
         section.region = self.request.user.user_profile.region
         section.save()
         messages.success(self.request, "Section created successfully")
@@ -195,6 +194,6 @@ class MoveSubsection(PermissionRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         subsection = SubSection.objects.get(id=request.POST.get('subsection'))
         order = request.POST.get('modal-subsection-position')
-        indexer_response = SubSectionReIndexer(subsection, order).reorder()
+        indexer_response = OrderBasedReIndexer(subsection, order, section=subsection.section).reorder()
         messages.success(request, indexer_response)
         return HttpResponseRedirect(subsection.get_absolute_url())

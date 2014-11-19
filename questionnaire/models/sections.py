@@ -14,6 +14,9 @@ class Section(BaseModel):
     questionnaire = models.ForeignKey(Questionnaire, blank=False, null=False, related_name="sections")
     region = models.ForeignKey("Region", blank=False, null=True, related_name="sections")
 
+    def __unicode__(self):
+        return self.name
+
     def ordered_questions(self):
         subsections = self.sub_sections.order_by('order')
         questions = []
@@ -41,6 +44,9 @@ class Section(BaseModel):
     def get_absolute_url(self):
         args = self.questionnaire.id, self.id
         return reverse('questionnaire_entry_page', args=args)
+
+    def is_last_in(self, questionnaire):
+        return self.order == Section.get_next_order(questionnaire) - 1
 
     @classmethod
     def get_next_order(cls, questionnaire):

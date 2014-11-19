@@ -5,12 +5,11 @@ from urllib import quote
 from django.core.urlresolvers import reverse
 
 from django.test import Client
-from mock import MagicMock, patch
 
 from questionnaire.forms.sections import SectionForm, SubSectionForm
 from questionnaire.models import Questionnaire, Section, SubSection, Region
-from questionnaire.services.question_re_indexer import SubSectionReIndexer
 from questionnaire.tests.base_test import BaseTest
+from questionnaire.tests.factories.section_factory import SectionFactory
 from questionnaire.tests.factories.sub_section_factory import SubSectionFactory
 
 
@@ -24,11 +23,13 @@ class SectionsViewTest(BaseTest):
         self.client.login(username=self.user.username, password='pass')
 
         self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013, region=self.region)
+        self.section = SectionFactory(questionnaire=self.questionnaire)
         self.url = '/questionnaire/entry/%s/section/new/' % self.questionnaire.id
         self.form_data = {'name': 'New section',
                           'description': 'funny section',
                           'title': 'some title',
-                          'questionnaire': self.questionnaire.id}
+                          'questionnaire': self.questionnaire.id,
+                          'order': 1}
 
     def test_get_create_section(self):
         response = self.client.get(self.url)
@@ -45,17 +46,6 @@ class SectionsViewTest(BaseTest):
         section = Section.objects.get(**self.form_data)
         self.failUnless(section)
         self.assertEqual(self.region, section.region)
-        self.assertRedirects(response,
-                             expected_url='/questionnaire/entry/%s/section/%s/' % (self.questionnaire.id, section.id))
-
-    def test_post_with_form_increments_order_before_saving(self):
-        Section.objects.create(name="Some", order=1, questionnaire=self.questionnaire)
-        form_data = self.form_data.copy()
-        form_data['name'] = 'Another section'
-        self.failIf(Section.objects.filter(**form_data))
-        response = self.client.post(self.url, data=form_data)
-        section = Section.objects.get(order=2, name=form_data['name'])
-        self.failUnless(section)
         self.assertRedirects(response,
                              expected_url='/questionnaire/entry/%s/section/%s/' % (self.questionnaire.id, section.id))
 

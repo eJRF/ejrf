@@ -1,5 +1,6 @@
 from time import sleep
 from lettuce import step, world
+from nose.tools import assert_true, assert_false
 from questionnaire.features.pages.step_utils import assign, create_user_with_no_permissions, \
     create_regional_admin_with_no_permissions
 from questionnaire.features.pages.users import LoginPage
@@ -66,11 +67,11 @@ def when_i_open_that_regional_questionnaire_for_editing(step):
 
 @step(u'And I have regional questions that are not assigned to my questionnaire')
 def and_i_have_regional_questions_that_are_not_assigned_to_my_questionnaire(step):
-    world.not_assigned_question1 = Question.objects.create(text='unassigned 1', export_label='UNICEF Contact',
+    world.not_assigned_question1 = Question.objects.create(text='unassigned 1', export_label='Un assigned 1',
                                                            UID='0033w', answer_type='Text', region=world.region)
-    world.not_assigned_question2 = Question.objects.create(text='unassigned 2', export_label='UNICEF Contact',
+    world.not_assigned_question2 = Question.objects.create(text='unassigned 2', export_label='Un assigned 2',
                                                            UID='00334', answer_type='Text', region=world.region)
-    world.not_assigned_question3 = Question.objects.create(text='unassigned 3', export_label='WHO Contact',
+    world.not_assigned_question3 = Question.objects.create(text='unassigned 3', export_label='Un assigned 3',
                                                            UID='0023w',
                                                            answer_type='Text', region=world.region)
 
@@ -92,9 +93,8 @@ def and_i_have_core_questions_assigned_to_my_questionnaire(step):
 
 @step(u'When I select the regional questions to assign to the questionnaire')
 def when_i_select_the_regional_questions_to_assign_to_the_questionnaire(step):
-    world.page.check(world.not_assigned_question1.id)
-    world.page.check(world.not_assigned_question2.id)
-    world.page.check(world.not_assigned_question3.id)
+    questions_to_assign = [world.not_assigned_question1, world.not_assigned_question2, world.not_assigned_question3]
+    world.page.ckeck_with_js('question', questions_to_assign)
 
 
 @step(u'Then I should see the newly assigned regional questions in the questionnaire')
@@ -105,15 +105,15 @@ def then_i_should_see_the_newly_assigned_regional_questions_in_the_questionnaire
 
 @step(u'Then I should see unassign options for each regional question')
 def then_i_should_see_unassign_options_for_each_regional_question(step):
-    assert world.page.is_element_present_by_id('unassign-question-%s' % world.question3.id)
-    assert world.page.is_element_present_by_id('unassign-question-%s' % world.question4.id)
-    assert world.page.is_element_present_by_id('unassign-question-%s' % world.question5.id)
+    assert_true(world.page.is_element_present_by_id('unassign-question-%s' % world.question3.id))
+    assert_true(world.page.is_element_present_by_id('unassign-question-%s' % world.question4.id))
+    assert_true(world.page.is_element_present_by_id('unassign-question-%s' % world.question5.id))
 
 
 @step(u'And I should not see unassign options for the core questions')
 def and_i_should_not_see_unassign_options_for_the_core_questions(step):
-    assert (world.page.is_element_present_by_id('unassign-question-%s' % world.question7.id), False)
-    assert (world.page.is_element_present_by_id('unassign-question-%s' % world.question8.id), False)
+    assert_false(world.page.is_element_present_by_id('unassign-question-%s' % world.question7.id))
+    assert_false(world.page.is_element_present_by_id('unassign-question-%s' % world.question8.id))
 
 
 @step(u'I choose to unassign a question from a sub-section')

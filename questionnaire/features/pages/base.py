@@ -1,5 +1,5 @@
 from lettuce.django import django_url
-from nose.tools import assert_equals, assert_true, assert_in
+from nose.tools import assert_equals, assert_true, assert_in, assert_false
 
 
 class PageObject(object):
@@ -105,7 +105,7 @@ class PageObject(object):
         assert self.browser.find_by_id(id).first['disabled']
 
     def is_element_with_id_enabled(self, id):
-        assert (self.browser.find_by_id(id).first['disabled'], False)
+        assert_false(self.browser.find_by_id(id).first['disabled'])
 
     def find_by_id(self, id, status=True):
         assert_equals(status, self.is_element_present_by_id(id))
@@ -144,3 +144,8 @@ class PageObject(object):
     def is_text_present_in_element_by_id(self, text_to_check_for, element_id):
         text_in_element = self.get_text_of_element_by_id(element_id)
         assert_in(text_to_check_for, text_in_element)
+
+    def ckeck_with_js(self, id_prefix, question_ids):
+        for qn in question_ids:
+            script = "$('#id-%s-%s').find('input').click()" % (id_prefix, qn.id)
+            self.browser.execute_script(script)
