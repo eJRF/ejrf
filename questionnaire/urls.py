@@ -11,7 +11,7 @@ from questionnaire.views.locations import ListRegions, ListCountries, RegionsFor
 from questionnaire.views.manage import ManageJRF, ManageRegionalJRF, EditQuestionnaireNameView
 from questionnaire.views.questionnaire_preview import PreviewQuestionnaire
 from questionnaire.views.sections import NewSection, NewSubSection, EditSection, EditSubSection, DeleteSection, \
-    DeleteSubSection, ReOrderQuestions, MoveSubsection, GetSubSections
+    DeleteSubSection, ReOrderQuestions, MoveSubsection, GetSubSections, MoveGrid
 from questionnaire.views.questions import QuestionList, CreateQuestion, DeleteQuestion, EditQuestion
 from questionnaire.views.questionnaires import Entry, SubmitQuestionnaire, DuplicateQuestionnaire, \
     FinalizeQuestionnaire, UnfinalizeQuestionnaire, PublishQuestionnaire, ApproveQuestionnaire, DeleteAnswerRow
@@ -94,8 +94,12 @@ urlpatterns = patterns('',
                            DeleteGrid.as_view(), name="delete_grid_page"),
                        url(r'^subsection/(?P<subsection_id>\d+)/assign_questions/$', AssignQuestion.as_view(),
                            name="assign_question_to_subsection_page"),
+
                        url(r'^subsection/move/$', MoveSubsection.as_view(),
                            name="move_subsection"),
+                       url(r'^grid/move/$', MoveGrid.as_view(),
+                           name="move_grid"),
+
                        url(r'^subsection/(?P<subsection_id>\d+)/question/(?P<question_id>\d+)/unassign/$',
                            UnAssignQuestion.as_view(), name="unassign_question_page"),
                        url(r'^subsection/(?P<subsection_id>\d+)/reorder/$', ReOrderQuestions.as_view(),

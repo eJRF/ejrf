@@ -1,9 +1,11 @@
-<h4 class="button-padding">
+<div class="button-padding">
+    <h4>
     {% if section.has_at_least_two_subsections and subsection.title %}
     {{ section.order }}.{{ subsection.order }}.
     {% endif %}
 
     {{ subsection.title | default_if_none:''}}
+    </h4>
     {% if perms.auth.can_edit_questionnaire and user.user_profile.region == questionnaire.region and not preview %}
     <div class="btn-group pull-right">
 
@@ -44,7 +46,7 @@
         {% endif %}
     </div>
     {% endif %}
-</h4>
+</div>
 {% if subsection.description %}
 <div class="">
     {{ subsection.description| safe }}

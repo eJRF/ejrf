@@ -10,10 +10,12 @@ function disableInputFields(status) {
         $(this).prop('disabled', status);
     });
     var $save_form_content = $('#save-options');
-    if (status)
-        {$save_form_content.hide();}
-    else
-        {$save_form_content.show();}
+    if (status) {
+        $save_form_content.hide();
+    }
+    else {
+        $save_form_content.show();
+    }
 
     $('.add-more').prop('disabled', status);
 }

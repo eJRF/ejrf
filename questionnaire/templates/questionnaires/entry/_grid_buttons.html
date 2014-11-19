@@ -1,13 +1,30 @@
 {% if perms.auth.can_edit_questionnaire and  user.user_profile.region == questionnaire.region and user.user_profile.region == group.region and not preview %}
-    <div class="btn-group pull-right">
-        <a href="" class="delete-grid pull-right" data-toggle="modal"
-           data-target="#delete-grid-modal-{{ group.id }}"
-           id="delete-grid-{{ group.id }}">
-            <span class="cyan"><span class="glyphicon glyphicon-trash"></span>Delete Grid</span>
-        </a>
-        <a href="" class="pull-right" data-toggle="modal" data-target="#create-skip-rule"
-           data-target="#" onClick="skipRules.updateGrid({{ subsection.id }}, {{ group.id }})">
-            <span class="cyan"><span class=""></span>Add Grid Rules</span>
-        </a>
-    </div>
+<div class="btn-group pull-right" xmlns="http://www.w3.org/1999/html">
+    <span>
+
+    <script>
+        var selectMove = function(direction, formId) {
+            $('#' + formId).find("input[name='move_direction']").val(direction);
+        }
+    </script>
+
+    <form id="move-grid-form-{{group.id}}" action="{% url 'move_grid' %}" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="move_direction" />
+        <input type="hidden" name="group_id" value="{{ group.id }}"/>
+        <input type="submit" value="up" onclick="selectMove('up', 'move-grid-form-{{group.id}}')"/>
+        <input type="submit" value="down" onclick="selectMove('down', 'move-grid-form-{{group.id}}')"/>
+    </form>
+
+    <a href="" class="delete-grid pull-right" data-toggle="modal"
+       data-target="#delete-grid-modal-{{ group.id }}"
+       id="delete-grid-{{ group.id }}">
+        <span class="cyan"><span class="glyphicon glyphicon-trash"></span>Delete Grid</span>
+    </a>
+    <a href="" class="pull-right" data-toggle="modal" data-target="#create-skip-rule"
+       data-target="#" onClick="skipRules.updateGrid({{ subsection.id }}, {{ group.id }})">
+        <span class="cyan"><span class=""></span>Add Grid Rules</span>
+    </a>
+    </span>
+</div>
 {% endif %}

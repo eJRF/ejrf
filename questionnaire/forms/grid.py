@@ -102,3 +102,4 @@ class GridForm(forms.Form):
         for index, question_id in enumerate(question_ids):
             question = filter(lambda question: question.id == int(question_id), non_primary_questions)
             grid_group.orders.create(order=index + 1, question=question[0])
+

@@ -9,7 +9,7 @@ from django.views.generic import CreateView, UpdateView, DeleteView, View
 from questionnaire.forms.sections import SectionForm, SubSectionForm
 from questionnaire.mixins import RegionAndPermissionRequiredMixin, DoesNotExistExceptionHandlerMixin, \
     OwnerAndPermissionRequiredMixin
-from questionnaire.models import Section, SubSection
+from questionnaire.models import Section, SubSection, QuestionGroup
 from questionnaire.services.question_re_indexer import QuestionReIndexer, OrderBasedReIndexer
 from questionnaire.utils.model_utils import reindex_orders_in
 
@@ -197,3 +197,32 @@ class MoveSubsection(PermissionRequiredMixin, View):
         indexer_response = OrderBasedReIndexer(subsection, order, section=subsection.section).reorder()
         messages.success(request, indexer_response)
         return HttpResponseRedirect(subsection.get_absolute_url())
+
+
+
+
+class MoveGrid(PermissionRequiredMixin, View):
+
+    permission_required = 'auth.can_edit_questionnaire'
+
+    def post(self, request, *args, **kwargs):
+
+        group_id = request.POST.get("group_id")
+        move_direction= request.POST.get("move_direction")
+
+        question_group = QuestionGroup.objects.get(id=group_id)
+        MoveGrid.reorder_group_in_sub_section(question_group,move_direction)
+        return HttpResponseRedirect(question_group.subsection.get_absolute_url())
+
+    @classmethod
+    def reorder_group_in_sub_section(cls, group, move_direction):
+        if(group.order > 1):
+            group_above = group.subsection.question_group.get(order=group.order - 1)
+            if(group_above.grid):
+                group.order -= 1
+                group.save()
+                group_above.order += 1
+                group_above.save()
+            else:
+                pass
+                # group.subsection.question_group.add(QuestionGroup(order=group.order + 1))

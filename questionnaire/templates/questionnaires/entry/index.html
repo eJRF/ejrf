@@ -26,7 +26,12 @@
         <div id="section-title">
             {% include 'questionnaires/entry/_section_title.html' %}
         </div>
-        <form class="form-horizontal" id="questionnaire_entry" role="form" method="post">
+
+        {% if perms.auth.can_edit_questionnaire %}
+            <div class="form-horizontal" id="questionnaire_entry" role="form">
+        {% else %}
+            <form class="form-horizontal" id="questionnaire_entry" role="form" method="post">
+        {% endif %}
             <input type="hidden" value="{{ the_version }}" id="version-holder" class="hide"/>
             {% if preview %}
             <input type='hidden' name='preview' id="preview" value={{ preview }}/>
@@ -65,7 +70,11 @@
                 {% endfor %}
             </div>
             {% include 'questionnaires/entry/_save_button.html' %}
-        </form>
+        {% if perms.auth.can_edit_questionnaire %}
+            </div>
+        {% else %}
+            </form>
+        {% endif %}
     </div>
 </div>
 
