@@ -11,7 +11,7 @@ subsectionPositions.getSubSections = function (selectedSubsectionOrder) {
         if (selectedSubsectionOrder == order) {
             $('#subsection').val(id);
             $('#move_modal_label').text('Change Position of subsection: ' + name.replace('None', 'Un-titled subsection ' + order));
-            $('#modal-subsection-id').append('<option value=' + order + '>' + order + ' (Current) ' + '</option>');
+            $('#modal-subsection-id').append('<option value=' + order + ' selected>' + order + ' (Current) ' + '</option>');
         } else {
             $('#modal-subsection-id').append('<option value=' + order + '>' + order + '</option>');
         }
