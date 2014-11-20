@@ -116,7 +116,6 @@ var applySkipRules = (function () {
         showGridElements: function (elementsToBeHidden, gridInstance) {
             var self = this;
             $.map(self.hiddenGridQuestions, function (val, _) {
-                console.log(val);
                 if ($.inArray(val, elementsToBeHidden) === -1) {
                     self.showGridQuestion(val, gridInstance);
                 }
