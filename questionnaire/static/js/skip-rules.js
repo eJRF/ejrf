@@ -10,7 +10,15 @@ var applySkipRules = (function () {
     $(document).ready(function () {
         hideAllQuestions();
         hideAllSubsections();
+        hideElementsInScopeBy('.grid-group')
     });
+
+    var hideElementsInScopeBy = function(scopeClass){
+        var elementsToBeHidden = $(scopeClass);
+        $.map(elementsToBeHidden, function(originalGridInstance){
+            self.applySkipRules.hideAllGridQuestions(originalGridInstance);
+        })
+    }
 
     var hideQuestionById = function (id) {
         $('.form-group-question-' + id).hide();
@@ -117,29 +125,34 @@ var applySkipRules = (function () {
                 }
             });
         },
+        getallSelectedResponses: function(gridInstance){
+            var checkedRadios = $(gridInstance).find('[type=radio]:checked');
+            var selectedOptions = $(gridInstance).find('option:checked');
+            var allSelectedResponses = [];
+            $.merge(allSelectedResponses, checkedRadios);
+            $.merge(allSelectedResponses, selectedOptions);
+            return allSelectedResponses;
+        },
+
+        hideAllGridQuestions: function(gridInstance){
+            var allSelectedResponses = this.getallSelectedResponses(gridInstance)
+            var questionIdsToHide = getElementsToSkip(allSelectedResponses, 'data-skip-hybrid-grid-rules');
+            this.showGridElements(questionIdsToHide, gridInstance)
+
+            $.map(questionIdsToHide, function (val) {
+                $(gridInstance).find('.form-group-question-' + val).hide();
+            });
+            this.hiddenGridQuestions = questionIdsToHide;
+        },
         bindSkipRulesOn: function (gridInstance) {
             var self = this;
             $(gridInstance).find('div[class^="form-group form-group-question-"]').show()
-            var getallSelectedResponses =  function(){
-                var checkedRadios = $(gridInstance).find('[type=radio]:checked');
-                var selectedOptions = $(gridInstance).find('option:checked');
-                var allSelectedResponses = [];
-                $.merge(allSelectedResponses, checkedRadios);
-                $.merge(allSelectedResponses, selectedOptions);
-                return allSelectedResponses;
-            };
             var allOptions = $(gridInstance).find('[type="radio"], select');
 
             $.map(allOptions, function (element) {
                 $(element).off('change');
                 $(element).on('change', function () {
-                    var questionIdsToHide = getElementsToSkip(getallSelectedResponses(), 'data-skip-hybrid-grid-rules');
-                    self.showGridElements(questionIdsToHide, gridInstance)
-
-                    $.map(questionIdsToHide, function (val) {
-                        $(gridInstance).find('.form-group-question-' + val).hide();
-                    });
-                    self.hiddenGridQuestions = questionIdsToHide;
+                    self.hideAllGridQuestions(gridInstance)
                 })
             })
         }
