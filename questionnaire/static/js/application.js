@@ -166,16 +166,19 @@ $('input[type=radio]').on('click', function(){
     $redundant_hidden_radio.remove();
 });
 
-$('.add-row').on('click', function(event) {
-    var $el = $(this);
-    addRowOn($el, 'tr', 'table');
-    event.preventDefault();
-});
-
 $('.add-more').on('click', function(event) {
     var $el = $(this);
     var $new_row = addRowOn($el, '.hybrid-group-row', '.question-group');
     showSeparator($new_row);
+
+    //applySkipRules.bindSkipRulesOn is exported by skip-rules.js
+    applySkipRules.bindSkipRulesOn($new_row);
+    event.preventDefault();
+});
+
+$('.add-row').on('click', function(event) {
+    var $el = $(this);
+    addRowOn($el, 'tr', 'table');
     event.preventDefault();
 });
 

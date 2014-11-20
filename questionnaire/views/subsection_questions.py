@@ -24,8 +24,5 @@ class SubsectionQuestions(PermissionRequiredMixin, View):
                 question_dict['options'] = json.loads(options_json)
                 question_dict['parentQuestionGroup'] = qg.parent_group_id()
                 questions.append(question_dict)
-
-        data = {}
-        data['questions'] = questions
-
+        data = {'questions': questions}
         return HttpResponse(json.dumps(data), content_type="application/json")

@@ -48,7 +48,8 @@
                             </ul>
                         {% endif %}
                     {% else %}
-                        <div class="form-group">
+
+                        <div class="form-group form-group-question-{{ order.question.id }}">
                             <label class="col-sm-6 control-label">
                                 {% spaceless %}
                                 <div class="question-number">
@@ -112,8 +113,8 @@
         {% endwith %}
     {% endfor %}
     <div class="hybrid-group-row">
-        <button type="button" href="#" class="btn btn-default add-more"><span class="cyan bold"><i
-            class="glyphicon glyphicon-plus"></i> Add More</span></button>
+        <button type="button" href="#" class="btn btn-default add-more">
+            <span class="cyan bold"><i class="glyphicon glyphicon-plus"></i> Add More</span></button>
     </div>
 </div>
 
