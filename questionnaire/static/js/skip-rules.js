@@ -1,24 +1,26 @@
 var applySkipRules = (function () {
     var self = this;
-    var allRadios = $(":radio");
-    var allOptions = $("select");
-    var originalGridInstance = $('.grid-group')
-
-    var allHiddenQuestions = [];
-    var allHiddenSubsections = [];
+    var allRadios = $(":radio"),
+        allOptions = $("select"),
+        allHiddenQuestions = [],
+        allHiddenSubsections = [];
 
     $(document).ready(function () {
         hideAllQuestions();
         hideAllSubsections();
-        hideElementsInScopeBy('.grid-group')
+        hideElementsInScopeBy('.hybrid-group-row')
     });
 
-    var hideElementsInScopeBy = function(scopeClass){
+    var hideElementsInScopeBy = function (scopeClass) {
         var elementsToBeHidden = $(scopeClass);
-        $.map(elementsToBeHidden, function(originalGridInstance){
-            self.applySkipRules.hideAllGridQuestions(originalGridInstance);
+        $.map(elementsToBeHidden, function (element) {
+            console.log(element);
+            self.applySkipRules.bindOnChangeEventListener(element);
+        });
+        $.map(elementsToBeHidden, function (elementToHide) {
+            self.applySkipRules.hideAllGridQuestions(elementToHide);
         })
-    }
+    };
 
     var hideQuestionById = function (id) {
         $('.form-group-question-' + id).hide();
@@ -37,20 +39,20 @@ var applySkipRules = (function () {
     var getElementsToSkip = function (selectedElements, dataAttribute) {
         var elements = $.map(selectedElements, function (val) {
             if (val.attributes[dataAttribute]) {
-                var data = val.attributes[dataAttribute]
+                var data = val.attributes[dataAttribute];
                 return data && data.value.split(",");
             } else {
                 return '';
             }
         });
-        return $.grep(elements, function (val, index) {
+        return $.grep(elements, function (val, _) {
             return val !== '';
         });
     };
 
     var showElements = function (currentlyHiddenElements, elementsToBeHidden, fnShow) {
 
-        $.map(currentlyHiddenElements, function (val, index) {
+        $.map(currentlyHiddenElements, function (val, _) {
             if ($.inArray(val, elementsToBeHidden) === -1) {
                 fnShow(val);
             }
@@ -72,19 +74,14 @@ var applySkipRules = (function () {
         allHiddenQuestions = questionIdsToHide;
     };
 
-    var hideQuestionsWithinHybridGroup = function () {
-        hideQuestions('data-skip-hybrid-grid-rules')
-    };
-
     var hideAllQuestions = function () {
         hideQuestions('data-skip-rules');
     };
 
-
     var hideAllSubsections = function () {
-        var checkedRadios = $('[type="radio"]:checked');
-        var selectedOptions = $('option:selected');
-        var allSelectedResponses = [];
+        var checkedRadios = $('[type="radio"]:checked'),
+            selectedOptions = $('option:selected'),
+            allSelectedResponses = [];
         $.merge(allSelectedResponses, checkedRadios);
         $.merge(allSelectedResponses, selectedOptions);
         var subsectionIdsToHide = getElementsToSkip(allSelectedResponses, 'data-skip-subsection');
@@ -114,47 +111,49 @@ var applySkipRules = (function () {
         getElementsToSkip: getElementsToSkip,
         showElements: showElements,
         hiddenGridQuestions: [],
-        showGridQuestion: function(val, gridInstance){
+        showGridQuestion: function (val, gridInstance) {
             $(gridInstance).find('.form-group-question-' + val).show();
         },
         showGridElements: function (elementsToBeHidden, gridInstance) {
-        var self = this;
-        $.map(self.hiddenGridQuestions, function (val, index) {
+            var self = this;
+            $.map(self.hiddenGridQuestions, function (val, _) {
+                console.log(val);
                 if ($.inArray(val, elementsToBeHidden) === -1) {
                     self.showGridQuestion(val, gridInstance);
                 }
             });
         },
-        getallSelectedResponses: function(gridInstance){
-            var checkedRadios = $(gridInstance).find('[type=radio]:checked');
-            var selectedOptions = $(gridInstance).find('option:checked');
-            var allSelectedResponses = [];
+        getAllSelectedResponses: function (gridInstance) {
+            var checkedRadios = $(gridInstance).find('[type=radio]:checked'),
+                selectedOptions = $(gridInstance).find('option:checked'),
+                allSelectedResponses = [];
+
             $.merge(allSelectedResponses, checkedRadios);
             $.merge(allSelectedResponses, selectedOptions);
             return allSelectedResponses;
         },
 
-        hideAllGridQuestions: function(gridInstance){
-            var allSelectedResponses = this.getallSelectedResponses(gridInstance)
-            var questionIdsToHide = getElementsToSkip(allSelectedResponses, 'data-skip-hybrid-grid-rules');
-            this.showGridElements(questionIdsToHide, gridInstance)
-
+        hideAllGridQuestions: function (gridInstance) {
+            var allSelectedResponses = this.getAllSelectedResponses(gridInstance),
+                questionIdsToHide = getElementsToSkip(allSelectedResponses, 'data-skip-hybrid-grid-rules');
+            this.showGridElements(questionIdsToHide, gridInstance);
             $.map(questionIdsToHide, function (val) {
                 $(gridInstance).find('.form-group-question-' + val).hide();
             });
             this.hiddenGridQuestions = questionIdsToHide;
         },
-        bindSkipRulesOn: function (gridInstance) {
+        bindOnChangeEventListener: function (gridInstance) {
             var self = this;
-            $(gridInstance).find('div[class^="form-group form-group-question-"]').show()
             var allOptions = $(gridInstance).find('[type="radio"], select');
-
             $.map(allOptions, function (element) {
-                $(element).off('change');
                 $(element).on('change', function () {
                     self.hideAllGridQuestions(gridInstance)
                 })
             })
+        },
+        bindSkipRulesOn: function (gridInstance) {
+            $(gridInstance).find('div[class^="form-group form-group-question-"]').show();
+            this.bindOnChangeEventListener(gridInstance);
         }
     };
 })();
