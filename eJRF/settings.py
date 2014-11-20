@@ -10,6 +10,7 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
@@ -27,7 +28,7 @@ TEMPLATE_DEBUG = True
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
+    # 'django.template.loaders.eggs.Loader',
 )
 
 STATICFILES_DIRS = (
@@ -41,7 +42,7 @@ STATIC_ROOT = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
 ALLOWED_HOSTS = []
@@ -84,11 +85,11 @@ WSGI_APPLICATION = 'eJRF.wsgi.application'
 
 DATABASES = {
     'default': {
-           "ENGINE": "django.db.backends.postgresql_psycopg2",
-           "NAME": "ejrf",
-           "USER": "ejrf",
-           "PASSWORD": "ejrf",
-           "HOST": "localhost",
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": "ejrf",
+        "USER": "ejrf",
+        "PASSWORD": "ejrf",
+        "HOST": "localhost",
     }
 }
 
@@ -123,6 +124,6 @@ ACCEPTED_EXTENSIONS = [".doc", ".docx", ".htm", ".html", ".jpg", ".pdf", ".ppt",
 MAX_UPLOAD_SIZE = 52428800
 # Importing server specific settings
 try:
-   from localsettings import *
+    from localsettings import *
 except ImportError, e:
-   pass
+    pass

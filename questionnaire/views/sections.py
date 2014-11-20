@@ -208,11 +208,17 @@ def swap_order(group1, group2):
     group1.save()
     group2.save()
 
+def move_subsection_groups_down_from(group):
+    groups_to_move = filter(lambda g: group != g and g.order >= group.order, group.subsection.question_group.all())
+    for g in groups_to_move:
+        g.order += 1
+        g.save()
+
+
 class MoveGrid(PermissionRequiredMixin, View):
     permission_required = 'auth.can_edit_questionnaire'
 
     def post(self, request, *args, **kwargs):
-
         group_id = request.POST.get("group_id")
         move_direction = request.POST.get("move_direction")
 
@@ -221,18 +227,36 @@ class MoveGrid(PermissionRequiredMixin, View):
         return HttpResponseRedirect(question_group.subsection.get_absolute_url())
 
     @classmethod
+    def move_and_create_group(cls, group, group_below, question_to_move, difference_in_pos):
+        new_group = group.subsection.question_group.create(order=group.order + difference_in_pos)
+        move_subsection_groups_down_from(new_group)
+        first_question = question_to_move
+        first_question.question_group.remove(group_below)
+        first_question.question_group.add(new_group)
+
+    @classmethod
+    def move_up(cls, group):
+        if group.order > 1:
+            group_above = group.subsection.question_group.get(order=group.order - 1)
+            if group_above.grid or (len(group_above.and_sub_group_questions()) <= 1):
+                swap_order(group, group_above)
+            else:
+                question_to_move = group_above.and_sub_group_questions()[:-1][0]
+                cls.move_and_create_group(group, group_above, question_to_move, 1)
+
+    @classmethod
+    def move_down(cls, group):
+        if group.order < group.subsection.question_group.filter(parent__isnull=True).count():
+            group_below = group.subsection.question_group.get(order=group.order + 1)
+            if group_below.grid or (len(group_below.and_sub_group_questions()) <= 1):
+                swap_order(group, group_below)
+            else:
+                question_to_move = group_below.and_sub_group_questions()[0]
+                cls.move_and_create_group(group, group_below, question_to_move, 0)
+
+    @classmethod
     def reorder_group_in_sub_section(cls, group, move_direction):
         if move_direction == "up":
-            if group.order > 1:
-                group_above = group.subsection.question_group.get(order=group.order - 1)
-                if group_above.grid or (len(group_above.and_sub_group_questions()) <= 1):
-                    swap_order(group, group_above)
-                else:
-                    new_group = group.subsection.question_group.create(order=group.order + 1)
-                    last_question = group_above.and_sub_group_questions()[:-1][0]
-                    last_question.question_group.remove(group_above)
-                    last_question.question_group.add(new_group)
-        else:  # group.subsection.question_group.add(QuestionGroup(order=group.order + 1))
-            if group.order < group.subsection.question_group.all().count():
-                group_below = group.subsection.question_group.get(order=group.order + 1)
-                swap_order(group, group_below)
+            cls.move_up(group)
+        else:
+            cls.move_down(group)
