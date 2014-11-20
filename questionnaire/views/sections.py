@@ -199,30 +199,40 @@ class MoveSubsection(PermissionRequiredMixin, View):
         return HttpResponseRedirect(subsection.get_absolute_url())
 
 
+def swap_order(group1, group2):
+    group1_order = group1.order
+    group2_order = group2.order
 
+    group1.order = group2_order
+    group2.order = group1_order
+    group1.save()
+    group2.save()
 
 class MoveGrid(PermissionRequiredMixin, View):
-
     permission_required = 'auth.can_edit_questionnaire'
 
     def post(self, request, *args, **kwargs):
 
         group_id = request.POST.get("group_id")
-        move_direction= request.POST.get("move_direction")
+        move_direction = request.POST.get("move_direction")
 
         question_group = QuestionGroup.objects.get(id=group_id)
-        MoveGrid.reorder_group_in_sub_section(question_group,move_direction)
+        MoveGrid.reorder_group_in_sub_section(question_group, move_direction)
         return HttpResponseRedirect(question_group.subsection.get_absolute_url())
 
     @classmethod
     def reorder_group_in_sub_section(cls, group, move_direction):
-        if(group.order > 1):
-            group_above = group.subsection.question_group.get(order=group.order - 1)
-            if(group_above.grid):
-                group.order -= 1
-                group.save()
-                group_above.order += 1
-                group_above.save()
-            else:
-                pass
-                # group.subsection.question_group.add(QuestionGroup(order=group.order + 1))
+        if move_direction == "up":
+            if group.order > 1:
+                group_above = group.subsection.question_group.get(order=group.order - 1)
+                if group_above.grid or (len(group_above.and_sub_group_questions()) <= 1):
+                    swap_order(group, group_above)
+                else:
+                    new_group = group.subsection.question_group.create(order=group.order + 1)
+                    last_question = group_above.and_sub_group_questions()[:-1][0]
+                    last_question.question_group.remove(group_above)
+                    last_question.question_group.add(new_group)
+        else:  # group.subsection.question_group.add(QuestionGroup(order=group.order + 1))
+            if group.order < group.subsection.question_group.all().count():
+                group_below = group.subsection.question_group.get(order=group.order + 1)
+                swap_order(group, group_below)
