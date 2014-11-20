@@ -14,7 +14,6 @@ var applySkipRules = (function () {
     var hideElementsInScopeBy = function (scopeClass) {
         var elementsToBeHidden = $(scopeClass);
         $.map(elementsToBeHidden, function (element) {
-            console.log(element);
             self.applySkipRules.bindOnChangeEventListener(element);
         });
         $.map(elementsToBeHidden, function (elementToHide) {

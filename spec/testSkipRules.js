@@ -7,7 +7,7 @@ function setUpHTMLFixture() {
 
 
 describe("skip rules", function() {
-    describe("getElementsToSkip", function() {    	
+    describe("getElementsToSkip", function() {
 		setUpHTMLFixture();
 
     	it("should return an empty collection when passed an empty collection", function(){
@@ -16,13 +16,14 @@ describe("skip rules", function() {
     	it("should return an empty collection when none of the elements have a value for data-skip-rule attribute", function(){
 			expect(applySkipRules.getElementsToSkip($('.singleElementNoAttr'), 'data-skip-rules').length).toEqual(0);
     	});
-    	
+
     	it("should return an single element collection when one elements has a data-skip-rule attribute", function(){
     		var actualResult = applySkipRules.getElementsToSkip($('.singleElementWithAttr'), 'data-skip-rules');
 			expect(actualResult.length).toEqual(1);
 			expect(actualResult[0]).toEqual('23');
     	});
     });
+
     describe("showElements", function() {
         var fns = {
             hide: function(val) { return; },
@@ -48,5 +49,29 @@ describe("skip rules", function() {
     		applySkipRules.showElements(["23","43"],["23","43"], fns.show);
     		expect(fns.show.calls.length).toEqual(0);
     	});
+    });
+
+    describe("getallSelectedResponses", function() {
+        var gridInstance = '<div class="hybrid-group-row">' +
+                            '<div class="col-sm-5 center-fields">' +
+                                '<input type="hidden" id="id_MultiChoice-1-response" name="MultiChoice-1-response" value="0,55">' +
+                                '<input type="hidden" id="id_MultiChoice-1-response" name="MultiChoice-1-response" value="" exclude="true">' +
+                                '<ul>' +
+                                    '<li>' +
+                                        '<label for="id_MultiChoice-1-response_0">' +
+                                            '<input id="id_MultiChoice-1-response_0" name="MultiChoice-1-response" type="radio" value="61"> Acellular</label>' +
+                                    '</li>' +
+                                    '<li>' +
+                                        '<label for="id_MultiChoice-1-response_1">' +
+                                            '<input checked="checked" id="id_MultiChoice-1-response_1" name="MultiChoice-1-response" type="radio" value="62"> Whole cell </label>'+
+                                    '</li>' +
+                                '</ul>' +
+                            '</div>'
+
+        it('should get all selected checkboxes', function(){
+            $('body').append(gridInstance)
+            var selectedOptions = applySkipRules.getAllSelectedResponses($('.hybrid-group-row'))
+            expect(selectedOptions.length).toEqual(1)
+        });
     });
 });
