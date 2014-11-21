@@ -108,6 +108,10 @@ class NumericalAnswerTest(BaseTest):
                                                     questionnaire=self.questionnaire)
         self.assertEqual(11, int_answer.format_response())
 
+        blank_answer = NumericalAnswer.objects.create(question=self.question, country=self.country, response='     ',
+                                            questionnaire=self.questionnaire)
+        self.assertEqual('', blank_answer.format_response())
+
     def test_numerical_answer_cannot_be_longer_than_9_chars(self):
         answer = NumericalAnswer(question=self.question, country=self.country,
                                  response='93939393939393939393939393993.39393', questionnaire=self.questionnaire)
@@ -117,8 +121,8 @@ class NumericalAnswerTest(BaseTest):
         question = QuestionFactory(answer_type=AnswerTypes.NUMBER, answer_sub_type=AnswerTypes.DECIMAL)
         answer_one = NumericalAnswerFactory(question=question, response=44.6)
         answer_two = NumericalAnswerFactory(question=question, response=44)
-        self.assertEqual(44.6, answer_one.format_response())
-        self.assertEqual(44.0, answer_two.format_response())
+        self.assertEqual('44.6', answer_one.format_response())
+        self.assertEqual('44', answer_two.format_response())
 
     def test_format_response_returns_integer_when_question_answer_sub_type_is_integer(self):
         question = QuestionFactory(answer_type=AnswerTypes.NUMBER, answer_sub_type=AnswerTypes.INTEGER)

@@ -48,7 +48,7 @@ class NumericalAnswer(Answer):
     def format_response(self):
         if AnswerTypes.is_integer(self.question.answer_sub_type) and number_from(self.response):
             return int(number_from(self.response))
-        return self.response
+        return ('%s' % self.response).strip()
 
     def _answer_sub_type_is_integer(self):
         return self.response and self.question.answer_sub_type and self.question.answer_sub_type.lower() == AnswerTypes.INTEGER.lower()
