@@ -289,7 +289,6 @@ class GridReordererTest(BaseTest):
         self.assertEqual(question_group2.order, 3)
         self.assertEqual(question_group3.order, 4)
         self.assertEqual(question_group4.order, 5)
-        print question_group3.question.all()
         self.assertEqual(len(question_group3.ordered_questions()), 1)
         self.assertEqual(question_group3.ordered_questions()[0], second_question)
         self.assertEqual(question_group3.orders.all()[0].order, 1)
@@ -301,22 +300,34 @@ class GridReordererTest(BaseTest):
         self.assertEqual(new_group.and_sub_group_questions()[0], self.question)
         self.assertEqual(new_group.orders.all()[0].order, 1)
 
-    def xtest_reorder_group_when_group_below_is_not_a_grid_and_two_or_more_questions_with_a_subg(self):
+    def test_reorder_group_when_group_below_is_not_a_grid_and_two_or_more_questions_with_a_subgroups(self):
         second_question = QuestionFactory()
         self.question_group3.question.add(second_question)
         QuestionGroupOrder.objects.create(question=second_question, question_group=self.question_group3, order=2)
 
-        self.assertEqual(QuestionGroup.objects.all().count(), 4)
+        sub_group = QuestionGroupFactory(parent=self.question_group3)
+        sub_group_question = QuestionFactory()
+        sub_group.question.add(sub_group_question)
+        QuestionGroupOrder.objects.create(question=sub_group_question, question_group=self.question_group3, order=3)
+
+        self.assertEqual(QuestionGroup.objects.all().count(), 5)
 
         GridReorderer(self.question_group2, "down").reorder_group_in_sub_section()
+
         question_group2 = QuestionGroup.objects.get(id=self.question_group2.id)
         question_group3 = QuestionGroup.objects.get(id=self.question_group3.id)
         question_group4 = QuestionGroup.objects.get(id=self.question_group4.id)
         self.assertEqual(question_group2.order, 3)
         self.assertEqual(question_group3.order, 4)
         self.assertEqual(question_group4.order, 5)
-        self.assertEqual(len(question_group3.and_sub_group_questions()), 1)
-        self.assertEqual(QuestionGroup.objects.all().count(), 5)
-        self.assertEqual(len(QuestionGroup.objects.all()), 5)
-        self.assertEqual(
-            len(self.subsection.question_group.get(order=question_group2.order - 1).and_sub_group_questions()), 1)
+        self.assertEqual(len(question_group3.ordered_questions()), 2)
+        self.assertEqual(question_group3.ordered_questions()[0], second_question)
+        self.assertEqual(question_group3.question_orders()[0].order, 1)
+        self.assertEqual(question_group3.question_orders()[1].order, 2)
+        self.assertEqual(len(question_group3.and_sub_group_questions()), 2)
+        self.assertEqual(QuestionGroup.objects.all().count(), 6)
+
+        new_group = self.subsection.question_group.get(order=question_group2.order - 1)
+        self.assertEqual(len(new_group.ordered_questions()), 1)
+        self.assertEqual(new_group.ordered_questions()[0], self.question)
+        self.assertEqual(new_group.orders.all()[0].order, 1)

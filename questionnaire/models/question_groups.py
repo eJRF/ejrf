@@ -71,7 +71,9 @@ class QuestionGroup(BaseModel):
 
     def remove_question_and_reorder(self, question):
         self.question.remove(question)
+        print self.orders.all()
         self.orders.filter(question=question).delete()
+        print self.orders.all()
         for i, q in enumerate(self.orders.order_by('order')):
             q.order = i + 1
             q.save()
