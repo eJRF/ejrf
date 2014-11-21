@@ -30,6 +30,15 @@ class QuestionGroup(BaseModel):
     def all_questions(self):
         return self.question.all()
 
+    def swap_order(self, other_group):
+        self_order = self.order
+        other_order = other_group.order
+
+        self.order = other_order
+        other_group.order = self_order
+        self.save()
+        other_group.save()
+
     def contains_or_sub_group_contains(self, question):
         if question in self.all_questions():
             return True

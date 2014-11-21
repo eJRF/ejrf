@@ -65,6 +65,12 @@ class SubSection(BaseModel):
         ordering = ('order',)
         app_label = 'questionnaire'
 
+    def move_groups_down_from(self, group):
+        groups_to_move = filter(lambda g: group != g and g.order >= group.order, self.question_group.filter(parent__isnull=True))
+        for g in groups_to_move:
+            g.order += 1
+            g.save()
+
     def get_absolute_url(self):
         return self.section.get_absolute_url()
 

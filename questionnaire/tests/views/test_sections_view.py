@@ -7,7 +7,7 @@ from django.core.urlresolvers import reverse
 from django.test import Client
 
 from questionnaire.forms.sections import SectionForm, SubSectionForm
-from questionnaire.models import Questionnaire, Section, SubSection, Region, QuestionGroup, Question
+from questionnaire.models import Questionnaire, Section, SubSection, Region, QuestionGroup, Question, QuestionGroupOrder
 from questionnaire.tests.base_test import BaseTest
 from questionnaire.tests.factories.question_factory import QuestionFactory
 from questionnaire.tests.factories.question_group_factory import QuestionGroupFactory
@@ -555,8 +555,9 @@ class SectionMoveGridTest(BaseTest):
         self.question_group3 = QuestionGroupFactory(subsection=self.subsection, order=3)
         self.question_group4 = QuestionGroupFactory(subsection=self.subsection, order=4, grid=True)
 
-
-        self.question_group3.question.add(QuestionFactory())
+        self.question = QuestionFactory()
+        self.question_group3.question.add(self.question)
+        QuestionGroupOrder.objects.create(question=self.question, question_group=self.question_group3, order=1)
 
     def test_reorder_group_with_sub_section(self):
         MoveGrid.reorder_group_in_sub_section(self.question_group2, "up")
@@ -591,8 +592,19 @@ class SectionMoveGridTest(BaseTest):
         self.assertEqual(question_group3.order, 4)
         self.assertEqual(len(QuestionGroup.objects.all()), 4)
 
+    def test_reorder_group_when_group_below_is_not_a_grid_and_has_one_question(self):
+        self.assertEqual(QuestionGroup.objects.all().count(), 4)
+        MoveGrid.reorder_group_in_sub_section(self.question_group2, "down")
+        question_group3 = QuestionGroup.objects.get(id=self.question_group3.id)
+        self.assertEqual(self.question_group2.order, 3)
+        self.assertEqual(question_group3.order, 2)
+        self.assertEqual(len(QuestionGroup.objects.all()), 4)
+
     def test_reorder_group_when_group_above_is_not_a_grid_and_has_two_questions(self):
-        self.question_group3.question.add(QuestionFactory())
+
+        second_question = QuestionFactory(text='question to be moved down')
+        self.question_group3.question.add(second_question)
+        QuestionGroupOrder.objects.create(question=second_question, question_group=self.question_group3, order=2)
         self.assertEqual(QuestionGroup.objects.all().count(), 4)
 
         MoveGrid.reorder_group_in_sub_section(self.question_group4, "up")
@@ -600,13 +612,19 @@ class SectionMoveGridTest(BaseTest):
         self.assertEqual(self.question_group3.order, 3)
         self.assertEqual(self.question_group4.order, 4)
         self.assertEqual(len(self.question_group3.and_sub_group_questions()), 1)
+        self.assertEqual(self.question_group3.and_sub_group_questions()[0], self.question)
         self.assertEqual(len(QuestionGroup.objects.all()), 5)
-        self.assertEqual(
-            len(self.subsection.question_group.get(order=self.question_group4.order + 1).and_sub_group_questions()), 1)
+        new_group = self.subsection.question_group.get(order=self.question_group4.order + 1)
+        self.assertEqual(len(new_group.and_sub_group_questions()), 1)
+        self.assertEqual(new_group.and_sub_group_questions()[0], second_question)
 
     def test_reorder_group_when_group_below_is_not_a_grid_and_two_or_more_questions(self):
 
-        self.question_group3.question.add(QuestionFactory())
+
+        second_question = QuestionFactory()
+        self.question_group3.question.add(second_question)
+        QuestionGroupOrder.objects.create(question=second_question, question_group=self.question_group3, order=2)
+
         self.assertEqual(QuestionGroup.objects.all().count(), 4)
 
         MoveGrid.reorder_group_in_sub_section(self.question_group2, "down")
@@ -621,5 +639,3 @@ class SectionMoveGridTest(BaseTest):
         self.assertEqual(len(QuestionGroup.objects.all()), 5)
         self.assertEqual(
             len(self.subsection.question_group.get(order=question_group2.order - 1).and_sub_group_questions()), 1)
-
-
