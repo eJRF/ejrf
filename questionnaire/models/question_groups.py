@@ -69,6 +69,16 @@ class QuestionGroup(BaseModel):
         else:
             return self.hybrid
 
+    def remove_question_and_reorder(self, question):
+        self.question.remove(question)
+        self.orders.filter(question=question).delete()
+        for i, q in enumerate(self.orders.order_by('order')):
+            q.order = i + 1
+            q.save()
+
+
+    def is_grid_or_has_less_than_two_question(self):
+        return self.grid or (len(self.and_sub_group_questions()) <= 1)
 
     def and_sub_group_questions(self):
         questions = list(self.all_questions())
