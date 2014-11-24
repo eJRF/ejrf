@@ -149,3 +149,6 @@ class PageObject(object):
         for qn in question_ids:
             script = "$('#id-%s-%s').find('input').click()" % (id_prefix, qn.id)
             self.browser.execute_script(script)
+
+    def assert_page_html_contains(self, html_to_check_for):
+        assert_in(html_to_check_for, self.browser.html)

@@ -252,3 +252,21 @@ def and_the_regional_section_should_no_longer_appear_in_the_questionnaire(step):
 def and_the_numbering_of_the_remaining_sections_should_be_updated(step):
     world.page.click_link_by_partial_href('/questionnaire/entry/%s/section/%s/' %(world.questionnaire.id, world.section3.id))
     world.page.is_text_present('%d. %s - %s' %(world.section3.order, world.region, world.section3.name))
+
+
+@step(u'And I should see the current position of the section')
+def and_i_should_see_the_current_position_of_the_section(step):
+    world.page.is_text_present("%s" % world.section1.order)
+
+@step(u'And I change the position of the section')
+def and_i_change_the_position_of_the_section(step):
+    world.new_section_position = 2
+    world.page.select('order', world.new_section_position)
+
+@step(u'When I choose to update that section again')
+def when_i_choose_to_update_that_section_again(step):
+    step.given('And I choose to update a section')
+
+@step(u'Then I should see its new position')
+def then_i_should_see_its_new_position(step):
+    world.page.verify_current_position_of_section(world.new_section_position)
