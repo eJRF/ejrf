@@ -283,6 +283,9 @@ function getTableRow($questionForm,$index) {
         return "<tr class='group-tr' " +
                "data-group-id='"+ $($questionForm).attr('data-group-id') +"'>" +
                "<td><hr class='group-hr'/></td></tr>";
+    } else if ($($questionForm).hasClass('grid-group')){
+        // return "";
+        return "<tr><td class='group-tr'>Grid question</td></tr>";
     }
     return "<tr id='question-"+ $index + "' class='sortable-tr'><td>" + $($questionForm).html() + "</td></tr>"
 }
@@ -292,7 +295,7 @@ function getModalWithSubSectionQuestions($element) {
         $modal = $('#reorder_modal_label'),
         action = $element.attr('data-href'),
         questionFormsAsTableRows = "";
-        getQuestionsInSubsection($element).each(function(index, $questionForm){
+        getQuestionsInSubsection($element).map(function(index, $questionForm){
             questionFormsAsTableRows += getTableRow($questionForm,index)
         });
         $modal.find('#reorder-content-table').html(questionFormsAsTableRows);
@@ -328,7 +331,8 @@ function reIndexOrderFields($item, container) {
         $sameGroupRows.each(function(index, questionTableRow){
             var reverseIndex =  parseInt(totalQuestionRows) - parseInt(index),
                 $hiddenOrderField = $(questionTableRow).find('input[type=hidden]'),
-                orderId = $hiddenOrderField.val().split(",")[1];
+                hiddenFieldValue = $hiddenOrderField.val(),
+                orderId = hiddenFieldValue && hiddenFieldValue.split(",")[1];
             $hiddenOrderField.val('');
             $hiddenOrderField.val($(groupTableRows[i]).attr('data-group-id') + "," + orderId +","+ reverseIndex);
         });
@@ -353,7 +357,7 @@ function activateSortable($modal){
 
 function getQuestionsInSubsection($element){
     var $subsectionContainer = $element.parents('div .subsection-content');
-    return  $subsectionContainer.find('.form-group, .group-hr');
+    return  $subsectionContainer.find('.form-group, .group-hr, .grid-group');
 }
 
 
