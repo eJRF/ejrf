@@ -13,6 +13,7 @@
     margin-right: 20px;
 }
 
+
 #bottom-nav-bar{
     border-top: 1px solid #efefef;
     bottom: 0;
@@ -495,4 +496,8 @@ select.hide{
     border: 0;
     font-size: 14px;
     width: auto;
+}
+
+.hybrid-group-row{
+    padding-top: 40px;
 }

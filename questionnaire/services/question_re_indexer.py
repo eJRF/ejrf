@@ -23,6 +23,7 @@ class QuestionReIndexer(object):
                 new_group = QuestionGroup.objects.get(id=posted_group_id)
                 old_question_group = QuestionGroup.objects.get(id=order.question_group.id)
                 old_question_group.question.remove(order.question)
+                new_group.question.add(order.question)
                 order.question_group = new_group
                 order.order = posted_order
                 order.save()
@@ -78,6 +79,7 @@ class GridReorderer:
     def __init__(self, group, move_direction):
         self.move_direction = move_direction
         self.group = group
+        self.message = {'success': 'The Grid was successfully moved ' + move_direction }
 
     def _is_not_last_question_group(self):
         return self.group.order < self.group.subsection.question_group.filter(parent__isnull=True).count()
@@ -98,6 +100,8 @@ class GridReorderer:
             else:
                 question_to_move = group_above.ordered_questions()[::-1][0]
                 self._move_and_create_group(group_above, question_to_move, self.ONE_BELOW_CURRENT_GROUP_ORDER)
+        else:
+            self.message = {'warning': 'The Grid was not moved up because its the first in this subsection' }
 
     def _move_down(self):
         if self._is_not_last_question_group():
@@ -108,6 +112,8 @@ class GridReorderer:
             else:
                 question_to_move = group_below.ordered_questions()[0]
                 self._move_and_create_group(group_below, question_to_move, 0)
+        else:
+            self.message = {'warning': 'The Grid was not moved down because its the last in this subsection' }
 
     def reorder_group_in_sub_section(self):
         if self.move_direction == "up":

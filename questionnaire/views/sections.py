@@ -207,12 +207,13 @@ class MoveGrid(PermissionRequiredMixin, View):
         move_direction = request.POST.get("move_direction")
 
         question_group = QuestionGroup.objects.get(id=group_id)
-        GridReorderer.reorder_group_in_sub_section(question_group, move_direction)
+        grid_reorderer = GridReorderer(question_group, move_direction)
+        grid_reorderer.reorder_group_in_sub_section()
+        self.add_message(grid_reorderer.message)
         return HttpResponseRedirect(question_group.subsection.get_absolute_url())
 
-
-
-
-
-
-
+    def add_message(self, reorder_messages):
+        if 'warning' in reorder_messages.keys():
+            messages.warning(self.request, reorder_messages.get('warning'))
+        else:
+            messages.success(self.request, reorder_messages.get('success'))

@@ -5,8 +5,10 @@ from django.core.urlresolvers import reverse
 from django.test import Client
 
 from questionnaire.forms.sections import SectionForm, SubSectionForm
-from questionnaire.models import Questionnaire, Section, SubSection, Region
+from questionnaire.models import Questionnaire, Section, SubSection, Region, QuestionGroupOrder
 from questionnaire.tests.base_test import BaseTest
+from questionnaire.tests.factories.question_factory import QuestionFactory
+from questionnaire.tests.factories.question_group_factory import QuestionGroupFactory
 from questionnaire.tests.factories.section_factory import SectionFactory
 from questionnaire.tests.factories.sub_section_factory import SubSectionFactory
 
@@ -542,3 +544,61 @@ class SectionGetSubSectionsTest(BaseTest):
         self.assertEqual([{'title': 'subsection 1', 'id': subsection.id, 'order': 1}], json.loads(response.content))
 
 
+class MoveGridViewTest(BaseTest):
+    def setUp(self):
+        self.user = self.create_user(org="WHO")
+        self.user = self.assign('can_edit_questionnaire', self.user)
+
+        self.client = Client()
+        self.client.login(username=self.user.username, password='pass')
+
+        self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013)
+        self.section = Section.objects.create(name="section", questionnaire=self.questionnaire, order=1)
+
+        self.url = '/grid/move/'
+
+        self.subsection = SubSectionFactory(section=self.section)
+        self.question_group1 = QuestionGroupFactory(subsection=self.subsection, order=1, grid=True)
+        self.question_group2 = QuestionGroupFactory(subsection=self.subsection, order=2, grid=True)
+        self.question_group3 = QuestionGroupFactory(subsection=self.subsection, order=3)
+        self.question_group4 = QuestionGroupFactory(subsection=self.subsection, order=4, grid=True)
+
+        self.question = QuestionFactory()
+        self.question_group3.question.add(self.question)
+        QuestionGroupOrder.objects.create(question=self.question, question_group=self.question_group3, order=1)
+
+    def test_redirects_with_correct_message_when_its_the_first_in_the_subsection(self):
+        form_data = {'move_direction': 'up', 'group_id': self.question_group1.id}
+
+        response = self.client.post(self.url, data=form_data)
+
+        warning_message = 'The Grid was not moved up because its the first in this subsection'
+        self.assertRedirects(response, self.section.get_absolute_url())
+        self.assertIn(warning_message, response.cookies['messages'].value)
+
+    def test_redirects_with_correct_message_when_its_the_last_in_the_subsection(self):
+        form_data = {'move_direction': 'down', 'group_id': self.question_group4.id}
+
+        response = self.client.post(self.url, data=form_data)
+
+        warning_message = 'The Grid was not moved down because its the last in this subsection'
+        self.assertRedirects(response, self.section.get_absolute_url())
+        self.assertIn(warning_message, response.cookies['messages'].value)
+
+    def test_redirects_with_correct_message_when_its_the_second_group_in_the_subsection_moving_down(self):
+        form_data = {'move_direction': 'down', 'group_id': self.question_group1.id}
+
+        response = self.client.post(self.url, data=form_data)
+
+        success_message = 'The Grid was successfully moved down'
+        self.assertRedirects(response, self.section.get_absolute_url())
+        self.assertIn(success_message, response.cookies['messages'].value)
+
+    def test_redirects_with_correct_message_when_its_the_second_group_in_the_subsection_moving_up(self):
+        form_data = {'move_direction': 'up', 'group_id': self.question_group2.id}
+
+        response = self.client.post(self.url, data=form_data)
+
+        success_message = 'The Grid was successfully moved up'
+        self.assertRedirects(response, self.section.get_absolute_url())
+        self.assertIn(success_message, response.cookies['messages'].value)
