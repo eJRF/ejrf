@@ -30,14 +30,11 @@ class SectionForm(ModelForm):
         return zip(unique_orders, unique_orders)
 
     def save(self, commit=True):
-        section = super(SectionForm, self).save(commit)
+        section = super(SectionForm, self).save(commit=False)
         if commit:
-            if not section.is_last_in(section.questionnaire):
-                based_re_indexer = OrderBasedReIndexer(section, self.cleaned_data['order'],
+            based_re_indexer = OrderBasedReIndexer(section, self.cleaned_data['order'],
                                                        questionnaire=section.questionnaire)
-                based_re_indexer.reorder()
-            else:
-                reindex_orders_in(Section, questionnaire=section.questionnaire)
+            based_re_indexer.reorder()
         return section
 
 

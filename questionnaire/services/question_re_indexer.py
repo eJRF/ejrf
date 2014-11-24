@@ -63,15 +63,36 @@ class OrderBasedReIndexer:
         self.klass = eval(self.obj.__class__.__name__)
         self.SUCCESS_MESSAGE = 'The %ss were reordered successfully!' % self.klass
 
+    def _get_old_order(self, all_objects):
+        if self.obj.id:
+            order_to_move_from = all_objects.get(id=self.obj.id).order
+        else:
+            order_to_move_from = max(all_objects.values_list('order', flat=True)) + 1
+        return order_to_move_from
+
     def reorder(self):
-        all_objects = list(self.klass.objects.filter(**self.kwargs).order_by('order', '-modified'))
-        object_to_swap = all_objects.pop(self.obj.order - 1)
-        all_objects.insert(self.new_order - 1, object_to_swap)
-        for index, obj in enumerate(all_objects):
-            obj.order = index + 1
+        all_objects = self.klass.objects.filter(**self.kwargs).order_by('order')
+        order_to_move_from = self._get_old_order(all_objects)
+        objects_to_move = self._get_objects_to_move(all_objects, order_to_move_from)
+        for obj in objects_to_move:
+            obj.order += self._move_delta(order_to_move_from)
             obj.save()
+        self.obj.order = self.new_order
+        self.obj.save()
         return self.SUCCESS_MESSAGE
 
+    def _get_objects_to_move(self, all_objects, order_to_move_from):
+        if self._moving_up(order_to_move_from):
+            return all_objects.filter(order__gte=self.new_order, order__lte=order_to_move_from)
+        return all_objects.filter(order__gte=order_to_move_from, order__lte=self.new_order)
+
+    def _moving_up(self, old_order):
+        return self.new_order < old_order
+
+    def _move_delta(self, order_to_move_from):
+        if self._moving_up(order_to_move_from):
+            return 1
+        return -1
 
 class GridReorderer:
     ONE_BELOW_CURRENT_GROUP_ORDER = 1
