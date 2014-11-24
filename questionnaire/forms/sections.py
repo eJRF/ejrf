@@ -20,17 +20,13 @@ class SectionForm(ModelForm):
                    'description': forms.Textarea(attrs={"rows": 4, "cols": 40})}
 
     def _get_options(self):
-        section_orders = Section.objects.order_by('order').values_list('order', flat=True)
-        if self.instance.id:
-            questionnaire = self.instance.questionnaire
-            orders = list(section_orders.filter(questionnaire=questionnaire))
-            unique_orders = set(orders)
-            return zip(unique_orders, unique_orders)
-
-        max_plus_one = max(section_orders) + 1
-        all_orders = list(section_orders)
-        all_orders.append(max_plus_one)
-        unique_orders = set(all_orders)
+        questionnaire = self.initial['questionnaire']
+        section_orders = list(Section.objects.filter(questionnaire=questionnaire).order_by('order').values_list('order', flat=True))
+        if not section_orders:
+            section_orders.append(1)
+        elif not self.instance.id:
+            section_orders.append(max(section_orders) + 1)
+        unique_orders = set(section_orders)
         return zip(unique_orders, unique_orders)
 
     def save(self, commit=True):

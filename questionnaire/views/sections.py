@@ -9,7 +9,7 @@ from django.views.generic import CreateView, UpdateView, DeleteView, View
 from questionnaire.forms.sections import SectionForm, SubSectionForm
 from questionnaire.mixins import RegionAndPermissionRequiredMixin, DoesNotExistExceptionHandlerMixin, \
     OwnerAndPermissionRequiredMixin
-from questionnaire.models import Section, SubSection, QuestionGroup
+from questionnaire.models import Section, SubSection, QuestionGroup, Questionnaire
 from questionnaire.services.question_re_indexer import QuestionReIndexer, OrderBasedReIndexer, GridReorderer
 from questionnaire.utils.model_utils import reindex_orders_in
 
@@ -21,12 +21,22 @@ class NewSection(RegionAndPermissionRequiredMixin, CreateView):
         super(NewSection, self).__init__(**kwargs)
         self.form_class = SectionForm
         self.object = Section
+        self.questionnaire = None
         self.template_name = "sections/subsections/new.html"
+
+    def post(self, request, *args, **kwargs):
+        self.questionnaire = Questionnaire.objects.get(id=kwargs['questionnaire_id'])
+        return super(NewSection, self).post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super(NewSection, self).get_context_data(**kwargs)
         context['btn_label'] = "CREATE"
         return context
+
+    def get_initial(self):
+        initial = super(NewSection, self).get_initial()
+        initial.update({'questionnaire': self.questionnaire})
+        return initial
 
     def form_valid(self, form):
         section = form.save(commit=False)
