@@ -73,6 +73,8 @@ class OrderBasedReIndexer:
 
 
 class GridReorderer:
+    ONE_BELOW_CURRENT_GROUP_ORDER = 1
+
     def __init__(self, group, move_direction):
         self.move_direction = move_direction
         self.group = group
@@ -83,23 +85,24 @@ class GridReorderer:
     def _move_and_create_group(self, group_in_move_direction, question_to_move, difference_in_pos):
         new_group = self.group.subsection.question_group.create(order=self.group.order + difference_in_pos)
         self.group.subsection.move_groups_down_from(new_group)
-        first_question = question_to_move
-        first_question.question_group.add(new_group)
         group_in_move_direction.remove_question_and_reorder(question_to_move)
+        new_group.question.add(question_to_move)
         question_to_move.orders.create(question_group=new_group, order=1)
 
     def _move_up(self):
         if self.group.order > 1:
-            group_above = self.group.subsection.question_group.get(order=self.group.order - 1)
+            previous_group_order = self.group.order - 1
+            group_above = self.group.subsection.question_group.get(order=previous_group_order)
             if group_above.is_grid_or_has_less_than_two_question():
                 self.group.swap_order(group_above)
             else:
                 question_to_move = group_above.ordered_questions()[::-1][0]
-                self._move_and_create_group(group_above, question_to_move, 1)
+                self._move_and_create_group(group_above, question_to_move, self.ONE_BELOW_CURRENT_GROUP_ORDER)
 
     def _move_down(self):
         if self._is_not_last_question_group():
-            group_below = self.group.subsection.question_group.get(order=self.group.order + 1)
+            next_group_order = self.group.order + 1
+            group_below = self.group.subsection.question_group.get(order=next_group_order)
             if group_below.is_grid_or_has_less_than_two_question():
                 self.group.swap_order(group_below)
             else:
