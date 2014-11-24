@@ -20,7 +20,6 @@ Feature: Section feature
     And I save the section
     Then I should see error messages against the fields
 
-  @WIP
   Scenario: Update Section in Core Questionnaire
     Given I am logged in as a global admin
     And I have a questionnaire with sections and subsections
