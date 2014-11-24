@@ -40,7 +40,9 @@ class SkipQuestion(SkipRule):
         return {'id': self.id,
                 'skip_question': self.skip_question.text,
                 'root_question': self.root_question.text,
-                'response': self.response.text}
+                'response': self.response.text,
+                'is_in_hygrid': self.is_in_hybrid_grid(),
+        }
 
 
 class SkipSubsection(SkipRule):

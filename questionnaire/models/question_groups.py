@@ -63,7 +63,7 @@ class QuestionGroup(BaseModel):
     def parent_group_id(self):
         return self.parent_group().id
 
-    def is_in_hybrid_grid(self):
+    def  is_in_hybrid_grid(self):
         if self.parent is not None:
             return self.hybrid or self.parent.is_in_hybrid_grid()
         else:

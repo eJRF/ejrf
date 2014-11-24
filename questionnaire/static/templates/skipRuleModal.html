@@ -1,21 +1,30 @@
 <div>
     <ul class="nav nav-tabs" role="tablist">
-        <li role="presentation" class="active"><a id="selectNewRuleTab" href="#newRule" role="tab" data-toggle="tab"
+        <li role="presentation" class="active"><a id="selectNewRuleTab" href="#newRuleTab" role="tab" data-toggle="tab"
                                                   data-ng-click="setActiveTab('newRuleTab')">New Question Rule</a></li>
-        <li role="presentation"><a id="selectNewSubsectiongRuleTab" href="#newSubsectionRules" role="tab" data-toggle="tab" data-ng-hide="subsectionTabHidden"
+
+        <li role="presentation"><a id="selectNewSubsectiongRuleTab" href="#newSubsectionRuleTab" role="tab"
+                                   data-toggle="tab" data-ng-hide="subsectionTabHidden"
                                    data-ng-click="setActiveTab('newSubsectionRuleTab')">New Subsection Rule</a></li>
-        <li role="presentation"><a id="selectExistingRuleTab" href="#existingRules" role="tab" data-toggle="tab"
-                                   data-ng-click="setActiveTab('existingRulesTab')">Existing Rules</a></li>
+
+        <li role="presentation"><a id="selectExistingRuleTab" href="#existingRulesTab" role="tab" data-toggle="tab"
+                                   data-ng-click="setActiveTab('existingRulesTab')"
+                                   data-ng-hide="existingRulesTabHidden">Existing Rules</a></li>
+
+        <li role="presentation"><a id="selectExistingGridRuleTab" href="#existingGridRulesTab" role="tab" data-toggle="tab"
+                                   data-ng-hide="existingGridRulesTabHidden"
+                                   data-ng-click="setActiveTab('existingGridRulesTab')">Existing Grid Rules</a></li>
     </ul>
     <div id="newRuleTab" data-ng-show="activeTab == 'newRuleTab'">
-        <form method="post" class="form-horizontal" id="sumbit-skip-rule" name="skipForm" data-ng-submit="submitQuestionForm()">
+        <form method="post" class="form-horizontal" id="sumbit-skip-rule" name="skipForm"
+              data-ng-submit="submitQuestionForm()">
             <div class="modal-body question-group indent">
                 <div data-ng-class="skipResult.className" class="alert" data-ng-show="skipResult.show">
-                    {{skipResult.message}}
+                    {{ skipResult.message }}
                 </div>
 
                 <input name="subsection_id" type="hidden" data-ng-model="skipRule.subsectionId"
-                       value="{{subsectionId}}"/>
+                       value="{{ subsectionId }}"/>
 
                 <div class="form-group">
                     <label class="col-sm-3 control-label">Select Root Question</label>
@@ -37,7 +46,7 @@
                                 <label style="display:block;">
                                     <input type="radio" name="response" required
                                            data-ng-model="skipRule.questionResponse"
-                                           ng-value="option.pk"/>&nbsp;{{option.fields.text}}
+                                           ng-value="option.pk"/>&nbsp;{{ option.fields.text }}
                                 </label>
                             </li>
                         </ul>
@@ -68,11 +77,11 @@
         <form method="post" class="form-horizontal" name="skipForm" data-ng-submit="submitSubsectionForm()">
             <div class="modal-body question-group indent">
                 <div data-ng-class="skipResult.className" class="alert" data-ng-show="skipResult.show">
-                    {{skipResult.message}}
+                    {{ skipResult.message }}
                 </div>
 
                 <input name="subsection_id" type="hidden" data-ng-model="skipRule.subsectionId"
-                       value="{{subsectionId}}"/>
+                       value="{{ subsectionId }}"/>
 
                 <div class="form-group">
                     <label class="col-sm-3 control-label">Select Root Question</label>
@@ -94,7 +103,7 @@
                                 <label style="display:block;">
                                     <input type="radio" name="subsection_response" required
                                            data-ng-model="skipRule.questionResponse"
-                                           ng-value="option.pk"/>&nbsp;{{option.fields.text}}
+                                           ng-value="option.pk"/>&nbsp;{{ option.fields.text }}
                                 </label>
                             </li>
                         </ul>
@@ -125,15 +134,19 @@
         <div class="modal-body">
             <div class="question-group indent">
                 <div data-ng-repeat="rule in existingRules | orderBy:'id'" class="existingRule">
-                    <div class="form-group" style="display:none;"><label class="col-sm-3 control-label">Rule ID</label>{{rule.id}}
+                    <div class="form-group" style="display:none;"><label class="col-sm-3 control-label">Rule
+                        ID</label>{{ rule.id }}
                     </div>
-                    <div class="form-group"><label class="col-sm-2 control-label">Root Question</label>{{rule.root_question}}
+                    <div class="form-group"><label class="col-sm-2 control-label">Root
+                        Question</label>{{ rule.root_question }}
                     </div>
-                    <div class="form-group"><label class="col-sm-2 control-label">Response</label>{{rule.response}}
+                    <div class="form-group"><label class="col-sm-2 control-label">Response</label>{{ rule.response }}
                     </div>
-                    <div class="form-group" data-ng-show="rule.skip_question !== Null"><label class="col-sm-2 control-label">Question to Skip</label>{{rule.skip_question}}
+                    <div class="form-group" data-ng-show="rule.skip_question !== Null"><label
+                            class="col-sm-2 control-label">Question to Skip</label>{{ rule.skip_question }}
                     </div>
-                    <div class="form-group" data-ng-show="rule.skip_subsection !== Null"><label class="col-sm-2 control-label">Subsection to Skip</label>{{rule.skip_subsection}}
+                    <div class="form-group" data-ng-show="rule.skip_subsection !== Null"><label
+                            class="col-sm-2 control-label">Subsection to Skip</label>{{ rule.skip_subsection }}
                     </div>
                     <hr/>
                 </div>
@@ -145,4 +158,34 @@
             </a>
         </div>
     </div>
+    <div id="existingGridRulesTab" data-ng-show="activeTab == 'existingGridRulesTab'">
+        <div class="modal-body">
+            <div class="question-group indent">
+                <div data-ng-repeat="rule in existingGridRules | orderBy:'id'" class="existingRule">
+                    <div class="form-group" style="display:none;"><label class="col-sm-3 control-label">Rule
+                        ID</label>{{ rule.id }}
+                    </div>
+                    <div class="form-group"><label class="col-sm-2 control-label">Root
+                        Question</label>{{ rule.root_question }}
+                    </div>
+                    <div class="form-group"><label class="col-sm-2 control-label">Response</label>{{ rule.response }}
+                    </div>
+                    <div class="form-group" data-ng-show="rule.skip_question !== Null"><label
+                            class="col-sm-2 control-label">Question to Skip</label>{{ rule.skip_question }}
+                    </div>
+                    <div class="form-group" data-ng-show="rule.skip_subsection !== Null"><label
+                            class="col-sm-2 control-label">Subsection to Skip</label>{{ rule.skip_subsection }}
+                    </div>
+                    <hr/>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a type="cancel" class="btn btn-default" id="existing-grid-close-button" data-dismiss="modal">
+                <span class="red bold"  ><i class="glyphicon glyphicon-remove" ></i> Close</span>
+            </a>
+        </div>
+    </div>
+
+
 </div>

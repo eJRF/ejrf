@@ -25,6 +25,7 @@ angular.module('questionnaireApp', [])
         resetSkipRule();
         $scope.questions = [];
         $scope.existingRules = [];
+
         $scope.matchSelectedQuestion = function(question) {
             return !($scope.skipRule.rootQuestion.pk == question.pk);
         };
@@ -33,7 +34,13 @@ angular.module('questionnaireApp', [])
             $http.get( "/questionnaire/subsection/" + subsectionId + "/skiprules/").
                 success(function(data, status, headers, config) {
                 $scope.existingRules = data;
-            });
+                $scope.existingGridRules = [];
+                for (var rule in data){
+                    if (data[rule].is_in_hygrid == true){
+                        $scope.existingGridRules.push(data[rule]);
+                    }
+                }
+                });
         };
         var updateCreateQuestionRuleForm = function(subsectionId) {
             $http.get( "/questionnaire/subsection/" + subsectionId + "/questions/").
@@ -62,14 +69,24 @@ angular.module('questionnaireApp', [])
         };
 
         $scope.updateSkipRuleModal = function(subsectionId, gridId) {
+
             updateRules(subsectionId);
             updateCreateQuestionRuleForm(subsectionId);
             updateCreateSubsectionRuleForm(subsectionId);
+            $scope.existingGridRulesTabHidden = true;
+            $scope.existingRulesTabHidden = false;
+
             if(gridId != undefined) {
                 $scope.subsectionTabHidden = true;
+                $scope.existingGridRulesTabHidden = false;
+                $scope.existingRulesTabHidden = true;
                 $scope.filterQuestions = function(question) {
                     return question.parentQuestionGroup == gridId;
                 };
+
+                $("#existing-grid-close-button").on('click', function(){
+                    window.location.href  = window.location.pathname;
+                });
             }
         };
         $scope.fns = {};
