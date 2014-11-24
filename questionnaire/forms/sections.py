@@ -1,6 +1,7 @@
 from django.forms import ModelForm
 from django import forms
 
+from questionnaire.utils.model_utils import reindex_orders_in
 from questionnaire.models import Section, SubSection
 from questionnaire.services.question_re_indexer import OrderBasedReIndexer
 
@@ -34,10 +35,13 @@ class SectionForm(ModelForm):
 
     def save(self, commit=True):
         section = super(SectionForm, self).save(commit)
-        if commit and not section.is_last_in(section.questionnaire):
-            based_re_indexer = OrderBasedReIndexer(section, self.cleaned_data['order'],
-                                                   questionnaire=section.questionnaire)
-            based_re_indexer.reorder()
+        if commit:
+            if not section.is_last_in(section.questionnaire):
+                based_re_indexer = OrderBasedReIndexer(section, self.cleaned_data['order'],
+                                                       questionnaire=section.questionnaire)
+                based_re_indexer.reorder()
+            else:
+                reindex_orders_in(Section, questionnaire=section.questionnaire)
         return section
 
 
