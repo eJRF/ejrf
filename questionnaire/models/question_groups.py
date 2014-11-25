@@ -69,8 +69,14 @@ class QuestionGroup(BaseModel):
         else:
             return self.hybrid
 
+    def remove_question(self, question):
+        if question in self.question.all():
+            self.question.remove(question)
+        else:
+            map(lambda sub_group: sub_group.remove_question(question), self.sub_group.all())
+
     def remove_question_and_reorder(self, question):
-        self.question.remove(question)
+        self.remove_question(question)
         self.orders.filter(question=question).delete()
         for i, q in enumerate(self.orders.order_by('order')):
             q.order = i + 1
