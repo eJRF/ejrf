@@ -2,13 +2,14 @@ from django.db import models
 from model_utils.managers import InheritanceManager
 
 from questionnaire.models.base import BaseModel
-from questionnaire.models import Question, QuestionOption, SubSection
+from questionnaire.models import Question, QuestionOption, SubSection, Region
 
 
 class SkipRule(BaseModel):
     root_question = models.ForeignKey(Question, blank=False, null=False, related_name="root_skip_rules")
     response = models.ForeignKey(QuestionOption, blank=False, null=False, related_name="skip_rules")
     subsection = models.ForeignKey(SubSection, blank=False, null=False, related_name="skip_rules")
+    region = models.ForeignKey(Region, blank=True, null=True, related_name="skip_rules")
 
     objects = InheritanceManager()
 

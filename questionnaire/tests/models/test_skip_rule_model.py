@@ -9,8 +9,9 @@ class SkipQuestionRuleTest(BaseTest):
     def test_skip_rules_fields(self):
         skip_rule = SkipQuestion()
         fields = [str(item.attname) for item in skip_rule._meta.fields]
-        self.assertEqual(8, len(fields))
-        for field in ['id', 'created', 'modified', 'root_question_id', 'skip_question_id', 'subsection_id', 'response_id']:
+        self.assertEqual(9, len(fields))
+        for field in ['id', 'created', 'modified', 'root_question_id', 'skip_question_id', 'subsection_id',
+                      'response_id', 'region_id']:
             self.assertIn(field, fields)
 
     def test_skip_question_rule_stores(self):
@@ -29,8 +30,9 @@ class SkipSubsectionRuleTest(BaseTest):
     def test_skip_rules_fields(self):
         skip_rule = SkipSubsection()
         fields = [str(item.attname) for item in skip_rule._meta.fields]
-        self.assertEqual(8, len(fields))
-        for field in ['id', 'created', 'modified', 'root_question_id', 'skip_subsection_id', 'subsection_id', 'response_id']:
+        self.assertEqual(9, len(fields))
+        for field in ['id', 'created', 'modified', 'root_question_id', 'skip_subsection_id', 'subsection_id',
+                      'response_id', 'region_id']:
             self.assertIn(field, fields)
 
     def test_skip_subsection_rule_stores(self):
