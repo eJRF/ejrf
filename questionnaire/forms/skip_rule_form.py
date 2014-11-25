@@ -25,6 +25,13 @@ class SkipRuleForm(forms.ModelForm):
         skip_question_groups = skip_question.question_group.filter(subsection=subsection_)
         return subsection_ and root_question_groups.exists() and skip_question_groups.exists()
 
+    def save(self, commit=True):
+        skip_rule = super(SkipRuleForm, self).save(commit=False)
+        if commit:
+            skip_rule.region = self.initial.get("region", None)
+            skip_rule.save()
+        return skip_rule
+
 
 class SkipQuestionForm(SkipRuleForm):
     class Meta:
@@ -47,10 +54,13 @@ class SkipQuestionForm(SkipRuleForm):
             self._errors['root_question'] = ["This rule already exists"]
 
     def _clean_skip_question(self, root_question, skip_question, subsection):
-        groups = filter(lambda group: root_question in group.question.all(), subsection.all_question_groups())
-        if len(groups) == 1 and groups[0].is_in_hybrid_grid():
+        groups = subsection.question_group.filter(question=root_question)
+        region = self.initial.get("region", None)
+        if groups.exists() and groups[0].is_in_hybrid_grid():
             if not groups[0].contains_or_sub_group_contains(skip_question):
                 self._errors['skip_question'] = ["Question to skip must be in the same hybrid grid"]
+        if region and skip_question.region != region:
+            self._errors['skip_question'] = ["Question to skip must belong to %s" % region.name]
 
     def _clean_root_question(self):
         root_question = self.cleaned_data.get('root_question', None)

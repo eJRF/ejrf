@@ -5,6 +5,7 @@ from questionnaire.tests.base_test import BaseTest
 from questionnaire.tests.factories.question_factory import QuestionFactory
 from questionnaire.tests.factories.question_group_factory import QuestionGroupFactory
 from questionnaire.tests.factories.question_option_factory import QuestionOptionFactory
+from questionnaire.tests.factories.region_factory import RegionFactory
 from questionnaire.tests.factories.skip_rule_factory import SkipQuestionRuleFactory, SkipSubsectionRuleFactory
 from questionnaire.tests.factories.sub_section_factory import SubSectionFactory
 
@@ -191,3 +192,56 @@ class SkipSubsectionRuleFormTest(BaseTest):
         self.assertFalse(skip_subsection_rule_form.is_valid())
         errors = 'The subsection you have specified to skip comes before the root question.'
         self.assertIn(errors, skip_subsection_rule_form.errors['skip_subsection'])
+
+
+class RegionalAdminSkipQuestionRuleFormTest(BaseTest):
+    def setUp(self):
+        self.region = RegionFactory()
+        self.root_question = QuestionFactory()
+        self.question_to_skip = QuestionFactory()
+        self.response = QuestionOptionFactory(question=self.root_question)
+        self.subsection = SubSectionFactory(region=self.region)
+        self.question_group = QuestionGroupFactory(subsection=self.subsection)
+
+        self.root_question.question_group.add(self.question_group)
+        self.question_to_skip.question_group.add(self.question_group)
+
+        self.form_data = {'root_question': self.root_question.id,
+                          'response': self.response.id,
+                          'skip_question': self.question_to_skip.id,
+                          'subsection': self.subsection.id}
+        QuestionGroupOrder.objects.create(question=self.root_question, question_group=self.question_group, order=1)
+        QuestionGroupOrder.objects.create(question=self.question_to_skip, question_group=self.question_group, order=2)
+
+    def test_is_valid_when_region_is_owner_of_skip_question(self):
+        skip_question_form = SkipQuestionForm(data=self.form_data, initial={'region': None})
+        self.assertTrue(skip_question_form.is_valid())
+
+    def test_should_save_skip_rule_with_region(self):
+        skip_question_form = SkipQuestionForm(data=self.form_data, initial={'region': None})
+        skip_question_rule = skip_question_form.save()
+
+        self.assertIsNone(skip_question_rule.region)
+        self.assertEqual(skip_question_rule.root_question, self.root_question)
+
+    def test_should_be_invalid_when_region_is_given_and_skip_question_belongs_other_region(self):
+        region = RegionFactory()
+        skip_question_form = SkipQuestionForm(data=self.form_data, initial={'region': region})
+
+        self.assertFalse(skip_question_form.is_valid())
+        message = 'Question to skip must belong to %s' % region.name
+        self.assertIn(message, skip_question_form.errors['skip_question'])
+
+    def test_save_skip_rule(self):
+        question_to_skip = QuestionFactory(region=self.region)
+        self.question_group.question.add(question_to_skip)
+
+        QuestionGroupOrder.objects.create(question=question_to_skip, question_group=self.question_group, order=2)
+        data = self.form_data
+        data['skip_question'] = question_to_skip.id
+        skip_question_form = SkipQuestionForm(data=data, initial={'region': self.region})
+        skip_question_form.is_valid()
+        skip_question_rule = skip_question_form.save()
+
+        self.assertEqual(skip_question_rule.region, self.region)
+        self.assertEqual(skip_question_rule.root_question, self.root_question)

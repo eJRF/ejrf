@@ -50,7 +50,7 @@ class ViewUtilTest(BaseTest):
         UserProfile.objects.create(user=user, organization=organization)
         request = self.factory.get('/')
         request.user = user
-        self.assertEqual(None, get_regions(request))
+        self.assertEqual([], get_regions(request))
 
     def test_gets_region_from_get_user_request(self):
         kenya = Country.objects.create(name="Kenya")

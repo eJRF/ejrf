@@ -12,14 +12,21 @@ from questionnaire.utils.view_utils import get_regions
 class SkipRuleView(PermissionRequiredMixin, View):
     permission_required = 'auth.can_edit_questionnaire'
 
-    def error_response(self, error_message):
+    def _error_response(self, error_message):
         return HttpResponse(json.dumps({'result': error_message}), content_type="application/json", status=400)
 
+    def _get_region_from(self, regions):
+        if len(regions) > 0:
+            return regions[0]
+        return None
+
     def post(self, request, *args, **kwargs):
+        region = self._get_region_from(get_regions(request))
+        initial = {'region': region}
         if 'skip_question' in request.POST.keys():
-            skip_question_rule_form = SkipQuestionForm(request.POST)
+            skip_question_rule_form = SkipQuestionForm(request.POST, initial=initial)
         else:
-            skip_question_rule_form = SkipSubsectionForm(request.POST)
+            skip_question_rule_form = SkipSubsectionForm(request.POST, initial=initial)
 
         if skip_question_rule_form.is_valid():
             skip_question_rule_form.save()
@@ -28,7 +35,7 @@ class SkipRuleView(PermissionRequiredMixin, View):
         else:
             errors_message = skip_question_rule_form.errors.values()
             error_msgs = [error for errors in errors_message for error in errors]
-            return self.error_response(error_msgs)
+            return self._error_response(error_msgs)
 
     def get(self, request, subsection_id, *args, **kwargs):
         data = SkipRule.objects.filter(subsection_id=subsection_id).select_subclasses()
