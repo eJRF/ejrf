@@ -109,8 +109,7 @@ class GridReorderer:
         new_group = self.group.subsection.question_group.create(order=self.group.order + difference_in_pos)
         self.group.subsection.move_groups_down_from(new_group)
         group_in_move_direction.remove_question_and_reorder(question_to_move)
-        new_group.question.add(question_to_move)
-        question_to_move.orders.create(question_group=new_group, order=1)
+        new_group.add_question(question_to_move, 1)
 
     def _move_up(self):
         if self.group.order > 1:
@@ -136,8 +135,13 @@ class GridReorderer:
         else:
             self.message = {'warning': 'The Grid was not moved down because its the last in this subsection' }
 
+    def _remove_empty_groups(self):
+        groups = self.group.subsection.question_group.all()
+        QuestionGroup.delete_empty_groups(groups)
+
     def reorder_group_in_sub_section(self):
         if self.move_direction == "up":
             self._move_up()
         else:
             self._move_down()
+        self._remove_empty_groups()

@@ -227,8 +227,11 @@ class GridReordererTest(BaseTest):
         self.question_group3 = QuestionGroupFactory(subsection=self.subsection, order=3)
         self.question_group4 = QuestionGroupFactory(subsection=self.subsection, order=4, grid=True)
 
-        self.question = QuestionFactory()
+        self.question_group1.question.add(QuestionFactory(text="group 1"))
+        self.question_group2.question.add(QuestionFactory(text="group 2"))
+        self.question = QuestionFactory(text="group 3")
         self.question_group3.question.add(self.question)
+        self.question_group4.question.add(QuestionFactory(text= "group 4"))
         QuestionGroupOrder.objects.create(question=self.question, question_group=self.question_group3, order=1)
 
     def test_reorder_group_with_sub_section(self):
@@ -365,9 +368,11 @@ class GridReordererTest(BaseTest):
         self.assertEqual(question_group3.ordered_questions()[0], self.question)
         self.assertEqual(question_group3.question_orders()[0].order, 1)
         self.assertEqual(len(question_group3.and_sub_group_questions()), 2)
-        self.assertEqual(QuestionGroup.objects.all().count(), 6)
+        self.assertEqual(QuestionGroup.objects.all().count(), 5)
 
         new_group = self.subsection.question_group.get(order=question_group4.order + 1)
         self.assertEqual(len(new_group.ordered_questions()), 1)
         self.assertEqual(new_group.ordered_questions()[0], sub_group_question)
         self.assertEqual(new_group.orders.all()[0].order, 1)
+        all_groups = QuestionGroup.objects.all()
+        self.assertEqual(len(filter(lambda group: len(group.and_sub_group_questions()) == 0, all_groups)), 0)

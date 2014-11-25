@@ -70,18 +70,27 @@ class QuestionGroup(BaseModel):
             return self.hybrid
 
     def remove_question(self, question):
+        self.orders.filter(question=question).delete()
         if question in self.question.all():
             self.question.remove(question)
-        else:
-            map(lambda sub_group: sub_group.remove_question(question), self.sub_group.all())
+        map(lambda sub_group: sub_group.remove_question(question), self.sub_group.all())
+
+    @classmethod
+    def delete_empty_groups(cls, groups):
+        for g in groups:
+            QuestionGroup.delete_empty_groups(g.sub_groups())
+            if (not g.has_subgroups()) and len(g.and_sub_group_questions()) == 0:
+                g.delete()
+
+    def add_question(self, question, order):
+        self.question.add(question)
+        question.orders.create(question_group=self, order=order)
 
     def remove_question_and_reorder(self, question):
         self.remove_question(question)
-        self.orders.filter(question=question).delete()
         for i, q in enumerate(self.orders.order_by('order')):
             q.order = i + 1
             q.save()
-
 
     def is_grid_or_has_less_than_two_question(self):
         return self.grid or (len(self.and_sub_group_questions()) <= 1)
@@ -89,7 +98,7 @@ class QuestionGroup(BaseModel):
     def and_sub_group_questions(self):
         questions = list(self.all_questions())
         for sub_group in self.sub_groups():
-            questions.extend(sub_group.all_questions())
+            questions.extend(sub_group.and_sub_group_questions())
         return questions
 
     def ordered_questions(self):
