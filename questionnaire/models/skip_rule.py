@@ -12,13 +12,6 @@ class SkipRule(BaseModel):
 
     objects = InheritanceManager()
 
-    def get_question_group(self):
-        groups = filter(lambda group: self.root_question in group.question.all(), self.subsection.question_group.all())
-        if len(groups) == 1:
-            return groups[0]
-        else:
-            raise Exception("Cannot find the question group for the root question")
-
     def get_sub_type(self):
         return self.__class__.__name__
 
@@ -33,8 +26,13 @@ class SkipQuestion(SkipRule):
         SkipQuestion.objects.create(skip_question=self.skip_question, response=self.response,
                                     root_question=self.root_question, subsection=new_subsection)
 
+    def _get_question_group(self):
+        groups = self.subsection.question_group.filter(question=self.root_question)
+        if groups.exists():
+            return groups[0]
+
     def is_in_hybrid_grid(self):
-        return self.get_question_group().parent_group().hybrid
+        return self._get_question_group().parent_group().hybrid
 
     def to_dictionary(self):
         return {'id': self.id,

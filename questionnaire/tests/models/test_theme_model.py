@@ -5,7 +5,7 @@ from questionnaire.utils.answer_type import AnswerTypes
 
 
 class ThemeTest(BaseTest):
-    def test_user_fields(self):
+    def test_theme_fields(self):
         theme = Theme()
         fields = [str(item.attname) for item in theme._meta.fields]
         self.assertEqual(6, len(fields))
