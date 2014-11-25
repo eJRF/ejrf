@@ -19,10 +19,13 @@
                 onclick="selectMove('down', 'move-grid-form-{{group.id}}')">
             <span class="cyan"><span class="glyphicon glyphicon-circle-arrow-down"></span>Move Down</span></button>
 
+        {% if group.hybrid %}
         <a href="" class="btn btn-default btn-sm" data-toggle="modal" data-target="#create-skip-rule"
            data-target="#" onClick="skipRules.updateGrid({{ subsection.id }}, {{ group.id }})">
             <span class="cyan"><span class="glyphicon glyphicon-plus-sign"></span>Add Grid Rules</span>
         </a>
+        {% endif %}
+
         <a href="" class="delete-grid btn btn-default btn-sm" data-toggle="modal"
            data-target="#delete-grid-modal-{{ group.id }}"
            id="delete-grid-{{ group.id }}">
