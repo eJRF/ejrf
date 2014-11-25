@@ -6,6 +6,7 @@ from braces.views import PermissionRequiredMixin
 
 from questionnaire.forms.skip_rule_form import SkipRuleForm, SkipQuestionForm, SkipSubsectionForm
 from questionnaire.models import SkipRule
+from questionnaire.utils.view_utils import get_regions
 
 
 class SkipRuleView(PermissionRequiredMixin, View):
@@ -31,8 +32,10 @@ class SkipRuleView(PermissionRequiredMixin, View):
 
     def get(self, request, subsection_id, *args, **kwargs):
         data = SkipRule.objects.filter(subsection_id=subsection_id).select_subclasses()
-        responses = map(lambda q: q.to_dictionary(), data)
-        return HttpResponse(json.dumps(responses), content_type="application/json", status=200)
+        response_data = {'global_rules': map(lambda x: x.to_dictionary(), data.filter(region__isnull=True)),
+                         'regional_rules': map(lambda x: x.to_dictionary(),
+                                               data.filter(region__in=get_regions(request)))}
+        return HttpResponse(json.dumps(response_data), content_type="application/json", status=200)
 
     def delete(self, request, rule_id, *args, **kwargs):
         status = 204
@@ -43,4 +46,3 @@ class SkipRuleView(PermissionRequiredMixin, View):
             status = 200
 
         return HttpResponse(status=status)
-

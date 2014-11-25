@@ -5,12 +5,14 @@ from django.test import Client
 from questionnaire.tests.base_test import BaseTest
 from questionnaire.models import Question, SkipRule, QuestionOption, Questionnaire, Section, SubSection, \
     QuestionGroup, QuestionGroupOrder
+from questionnaire.tests.factories.question_factory import QuestionFactory
 from questionnaire.tests.factories.question_group_factory import QuestionGroupFactory
+from questionnaire.tests.factories.region_factory import RegionFactory
 from questionnaire.tests.factories.skip_rule_factory import SkipQuestionRuleFactory
 from questionnaire.tests.factories.sub_section_factory import SubSectionFactory
 
 
-class SkipQuestionPostTest(BaseTest):
+class SkipRuleViewPostTest(BaseTest):
     def setUp(self):
         self.client = Client()
         self.url = "/questionnaire/subsection/skiprules/"
@@ -136,22 +138,75 @@ class SkipQuestionPostTest(BaseTest):
 
 
 class SkipQuestionGetTest(BaseTest):
+
     def setUp(self):
-        subsection = SubSectionFactory()
-        question_group = QuestionGroupFactory(subsection=subsection)
-        self.skip_rule = SkipQuestionRuleFactory(subsection=subsection)
-        question_group.question.add(self.skip_rule.root_question)
+        self.subsection = SubSectionFactory()
+        self.question_group = QuestionGroupFactory(grid=True, hybrid=True)
+        self.question = QuestionFactory()
+        self.question_group.question.add(self.question)
+        self.skip_rule = SkipQuestionRuleFactory(root_question=self.question, subsection=self.question_group.subsection)
         self.client = Client()
         user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
         self.assign('can_edit_questionnaire', user)
         self.client.login(username=user.username, password='pass')
-        self.url = "/questionnaire/subsection/%d/skiprules/" % subsection.id
+        self.url = "/questionnaire/subsection/%d/skiprules/" % self.subsection.id
 
     def test_get_existing_skip_rules(self):
-        self.assertTrue(SkipRule.objects.all().count() == 1)
+        self.assertEqual(SkipRule.objects.all().count(), 1)
         response = self.client.get(self.url)
+        expected_data = [
+            {"skip_question": "A nice question", "root_question": "A nice question", "is_in_hygrid": True, "id": 1,
+             "response": "Yes"}]
+
+        self.assertEqual(expected_data, json.loads(response.content))
         self.assertEqual(response.status_code, 200)
 
+
+class RegionalSkipQuestionGetTest(BaseTest):
+    def setUp(self):
+        self.client = Client()
+        user = self.create_user(group=self.REGIONAL_ADMIN, org="WHO", region='AFR')
+        region = user.user_profile.region
+        self.assign('can_edit_questionnaire', user)
+        self.client.login(username=user.username, password='pass')
+
+        self.global_question_group = QuestionGroupFactory(grid=True, hybrid=True)
+        self.global_question = QuestionFactory()
+        self.global_question_group.question.add(self.global_question)
+        group_subsection = self.global_question_group.subsection
+        self.global_skip_rule = SkipQuestionRuleFactory(root_question=self.global_question,
+                                                        subsection=group_subsection,
+                                                        region=None)
+        asia = RegionFactory(name='ASIAN')
+        SkipQuestionRuleFactory(root_question=self.global_question, subsection=group_subsection, region=asia)
+
+        self.question_group = QuestionGroupFactory(grid=True, hybrid=True, subsection=group_subsection)
+        self.question = QuestionFactory(text='regional question')
+        self.question_group.question.add(self.question)
+        self.skip_rule = SkipQuestionRuleFactory(root_question=self.question,
+                                                 subsection=group_subsection,
+                                                 region=region)
+
+        self.url = "/questionnaire/subsection/%d/skiprules/" % self.global_skip_rule.subsection.id
+
+    def test_get_existing_skip_rules(self):
+        response = self.client.get(self.url)
+        global_rules = {"skip_question": "A nice question",
+                        "root_question": "A nice question",
+                        "is_in_hygrid": True,
+                        "id": self.global_skip_rule.id, "response": "Yes"}
+
+        regional_rules = {u"skip_question": u"A nice question",
+                          u"root_question": u"regional question",
+                          u"is_in_hygrid": True,
+                          u"id": self.skip_rule.id,
+                          u"response": u"Yes"}
+
+        self.assertEqual(response.status_code, 200)
+        json_loads = json.loads(response.content)
+
+        self.assertEqual(global_rules, json_loads['global_rules'][0])
+        self.assertEqual(regional_rules, json_loads['regional_rules'][0])
 
 class SkipQuestionDeleteTest(BaseTest):
 

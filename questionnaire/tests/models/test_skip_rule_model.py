@@ -38,4 +38,3 @@ class SkipSubsectionRuleTest(BaseTest):
     def test_skip_subsection_rule_stores(self):
         skip_subsection = SkipSubsectionRuleFactory()
         self.failUnless(skip_subsection.id)
-
