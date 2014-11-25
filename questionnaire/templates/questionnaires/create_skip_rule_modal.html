@@ -11,7 +11,10 @@
 </div>
 
 <script type="text/javascript">
-  var csrfToken = '{{ csrf_token }}';
-  var url = "{% url 'skip_rules' %}";
-  var sectionId = "{{ section.id }}";
+    var csrfToken = '{{ csrf_token }}';
+    var url = "{% url 'skip_rules' %}";
+    var sectionId = "{{ section.id }}";
+    $("#existing-grid-close-button").on('click', function(){
+        window.location.href = window.location.pathname;
+    });
 </script>

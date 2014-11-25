@@ -133,7 +133,13 @@
     <div id="existingRulesTab" data-ng-show="activeTab == 'existingRulesTab'">
         <div class="modal-body">
             <div class="question-group indent">
+                <div data-ng-class="deleteResult.className" class="alert" data-ng-show="deleteResult.show">
+                    {{ deleteResult.message }}
+                </div>
                 <div data-ng-repeat="rule in existingRules | orderBy:'id'" class="existingRule">
+                    <button class="btn btn-default pull-right" value="delete" data-ng-click="deleteRule(rule)">
+                        <span class="red bold"><span class="glyphicon glyphicon-remove"></span> Delete</span>
+                    </button>
                     <div class="form-group" style="display:none;"><label class="col-sm-3 control-label">Rule
                         ID</label>{{ rule.id }}
                     </div>
@@ -161,7 +167,13 @@
     <div id="existingGridRulesTab" data-ng-show="activeTab == 'existingGridRulesTab'">
         <div class="modal-body">
             <div class="question-group indent">
+                <div data-ng-class="deleteResult.className" class="alert" data-ng-show="deleteResult.show">
+                    {{ deleteResult.message }}
+                </div>
                 <div data-ng-repeat="rule in existingGridRules | orderBy:'id'" class="existingRule">
+                    <button class="btn btn-default pull-right" value="delete" data-ng-click="deleteRule(rule)">
+                        <span class="red bold"><span class="glyphicon glyphicon-remove"></span> Delete</span>
+                    </button>
                     <div class="form-group" style="display:none;"><label class="col-sm-3 control-label">Rule
                         ID</label>{{ rule.id }}
                     </div>

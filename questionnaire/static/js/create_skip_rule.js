@@ -64,17 +64,36 @@ angular.module('questionnaireApp', [])
                 });
         };
 
+        $scope.deleteRule = function(rule) {
+            $http.delete("/questionnaire/subsection/skiprule/" + rule.id + "/")
+                .success(function(data, status) {
+                    var index = $scope.existingRules.indexOf(rule);
+                    if (index > -1) {
+                        $scope.existingRules.splice(index, 1);
+                    }
+
+                    var gridRuleIndex = $scope.existingGridRules.indexOf(rule);
+                    if (gridRuleIndex > -1) {
+                        $scope.existingGridRules.splice(index, 1);
+                    }
+                    $scope.deleteResult = { className: "alert-success", message: "Rule successfully deleted", show: true};
+                })
+                .error(function(){
+                    $scope.deleteResult = { className: "alert-danger", message: "Rule was not deleted", show: true};
+                });
+        };
+
         $scope.filterQuestions = function(question) {
             return true;
         };
 
         $scope.updateSkipRuleModal = function(subsectionId, gridId) {
-
             updateRules(subsectionId);
             updateCreateQuestionRuleForm(subsectionId);
             updateCreateSubsectionRuleForm(subsectionId);
             $scope.existingGridRulesTabHidden = true;
             $scope.existingRulesTabHidden = false;
+            $scope.deleteResult = {};
 
             if(gridId != undefined) {
                 $scope.subsectionTabHidden = true;
@@ -82,11 +101,7 @@ angular.module('questionnaireApp', [])
                 $scope.existingRulesTabHidden = true;
                 $scope.filterQuestions = function(question) {
                     return question.parentQuestionGroup == gridId;
-                };
-
-                $("#existing-grid-close-button").on('click', function(){
-                    window.location.href  = window.location.pathname;
-                });
+                };   
             }
         };
         $scope.fns = {};
@@ -145,7 +160,9 @@ angular.module('questionnaireApp', [])
             var postData = getSubsectionFormData();
             createSkipRule(postData);
         };
-    }]);
+    }]).run(function($http) {
+        $http.defaults.headers.common['X-CSRFToken'] = window.csrfToken;
+    });;
 
 skipRules.updateSubsection = function(subsectionId) {
     angular.element(document.getElementById('skip-rule-controller')).scope().updateSkipRuleModal(subsectionId);

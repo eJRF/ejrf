@@ -70,7 +70,7 @@ urlpatterns = patterns('',
                        url(r'^questionnaire/subsection/(?P<subsection_id>\d+)/skiprules/$', SkipRuleView.as_view(),
                            name="get_skip_rules"),
                        url(r'^questionnaire/subsection/skiprules/$', SkipRuleView.as_view(), name="skip_rules"),
-
+                       url(r'^questionnaire/subsection/skiprule/(?P<rule_id>\d+)/$', SkipRuleView.as_view(), name="single_skip_rule"),
 
                        url(r'^questionnaire/entry/(?P<questionnaire_id>\d+)/documents/upload/$',
                            UploadDocument.as_view(), name='upload_document'),

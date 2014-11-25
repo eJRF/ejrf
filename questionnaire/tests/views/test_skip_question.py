@@ -5,7 +5,9 @@ from django.test import Client
 from questionnaire.tests.base_test import BaseTest
 from questionnaire.models import Question, SkipRule, QuestionOption, Questionnaire, Section, SubSection, \
     QuestionGroup, QuestionGroupOrder
+from questionnaire.tests.factories.question_group_factory import QuestionGroupFactory
 from questionnaire.tests.factories.skip_rule_factory import SkipQuestionRuleFactory
+from questionnaire.tests.factories.sub_section_factory import SubSectionFactory
 
 
 class SkipQuestionPostTest(BaseTest):
@@ -135,14 +137,45 @@ class SkipQuestionPostTest(BaseTest):
 
 class SkipQuestionGetTest(BaseTest):
     def setUp(self):
-        self.skip_rule = SkipQuestionRuleFactory()
+        subsection = SubSectionFactory()
+        question_group = QuestionGroupFactory(subsection=subsection)
+        self.skip_rule = SkipQuestionRuleFactory(subsection=subsection)
+        question_group.question.add(self.skip_rule.root_question)
         self.client = Client()
         user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
         self.assign('can_edit_questionnaire', user)
         self.client.login(username=user.username, password='pass')
-        self.url = "/questionnaire/subsection/%d/skiprules/" % self.skip_rule.id
+        self.url = "/questionnaire/subsection/%d/skiprules/" % subsection.id
 
     def test_get_existing_skip_rules(self):
         self.assertTrue(SkipRule.objects.all().count() == 1)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
+
+
+class SkipQuestionDeleteTest(BaseTest):
+
+    def setUp(self):
+        self.skip_rule = SkipQuestionRuleFactory()
+        self.client = Client()
+        user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
+        self.assign('can_edit_questionnaire', user)
+        self.client.login(username=user.username, password='pass')
+
+    def test_should_delete_skip_rule_when_it_exists(self):
+        #given
+        url = '/questionnaire/subsection/skiprule/%d/' % self.skip_rule.id
+        #when
+        response = self.client.delete(url)
+        #then
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(SkipRule.objects.filter(id=self.skip_rule.id).count(), 0)
+
+    def test_should_not_delete_skip_rule_when_it_doesnt_exists(self):
+        #given
+        url = '/questionnaire/subsection/skiprule/%d/' % (self.skip_rule.id + 1)
+        #when
+        response = self.client.delete(url)
+        #then
+        self.assertEqual(204, response.status_code)
+        self.assertEqual(SkipRule.objects.filter(id=self.skip_rule.id).count(), 1)

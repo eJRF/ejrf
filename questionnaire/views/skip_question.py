@@ -33,3 +33,14 @@ class SkipRuleView(PermissionRequiredMixin, View):
         data = SkipRule.objects.filter(subsection_id=subsection_id).select_subclasses()
         responses = map(lambda q: q.to_dictionary(), data)
         return HttpResponse(json.dumps(responses), content_type="application/json", status=200)
+
+    def delete(self, request, rule_id, *args, **kwargs):
+        status = 204
+        rules = SkipRule.objects.filter(id=rule_id)
+
+        if rules:
+            rules[0].delete()
+            status = 200
+
+        return HttpResponse(status=status)
+
