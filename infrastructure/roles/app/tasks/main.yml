@@ -33,7 +33,3 @@
   script: collect-static.sh
   args:
     chdir: /srv/checkout/
-#syncdb  done
-#migrate done
-#collectstatic
-#
