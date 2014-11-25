@@ -1,5 +1,39 @@
 ---
-#syncdb
-#migrate
+- apt: name=git state=present update_cache=yes
+
+- apt: name={{ item }} state=present
+  with_items:
+    - python-pip
+    - python-dev
+
+- pip: name={{ item }}
+  with_items:
+    - psycopg2
+    - virtualenv
+
+- file: path=/srv/checkout owner=ubuntu  mode=0755 state=directory
+
+- name: ejrf repo
+  git: repo=https://github.com/eJRF/ejrf.git dest=/srv/checkout version=HEAD
+
+- name: ejrf requirements
+  pip: requirements=/srv/checkout/pip-requirements.txt virtualenv=/srv/checkout/ejrfvenv
+
+- name: ejrf sync db
+  script: sync-db.sh
+  args:
+    chdir: /srv/checko/
+
+- name: ejrf migrate d
+  script: migrate-db.sh
+  args:
+    chdir: /srv/checkout/
+
+- name: ejrf collect static
+  script: collect-static.sh
+  args:
+    chdir: /srv/checkout/
+#syncdb  done
+#migrate done
 #collectstatic
 #

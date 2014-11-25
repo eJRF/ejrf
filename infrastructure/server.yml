@@ -2,6 +2,7 @@
 - hosts: server
   sudo: true
   roles:
-     - nginx
      - postgres
+     - app
+     - nginx
      - uwsgi
