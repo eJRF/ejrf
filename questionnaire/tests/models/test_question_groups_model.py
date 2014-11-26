@@ -41,6 +41,16 @@ class QuestionGroupTest(BaseTest):
                       'display_all', 'allow_multiples', 'hybrid']:
             self.assertIn(field, fields)
 
+    def test_knows_next_question_group_order_in_subsection(self):
+        expected_next_order= self.parent_question_group.order + 1
+        self.assertEqual(expected_next_order, QuestionGroup.next_order_in(self.sub_section))
+
+    def test_next_question_group_order_in_subsection_is_1_if_no_other_groups_exist(self):
+        self.sub_section.question_group.all().delete()
+
+        expected_next_order = 1
+        self.assertEqual(expected_next_order, QuestionGroup.next_order_in(self.sub_section))
+
     def test_grouped_questions_store(self):
         grouped_question = QuestionGroup.objects.create(subsection=self.sub_section, order=1)
         grouped_question.question.add(self.question)

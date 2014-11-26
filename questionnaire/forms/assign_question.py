@@ -1,7 +1,7 @@
 from django.forms import Form
 from django import forms
 
-from questionnaire.models import Question
+from questionnaire.models import Question, QuestionGroup
 
 
 class AssignQuestionForm(Form):
@@ -17,12 +17,7 @@ class AssignQuestionForm(Form):
         return Question.objects.filter(region=self.region)
 
     def save(self, commit=True, *args, **kwargs):
-        if self.subsection.question_group.count() > 1:
-            question_group = self.subsection.question_group.filter(parent__isnull=True).order_by('-order')[0]
-            if question_group.grid:
-                question_group = self.subsection.question_group.create(order=question_group.order + 1)
-        else:
-            question_group = self.subsection.question_group.get_or_create()[0]
+        question_group = self._get_question_group()
         args = list(self.cleaned_data['questions'])
         question_group.question.add(*args)
         self._create_group_orders(question_group)
@@ -31,3 +26,12 @@ class AssignQuestionForm(Form):
         max_order = question_group.max_questions_order()
         for index, question in enumerate(self.cleaned_data['questions']):
             question.orders.create(question_group=question_group, order=max_order + index + 1)
+
+    def _get_question_group(self):
+        if self.subsection.question_group.exists():
+            question_group = self.subsection.question_group.filter(parent__isnull=True).order_by('-order')[0]
+            if question_group.grid:
+                return self.subsection.question_group.create(order=question_group.order + 1)
+            return question_group
+        next_order = QuestionGroup.next_order_in(self.subsection)
+        return self.subsection.question_group.create(order=next_order)

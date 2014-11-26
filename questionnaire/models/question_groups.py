@@ -76,6 +76,14 @@ class QuestionGroup(BaseModel):
         map(lambda sub_group: sub_group.remove_question(question), self.sub_group.all())
 
     @classmethod
+    def next_order_in(cls, subsection):
+        first_order = 1
+        existing_orders = cls.objects.filter(subsection=subsection, parent__isnull=True).values_list('order', flat=True)
+        if existing_orders.exists():
+            return max(existing_orders) + 1
+        return first_order
+
+    @classmethod
     def delete_empty_groups(cls, groups):
         for g in groups:
             QuestionGroup.delete_empty_groups(g.sub_groups())
