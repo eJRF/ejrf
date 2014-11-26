@@ -22,11 +22,11 @@ def given_i_am_a_logged_in_global_admin(step):
 def and_i_have_a_questionnaire_with_sections_and_with_subsections(step):
     world.questionnaire = Questionnaire.objects.create(name="JRF Bolivia version", description="some more description",
                                                        year=2013, status=Questionnaire.DRAFT)
-    world.section1 = Section.objects.create(order=0,
+    world.section1 = Section.objects.create(order=1,
                                             title="WHO/UNICEF Joint Reporting Form on Immunization for the Period January-December, 2013",
                                             description="""If a question is not relevant, enter "NR" (not relevant)""",
                                             questionnaire=world.questionnaire, name="Cover page")
-    world.section2 = Section.objects.create(order=1,
+    world.section2 = Section.objects.create(order=2,
                                             title="Another title",
                                             description="This is just another one of them",
                                             questionnaire=world.questionnaire, name="Cover page")
@@ -46,6 +46,8 @@ def and_i_have_assigned_questions(step):
     world.question3 = Question.objects.create(text='Name of UNICEF contact', export_label='UNICEF Contact',
                                               UID='00026', answer_type='Text')
     world.question4 = Question.objects.create(text='Name of WHO contact', export_label='WHO Contact', UID='00028',
+                                              answer_type='Text')
+    world.question5 = Question.objects.create(text='Name of WHO contact', export_label='WHO Contact', UID='00029',
                                               answer_type='Text')
 
     parent = QuestionGroup.objects.create(subsection=world.sub_section, order=1)

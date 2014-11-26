@@ -12,10 +12,10 @@
         {% csrf_token %}
         <input type="hidden" name="move_direction"/>
         <input type="hidden" name="group_id" value="{{ group.id }}"/>
-        <button class="btn btn-default btn-sm" type="submit" value="up"
+        <button class="btn btn-default btn-sm" id="btn-moveup-{{ group.id }}" type="submit" value="up"
                 onclick="selectMove('up', 'move-grid-form-{{group.id}}')">
             <span class="cyan"><span class="glyphicon glyphicon-circle-arrow-up"></span>Move Up</span></button>
-        <button class="btn btn-default btn-sm" type="submit" value="down"
+        <button class="btn btn-default btn-sm" id="btn-movedwn-{{ group.id }}" type="submit" value="down"
                 onclick="selectMove('down', 'move-grid-form-{{group.id}}')">
             <span class="cyan"><span class="glyphicon glyphicon-circle-arrow-down"></span>Move Down</span></button>
 
