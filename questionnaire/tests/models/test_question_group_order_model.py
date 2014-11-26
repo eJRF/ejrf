@@ -53,3 +53,5 @@ class QuestionGroupOrderTest(BaseTest):
         self.assertTrue(question_group_order.is_first_answer_type_in_group())
         self.assertFalse(another_question_group_order.is_first_answer_type_in_group())
         self.assertTrue(number_group_order.is_first_answer_type_in_group())
+
+

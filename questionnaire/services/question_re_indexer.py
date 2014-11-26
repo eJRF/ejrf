@@ -1,7 +1,7 @@
 import copy
 
 from questionnaire.models import QuestionGroupOrder, QuestionGroup, SubSection, Section
-from questionnaire.utils.model_utils import number_from
+from questionnaire.utils.model_utils import number_from, reindex_orders_in
 
 
 class QuestionReIndexer(object):
@@ -141,8 +141,8 @@ class GridReorderer:
             self.message = {'warning': 'The Grid was not moved down because its the last in this subsection' }
 
     def _remove_empty_groups(self):
-        groups = self.group.subsection.question_group.all()
-        QuestionGroup.delete_empty_groups(groups)
+        QuestionGroup.delete_empty_groups(self.group.subsection)
+        reindex_orders_in(QuestionGroup, subsection=self.group.subsection)
 
     def reorder_group_in_sub_section(self):
         if self.move_direction == "up":

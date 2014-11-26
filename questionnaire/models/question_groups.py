@@ -84,11 +84,11 @@ class QuestionGroup(BaseModel):
         return first_order
 
     @classmethod
-    def delete_empty_groups(cls, groups):
-        for g in groups:
-            QuestionGroup.delete_empty_groups(g.sub_groups())
-            if (not g.has_subgroups()) and len(g.and_sub_group_questions()) == 0:
-                g.delete()
+    def delete_empty_groups(cls, subsection):
+        groups = cls.objects.filter(subsection=subsection)
+        for group in groups:
+            if not group.question.exists():
+                group.delete()
 
     def add_question(self, question, order):
         self.question.add(question)
