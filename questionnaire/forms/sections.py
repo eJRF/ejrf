@@ -13,6 +13,7 @@ class SectionForm(ModelForm):
         super(SectionForm, self).__init__(*args, **kwargs)
         self.fields['order'].choices = self._get_options()
         self.fields['order'].label = 'Position'
+
     class Meta:
         model = Section
         fields = ['questionnaire', 'name', 'title', 'description', 'order']
@@ -21,7 +22,8 @@ class SectionForm(ModelForm):
 
     def _get_options(self):
         questionnaire = self.initial['questionnaire']
-        section_orders = list(Section.objects.filter(questionnaire=questionnaire).order_by('order').values_list('order', flat=True))
+        section_orders = list(
+            Section.objects.filter(questionnaire=questionnaire).order_by('order').values_list('order', flat=True))
         if not section_orders:
             section_orders.append(1)
         elif not self.instance.id:
@@ -29,11 +31,12 @@ class SectionForm(ModelForm):
         unique_orders = set(section_orders)
         return zip(unique_orders, unique_orders)
 
-    def save(self, commit=True):
+    def save(self, commit=True, *args, **kwargs):
         section = super(SectionForm, self).save(commit=False)
+        section.region = self.initial.get('region', None)
         if commit:
             based_re_indexer = OrderBasedReIndexer(section, self.cleaned_data['order'],
-                                                       questionnaire=section.questionnaire)
+                                                   questionnaire=section.questionnaire)
             based_re_indexer.reorder()
         return section
 

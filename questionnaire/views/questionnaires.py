@@ -49,11 +49,12 @@ class Entry(DoesNotExistExceptionHandlerMixin, AdvancedMultiplePermissionsRequir
         printable = 'printable' in request.GET
         version = request.GET.get('version', None)
         preview = self._check_preview_mode(questionnaire)
+        region = self.request.user.user_profile.region
         context = {'questionnaire': questionnaire,
                    'section': section, 'printable': printable,
                    'preview': preview, 'formsets': formsets,
                    'ordered_sections': questionnaire.sections.order_by('order'),
-                   'section_form': SectionForm(initial={'questionnaire': questionnaire}),
+                   'section_form': SectionForm(initial={'questionnaire': questionnaire, 'region': region}),
                    'new_section_action': reverse('new_section_page', args=(questionnaire.id, )),
                    'subsection_form': SubSectionForm(),
                    'subsection_action': reverse('new_subsection_page', args=(questionnaire.id, section.id)),

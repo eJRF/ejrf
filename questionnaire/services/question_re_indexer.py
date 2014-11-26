@@ -65,10 +65,8 @@ class OrderBasedReIndexer:
 
     def _get_old_order(self, all_objects):
         if self.obj.id:
-            order_to_move_from = all_objects.get(id=self.obj.id).order
-        else:
-            order_to_move_from = max(all_objects.values_list('order', flat=True)) + 1
-        return order_to_move_from
+            return all_objects.get(id=self.obj.id).order
+        return max(all_objects.values_list('order', flat=True)) + 1
 
     def reorder(self):
         all_objects = self.klass.objects.filter(**self.kwargs).order_by('order')
