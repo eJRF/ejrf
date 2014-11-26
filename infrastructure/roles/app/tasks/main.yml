@@ -33,3 +33,8 @@
   script: collect-static.sh
   args:
     chdir: /srv/checkout/
+
+- name: ejrf load fixtures
+  script: load-fixtures.sh
+  args:
+    chdir: /srv/checkout/
