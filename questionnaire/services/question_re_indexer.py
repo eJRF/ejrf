@@ -107,7 +107,8 @@ class GridReorderer:
         self.message = {'success': 'The Grid was successfully moved ' + move_direction }
 
     def _is_not_last_question_group(self):
-        return self.group.order < self.group.subsection.question_group.filter(parent__isnull=True).count()
+        subsection_orders = self.group.subsection.question_group.filter(parent__isnull=True).values_list('order', flat=True)
+        return self.group.order < max(subsection_orders)
 
     def _move_and_create_group(self, group_in_move_direction, question_to_move, difference_in_pos):
         new_group = self.group.subsection.question_group.create(order=self.group.order + difference_in_pos)
