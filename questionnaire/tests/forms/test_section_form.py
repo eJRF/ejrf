@@ -3,10 +3,12 @@ from questionnaire.models import Questionnaire, Section, SubSection
 from questionnaire.tests.base_test import BaseTest
 from questionnaire.tests.factories.questionnaire_factory import QuestionnaireFactory
 from questionnaire.tests.factories.section_factory import SectionFactory
+from questionnaire.tests.factories.region_factory import RegionFactory
 
 
 class CoreSectionFormTest(BaseTest):
     def setUp(self):
+        self.region = RegionFactory()
         self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013)
 
         self.section1 = SectionFactory(questionnaire=self.questionnaire, order=1, name='Section 1')
@@ -23,8 +25,10 @@ class CoreSectionFormTest(BaseTest):
         self.assertTrue(section_form.is_valid())
 
     def test_valid_with_initial(self):
-        section_form = SectionForm(data=self.form_data, initial={'questionnaire': self.questionnaire.id})
+        section_form = SectionForm(data=self.form_data, initial={'questionnaire': self.questionnaire.id, 'region': self.region})
         self.assertTrue(section_form.is_valid())
+        section = section_form.save()
+        self.assertEqual(section.region, self.region)
 
     def test_that_sections_that_are_reorder(self):
         section_form = SectionForm(instance=self.section3,

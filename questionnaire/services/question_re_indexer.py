@@ -56,8 +56,9 @@ class QuestionReIndexer(object):
 
 class OrderBasedReIndexer:
 
-    def __init__(self, obj, new_order, **kwargs):
+    def __init__(self, obj, new_order, region=None, **kwargs):
         self.obj = obj
+        self.region = region
         self.kwargs = kwargs
         self.new_order = number_from(new_order)
         self.klass = eval(self.obj.__class__.__name__)
@@ -75,9 +76,14 @@ class OrderBasedReIndexer:
         for obj in objects_to_move:
             obj.order += self._move_delta(order_to_move_from)
             obj.save()
+        self._save_new_instance()
+        return self.SUCCESS_MESSAGE
+
+    def _save_new_instance(self):
+        if not self.obj.id:
+            self.obj.region = self.region
         self.obj.order = self.new_order
         self.obj.save()
-        return self.SUCCESS_MESSAGE
 
     def _get_objects_to_move(self, all_objects, order_to_move_from):
         if self._moving_up(order_to_move_from):

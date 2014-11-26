@@ -33,13 +33,12 @@ class SectionForm(ModelForm):
 
     def save(self, commit=True, *args, **kwargs):
         section = super(SectionForm, self).save(commit=False)
-        section.region = self.initial.get('region', None)
+        region = self.initial.get('region', None)
         if commit:
             based_re_indexer = OrderBasedReIndexer(section, self.cleaned_data['order'],
-                                                   questionnaire=section.questionnaire)
+                                                   questionnaire=section.questionnaire, region=region)
             based_re_indexer.reorder()
         return section
-
 
 class SubSectionForm(ModelForm):
     def save(self, commit=True, *args, **kwargs):

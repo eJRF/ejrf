@@ -50,6 +50,7 @@ class Entry(DoesNotExistExceptionHandlerMixin, AdvancedMultiplePermissionsRequir
         version = request.GET.get('version', None)
         preview = self._check_preview_mode(questionnaire)
         region = self.request.user.user_profile.region
+
         context = {'questionnaire': questionnaire,
                    'section': section, 'printable': printable,
                    'preview': preview, 'formsets': formsets,

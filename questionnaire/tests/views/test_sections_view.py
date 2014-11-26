@@ -153,6 +153,33 @@ class EditSectionsViewTest(BaseTest):
         self.assertRedirects(response, expected_url='/accounts/login/?next=%s' % url)
 
 
+    def test_updates_section_with_users_region(self):
+        client = Client()
+        user = self.create_user(username='new-user', group=self.REGIONAL_ADMIN, org="WHO", region='AFRO')
+        region = user.user_profile.region
+        questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013, region=region)
+        section = Section.objects.create(name="section", questionnaire=questionnaire, order=1, region=region)
+
+        self.assign('can_edit_questionnaire', user)
+        client.login(username=user.username, password='pass')
+        form_data = {'name': 'section edited',
+                          'description': 'funny section',
+                          'title': 'some title',
+                          'order': 1,
+                          'questionnaire': questionnaire.id}
+
+        url = '/section/%d/edit/' % section.id
+        response = client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        response = client.post(url, data=form_data)
+
+        edited = Section.objects.get(id=section.id)
+        self.assertEqual(edited.region, region)
+        self.assertEqual(edited.title, form_data['title'])
+        self.assertEqual(edited.name, form_data['name'])
+
+
 class DeleteSectionsViewTest(BaseTest):
     def setUp(self):
         self.client = Client()
