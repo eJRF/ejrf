@@ -4,7 +4,7 @@
 from questionnaire.models import QuestionGroupOrder, QuestionOption, QuestionGroup, Question, SubSection, Section, \
     Questionnaire
 
-questionnaire = Questionnaire.objects.get(name="JRF 2013 Core English", description="From dropbox as given by Rouslan")
+questionnaire = Questionnaire.objects.get(name="JRF Core English", description="From dropbox as given by Rouslan")
 
 section_2 = Section.objects.create(title="School Based Immunization", order=3,
                                    questionnaire=questionnaire, name="School Imm. Delivery", description="""Please complete this section if in your country

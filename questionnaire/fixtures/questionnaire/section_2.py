@@ -1,7 +1,7 @@
 from questionnaire.models import Questionnaire, Section, SubSection, Question, QuestionGroup, QuestionOption, \
     QuestionGroupOrder
 
-questionnaire = Questionnaire.objects.get(name="JRF 2013 Core English", description="From dropbox as given by Rouslan")
+questionnaire = Questionnaire.objects.get(name="JRF Core English", description="From dropbox as given by Rouslan")
 
 section_1 = Section.objects.create(order=2, title="Immunization Schedule for 2013", description="""
 Describe the 2013 national immunization schedule for routine services in the following table. Include all doses administered to young children, adolescents, and adults on a routine basis. Each row describes a vaccine or combination vaccine. Include vitamin A if it is delivered through routine immunization services. Also include information about the use of auto-disable (AD) syringes. <br/>

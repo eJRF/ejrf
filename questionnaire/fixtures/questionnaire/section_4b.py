@@ -1,7 +1,7 @@
 from questionnaire.models import Questionnaire, Section, SubSection, Question, QuestionGroup, QuestionOption, \
     QuestionGroupOrder
 
-questionnaire = Questionnaire.objects.get(name="JRF 2013 Core English", description="From dropbox as given by Rouslan")
+questionnaire = Questionnaire.objects.get(name="JRF Core English", description="From dropbox as given by Rouslan")
 
 section_1 = Section.objects.create(order=5, questionnaire=questionnaire, name="Coverage Surveys",
                                    title="Immunization and Vitamin A Coverage")

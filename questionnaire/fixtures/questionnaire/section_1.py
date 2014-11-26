@@ -9,7 +9,7 @@ QuestionGroup.objects.all().delete()
 QuestionOption.objects.all().delete()
 QuestionGroupOrder.objects.all().delete()
 
-questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English",
+questionnaire = Questionnaire.objects.create(name="JRF Core English",
                                              description="From dropbox as given by Rouslan",
                                              year=2013, status=Questionnaire.PUBLISHED)
 

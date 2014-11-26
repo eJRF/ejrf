@@ -1,6 +1,6 @@
 from questionnaire.models import Questionnaire, Section, SubSection, Question, QuestionGroup, QuestionGroupOrder
 
-questionnaire = Questionnaire.objects.get(name="JRF 2013 Core English", description="From dropbox as given by Rouslan")
+questionnaire = Questionnaire.objects.get(name="JRF Core English", description="From dropbox as given by Rouslan")
 
 section_1 = Section.objects.create(order=0,
                                    title="WHO/UNICEF Joint Reporting Form on Immunization for the Period January-December, 2013",
