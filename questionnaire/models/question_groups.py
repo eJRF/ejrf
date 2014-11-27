@@ -15,6 +15,7 @@ class QuestionGroup(BaseModel):
     grid = models.BooleanField(default=False)
     display_all = models.BooleanField(default=False)
     hybrid = models.BooleanField(default=False)
+    is_core = models.BooleanField(default=False)
 
     @property
     def region(self):

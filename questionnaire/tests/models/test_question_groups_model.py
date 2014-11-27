@@ -35,10 +35,10 @@ class QuestionGroupTest(BaseTest):
     def test_grouped_questions_field(self):
         grouped_question = QuestionGroup()
         fields = [str(item.attname) for item in grouped_question._meta.fields]
-        self.assertEqual(12, len(fields))
+        self.assertEqual(13, len(fields))
         for field in ['id', 'created', 'modified', 'subsection_id', 'name', 'instructions', 'parent_id', 'order',
                       'grid',
-                      'display_all', 'allow_multiples', 'hybrid']:
+                      'display_all', 'allow_multiples', 'hybrid', 'is_core']:
             self.assertIn(field, fields)
 
     def test_knows_next_question_group_order_in_subsection(self):
