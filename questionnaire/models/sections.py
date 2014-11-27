@@ -51,7 +51,7 @@ class Section(BaseModel):
     @classmethod
     def get_next_order(cls, questionnaire):
         sections = cls.objects.filter(questionnaire=questionnaire).reverse()
-        return sections[0].order + 1 if sections else 0
+        return sections[0].order + 1 if sections else 1
 
 
 class SubSection(BaseModel):
@@ -66,7 +66,7 @@ class SubSection(BaseModel):
         app_label = 'questionnaire'
 
     def move_groups_down_from(self, group):
-        groups_to_move = filter(lambda g: group != g and g.order >= group.order, self.question_group.filter(parent__isnull=True))
+        groups_to_move = self.question_group.filter(parent__isnull=True, order__gte=group.order).exclude(id=group.id)
         for g in groups_to_move:
             g.order += 1
             g.save()

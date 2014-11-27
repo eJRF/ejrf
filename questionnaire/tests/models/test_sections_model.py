@@ -93,7 +93,7 @@ class SectionTest(BaseTest):
 
     def test_next_order_starts_from_0_if_no_sections_exists_in_a_questionnaire(self):
         Section.objects.filter(questionnaire=self.questionnaire).delete()
-        self.assertEqual(0, Section.get_next_order(self.questionnaire))
+        self.assertEqual(1, Section.get_next_order(self.questionnaire))
 
     def test_mapped_question_orders(self):
         grid_question_group = QuestionGroup.objects.create(subsection=self.sub_section, order=11, grid=True,
