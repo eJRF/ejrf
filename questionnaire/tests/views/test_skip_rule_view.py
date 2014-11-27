@@ -138,21 +138,17 @@ class SkipRuleViewPostTest(BaseTest):
 
 
 class SkipQuestionGetTest(BaseTest):
-
     def setUp(self):
         self.subsection = SubSectionFactory()
         self.question_group = QuestionGroupFactory(grid=True, hybrid=True)
         self.question = QuestionFactory()
         self.question_group.question.add(self.question)
-<<<<<<< HEAD
         self.skip_rule = SkipQuestionRuleFactory(root_question=self.question, subsection=self.question_group.subsection)
-=======
         self.subsection = self.question_group.subsection
         self.skip_rule = SkipQuestionRuleFactory(root_question=self.question,
                                                  subsection=self.subsection,
                                                  region=None)
 
->>>>>>> create skip rule for a region, display global rules
         self.client = Client()
         user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
         self.assign('can_edit_questionnaire', user)
@@ -160,18 +156,18 @@ class SkipQuestionGetTest(BaseTest):
         self.url = "/questionnaire/subsection/%d/skiprules/" % self.subsection.id
 
     def test_get_existing_skip_rules(self):
-        self.assertEqual(SkipRule.objects.all().count(), 1)
+        self.assertEqual(SkipRule.objects.all().count(), 2)
         response = self.client.get(self.url)
         expected_data = {"skip_question": "A nice question",
                          "root_question": "A nice question",
                          "is_in_hygrid": True,
                          "id": self.skip_rule.id,
-                         "response": "Yes"}
+                         "response": "Yes",
+                         "can_delete": True}
 
         self.assertEqual(response.status_code, 200)
         json_loads = json.loads(response.content)
-        self.assertEqual(expected_data, json_loads['global_rules'][0])
-
+        self.assertIn(expected_data, json_loads)
 
 class RegionalSkipQuestionGetTest(BaseTest):
     def setUp(self):
@@ -205,23 +201,27 @@ class RegionalSkipQuestionGetTest(BaseTest):
         global_rules = {"skip_question": "A nice question",
                         "root_question": "A nice question",
                         "is_in_hygrid": True,
-                        "id": self.global_skip_rule.id, "response": "Yes"}
+                        "id": self.global_skip_rule.id,
+                        "response": "Yes",
+                        "can_delete": False
+        }
 
         regional_rules = {u"skip_question": u"A nice question",
                           u"root_question": u"regional question",
                           u"is_in_hygrid": True,
                           u"id": self.skip_rule.id,
-                          u"response": u"Yes"}
+                          u"response": u"Yes",
+                          u"can_delete": True}
 
         self.assertEqual(response.status_code, 200)
         json_loads = json.loads(response.content)
 
-        self.assertEqual(global_rules, json_loads['global_rules'][0])
-        self.assertEqual(regional_rules, json_loads['regional_rules'][0])
-<<<<<<< HEAD
+
+        self.assertIn(global_rules, json_loads)
+        self.assertIn(regional_rules,json_loads)
+
 
 class SkipQuestionDeleteTest(BaseTest):
-
     def setUp(self):
         self.skip_rule = SkipQuestionRuleFactory()
         self.client = Client()
@@ -230,21 +230,13 @@ class SkipQuestionDeleteTest(BaseTest):
         self.client.login(username=user.username, password='pass')
 
     def test_should_delete_skip_rule_when_it_exists(self):
-        #given
         url = '/questionnaire/subsection/skiprule/%d/' % self.skip_rule.id
-        #when
         response = self.client.delete(url)
-        #then
         self.assertEqual(200, response.status_code)
         self.assertEqual(SkipRule.objects.filter(id=self.skip_rule.id).count(), 0)
 
     def test_should_not_delete_skip_rule_when_it_doesnt_exists(self):
-        #given
         url = '/questionnaire/subsection/skiprule/%d/' % (self.skip_rule.id + 1)
-        #when
         response = self.client.delete(url)
-        #then
         self.assertEqual(204, response.status_code)
         self.assertEqual(SkipRule.objects.filter(id=self.skip_rule.id).count(), 1)
-=======
->>>>>>> create skip rule for a region, display global rules

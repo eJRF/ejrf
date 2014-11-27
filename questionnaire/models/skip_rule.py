@@ -35,13 +35,17 @@ class SkipQuestion(SkipRule):
     def is_in_hybrid_grid(self):
         return self._get_question_group().parent_group().hybrid
 
-    def to_dictionary(self):
-        return {'id': self.id,
+    def to_dictionary(self, user):
+        data = {'id': self.id,
                 'skip_question': self.skip_question.text,
                 'root_question': self.root_question.text,
                 'response': self.response.text,
                 'is_in_hygrid': self.is_in_hybrid_grid(),
+                'can_delete': False
         }
+        if user.user_profile.is_global_admin() or user.user_profile.region == self.region:
+            data['can_delete'] = True
+        return data
 
 
 class SkipSubsection(SkipRule):
@@ -51,8 +55,13 @@ class SkipSubsection(SkipRule):
         SkipSubsection.objects.create(skip_subsection=new_subsection_to_skip, response=self.response,
                                       root_question=self.root_question, subsection=new_subsection)
 
-    def to_dictionary(self):
-        return {'id': self.id,
+    def to_dictionary(self, user):
+        data = {'id': self.id,
                 'skip_subsection': (" %s. %s" % (self.skip_subsection.order, self.skip_subsection.title)),
                 'root_question': self.root_question.text,
-                'response': self.response.text}
+                'response': self.response.text,
+                'can_delete': False
+        }
+        if user.user_profile.is_global_admin() or user.user_profile.region == self.region:
+            data['can_delete'] = True
+        return data

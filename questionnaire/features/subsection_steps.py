@@ -134,6 +134,8 @@ def and_i_choose_to_see_existing_skip_rules(step):
 def then_i_should_see_group1_existing_skip_rules(step, number_of_rules):
     actual_number = world.skip_rule_page.number_of_rules()
     sleep(2)
+    # if int(number_of_rules) == 2:
+    #     sleep(2000)
     assert (actual_number == int(number_of_rules)), 'Expecting %s number of rules, got %s number of rules' % (int(number_of_rules), actual_number)
 
 @step(u'When I create a new question skip rule')

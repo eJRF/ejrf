@@ -137,7 +137,7 @@
                     {{ deleteResult.message }}
                 </div>
                 <div data-ng-repeat="rule in existingRules | orderBy:'id'" class="existingRule">
-                    <button  id="delete-rule-{{ rule.id }}" class="btn btn-default pull-right" value="delete" data-ng-click="deleteRule(rule)">
+                    <button  id="delete-rule-{{ rule.id }}" class="btn btn-default pull-right" value="delete" data-ng-click="deleteRule(rule)" data-ng-show="rule.can_delete">
                         <span class="red bold"><span class="glyphicon glyphicon-remove"></span> Delete</span>
                     </button>
                     <div class="form-group" style="display:none;"><label class="col-sm-3 control-label">Rule

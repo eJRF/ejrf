@@ -39,9 +39,8 @@ class SkipRuleView(PermissionRequiredMixin, View):
 
     def get(self, request, subsection_id, *args, **kwargs):
         data = SkipRule.objects.filter(subsection_id=subsection_id).select_subclasses()
-        response_data = {'global_rules': map(lambda x: x.to_dictionary(), data.filter(region__isnull=True)),
-                         'regional_rules': map(lambda x: x.to_dictionary(),
-                                               data.filter(region__in=get_regions(request)))}
+        response_data = map(lambda x: x.to_dictionary(request.user), data)
+
         return HttpResponse(json.dumps(response_data), content_type="application/json", status=200)
 
     def delete(self, request, rule_id, *args, **kwargs):
