@@ -1,7 +1,4 @@
 ---
-vars:
-    version: "{{ lookup('env','SNAP_COMMIT') }}"
-
 - apt: name=git state=present update_cache=yes
 
 - apt: name={{ item }} state=present
