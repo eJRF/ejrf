@@ -11,7 +11,7 @@ class UserProfile(BaseModel):
     organization = models.ForeignKey("Organization", blank=True, null=True)
 
     def is_global_admin(self):
-        return self.region == None    organization = models.ForeignKey("Organization", blank=True, null=True)
+        return self.region == None
 
     def can_delete(self, obj):
         return (not self. region and obj.is_core) or (self.region and self.region == obj.region and not obj.is_core)
