@@ -191,9 +191,9 @@ class DeleteSectionsViewTest(BaseTest):
         self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013,
                                                           region=self.region)
         self.section = Section.objects.create(name="section", questionnaire=self.questionnaire, order=1,
-                                              region=self.region)
+                                              region=self.region, is_core=True)
         self.section_1 = Section.objects.create(name="section 2", questionnaire=self.questionnaire, order=2
-                                                , region=self.region)
+                                                , region=self.region, is_core=True)
         self.url = '/section/%d/delete/' % self.section.id
 
     def test_post_deletes_section(self):
@@ -224,7 +224,7 @@ class DeleteSectionsViewTest(BaseTest):
         referer_url = '/questionnaire/entry/%d/section/%d/' % (self.questionnaire.id, self.section_1.id)
         meta = {'HTTP_REFERER': referer_url}
         section_3 = Section.objects.create(name="section", questionnaire=self.questionnaire, order=3,
-                                           region=self.region)
+                                           region=self.region, is_core=True)
         Section.objects.create(name="section 2", questionnaire=self.questionnaire, order=4)
         self.client.post('/section/%d/delete/' % section_3.id, data={}, **meta)
         self.assertEqual([1, 2, 3], list(Section.objects.values_list('order', flat=True)))
@@ -237,6 +237,33 @@ class DeleteSectionsViewTest(BaseTest):
         self.assertRedirects(response, expected_url='/accounts/login/?next=%s' % url)
         response = self.client.post(url)
         self.assertRedirects(response, expected_url='/accounts/login/?next=%s' % url)
+
+
+class RegionalDeleteSectionTest(BaseTest):
+
+    def setUp(self):
+        self.client = Client()
+        self.user = self.create_user(group=self.REGIONAL_ADMIN, org="WHO", region="AFRO")
+        self.region = self.user.user_profile.region
+        self.assign('can_edit_questionnaire', self.user)
+        self.client.login(username=self.user.username, password='pass')
+
+        self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013,
+                                                          region=self.region)
+        self.section = Section.objects.create(name="section", questionnaire=self.questionnaire, order=1,
+                                              region=self.region, is_core=True)
+        self.section_1 = Section.objects.create(name="section 2", questionnaire=self.questionnaire, order=2
+                                                , region=self.region, is_core=True)
+        self.url = '/section/%d/delete/' % self.section.id
+
+    def test_sections_that_are_core_cannot_be_deleted(self):
+        expected_url = '/questionnaire/entry/%d/section/%d/' % (self.questionnaire.id, self.section.id)
+        meta = {'HTTP_REFERER': expected_url}
+        response = self.client.post(self.url, data={}, **meta)
+
+        self.assertRedirects(response, expected_url=expected_url)
+        message = 'You are not permitted to delete a core section'
+        self.assertIn(message, response.cookies['messages'].value)
 
 
 class SubSectionsViewTest(BaseTest):

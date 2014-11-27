@@ -8,14 +8,14 @@ from questionnaire.models import Questionnaire, Section, SubSection, Question, Q
 def and_i_have_a_questionnaire_with_sections_and_subsections(step):
     world.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", description="ha", status=Questionnaire.DRAFT)
     world.section_1 = Section.objects.create(title="Section A Title Sample", order=1, questionnaire=world.questionnaire, name="Section A Name Sample",
-                                             description="Section A Description")
+                                             description="Section A Description", is_core=True)
     world.section1 = world.section_1
     world.section_2 = Section.objects.create(title="Section B Title Sample", order=2, questionnaire=world.questionnaire, name="Section B Name Sample",
-                                             description="Section B Description")
+                                             description="Section B Description", is_core=True)
     world.section_3 = Section.objects.create(title="Section C Title Sample", order=3, questionnaire=world.questionnaire, name="Section C Name Sample",
-                                             description="Section C Description")
+                                             description="Section C Description", is_core=True)
     world.section_4 = Section.objects.create(title="Section D Title Sample", order=4, questionnaire=world.questionnaire, name="Section D Name Sample",
-                                             description="Section D Description")
+                                             description="Section D Description", is_core=True)
     world.sub_section = SubSection.objects.create(title="Subsection Title Sample", order=1, section=world.section_1)
     world.sub_section_2 = SubSection.objects.create(title="Second Subsection", order=2, section=world.section_1)
     world.sub_section_3 = SubSection.objects.create(title="Third Subsection", order=3, section=world.section_1)

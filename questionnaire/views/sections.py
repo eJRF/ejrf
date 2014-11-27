@@ -92,15 +92,22 @@ class DeleteSection(DoesNotExistExceptionHandlerMixin, OwnerAndPermissionRequire
         deleting_myself = referer_url and (section_page in referer_url)
         if deleting_myself:
             return self.section.questionnaire.absolute_url()
-        return referer_url
+        if referer_url:
+            return referer_url
+        return self.success_url
 
     def post(self, request, *args, **kwargs):
         self.section = self.get_object()
-        response = super(DeleteSection, self).post(request, *args, **kwargs)
-        reindex_orders_in(Section, questionnaire=self.section.questionnaire)
-        message = "Section successfully deleted."
-        messages.success(request, message)
-        return response
+        user_profile = self.request.user.user_profile
+        if user_profile.can_delete(self.section):
+            response = super(DeleteSection, self).post(request, *args, **kwargs)
+            reindex_orders_in(Section, questionnaire=self.section.questionnaire)
+            message = "Section successfully deleted."
+            messages.success(request, message)
+            return response
+        message = "You are not permitted to delete a core section"
+        messages.error(request, message)
+        return HttpResponseRedirect(self.section.get_absolute_url())
 
 
 class NewSubSection(RegionAndPermissionRequiredMixin, CreateView):

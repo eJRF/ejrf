@@ -55,13 +55,15 @@ class RegionAndPermissionRequiredMixin(RegionalPermissionRequired):
 
 
 class OwnerAndPermissionRequiredMixin(RegionalPermissionRequired):
+    def _get_class_name(self, object_id):
+        return object_id.replace("_id", "").capitalize()
+
     def get_region(self, kwargs):
         if 'subsection_id' in kwargs:
             return [SubSection.objects.get(id=kwargs['subsection_id']).region]
         object_ids = filter(lambda key: key.endswith('_id'), kwargs.keys())
-        objects = [eval(object_id.replace("_id", "").capitalize()).objects.get(id=kwargs[object_id]) for object_id in
-                   object_ids]
-        return [object.region for object in objects]
+        objects = [eval(self._get_class_name(object_id)).objects.get(id=kwargs[object_id]) for object_id in object_ids]
+        return [obj.region for obj in objects]
 
 
 class DeleteDocumentMixin(WithErrorMessageAccessMixin):
