@@ -13,6 +13,7 @@ class Section(BaseModel):
     description = models.TextField(blank=True, null=True)
     questionnaire = models.ForeignKey(Questionnaire, blank=False, null=False, related_name="sections")
     region = models.ForeignKey("Region", blank=False, null=True, related_name="sections")
+    is_core = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.name
@@ -60,6 +61,7 @@ class SubSection(BaseModel):
     section = models.ForeignKey(Section, blank=False, null=False, related_name="sub_sections")
     description = models.TextField(blank=True, null=True)
     region = models.ForeignKey("Region", blank=False, null=True, related_name="sub_sections")
+    is_core = models.BooleanField(default=False)
 
     class Meta:
         ordering = ('order',)

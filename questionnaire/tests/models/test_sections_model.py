@@ -45,9 +45,9 @@ class SectionTest(BaseTest):
     def test_section_fields(self):
         section = Section()
         fields = [str(item.attname) for item in section._meta.fields]
-        self.assertEqual(9, len(fields))
+        self.assertEqual(10, len(fields))
         for field in ['id', 'created', 'modified', 'title', 'order', 'questionnaire_id', 'name', 'description',
-                      'region_id']:
+                      'region_id', 'is_core']:
             self.assertIn(field, fields)
 
     def test_section_store(self):
@@ -138,8 +138,8 @@ class SubSectionTest(BaseTest):
     def test_sub_section_fields(self):
         sub_section = SubSection()
         fields = [str(item.attname) for item in sub_section._meta.fields]
-        self.assertEqual(8, len(fields))
-        for field in ['id', 'created', 'modified', 'title', 'order', 'section_id', 'description', 'region_id']:
+        self.assertEqual(9, len(fields))
+        for field in ['id', 'created', 'modified', 'title', 'order', 'section_id', 'description', 'region_id', 'is_core']:
             self.assertIn(field, fields)
 
     def test_sub_section_store(self):
