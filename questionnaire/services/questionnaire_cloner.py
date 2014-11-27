@@ -35,7 +35,7 @@ class QuestionnaireClonerService(object):
 
     def _clone_sections(self):
         sections = self.original_questionnaire.sections.all()
-        fields = ['name', 'title', 'description', 'order']
+        fields = ['name', 'title', 'description', 'order', 'is_core']
         return create_copies(sections, self.region, fields, questionnaire=self.questionnaire)
 
     def _clone_skip_rules_for_subsection(self, rules, new_subsection):
