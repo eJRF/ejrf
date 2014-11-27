@@ -1,4 +1,7 @@
 ---
+vars:
+    version: "{{ lookup('env','SNAP_COMMIT') }}"
+
 - apt: name=git state=present update_cache=yes
 
 - apt: name={{ item }} state=present
@@ -14,7 +17,7 @@
 - file: path=/srv/checkout owner=ubuntu  mode=0755 state=directory
 
 - name: ejrf repo
-  git: repo=https://github.com/eJRF/ejrf.git dest=/srv/checkout version=HEAD
+  git: repo=https://github.com/eJRF/ejrf.git dest=/srv/checkout version="{{ version }}"
 
 - name: ejrf requirements
   pip: requirements=/srv/checkout/pip-requirements.txt virtualenv=/srv/checkout/ejrfvenv
