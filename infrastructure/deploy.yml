@@ -2,27 +2,7 @@
 - hosts: all
   vars:
     version: "{{ lookup('env','SNAP_COMMIT') }}"
-  tasks:
+  sudo: true
+  roles:
+     - app
 
-    - name: ejrf repo
-      git: repo=https://github.com/eJRF/ejrf.git dest=/srv/checkout version="{{ version }}"
-      sudo: yes
-
-    - name: ejrf requirements
-      pip: requirements=/srv/checkout/pip-requirements.txt virtualenv=/srv/checkout/ejrfvenv
-
-    - name: ejrf sync db
-      script: sync-db.sh
-      args:
-        chdir: /srv/checkout/
-
-    - name: ejrf migrate db
-      script: migrate-db.sh
-      args:
-        chdir: /srv/checkout/
-
-    - name: copy run server
-      copy: src=run-server.sh dest=/srv/checkout/run-server.sh mode=777
-
-    - name: start server
-      script: restart-service.sh
