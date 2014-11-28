@@ -1,7 +1,6 @@
 from django.forms import ModelForm
 from django import forms
 
-from questionnaire.utils.model_utils import reindex_orders_in
 from questionnaire.models import Section, SubSection
 from questionnaire.services.question_re_indexer import OrderBasedReIndexer
 
@@ -9,10 +8,11 @@ from questionnaire.services.question_re_indexer import OrderBasedReIndexer
 class SectionForm(ModelForm):
     order = forms.ChoiceField(choices=())
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, user=None, *args, **kwargs):
         super(SectionForm, self).__init__(*args, **kwargs)
         self.fields['order'].choices = self._get_options()
         self.fields['order'].label = 'Position'
+        self.user = user
 
     class Meta:
         model = Section
@@ -30,6 +30,14 @@ class SectionForm(ModelForm):
             section_orders.append(max(section_orders) + 1)
         unique_orders = set(section_orders)
         return zip(unique_orders, unique_orders)
+
+    def _clean_is_core(self):
+        if self.user and self.instance and not self.user.user_profile.can_delete(self.instance):
+            self.errors['name'] = "You are not permitted to edit this section"
+
+    def clean(self):
+        self._clean_is_core()
+        return super(SectionForm, self).clean()
 
     def save(self, commit=True, *args, **kwargs):
         section = super(SectionForm, self).save(commit=False)

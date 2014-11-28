@@ -25,7 +25,8 @@ class CoreSectionFormTest(BaseTest):
         self.assertTrue(section_form.is_valid())
 
     def test_valid_with_initial(self):
-        section_form = SectionForm(data=self.form_data, initial={'questionnaire': self.questionnaire.id, 'region': self.region})
+        section_form = SectionForm(data=self.form_data,
+                                   initial={'questionnaire': self.questionnaire.id, 'region': self.region})
         self.assertTrue(section_form.is_valid())
         section = section_form.save()
         self.assertEqual(section.region, self.region)
@@ -55,7 +56,7 @@ class CoreSectionFormTest(BaseTest):
         expected_choices = [(self.section1.order, self.section1.order),
                             (self.section2.order, self.section2.order),
                             (self.section3.order, self.section3.order),
-                            (self.section3.order + 1, self.section3.order + 1),]
+                            (self.section3.order + 1, self.section3.order + 1), ]
 
         choices = section_form.fields['order'].choices
         [self.assertIn(choice, choices) for choice in expected_choices]
@@ -83,6 +84,39 @@ class CoreSectionFormTest(BaseTest):
 
         self.assertEqual(4, Section.objects.get(id=section3.id).order)
         self.assertEqual(5, Section.objects.get(id=section4.id).order)
+
+
+class PermissionBasedValidationTest(CoreSectionFormTest):
+    def test_is_invalid_when_user_is_regional_and_editing_core_section(self):
+        questionnaire = QuestionnaireFactory()
+        user = self.create_user(username='ra-user', group=self.REGIONAL_ADMIN, org="WHO", region='AFR')
+        section1 = SectionFactory(order=1, questionnaire=questionnaire, is_core=True, region=user.user_profile.region)
+        initial = {'questionnaire': questionnaire.id}
+
+        section_form = SectionForm(data=self.form_data, initial=initial, instance=section1, user=user)
+        self.assertFalse(section_form.is_valid())
+        self.assertIn('You are not permitted to edit this section', section_form.errors['name'])
+
+    def test_is_valid_when_user_is_regional_and_editing_none_core_section(self):
+        questionnaire = QuestionnaireFactory()
+        user = self.create_user(username='ra-user', group=self.REGIONAL_ADMIN, org="WHO", region='AFR')
+        section1 = SectionFactory(order=1, questionnaire=questionnaire, is_core=False, region=user.user_profile.region)
+        initial = {'questionnaire': questionnaire.id}
+
+        section_form = SectionForm(data=self.form_data, initial=initial, instance=section1, user=user)
+        self.assertTrue(section_form.is_valid())
+
+    def test_is_invalid_when_user_is_global_and_editing_none_core_section(self):
+        questionnaire = QuestionnaireFactory()
+        region = RegionFactory()
+        user = self.create_user(username='ra-user', group=self.GLOBAL_ADMIN, org="WHO")
+        section1 = SectionFactory(order=1, questionnaire=questionnaire, is_core=False, region=region)
+        initial = {'questionnaire': questionnaire.id}
+
+        section_form = SectionForm(data=self.form_data, initial=initial, instance=section1, user=user)
+
+        self.assertFalse(section_form.is_valid())
+        self.assertIn('You are not permitted to edit this section', section_form.errors['name'])
 
 
 class CoreSubSectionFormTest(BaseTest):
