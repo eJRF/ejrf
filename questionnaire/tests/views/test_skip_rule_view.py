@@ -169,6 +169,7 @@ class SkipQuestionGetTest(BaseTest):
         json_loads = json.loads(response.content)
         self.assertIn(expected_data, json_loads)
 
+
 class RegionalSkipQuestionGetTest(BaseTest):
     def setUp(self):
         self.client = Client()
@@ -216,17 +217,20 @@ class RegionalSkipQuestionGetTest(BaseTest):
         self.assertEqual(response.status_code, 200)
         json_loads = json.loads(response.content)
 
-
         self.assertIn(global_rules, json_loads)
-        self.assertIn(regional_rules,json_loads)
+        self.assertIn(regional_rules, json_loads)
 
 
 class SkipQuestionDeleteTest(BaseTest):
     def setUp(self):
         self.skip_rule = SkipQuestionRuleFactory()
         self.client = Client()
-        user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
+        user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO", username="ga")
+
+        self.regional_admin = self.create_user(group=self.REGIONAL_ADMIN, org="WHO", username="ra",
+                                               region=RegionFactory())
         self.assign('can_edit_questionnaire', user)
+        self.assign('can_edit_questionnaire', self.regional_admin)
         self.client.login(username=user.username, password='pass')
 
     def test_should_delete_skip_rule_when_it_exists(self):
@@ -240,3 +244,23 @@ class SkipQuestionDeleteTest(BaseTest):
         response = self.client.delete(url)
         self.assertEqual(204, response.status_code)
         self.assertEqual(SkipRule.objects.filter(id=self.skip_rule.id).count(), 1)
+
+    def test_cant_delete_global_skip_question_rule_as_regional_admin(self):
+        self.client.login(username=self.regional_admin.username, password='pass')
+        url = '/questionnaire/subsection/skiprule/%d/' % self.skip_rule.id
+        response = self.client.delete(url)
+        self.assertEqual(403, response.status_code)
+
+    def test_can_delete_regional_skip_question_rule_as_regional_admin(self):
+        question = SkipQuestionRuleFactory(region=self.regional_admin.user_profile.region)
+        self.client.login(username=self.regional_admin.username, password='pass')
+        url = '/questionnaire/subsection/skiprule/%d/' % question.id
+        response = self.client.delete(url)
+        self.assertEqual(200, response.status_code)
+
+    def test_cant_delete_another_regions_skip_question_rule_as_regional_admin(self):
+        question = SkipQuestionRuleFactory(region=RegionFactory())
+        self.client.login(username=self.regional_admin.username, password='pass')
+        url = '/questionnaire/subsection/skiprule/%d/' % question.id
+        response = self.client.delete(url)
+        self.assertEqual(403, response.status_code)

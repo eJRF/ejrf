@@ -48,7 +48,11 @@ class SkipRuleView(PermissionRequiredMixin, View):
         rules = SkipRule.objects.filter(id=rule_id)
 
         if rules:
-            rules[0].delete()
-            status = 200
+            rule = rules[0]
+            if request.user.user_profile.is_global_admin() or rule.region == request.user.user_profile.region:
+                rule.delete()
+                status = 200
+            else:
+                status = 403
 
         return HttpResponse(status=status)
