@@ -64,12 +64,9 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <a type="cancel" class="btn btn-default" data-dismiss="modal">
-                    <span class="red bold"><i class="glyphicon glyphicon-remove"></i> Cancel</span>
-                </a>
                 <button tyep="button" class="btn btn-default" id="save-skip-rule-button"
                         data-ng-click="fns.createRule()">
-                    <span class="green bold"><i class="glyphicon glyphicon-ok"></i> Done</span></button>
+                    <span class="green bold"><i class="glyphicon glyphicon-ok"></i> Create</span></button>
             </div>
         </form>
     </div>
@@ -121,12 +118,9 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <a type="cancel" class="btn btn-default" data-dismiss="modal">
-                    <span class="red bold"><i class="glyphicon glyphicon-remove"></i> Cancel</span>
-                </a>
                 <button tyep="button" class="btn btn-default" id="save-subsection-skip-rule-button"
                         data-ng-click="fns.createRule()">
-                    <span class="green bold"><i class="glyphicon glyphicon-ok"></i> Done</span></button>
+                    <span class="green bold"><i class="glyphicon glyphicon-ok"></i> Create</span></button>
             </div>
         </form>
     </div>
@@ -158,15 +152,10 @@
                 </div>
             </div>
         </div>
-        <div class="modal-footer">
-            <a type="cancel" class="btn btn-default" data-dismiss="modal">
-                <span class="red bold"><i class="glyphicon glyphicon-remove"></i> Close</span>
-            </a>
-        </div>
     </div>
     <div id="existingGridRulesTab" data-ng-show="activeTab == 'existingGridRulesTab'">
         <div class="modal-body">
-            <div class="question-group indent">
+            <div class="question-group indent">`
                 <div data-ng-class="deleteResult.className" class="alert" data-ng-show="deleteResult.show">
                     {{ deleteResult.message }}
                 </div>
@@ -193,11 +182,6 @@
             </div>
         </div>
         <div class="modal-footer">
-            <a type="cancel" class="btn btn-default" id="existing-grid-close-button" data-dismiss="modal">
-                <span class="red bold"  ><i class="glyphicon glyphicon-remove" ></i> Close</span>
-            </a>
         </div>
     </div>
-
-
 </div>
