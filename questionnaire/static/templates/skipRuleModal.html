@@ -32,7 +32,7 @@
                     <div class="col-sm-7 center-fields">
                         <select required name="root_question" id="root-question"
                                 data-ng-model="skipRule.rootQuestion"
-                                data-ng-options="q.fields.text for q in questions | filter: {fields:{answer_type: 'MultiChoice'}} | filter:filterQuestions">
+                                data-ng-options="q.fields.text for q in questions | filter: {fields:{answer_type: 'MultiChoice'}} | filter:filterQuestions track by q.pk">
                             <option value="">Select Root Question</option>
                         </select>
                     </div>
@@ -46,7 +46,8 @@
                                 <label style="display:block;">
                                     <input type="radio" name="response" required
                                            data-ng-model="skipRule.questionResponse"
-                                           ng-value="option.pk"/>&nbsp;{{ option.fields.text }}
+                                           ng-value="option.pk" id="id-question-option-{{ option.pk }}"/>
+                                           &nbsp;{{ option.fields.text }}
                                 </label>
                             </li>
                         </ul>
@@ -57,7 +58,7 @@
 
                     <div class="col-sm-7 center-fields">
                         <select name="skip_question" required data-ng-model="skipRule.skipQuestion"
-                                data-ng-options="q.fields.text for q in questions | filter:matchSelectedQuestion | filter:filterQuestions">
+                                data-ng-options="q.fields.text for q in questions | filter:matchSelectedQuestion | filter:filterQuestions  track by q.pk">
                             <option value="">Select Question</option>
                         </select>
                     </div>

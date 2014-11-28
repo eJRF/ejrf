@@ -1,6 +1,5 @@
 Feature: Grid positioning
 
-  @WIP
   Scenario: Move grid
     Given I am logged in as a global admin
     And I have a questionnaire with a grid

@@ -50,3 +50,16 @@ Feature: Skip Rules
     Then I should see an option to delete skip rules
     When I have selected delete
     Then I should see the rule disappear and a message that the skip rule was successfully deleted
+
+  Scenario: Create Hybrid grid skip rule
+    Given I am logged in as a global admin
+    And I have a questionnaire with sections and subsections
+    And I have a hybrid group with multichoice question and other questions
+    And I visit that questionnaires section page
+    And I click to add a grid skip rule
+    And I choose to see existing grid skip rules
+    Then I should see '0' existing grid skip rules
+    When I click create a new hybrid grid question skip rule
+    And I fill in the grid rule form
+    And I click save rule
+    Then I should see '1' existing grid skip rules

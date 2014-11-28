@@ -54,5 +54,4 @@ class SkipRuleView(PermissionRequiredMixin, View):
                 status = 200
             else:
                 status = 403
-
         return HttpResponse(status=status)
