@@ -8,9 +8,9 @@ from questionnaire.tests.factories.region_factory import RegionFactory
 
 class CoreSectionFormTest(BaseTest):
     def setUp(self):
-        self.region = RegionFactory()
         self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013)
-
+        self.user = self.create_user(username='some user', group=self.GLOBAL_ADMIN, org='WHO')
+        self.region = self.user.user_profile.region
         self.section1 = SectionFactory(questionnaire=self.questionnaire, order=1, name='Section 1')
         self.section2 = SectionFactory(questionnaire=self.questionnaire, order=2, name='Section 2')
         self.section3 = SectionFactory(questionnaire=self.questionnaire, order=3, name='Section 3')
@@ -25,13 +25,15 @@ class CoreSectionFormTest(BaseTest):
         self.assertTrue(section_form.is_valid())
 
     def test_valid_with_initial(self):
-        section_form = SectionForm(data=self.form_data,
-                                   initial={'questionnaire': self.questionnaire.id, 'region': self.region})
+        initial = {'questionnaire': self.questionnaire.id, 'region': self.region, 'user': self.user}
+        section_form = SectionForm(data=self.form_data, initial=initial)
+
         self.assertTrue(section_form.is_valid())
         section = section_form.save()
         self.assertEqual(section.region, self.region)
+        self.assertTrue(section.is_core)
 
-    def test_that_sections_that_are_reorder(self):
+    def test_that_sections_are_reordered_after_save(self):
         section_form = SectionForm(instance=self.section3,
                                    data=self.form_data, initial={'questionnaire': self.questionnaire.id})
         section_form.save()
@@ -91,9 +93,9 @@ class PermissionBasedValidationTest(CoreSectionFormTest):
         questionnaire = QuestionnaireFactory()
         user = self.create_user(username='ra-user', group=self.REGIONAL_ADMIN, org="WHO", region='AFR')
         section1 = SectionFactory(order=1, questionnaire=questionnaire, is_core=True, region=user.user_profile.region)
-        initial = {'questionnaire': questionnaire.id}
+        initial = {'questionnaire': questionnaire.id, 'user': user}
 
-        section_form = SectionForm(data=self.form_data, initial=initial, instance=section1, user=user)
+        section_form = SectionForm(data=self.form_data, initial=initial, instance=section1)
         self.assertFalse(section_form.is_valid())
         self.assertIn('You are not permitted to edit this section', section_form.errors['name'])
 
@@ -101,9 +103,9 @@ class PermissionBasedValidationTest(CoreSectionFormTest):
         questionnaire = QuestionnaireFactory()
         user = self.create_user(username='ra-user', group=self.REGIONAL_ADMIN, org="WHO", region='AFR')
         section1 = SectionFactory(order=1, questionnaire=questionnaire, is_core=False, region=user.user_profile.region)
-        initial = {'questionnaire': questionnaire.id}
+        initial = {'questionnaire': questionnaire.id, 'user': user}
 
-        section_form = SectionForm(data=self.form_data, initial=initial, instance=section1, user=user)
+        section_form = SectionForm(data=self.form_data, initial=initial, instance=section1)
         self.assertTrue(section_form.is_valid())
 
     def test_is_invalid_when_user_is_global_and_editing_none_core_section(self):
@@ -111,9 +113,9 @@ class PermissionBasedValidationTest(CoreSectionFormTest):
         region = RegionFactory()
         user = self.create_user(username='ra-user', group=self.GLOBAL_ADMIN, org="WHO")
         section1 = SectionFactory(order=1, questionnaire=questionnaire, is_core=False, region=region)
-        initial = {'questionnaire': questionnaire.id}
+        initial = {'questionnaire': questionnaire.id, 'user': user}
 
-        section_form = SectionForm(data=self.form_data, initial=initial, instance=section1, user=user)
+        section_form = SectionForm(data=self.form_data, initial=initial, instance=section1)
 
         self.assertFalse(section_form.is_valid())
         self.assertIn('You are not permitted to edit this section', section_form.errors['name'])

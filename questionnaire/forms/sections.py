@@ -8,11 +8,10 @@ from questionnaire.services.question_re_indexer import OrderBasedReIndexer
 class SectionForm(ModelForm):
     order = forms.ChoiceField(choices=())
 
-    def __init__(self, user=None, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super(SectionForm, self).__init__(*args, **kwargs)
         self.fields['order'].choices = self._get_options()
         self.fields['order'].label = 'Position'
-        self.user = user
 
     class Meta:
         model = Section
@@ -32,21 +31,30 @@ class SectionForm(ModelForm):
         return zip(unique_orders, unique_orders)
 
     def _clean_is_core(self):
-        if self.user and self.instance and not self.user.user_profile.can_delete(self.instance):
-            self.errors['name'] = "You are not permitted to edit this section"
+        user = self.initial.get('user')
+        if user and self.instance.id and not user.user_profile.can_delete(self.instance):
+            self.errors['name'] = 'You are not permitted to edit this section'
 
     def clean(self):
         self._clean_is_core()
         return super(SectionForm, self).clean()
 
+    def _set_is_core(self):
+        user = self.initial.get('user')
+        if user and user.user_profile.region:
+            return False
+        return True
+
     def save(self, commit=True, *args, **kwargs):
         section = super(SectionForm, self).save(commit=False)
         region = self.initial.get('region', None)
+        section.is_core = self._set_is_core()
         if commit:
             based_re_indexer = OrderBasedReIndexer(section, self.cleaned_data['order'],
                                                    questionnaire=section.questionnaire, region=region)
             based_re_indexer.reorder()
         return section
+
 
 class SubSectionForm(ModelForm):
     def save(self, commit=True, *args, **kwargs):

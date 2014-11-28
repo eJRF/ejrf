@@ -51,11 +51,12 @@ class Entry(DoesNotExistExceptionHandlerMixin, AdvancedMultiplePermissionsRequir
         preview = self._check_preview_mode(questionnaire)
         region = self.request.user.user_profile.region
 
+        initial = {'questionnaire': questionnaire, 'region': region, 'user': request.user}
         context = {'questionnaire': questionnaire,
                    'section': section, 'printable': printable,
                    'preview': preview, 'formsets': formsets,
                    'ordered_sections': questionnaire.sections.order_by('order'),
-                   'section_form': SectionForm(initial={'questionnaire': questionnaire, 'region': region}),
+                   'section_form': SectionForm(initial=initial),
                    'new_section_action': reverse('new_section_page', args=(questionnaire.id, )),
                    'subsection_form': SubSectionForm(),
                    'subsection_action': reverse('new_subsection_page', args=(questionnaire.id, section.id)),
@@ -83,7 +84,7 @@ class Entry(DoesNotExistExceptionHandlerMixin, AdvancedMultiplePermissionsRequir
 
         context = {'questionnaire': questionnaire, 'section': section,
                    'formsets': formsets, 'ordered_sections': questionnaire.ordered_sections(),
-                   'form': SectionForm(initial={'questionnaire': questionnaire}),
+                   'form': SectionForm(initial={'questionnaire': questionnaire, 'user': request.user}),
                    'new_section_action': reverse('new_section_page', args=(questionnaire.id, )),
                    'subsection_form': SubSectionForm(),
                    'subsection_action': reverse('new_subsection_page', args=(questionnaire.id, section.id)),

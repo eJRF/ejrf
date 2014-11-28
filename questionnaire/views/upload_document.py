@@ -40,11 +40,12 @@ class UploadDocument(AdvancedMultiplePermissionsRequiredMixin, CreateView):
         context = super(UploadDocument, self).get_context_data(**kwargs)
         upload_data_initial = {'questionnaire': self.questionnaire, 'country': get_country(self.request)}
         attachments = self.user_questionnaire_service.attachments()
+        initial = {'questionnaire': self.questionnaire, 'user': self.request.user}
         context.update({'upload_form': self.form_class(initial=upload_data_initial),
                         'button_label': 'Upload', 'id': 'id-upload-form', 'questionnaire': self.questionnaire,
                         'action': reverse('upload_document', args=(self.questionnaire.id,)),
                         'documents': attachments,
-                        'section_form': SectionForm(initial={'questionnaire': self.questionnaire}),
+                        'section_form': SectionForm(initial=initial),
                         'ordered_sections': self.questionnaire.sections.order_by('order'),
                         'preview': self._check_preview_mode(),
                         'new_section_action': reverse("new_section_page", args=(self.questionnaire.id,))})
