@@ -178,11 +178,15 @@ class DeleteSubSection(OwnerAndPermissionRequiredMixin, DeleteView):
 
     def post(self, request, *args, **kwargs):
         self.success_url = self._set_success_url()
-        response = super(DeleteSubSection, self).post(request, *args, **kwargs)
-        reindex_orders_in(SubSection, section=self.object.section)
-        message = "Subsection successfully deleted."
-        messages.success(request, message)
-        return response
+        if request.user.user_profile.can_delete(self.object):
+            response = super(DeleteSubSection, self).post(request, *args, **kwargs)
+            reindex_orders_in(SubSection, section=self.object.section)
+            message = "Subsection successfully deleted."
+            messages.success(request, message)
+            return response
+        message = "You are not permitted to delete a core subsection"
+        messages.error(request, message)
+        return HttpResponseRedirect(self.object.get_absolute_url())
 
 
 class GetSubSections(OwnerAndPermissionRequiredMixin, View):

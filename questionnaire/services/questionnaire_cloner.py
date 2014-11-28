@@ -54,7 +54,7 @@ class QuestionnaireClonerService(object):
 
     def _clone_sub_sections(self):
         sub_sections_map = {}
-        fields = ['title', 'description', 'order']
+        fields = ['title', 'description', 'order', 'is_core']
         for old_section, new_section in self.sections.items():
             sub_sections = old_section.sub_sections.all()
             sub_sections_map.update(create_copies(sub_sections, self.region, fields, section=new_section))
