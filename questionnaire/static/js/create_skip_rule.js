@@ -27,7 +27,7 @@ angular.module('questionnaireApp', [])
         $scope.existingRules = [];
 
         $scope.matchSelectedQuestion = function (question) {
-            return !($scope.skipRule.rootQuestion.pk == question.pk);
+            return !($scope.skipRule.rootQuestion.pk == question.pk) && question.canSkip;
         };
 
         var updateRules = function (subsectionId) {
