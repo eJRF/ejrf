@@ -20,12 +20,18 @@ while test $# -gt 0; do
             shift
             ;;
         *)
+            export ARG="$1"
             break
             ;;
     esac
 done
 
-if [ -a $TASKS ]
+if [ ! "$SETTINGS_FILE" == "" ]
+then
+    echo "Using settings file - $SETTINGS_FILE"
+fi
+
+if [ "$TASKS" ==  "" ]
 then
     export TASKS='setup','migrate','ut','ft'
 fi
@@ -53,20 +59,22 @@ do
             ;;
         ut)
             echo "running unit tests"
+            echo "Testing $ARG"
             if [ -a $SETTINGS_FILE ]
             then
-                ./manage.py test --settings=$SETTINGS_FILE
+                ./manage.py test --settings=$SETTINGS_FILE $ARG
             else
-                ./manage.py test
+                ./manage.py test $ARG
             fi
             ;;
         ft)
             echo "running functional tests"
+            echo "Testing $ARG"
             if [ -a $SETTINGS_FILE ]
             then
-                ./manage.py harvest --tag=-WIP --tag=-Upload -v 2 --settings=$SETTINGS_FILE
+                ./manage.py harvest --tag=-WIP --tag=-Upload -v 2 --settings=$SETTINGS_FILE $ARG
             else
-                ./manage.py harvest --tag=-WIP --tag=-Upload -v 2
+                ./manage.py harvest --tag=-WIP --tag=-Upload -v 2 $ARG
             fi
             ;;
     esac
