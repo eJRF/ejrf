@@ -42,6 +42,12 @@ class QuestionnaireBuilder():
         valid_data['response'] = 1231242143124
         return valid_data
 
+    @classmethod
+    def create_data_with_invalid_root_question(cls):
+        valid_data = cls.create_valid_data()
+        valid_data['root_question'] = 1231242143124
+        return valid_data
+
 class SkipQuestionViewPostTest(BaseTest):
     def setUp(self):
         self.client = Client()
@@ -59,12 +65,25 @@ class SkipQuestionViewPostTest(BaseTest):
         self.assertEqual(SkipRule.objects.all().count(), 1)
 
     def test_post_skip_question_for_root_question_not_existing(self):
-        form_data = QuestionnaireBuilder.create_data_with_invalid_response()
+        form_data = QuestionnaireBuilder.create_data_with_invalid_root_question()
 
         response = self.client.post(self.url, data=form_data)
+
         self.assertEqual(400, response.status_code)
         self.assertEqual(SkipRule.objects.all().count(), 0)
         expected_errors = [u'Select a valid choice. That choice is not one of the available choices.']
+
+        self.assertEqual(json.loads(response.content)['result'], expected_errors)
+
+    def test_post_skip_question_for_response_not_existing(self):
+        form_data = QuestionnaireBuilder.create_data_with_invalid_response()
+
+        response = self.client.post(self.url, data=form_data)
+
+        self.assertEqual(400, response.status_code)
+        self.assertEqual(SkipRule.objects.all().count(), 0)
+        expected_error_message = [u'The selected option is not a valid option for the root question']
+        self.assertEqual(json.loads(response.content)['result'], expected_error_message)
 
 class SkipQuestionPostTest(BaseTest):
     def setUp(self):
@@ -108,28 +127,6 @@ class SkipQuestionPostTest(BaseTest):
                           'response': str(response.pk),
                           'skip_question': str(skip_question.pk),
                           'subsection': str(self.subsection_id)}
-
-
-    def test_post_skip_question_for_root_question_not_existing(self):
-        self.assertEqual(SkipRule.objects.all().count(), 0)
-        data = self.form_data
-        data['root_question'] = '341543'
-        response = self.client.post(self.url, data=data)
-        self.assertEqual(400, response.status_code)
-        self.assertEqual(SkipRule.objects.all().count(), 0)
-        expected_errors = [u'Select a valid choice. That choice is not one of the available choices.']
-
-        self.assertEqual(json.loads(response.content)['result'], expected_errors)
-
-    def test_post_skip_question_for_response_not_existing(self):
-        self.assertEqual(SkipRule.objects.all().count(), 0)
-        data = self.form_data
-        data['response'] = '341543'
-        response = self.client.post(self.url, data=data)
-        self.assertEqual(400, response.status_code)
-        self.assertEqual(SkipRule.objects.all().count(), 0)
-        expected_error_message = [u'The selected option is not a valid option for the root question']
-        self.assertEqual(json.loads(response.content)['result'], expected_error_message)
 
     def test_post_skip_question_for_skip_question_not_existing(self):
         self.assertEqual(SkipRule.objects.all().count(), 0)
