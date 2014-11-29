@@ -31,7 +31,16 @@ class QuestionnaireBuilder():
 
         response = QuestionOption.objects.create(text="Some response", question=root_question, UID="U0003")
 
-        return (root_question.pk, response.pk, skip_question.pk, subsection.pk)
+        return {'root_question': str(root_question.pk),
+                'response': str(response.pk),
+                'skip_question': str(skip_question.pk),
+                'subsection': str(subsection.pk)}
+
+    @classmethod
+    def create_data_with_invalid_response(cls):
+        valid_data = cls.create_valid_data()
+        valid_data['response'] = 1231242143124
+        return valid_data
 
 class SkipQuestionViewPostTest(BaseTest):
     def setUp(self):
@@ -42,17 +51,20 @@ class SkipQuestionViewPostTest(BaseTest):
         self.client.login(username=user.username, password='pass')
 
     def test_post_skip_question(self):
-        (root_question, response, skip_question, subsection) = QuestionnaireBuilder.create_valid_data()
-        form_data = {'root_question': str(root_question),
-                     'response': str(response),
-                     'skip_question': str(skip_question),
-                     'subsection': str(subsection)}
-
+        form_data = QuestionnaireBuilder.create_valid_data()
 
         response = self.client.post(self.url, data=form_data)
 
         self.assertEqual(201, response.status_code)
         self.assertEqual(SkipRule.objects.all().count(), 1)
+
+    def test_post_skip_question_for_root_question_not_existing(self):
+        form_data = QuestionnaireBuilder.create_data_with_invalid_response()
+
+        response = self.client.post(self.url, data=form_data)
+        self.assertEqual(400, response.status_code)
+        self.assertEqual(SkipRule.objects.all().count(), 0)
+        expected_errors = [u'Select a valid choice. That choice is not one of the available choices.']
 
 class SkipQuestionPostTest(BaseTest):
     def setUp(self):
