@@ -52,8 +52,6 @@ class SubsectionQuestionsTest(BaseTest):
         q2['canSkip'] = True
 
         actual_response = json.loads(response.content)['questions']
-        print q1
-        print actual_response
         self.assertTrue(q1 in actual_response)
         self.assertTrue(q2 in actual_response)
 

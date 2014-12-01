@@ -194,10 +194,14 @@ class GetSubSections(OwnerAndPermissionRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         section_id = kwargs.get("section_id")
-        subsections = SubSection.objects.filter(section_id=section_id)
+        subsections = self._get_subsections(section_id, request)
         subsections_dict = map(lambda subsection: subsection.to_dict(), subsections)
         return HttpResponse(json.dumps(subsections_dict), content_type="application/json", status=200)
 
+    def _get_subsections(self, section_id, request):
+        if request.user.user_profile.is_global_admin():
+            return SubSection.objects.filter(section_id=section_id, region__isnull=True, is_core=True)
+        return SubSection.objects.filter(section_id=section_id, region=request.user.user_profile.region, is_core=False)
 
 class ReOrderQuestions(PermissionRequiredMixin, View):
     permission_required = 'auth.can_edit_questionnaire'

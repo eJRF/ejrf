@@ -617,7 +617,10 @@ class SectionGetSubSectionsTest(BaseTest):
 
     def test_gets_subsections_for_a_section_with_one_subsection(self):
         subsection = SubSection.objects.create(title="subsection 1", section=self.section, order=1,
-                                               region=self.region)
+                                               region=self.region, is_core=False)
+
+        core_subsection = SubSection.objects.create(title="subsection 1", section=self.section, order=2,
+                                               region=self.region, is_core=True)
 
         response = self.client.get(self.url)
         self.assertEqual(200, response.status_code)

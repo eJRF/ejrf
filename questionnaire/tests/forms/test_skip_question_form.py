@@ -245,3 +245,29 @@ class RegionalAdminSkipQuestionRuleFormTest(BaseTest):
 
         self.assertEqual(skip_question_rule.region, self.region)
         self.assertEqual(skip_question_rule.root_question, self.root_question)
+
+
+class RegionalAdminSkipSubsectionRuleFormTest(BaseTest):
+    def setUp(self):
+        self.root_question = QuestionFactory()
+        self.response = QuestionOptionFactory(question=self.root_question)
+        self.subsection = SubSectionFactory(title="outside subsection", order=2)
+        self.subsection_to_skip = SubSectionFactory(is_core=True, region=None, order=3)
+        self.question_group = QuestionGroupFactory(subsection=self.subsection)
+        self.region = RegionFactory()
+        self.root_question.question_group.add(self.question_group)
+
+        self.form_data = {'root_question': self.root_question.id,
+                          'response': self.response.id,
+                          'skip_subsection': self.subsection_to_skip.id,
+                          'subsection': self.subsection.id}
+        QuestionGroupOrder.objects.create(question=self.root_question, question_group=self.question_group, order=1)
+
+    def test_is_invalid_if_skip_subsection_is_core(self):
+        data = self.form_data
+        data['skip_subsection'] = self.subsection_to_skip.id
+
+        skip_subsection_rule_form = SkipSubsectionForm(data=data, initial={'region': self.region })
+        self.assertFalse(skip_subsection_rule_form.is_valid())
+        errors = 'You cannot skip a core subsection'
+        self.assertIn(errors, skip_subsection_rule_form.errors['skip_subsection'])
