@@ -62,7 +62,7 @@ class OrderBasedReIndexer:
         self.kwargs = kwargs
         self.new_order = number_from(new_order)
         self.klass = eval(self.obj.__class__.__name__)
-        self.SUCCESS_MESSAGE = 'The %ss were reordered successfully!' % self.klass
+        self.SUCCESS_MESSAGE = 'The %ss were reordered successfully!' % self.klass.__name__.lower()
 
     def _get_old_order(self, all_objects):
         if self.obj.id:
