@@ -129,7 +129,7 @@ question21 = Question.objects.create(text='Other interventions given with the va
 "Other intervention given with the vaccine":  Mention any other intervention
 (e.g. growth monitoring, antihelmintics,...) that is given at the same time as the vaccination contact """)
 
-question22 = Question.objects.create(text='Does recorded on immunization or child death card', UID='C00022',
+question22 = Question.objects.create(text='Does recorded on immunization or child Heath card', UID='C00022',
                                      export_label='Doses recorded on immunizaton or child health card?',
                                      answer_type='MultiChoice')
 QuestionOption.objects.create(text="Yes", question=question22)
