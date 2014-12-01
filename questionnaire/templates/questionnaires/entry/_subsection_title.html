@@ -33,8 +33,7 @@
             <span class="cyan"><span class="glyphicon glyphicon-sort-by-order"></span> ReOrder</span>
         </a>
 
-
-        {% if perms.auth.can_edit_questionnaire and user.user_profile.region == subsection.region and not subsection.is_core %}
+        {% if perms.auth.can_edit_questionnaire and user.user_profile in subsection.profiles_with_edit_permission %}
         <a href="" id="edit-subsection-{{ subsection.id }}" class="btn btn-sm btn-default" data-toggle="modal"
            data-target="#edit_subsection_{{ subsection.id }}"><span class="cyan"><span
                 class="glyphicon glyphicon-pencil"></span> Edit</span>
