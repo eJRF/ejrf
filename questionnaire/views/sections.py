@@ -35,8 +35,8 @@ class NewSection(RegionAndPermissionRequiredMixin, CreateView):
 
     def get_initial(self):
         initial = super(NewSection, self).get_initial()
-        region = self.request.user.user_profile.region
-        initial.update({'questionnaire': self.questionnaire, 'region': region})
+        profile = self.request.user.user_profile
+        initial.update({'questionnaire': self.questionnaire, 'region': profile.region, 'user': profile.user})
         return initial
 
     def form_valid(self, form):

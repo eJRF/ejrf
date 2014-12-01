@@ -39,16 +39,20 @@ class SectionForm(ModelForm):
         self._clean_is_core()
         return super(SectionForm, self).clean()
 
-    def _set_is_core(self):
+    def _set_is_core(self, section):
         user = self.initial.get('user')
-        if user and user.user_profile.region:
-            return False
-        return True
+        if section.id:
+            return section
+        elif user and user.user_profile.region:
+            section.is_core = False
+        else:
+            section.is_core = True
+        return section
 
     def save(self, commit=True, *args, **kwargs):
         section = super(SectionForm, self).save(commit=False)
         region = self.initial.get('region', None)
-        section.is_core = self._set_is_core()
+        section = self._set_is_core(section)
         if commit:
             based_re_indexer = OrderBasedReIndexer(section, self.cleaned_data['order'],
                                                    questionnaire=section.questionnaire, region=region)

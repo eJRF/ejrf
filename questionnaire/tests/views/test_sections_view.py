@@ -348,14 +348,14 @@ class EditSubSectionsViewTest(BaseTest):
         self.client.login(username=self.user.username, password='pass')
 
         self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013, region=self.region)
-        self.section = Section.objects.create(questionnaire=self.questionnaire, name="section", order=1)
+        self.section = Section.objects.create(questionnaire=self.questionnaire, name="section", order=1, is_core=True)
         self.form_data = {'description': 'funny section',
                           'title': 'some title',
                           'order': 1,
                           'section': self.section.id}
         self.create_form_data = self.form_data.copy()
         del self.create_form_data['section']
-        self.subsection = SubSection.objects.create(section=self.section, region=self.region, **self.create_form_data)
+        self.subsection = SubSection.objects.create(section=self.section, region=self.region, is_core=True, **self.create_form_data)
         self.url = '/subsection/%d/edit/' % self.subsection.id
 
     def test_get_edit_section(self):

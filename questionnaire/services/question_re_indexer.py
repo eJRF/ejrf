@@ -98,6 +98,7 @@ class OrderBasedReIndexer:
             return 1
         return -1
 
+
 class GridReorderer:
     ONE_BELOW_CURRENT_GROUP_ORDER = 1
 
