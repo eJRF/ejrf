@@ -11,6 +11,7 @@ from questionnaire.models import Question, Questionnaire, Section, SubSection, Q
 def given_that_i_am_logged_in_as_a_regional_admin(step):
     world.user, world.region = create_regional_admin_with_no_permissions()
     world.user = assign('can_edit_questionnaire', world.user)
+    world.user = assign('can_view_questionnaire', world.user)
     world.page = LoginPage(world.browser)
     world.page.visit()
     world.page.login(world.user, "pass")

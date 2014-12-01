@@ -63,3 +63,15 @@ Feature: Skip Rules
     And I fill in the grid rule form
     And I click save rule
     Then I should see '1' existing grid skip rules
+
+  Scenario: Regional admin creates and views skip rule
+    Given that I am logged in as a regional admin
+    And I have a questionnaire for my region with sections and subsections
+    And I have core and regional questions assigned to the questionnaire
+    And I am editing that questionnaire
+    Then I should see options to add skip rules
+    When I select the option to add skip rules to a subsection
+    And I view existing skip rules
+    Then I should see '0' existing skip rules
+    When I create a new question skip rule
+    Then I should see '1' existing skip rules

@@ -2,11 +2,12 @@ from lettuce import step, world
 import time
 from questionnaire.features.pages.skip_rule_modal import SkipRuleModalPage
 from questionnaire.models.skip_rule import SkipQuestion, SkipSubsection
-from questionnaire.models import QuestionGroupOrder, Questionnaire
+from questionnaire.models import QuestionGroupOrder, Questionnaire, Question, QuestionGroup, QuestionOption
 from questionnaire.tests.factories.question_factory import QuestionFactory
 from questionnaire.tests.factories.question_group_factory import QuestionGroupFactory
 from questionnaire.tests.factories.question_option_factory import QuestionOptionFactory
 from questionnaire.tests.factories.sub_section_factory import SubSectionFactory
+from questionnaire.utils.answer_type import AnswerTypes
 
 
 @step(u'Then I should see an option to delete skip rules')
@@ -181,3 +182,37 @@ def then_i_should_see_group1_existing_grid_skip_rules(step, count):
     time.sleep(2)
     assert (actual_number == int(count)), 'Expecting %s number of rules, got %s number of rules' % (
         int(count), actual_number)
+
+
+@step(u'And I have core and regional questions assigned to the questionnaire')
+def and_i_have_core_and_regional_questions_assigned_to_the_questionnaire(step):
+    world.core_qn01 = Question.objects.create(text='Core Question 01', export_label='Core Qn 01', UID='01', answer_type=AnswerTypes.MULTI_CHOICE)
+    QuestionOption.objects.create(text='Option 1 of Core Question', question=world.core_qn01)
+    QuestionOption.objects.create(text='Option 2 of Core Question', question=world.core_qn01)
+
+    world.regional_qn02 = Question.objects.create(text='Regional Question 02', export_label='Regional Qn 02', UID='02', answer_type='Text', region=world.region)
+    world.regional_qn03 = Question.objects.create(text='Regional Question 03', export_label='Regional Qn 03', UID='03', answer_type='Text', region=world.region)
+
+    parent = QuestionGroup.objects.create(subsection=world.sub_section, order=1)
+    parent.question.add(world.core_qn01, world.regional_qn02, world.regional_qn03)
+
+    QuestionGroupOrder.objects.create(question=world.core_qn01, question_group=parent, order=1)
+    QuestionGroupOrder.objects.create(question=world.regional_qn02, question_group=parent, order=2)
+    QuestionGroupOrder.objects.create(question=world.regional_qn03, question_group=parent, order=3)
+
+
+@step(u'Then I should see options to add skip rules')
+def then_i_should_see_options_to_add_skip_rules(step):
+    world.page.is_text_present('Add Skip Rule')
+    world.page.is_element_present_by_id('id-create-skip-rule-%s' % world.sub_section.id)
+
+
+@step(u'When I select the option to add skip rules to a subsection')
+def when_i_select_the_option_to_add_skip_rules_to_a_subsection(step):
+    world.page.click_by_id('id-create-skip-rule-%s' % world.sub_section.id)
+
+
+@step(u'And I view existing skip rules')
+def and_i_view_existing_skip_rules(step):
+    world.skip_rule_page = SkipRuleModalPage(world.browser)
+    world.skip_rule_page.view_existing_rules()
