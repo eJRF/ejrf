@@ -5,31 +5,34 @@ from django.test import Client
 from questionnaire.tests.base_test import BaseTest
 from questionnaire.models import Question, SkipRule, QuestionOption, Questionnaire, Section, SubSection, \
     QuestionGroup, QuestionGroupOrder
+from questionnaire.tests.factories.question_factory import QuestionFactory
 from questionnaire.tests.factories.question_group_factory import QuestionGroupFactory
+from questionnaire.tests.factories.question_option_factory import QuestionOptionFactory
+from questionnaire.tests.factories.questionnaire_factory import QuestionnaireFactory
+from questionnaire.tests.factories.section_factory import SectionFactory
 from questionnaire.tests.factories.skip_rule_factory import SkipQuestionRuleFactory
 from questionnaire.tests.factories.sub_section_factory import SubSectionFactory
 
 class QuestionnaireBuilder():
     @classmethod
     def create_valid_data(cls):
-        region = None
-        questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013, region=region)
+        questionnaire = QuestionnaireFactory()
 
-        section = Section.objects.create(name="section", questionnaire=questionnaire, order=1)
+        section = SectionFactory(questionnaire=questionnaire, order=1)
 
-        subsection = SubSection.objects.create(title="subsection 1", section=section, order=1)
+        subsection = SubSectionFactory(section=section, order=1)
 
-        question_group = QuestionGroup.objects.create(subsection_id=subsection.id)
+        question_group = QuestionGroupFactory(subsection=subsection)
 
-        root_question = Question.objects.create(text='Q1', UID='C00003', answer_type='MultiChoice', region=region)
-        skip_question = Question.objects.create(text='Q2', UID='C00004', answer_type='Number', region=region)
+        root_question = QuestionFactory()
+        skip_question = QuestionFactory()
 
         question_group.question.add(root_question)
         question_group.question.add(skip_question)
         QuestionGroupOrder.objects.create(question=root_question, question_group=question_group, order=1)
         QuestionGroupOrder.objects.create(question=skip_question, question_group=question_group, order=2)
 
-        response = QuestionOption.objects.create(text="Some response", question=root_question, UID="U0003")
+        response = QuestionOptionFactory(question=root_question)
 
         return {'root_question': str(root_question.pk),
                 'response': str(response.pk),
@@ -39,13 +42,19 @@ class QuestionnaireBuilder():
     @classmethod
     def create_data_with_invalid_response(cls):
         valid_data = cls.create_valid_data()
-        valid_data['response'] = 1231242143124
+        valid_data['response'] = '123124214'
         return valid_data
 
     @classmethod
     def create_data_with_invalid_root_question(cls):
         valid_data = cls.create_valid_data()
-        valid_data['root_question'] = 1231242143124
+        valid_data['root_question'] = '123124214'
+        return valid_data
+
+    @classmethod
+    def create_data_with_invalid_skip_question(cls):
+        valid_data = cls.create_valid_data()
+        valid_data['skip_question'] = '123124214'
         return valid_data
 
 class SkipQuestionViewPostTest(BaseTest):
@@ -83,6 +92,16 @@ class SkipQuestionViewPostTest(BaseTest):
         self.assertEqual(400, response.status_code)
         self.assertEqual(SkipRule.objects.all().count(), 0)
         expected_error_message = [u'The selected option is not a valid option for the root question']
+        self.assertEqual(json.loads(response.content)['result'], expected_error_message)
+
+    def test_post_skip_question_for_skip_question_not_existing(self):
+        data = QuestionnaireBuilder.create_data_with_invalid_skip_question()
+
+        response = self.client.post(self.url, data=data)
+
+        self.assertEqual(400, response.status_code)
+        self.assertEqual(SkipRule.objects.all().count(), 0)
+        expected_error_message = [u'Select a valid choice. That choice is not one of the available choices.']
         self.assertEqual(json.loads(response.content)['result'], expected_error_message)
 
 class SkipQuestionPostTest(BaseTest):
@@ -128,16 +147,6 @@ class SkipQuestionPostTest(BaseTest):
                           'skip_question': str(skip_question.pk),
                           'subsection': str(self.subsection_id)}
 
-    def test_post_skip_question_for_skip_question_not_existing(self):
-        self.assertEqual(SkipRule.objects.all().count(), 0)
-        data = self.form_data
-        data['skip_question'] = '341543'
-        response = self.client.post(self.url, data=data)
-        self.assertEqual(400, response.status_code)
-
-        self.assertEqual(SkipRule.objects.all().count(), 0)
-        expected_error_message = [u'Select a valid choice. That choice is not one of the available choices.']
-        self.assertEqual(json.loads(response.content)['result'], expected_error_message)
 
     def test_post_skip_question_for_root_question_not_being_part_of_subsection(self):
         self.assertEqual(SkipRule.objects.all().count(), 0)
