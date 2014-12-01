@@ -1,6 +1,9 @@
 from questionnaire.models.sections import Section, SubSection
 from questionnaire.models import Questionnaire, Question, QuestionGroup, QuestionGroupOrder, QuestionOption
 from questionnaire.tests.base_test import BaseTest
+from questionnaire.tests.factories.section_factory import SectionFactory
+from questionnaire.tests.factories.sub_section_factory import SubSectionFactory
+from questionnaire.tests.factories.region_factory import RegionFactory
 
 
 class SectionTest(BaseTest):
@@ -67,6 +70,29 @@ class SectionTest(BaseTest):
         self.assertEqual(self.question4, questions[3])
         self.assertEqual(self.question5, questions[4])
         self.assertEqual(self.question6, questions[5])
+
+    def test_should_return_global_admin_profiles_when_section_is_core(self):
+        global_admin =  self.create_user(org='WHO')
+        section = SectionFactory(is_core=True, region=None)
+
+        self.assertEqual(1, len(section.profiles_with_edit_permission()))
+        self.assertIn(global_admin.user_profile, section.profiles_with_edit_permission())
+
+
+    def test_should_return_empty_when_section_is_core_and_belongs_to_aregion(self):
+        global_admin =  self.create_user(org='WHO')
+        section = SectionFactory(is_core=True, region=RegionFactory())
+
+        self.assertEqual(0, len(section.profiles_with_edit_permission()))
+
+    def test_should_return_regional_admin_profiles_when_section_is_not_core_and_belongs_to_region(self):
+        regional_admin =  self.create_user(org='WHO', group=self.REGIONAL_ADMIN, region='AFR')
+        other_regional_admin =  self.create_user(username='another_user', org='WHO', group=self.REGIONAL_ADMIN, region='AnotherRegion')
+        section = SectionFactory(is_core=False, region=regional_admin.user_profile.region)
+
+        self.assertEqual(1, len(section.profiles_with_edit_permission()))
+        self.assertIn(regional_admin.user_profile, section.profiles_with_edit_permission())
+        self.assertNotIn(other_regional_admin.user_profile, section.profiles_with_edit_permission())
 
     def test_ordered_questions_should_repeat_questions_in_multiple_groups(self):
         self.question_group3.question.add(self.question4, self.question5)
@@ -206,3 +232,27 @@ class SubSectionTest(BaseTest):
     def test_subsection_knows_the_order_of_its_next_group(self):
         group = self.sub_section.question_group.create(order=1)
         self.assertEqual(2, self.sub_section.next_group_order())
+
+    def test_should_return_global_admin_profiles_when_subsection_is_core(self):
+        global_admin =  self.create_user(org='WHO')
+        subsection = SubSectionFactory(is_core=True, region=None)
+
+        self.assertEqual(1, len(subsection.profiles_with_edit_permission()))
+        self.assertIn(global_admin.user_profile, subsection.profiles_with_edit_permission())
+
+
+    def test_should_return_empty_when_subsection_is_core_and_belongs_to_aregion(self):
+        global_admin =  self.create_user(org='WHO')
+        subsection = SubSectionFactory(is_core=True, region=RegionFactory())
+
+        self.assertEqual(0, len(subsection.profiles_with_edit_permission()))
+
+    def test_should_return_regional_admin_profiles_when_subsection_is_not_core_and_belongs_to_region(self):
+        regional_admin =  self.create_user(org='WHO', group=self.REGIONAL_ADMIN, region='AFR')
+        other_regional_admin =  self.create_user(username='another_user', org='WHO', group=self.REGIONAL_ADMIN, region='AnotherRegion')
+        subsection = SubSectionFactory(is_core=False, region=regional_admin.user_profile.region)
+
+        self.assertEqual(1, len(subsection.profiles_with_edit_permission()))
+        self.assertIn(regional_admin.user_profile, subsection.profiles_with_edit_permission())
+        self.assertNotIn(other_regional_admin.user_profile, subsection.profiles_with_edit_permission())
+

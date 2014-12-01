@@ -1,5 +1,6 @@
 import re
 from decimal import Decimal, InvalidOperation
+from questionnaire.models.users import UserProfile
 
 
 INITIAL_UID = 1
@@ -38,3 +39,12 @@ def number_from(chars):
     except InvalidOperation:
         pass
     return num
+
+def profiles_that_can_edit(obj):
+    user_profiles = UserProfile.objects.all()
+    if obj.is_core and obj.region:
+        return []
+    elif obj.is_core:
+        return user_profiles.filter(region__isnull=True)
+    return user_profiles.filter(region=obj.region)
+

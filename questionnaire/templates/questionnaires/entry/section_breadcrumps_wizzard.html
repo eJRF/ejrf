@@ -10,7 +10,7 @@
                             {% if section_.region %}{{ section_.region.name }} - {% endif %}
                             {{ section_.name }}</a>
                     </div>
-                    {% if  perms.auth.can_edit_questionnaire and user.user_profile.region and user.user_profile.region == section_.region and not section_.is_core or perms.auth.can_edit_questionnaire and not user.user_profile.region and section_.is_core  and not preview %}
+                    {% if  perms.auth.can_edit_questionnaire and user.user_profile in section_.profiles_with_edit_permission and not preview %}
                         <div class="section-list-button"><a class="section-list-link"
                                                             id="id-edit-section-{{ section_.id }}" href="#"
                                                             class="{% if section_.id == section.id %}current {% endif %} edit-section"

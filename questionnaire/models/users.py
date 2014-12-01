@@ -14,4 +14,4 @@ class UserProfile(BaseModel):
         return self.region == None
 
     def can_delete(self, obj):
-        return (not self. region and obj.is_core) or (self.region and self.region == obj.region and not obj.is_core)
+				return (not self.region and obj.is_core) or (self.region is not None and self.region == obj.region and not obj.is_core)

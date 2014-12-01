@@ -4,6 +4,7 @@ from django.db import models
 from questionnaire.models import Questionnaire
 from questionnaire.models.base import BaseModel
 from questionnaire.utils.answer_type import AnswerTypes
+from questionnaire.utils.model_utils import profiles_that_can_edit
 
 
 class Section(BaseModel):
@@ -48,6 +49,10 @@ class Section(BaseModel):
 
     def is_last_in(self, questionnaire):
         return self.order == Section.get_next_order(questionnaire) - 1
+
+
+    def profiles_with_edit_permission(self):
+        return profiles_that_can_edit(self)
 
     @classmethod
     def get_next_order(cls, questionnaire):
@@ -97,6 +102,9 @@ class SubSection(BaseModel):
     def next_group_order(self):
         last_group_order = self.question_group.exclude(order=None).order_by('-order')
         return last_group_order[0].order + 1 if last_group_order.exists() else 0
+
+    def profiles_with_edit_permission(self):
+        return profiles_that_can_edit(self)
 
     @classmethod
     def get_next_order(cls, section_id):
