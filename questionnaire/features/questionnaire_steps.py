@@ -16,9 +16,9 @@ def and_i_have_a_questionnaire_with_sections_and_subsections(step):
                                              description="Section C Description", is_core=True)
     world.section_4 = Section.objects.create(title="Section D Title Sample", order=4, questionnaire=world.questionnaire, name="Section D Name Sample",
                                              description="Section D Description", is_core=True)
-    world.sub_section = SubSection.objects.create(title="Subsection Title Sample", order=1, section=world.section_1)
-    world.sub_section_2 = SubSection.objects.create(title="Second Subsection", order=2, section=world.section_1)
-    world.sub_section_3 = SubSection.objects.create(title="Third Subsection", order=3, section=world.section_1)
+    world.sub_section = SubSection.objects.create(title="Subsection Title Sample", order=1, section=world.section_1, is_core=True)
+    world.sub_section_2 = SubSection.objects.create(title="Second Subsection", order=2, section=world.section_1, is_core=True)
+    world.sub_section_3 = SubSection.objects.create(title="Third Subsection", order=3, section=world.section_1, is_core=True)
 
 @step(u'And I have a questionnaire with one section')
 def and_i_have_a_questionnaire_with_sections_and_subsections(step):
