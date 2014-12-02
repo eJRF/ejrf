@@ -66,7 +66,7 @@ Feature: Skip Rules
 
   Scenario: Regional admin creates and views skip rule
     Given that I am logged in as a regional admin
-    And I have a questionnaire for my region with sections and subsections
+    And there is questionnaire for my region
     And I have core and regional questions assigned to the questionnaire
     And I am editing that questionnaire
     Then I should see options to add skip rules
@@ -75,3 +75,5 @@ Feature: Skip Rules
     Then I should see '0' existing skip rules
     When I create a new question skip rule
     Then I should see '1' existing skip rules
+    When I create a new subsection skip rule
+    Then I should see '2' existing skip rules

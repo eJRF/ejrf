@@ -2,7 +2,8 @@ from lettuce import step, world
 import time
 from questionnaire.features.pages.skip_rule_modal import SkipRuleModalPage
 from questionnaire.models.skip_rule import SkipQuestion, SkipSubsection
-from questionnaire.models import QuestionGroupOrder, Questionnaire, Question, QuestionGroup, QuestionOption
+from questionnaire.models import QuestionGroupOrder, Questionnaire, Question, QuestionGroup, QuestionOption, Section, \
+    SubSection
 from questionnaire.tests.factories.question_factory import QuestionFactory
 from questionnaire.tests.factories.question_group_factory import QuestionGroupFactory
 from questionnaire.tests.factories.question_option_factory import QuestionOptionFactory
@@ -216,3 +217,26 @@ def when_i_select_the_option_to_add_skip_rules_to_a_subsection(step):
 def and_i_view_existing_skip_rules(step):
     world.skip_rule_page = SkipRuleModalPage(world.browser)
     world.skip_rule_page.view_existing_rules()
+
+@step(u'And there is questionnaire for my region')
+def and_there_is_questionnaire_for_my_region(step):
+    world.questionnaire = Questionnaire.objects.create(name="JRF Bolivia version", description="some more description",
+                                                       year=2013, status=Questionnaire.DRAFT, region=world.region)
+    world.section1 = Section.objects.create(order=0, title="section 1",
+                                            questionnaire=world.questionnaire, name="section 1", region=world.region)
+    world.section_1 = Section.objects.create(order=4, title="section_1",
+                                            questionnaire=world.questionnaire, name="section_1")
+    world.section2 = Section.objects.create(order=1, title="Another title",
+                                            description="This is just another one of them",
+                                            questionnaire=world.questionnaire, name="Reported Cases",
+                                            region=world.region)
+    world.section3 = Section.objects.create(order=2, title="Section 3 Title",
+                                            description="Section 3 description",
+                                            questionnaire=world.questionnaire, name="Section 3", region=world.region)
+    world.section4 = Section.objects.create(order=3, title="Core Section",
+                                            description="Section 3 description",
+                                            questionnaire=world.questionnaire, name="Section 3")
+    world.sub_section = SubSection.objects.create(title="regional subs", order=1, section=world.section1, region=world.region)
+    world.regional_subsection = SubSection.objects.create(title="Other regional subsection", order=2, section=world.section1, region=world.region)
+    world.sub_section_1 = SubSection.objects.create(title="other R subs", order=1, section=world.section_1, region=world.region)
+    world.core_sub_section = SubSection.objects.create(title="core subs", order=2, section=world.section_1)
