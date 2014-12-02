@@ -19,7 +19,7 @@ def get_rules(option_id, subsection):
             rules_skipping_questions_in_hybrid_grids = filter(lambda rule: rule.is_in_hybrid_grid(),SkipQuestion.objects.filter(subsection=subsection, response_id=option_id))
             rules_skipping_subsections = SkipSubsection.objects.filter(subsection=subsection, response_id=option_id)
             question_rules = ",".join(map(lambda rule: str(rule.skip_question.id), rules_skipping_questions))
-            hybrid_grid_rules =  ",".join(map(lambda rule: str(rule.skip_question.id), rules_skipping_questions_in_hybrid_grids))
+            hybrid_grid_rules = ",".join(map(lambda rule: str(rule.skip_question.id), rules_skipping_questions_in_hybrid_grids))
             subsection_rules = ",".join(map(lambda rule: str(rule.skip_subsection.id), rules_skipping_subsections))
 
         return question_rules, subsection_rules, hybrid_grid_rules

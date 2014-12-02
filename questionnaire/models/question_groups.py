@@ -47,7 +47,10 @@ class QuestionGroup(BaseModel):
             return True in map(lambda group: group.contains_or_sub_group_contains(question), self.sub_groups())
 
     def sub_groups(self):
-        return self.sub_group.all()
+        all_groups = list(self.sub_group.all())
+        for group in self.sub_group.all():
+            all_groups.extend(list(group.sub_groups()))
+        return all_groups
 
     def is_in_grid(self):
         if self.parent is not None:
@@ -64,7 +67,7 @@ class QuestionGroup(BaseModel):
     def parent_group_id(self):
         return self.parent_group().id
 
-    def  is_in_hybrid_grid(self):
+    def is_in_hybrid_grid(self):
         if self.parent is not None:
             return self.hybrid or self.parent.is_in_hybrid_grid()
         else:
