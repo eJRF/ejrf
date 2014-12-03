@@ -5,11 +5,12 @@ from django.core.urlresolvers import reverse
 from django.test import Client
 
 from questionnaire.forms.sections import SectionForm, SubSectionForm
-from questionnaire.models import Questionnaire, Section, SubSection, Region, QuestionGroupOrder
+from questionnaire.models import Questionnaire, Section, SubSection, Region, QuestionGroupOrder, SkipRule
 from questionnaire.tests.base_test import BaseTest
 from questionnaire.tests.factories.question_factory import QuestionFactory
 from questionnaire.tests.factories.question_group_factory import QuestionGroupFactory
 from questionnaire.tests.factories.section_factory import SectionFactory
+from questionnaire.tests.factories.skip_rule_factory import SkipQuestionRuleFactory, SkipSubsectionRuleFactory
 from questionnaire.tests.factories.sub_section_factory import SubSectionFactory
 
 
@@ -486,6 +487,18 @@ class DeleteSubSectionsViewTest(BaseTest):
         response = self.client.post(url)
         self.assertRedirects(response, expected_url='/accounts/login/?next=%s' % url)
 
+    def test_post_deletes_subsection_and_rules(self):
+        SkipQuestionRuleFactory(subsection=self.subsection)
+        SkipSubsectionRuleFactory(subsection=self.subsection)
+        self.client.post(self.url)
+
+        self.assertEqual(len(SkipRule.objects.all()), 0)
+
+    def test_post_deletes_subsection_and_rules_where_it_is_subsection_to_skip(self):
+        SkipSubsectionRuleFactory(skip_subsection=self.subsection)
+        self.client.post(self.url)
+
+        self.assertEqual(len(SkipRule.objects.all()), 0)
 
 class DeleteRegionalSectionsViewTest(BaseTest):
     def setUp(self):
