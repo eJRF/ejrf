@@ -10,8 +10,10 @@ class UserProfile(BaseModel):
     country = models.ForeignKey("Country", blank=True, null=True)
     organization = models.ForeignKey("Organization", blank=True, null=True)
 
+    @property
     def is_global_admin(self):
-        return self.region == None
+        return self.region is None
 
     def can_delete(self, obj):
-				return (not self.region and obj.is_core) or (self.region is not None and self.region == obj.region and not obj.is_core)
+        return (not self.region and obj.is_core) or (
+        self.region is not None and self.region == obj.region and not obj.is_core)

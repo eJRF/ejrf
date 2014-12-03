@@ -1,12 +1,9 @@
-{% if perms.auth.can_edit_questionnaire and  user.user_profile.region == questionnaire.region and user.user_profile.region == group.region and not preview %}
+{% if perms.auth.can_edit_questionnaire and user.user_profile.region == None and not preview   %}
 <div>
     <script>
         var selectMove = function(direction, formId) {
             $('#' + formId).find("input[name='move_direction']").val(direction);
         }
-
-
-
     </script>
     <form id="move-grid-form-{{group.id}}" action="{% url 'move_grid' %}" method="POST" class="btn-group pull-right">
         {% csrf_token %}
@@ -32,5 +29,17 @@
             <span class="cyan"><span class="glyphicon glyphicon-trash"></span>Delete Grid</span>
         </a>
     </form>
+</div>
+{% endif %}
+{% if perms.auth.can_edit_questionnaire and user.user_profile.region == group.region and not preview  and not group.is_core %}
+<div>
+    <div class="btn-group pull-right">
+        {% if group.hybrid %}
+        <a href="" class="btn btn-default btn-sm" data-toggle="modal" data-target="#create-skip-rule"
+           data-target="#" onClick="skipRules.updateGrid({{ subsection.id }}, {{ group.id }})" id="grid-question-{{ group.id}}">
+            <span class="cyan"><span class="glyphicon glyphicon-plus-sign"></span>Add Grid Rules</span>
+        </a>
+        {% endif %}
+    </div>
 </div>
 {% endif %}

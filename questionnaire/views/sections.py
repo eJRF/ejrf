@@ -199,7 +199,7 @@ class GetSubSections(OwnerAndPermissionRequiredMixin, View):
         return HttpResponse(json.dumps(subsections_dict), content_type="application/json", status=200)
 
     def _get_subsections(self, section_id, request):
-        if request.user.user_profile.is_global_admin():
+        if request.user.user_profile.is_global_admin:
             return SubSection.objects.filter(section_id=section_id, region__isnull=True, is_core=True)
         return SubSection.objects.filter(section_id=section_id, region=request.user.user_profile.region, is_core=False)
 

@@ -15,7 +15,9 @@
     var csrfToken = '{{ csrf_token }}';
     var url = "{% url 'skip_rules' %}";
     var sectionId = "{{ section.id }}";
-    $("#close-skip-rule").on('click', function () {
+
+    $('#create-skip-rule').on('hide.bs.modal', function (e) {
         window.location.href = window.location.pathname;
     });
+
 </script>

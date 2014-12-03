@@ -49,7 +49,7 @@ class SkipRuleView(PermissionRequiredMixin, View):
 
         if rules:
             rule = rules[0]
-            if request.user.user_profile.is_global_admin() or rule.region == request.user.user_profile.region:
+            if request.user.user_profile.is_global_admin or rule.region == request.user.user_profile.region:
                 rule.delete()
                 status = 200
             else:

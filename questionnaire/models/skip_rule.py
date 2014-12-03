@@ -41,7 +41,7 @@ class SkipQuestion(SkipRule):
                 'root_question': self.root_question.text,
                 'response': self.response.text,
                 'is_in_hygrid': self.is_in_hybrid_grid(),
-                'can_delete': user.user_profile.is_global_admin() or user.user_profile.region == self.region
+                'can_delete': user.user_profile.is_global_admin or user.user_profile.region == self.region
         }
 
 
@@ -57,5 +57,5 @@ class SkipSubsection(SkipRule):
                 'skip_subsection': (" %s. %s" % (self.skip_subsection.order, self.skip_subsection.title)),
                 'root_question': self.root_question.text,
                 'response': self.response.text,
-                'can_delete': user.user_profile.is_global_admin() or user.user_profile.region == self.region
+                'can_delete': user.user_profile.is_global_admin or user.user_profile.region == self.region
         }

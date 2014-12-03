@@ -19,6 +19,10 @@ while test $# -gt 0; do
             export VENV=`echo $1 | sed -e 's/^[^=]*=//g'`
             shift
             ;;
+        ut)
+            export TASKS='ut'
+            shift
+            ;;
         *)
             export ARG="$1"
             break

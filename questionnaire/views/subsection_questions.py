@@ -24,7 +24,7 @@ class SubsectionQuestions(PermissionRequiredMixin, View):
                 question_dict = json.loads(question_json)[0]
                 question_dict['options'] = json.loads(options_json)
                 question_dict['parentQuestionGroup'] = qg.parent_group_id()
-                question_dict['canSkip'] = (user_profile.is_global_admin() or user_profile.region == q.region)
+                question_dict['canSkip'] = (user_profile.is_global_admin or user_profile.region == q.region)
                 questions.append(question_dict)
         data = {'questions': questions}
         return HttpResponse(json.dumps(data), content_type="application/json")
