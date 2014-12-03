@@ -10,10 +10,6 @@
         <li role="presentation"><a id="selectExistingRuleTab" href="#existingRulesTab" role="tab" data-toggle="tab"
                                    data-ng-click="setActiveTab('existingRulesTab')"
                                    data-ng-hide="existingRulesTabHidden">Existing Rules</a></li>
-
-        <li role="presentation"><a id="selectExistingGridRuleTab" href="#existingGridRulesTab" role="tab" data-toggle="tab"
-                                   data-ng-hide="existingGridRulesTabHidden"
-                                   data-ng-click="setActiveTab('existingGridRulesTab')">Existing Grid Rules</a></li>
     </ul>
     <div id="newRuleTab" data-ng-show="activeTab == 'newRuleTab'">
         <form method="post" class="form-horizontal" id="sumbit-skip-rule" name="skipForm"
@@ -112,7 +108,7 @@
 
                     <div class="col-sm-7 center-fields">
                         <select name="skip_subsection" required data-ng-model="skipRule.subsection"
-                                data-ng-options="getSubsectionTile(q) for q in subsections track by q.id">
+                                data-ng-options="getSubsectionTitle(q) for q in subsections track by q.id">
                             <option value="">Select SubSection</option>
                         </select>
                     </div>
@@ -131,7 +127,7 @@
                 <div data-ng-class="deleteResult.className" class="alert" data-ng-show="deleteResult.show">
                     {{ deleteResult.message }}
                 </div>
-                <div data-ng-repeat="rule in existingRules | orderBy:'id'" class="existingRule">
+                <div data-ng-repeat="rule in existingRules | filter:filterRules | orderBy:'id'" class="existingRule">
                     <button  id="delete-rule-{{ rule.id }}" class="btn btn-default pull-right" value="delete" data-ng-click="deleteRule(rule)" data-ng-show="rule.can_delete">
                         <span class="red bold"><span class="glyphicon glyphicon-remove"></span> Delete</span>
                     </button>
@@ -154,35 +150,7 @@
             </div>
         </div>
     </div>
-    <div id="existingGridRulesTab" data-ng-show="activeTab == 'existingGridRulesTab'">
-        <div class="modal-body">
-            <div class="question-group indent">
-                <div data-ng-class="deleteResult.className" class="alert" data-ng-show="deleteResult.show">
-                    {{ deleteResult.message }}
-                </div>
-                <div data-ng-repeat="rule in existingGridRules | orderBy:'id'" class="existingRule">
-                    <button id="delete-grid-rule-{{ rule.id }}" class="btn btn-default pull-right" value="delete" data-ng-click="deleteRule(rule)" data-ng-show="rule.can_delete">
-                        <span class="red bold"><span class="glyphicon glyphicon-remove"></span> Delete</span>
-                    </button>
-                    <div class="form-group" style="display:none;"><label class="col-sm-3 control-label">Rule
-                        ID</label>{{ rule.id }}
-                    </div>
-                    <div class="form-group"><label class="col-sm-2 control-label">Root
-                        Question</label>{{ rule.root_question }}
-                    </div>
-                    <div class="form-group"><label class="col-sm-2 control-label">Response</label>{{ rule.response }}
-                    </div>
-                    <div class="form-group" data-ng-show="rule.skip_question !== Null"><label
-                            class="col-sm-2 control-label">Question to Skip</label>{{ rule.skip_question }}
-                    </div>
-                    <div class="form-group" data-ng-show="rule.skip_subsection !== Null"><label
-                            class="col-sm-2 control-label">Subsection to Skip</label>{{ rule.skip_subsection }}
-                    </div>
-                    <hr/>
-                </div>
-            </div>
-        </div>
-        <div class="modal-footer">
-        </div>
+    <div class="modal-footer">
+    </div>
     </div>
 </div>

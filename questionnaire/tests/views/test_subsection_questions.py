@@ -45,11 +45,15 @@ class SubsectionQuestionsTest(BaseTest):
         q1['options'] = []
         q1['parentQuestionGroup'] = self.question_group.id
         q1['canSkip'] = True
+        q1['inHybrid'] = False
+        q1['inGrid'] = False
 
         q2 = self.obj_to_dict(self.question2)
         q2['options'] = []
         q2['parentQuestionGroup'] = self.question_group.id
         q2['canSkip'] = True
+        q2['inHybrid'] = False
+        q2['inGrid'] = False
 
         actual_response = json.loads(response.content)['questions']
         self.assertTrue(q1 in actual_response)
@@ -67,16 +71,22 @@ class SubsectionQuestionsTest(BaseTest):
         q3['options'] = []
         q3['parentQuestionGroup'] = self.question_group2.id
         q3['canSkip'] = True
+        q3['inHybrid'] = False
+        q3['inGrid'] = False
 
         q1 = self.obj_to_dict(self.question1)
         q1['options'] = []
         q1['parentQuestionGroup'] = self.question_group.id
         q1['canSkip'] = True
+        q1['inHybrid'] = False
+        q1['inGrid'] = False
 
         q2 = self.obj_to_dict(self.question2)
         q2['options'] = []
         q2['parentQuestionGroup'] = self.question_group.id
         q2['canSkip'] = True
+        q2['inHybrid'] = False
+        q2['inGrid'] = False
 
         actual_response = json.loads(response.content)['questions']
         self.assertTrue(q1 in actual_response)
@@ -93,16 +103,22 @@ class SubsectionQuestionsTest(BaseTest):
         q3['options'] = []
         q3['parentQuestionGroup'] = self.question_group2.id
         q3['canSkip'] = True
+        q3['inHybrid'] = False
+        q3['inGrid'] = False
 
         q1 = self.obj_to_dict(self.question1)
         q1['options'] = []
         q1['parentQuestionGroup'] = self.question_group.id
         q1['canSkip'] = False
+        q1['inHybrid'] = False
+        q1['inGrid'] = False
 
         q2 = self.obj_to_dict(self.question2)
         q2['options'] = []
         q2['parentQuestionGroup'] = self.question_group.id
         q2['canSkip'] = False
+        q2['inHybrid'] = False
+        q2['inGrid'] = False
 
         actual_response = json.loads(response.content)['questions']
         self.assertTrue(q1 in actual_response)
