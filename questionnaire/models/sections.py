@@ -20,7 +20,7 @@ class Section(BaseModel):
         return self.name
 
     def ordered_questions(self):
-        question_orders = QuestionGroupOrder.objects.filter(question_group__subsection__in=self.sub_sections.all())
+        question_orders = QuestionGroupOrder.objects.filter(question_group__subsection__in=self.sub_sections.all()).select_related()
         orders = question_orders.order_by('question_group__subsection__order', 'question_group__order', 'order')
         return [group_question_order.question for group_question_order in orders]
 

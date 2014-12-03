@@ -1,4 +1,5 @@
 import copy
+from django.db import transaction
 
 from questionnaire.models import QuestionGroupOrder, Questionnaire, SkipRule, SubSection
 from questionnaire.models.skip_rule import SkipQuestion, SkipSubsection
@@ -14,6 +15,7 @@ class QuestionnaireClonerService(object):
         self.sub_sections = None
         self.question_groups = None
 
+    @transaction.commit_on_success
     def clone(self):
         self.questionnaire.pk = None
         self.questionnaire.status = Questionnaire.DRAFT
