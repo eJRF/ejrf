@@ -24,6 +24,7 @@ def get_rules(option_id, subsection):
 
         return question_rules, subsection_rules, hybrid_grid_rules
 
+
 class MultiChoiceAnswerSelectWidget(forms.Select):
     def __init__(self, subsection, attrs=None, choices=(), question_options=None):
         super(MultiChoiceAnswerSelectWidget, self).__init__(attrs, choices)
@@ -116,7 +117,6 @@ class DataRuleRadioFieldRenderer(RadioFieldRenderer):
 
     def _get_rules(self, option):
         return get_rules(option, self.subsection)
-
 
 
 class SkipRuleRadioWidget(forms.RadioSelect):
