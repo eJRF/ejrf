@@ -3,8 +3,7 @@
     {% if section.has_at_least_two_subsections and subsection.title %}
     {{ section.order }}.{{ subsection.order }}.
     {% endif %}
-
-    {{ subsection.title | default_if_none:''}}
+    {% if subsection.region and not subsection.is_core %}{{ subsection.region.name }} - {% endif %} {{ subsection.title |  default_if_none:'' }}
     </h4>
     {% if perms.auth.can_edit_questionnaire and user.user_profile.region == questionnaire.region and not preview %}
     <div class="btn-group pull-right">

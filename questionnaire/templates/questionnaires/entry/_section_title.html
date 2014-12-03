@@ -1,5 +1,5 @@
 <h3 class="button-padding">{{ section.order }}.
-    {% if section.region %}{{ section.region.name }} - {% endif %} {{ section.title | safe }}
+    {% if section.region and not section.is_core %}{{ section.region.name }} - {% endif %} {{ section.title | safe }}
     {% if perms.auth.can_edit_questionnaire and user.user_profile.region == questionnaire.region and not preview %}
         <a href="" id="new-subsection" class="btn btn-default pull-right" data-toggle="modal"
            data-target="#new-subsection-modal"><span class="cyan"><span
