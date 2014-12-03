@@ -18,7 +18,10 @@
 <div class="container">
     <div class="row login-row">
         <div class="col-md-4" id="login-logo">
-            <img src="{{ STATIC_URL }}img/unicef_logo_white.png">
+            <div class="logos">
+                <img src="{{ STATIC_URL }}img/unicef_logo_white.png">
+                <img src="{{ STATIC_URL }}img/who_logo_white.png">
+            </div>
         </div>
         <div class="col-md-8" id="login-form-container">
             <form class="login-form" method="post" action="{% url 'django.contrib.auth.views.login' %}">
