@@ -13,10 +13,8 @@ class Migration(DataMigration):
             question_groups = question_grids[1]
             next_order = section.sub_sections.count() + 1
             new_subsection = orm.subsection.objects.create(section=section, order=next_order, is_core=subsection[0].is_core, region=subsection[0].region)
-            print new_subsection.id
             question_groups.subsection = new_subsection
             question_groups.save()
-            print question_grids[1].subsection.id
             for group in question_groups.sub_group.all():
                 group.subsection = new_subsection
                 group.save()
