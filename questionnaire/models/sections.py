@@ -1,7 +1,7 @@
 from django.core.urlresolvers import reverse
 from django.db import models
-
-from questionnaire.models import Questionnaire
+from django.db.models import Max
+from questionnaire.models import Questionnaire, QuestionGroupOrder
 from questionnaire.models.base import BaseModel
 from questionnaire.utils.answer_type import AnswerTypes
 from questionnaire.utils.model_utils import profiles_that_can_edit
@@ -20,13 +20,9 @@ class Section(BaseModel):
         return self.name
 
     def ordered_questions(self):
-        subsections = self.sub_sections.order_by('order')
-        questions = []
-        for subsection in subsections:
-            for group in subsection.question_group.order_by('order'):
-                orders = group.orders.order_by('order')
-                questions.extend([group_question_order.question for group_question_order in orders])
-        return questions
+        question_orders = QuestionGroupOrder.objects.filter(question_group__subsection__in=self.sub_sections.all())
+        orders = question_orders.order_by('question_group__subsection__order', 'question_group__order', 'order')
+        return [group_question_order.question for group_question_order in orders]
 
     def mapped_question_orders(self):
         subsections = self.sub_sections.order_by('order')
@@ -56,8 +52,8 @@ class Section(BaseModel):
 
     @classmethod
     def get_next_order(cls, questionnaire):
-        sections = cls.objects.filter(questionnaire=questionnaire).reverse()
-        return sections[0].order + 1 if sections else 1
+        max_order = cls.objects.filter(questionnaire=questionnaire).aggregate(Max('order')).get('order__max')
+        return max_order + 1 if max_order else 1
 
 
 class SubSection(BaseModel):
@@ -102,18 +98,16 @@ class SubSection(BaseModel):
         return self.parent_question_groups().count() > 1
 
     def next_group_order(self):
-        last_group_order = self.question_group.exclude(order=None).order_by('-order')
-        return last_group_order[0].order + 1 if last_group_order.exists() else 0
+        max_group_order = self.question_group.aggregate(Max('order')).get('order__max')
+        return max_group_order + 1 if max_group_order else 0
 
     def profiles_with_edit_permission(self):
         return profiles_that_can_edit(self)
 
     @classmethod
     def get_next_order(cls, section_id):
-        subsections = cls.objects.filter(section__id=section_id)
-        if subsections.exists():
-            return subsections.latest('order').order + 1
-        return 0
+        max_order = cls.objects.filter(section__id=section_id).aggregate(Max('order')).get('order__max')
+        return max_order + 1 if max_order else 0
 
     def __unicode__(self):
         return "%s ,%s" % (str(self.order), self.title)
