@@ -2,6 +2,7 @@ from django import forms
 
 from questionnaire.forms.custom_widgets import MultiChoiceQuestionSelectWidget
 from questionnaire.models import Question
+from questionnaire.utils.answer_type import AnswerTypes
 
 
 GRID_TYPES = (('', 'Choose One'),
@@ -23,7 +24,7 @@ class GridForm(forms.Form):
         self.region = kwargs.pop('region', None)
         super(GridForm, self).__init__(*args, **kwargs)
         unused_regional_questions = self.unused_regional_questions()
-        self.fields['primary_question'].queryset = unused_regional_questions.filter(is_primary=True)
+        self.fields['primary_question'].queryset = unused_regional_questions.filter(is_primary=True).exclude(answer_type=AnswerTypes.MULTIPLE_RESPONSE)
         non_primary_questions = unused_regional_questions.exclude(is_primary=True)
         self.fields['columns'].queryset = non_primary_questions
         self.fields['subgroup'].queryset = non_primary_questions
