@@ -6,7 +6,7 @@ from questionnaire.forms.assign_question import AssignQuestionForm
 from questionnaire.models import Questionnaire, Section, SubSection, Question, Region
 from questionnaire.models.skip_rule import SkipQuestion
 from questionnaire.tests.base_test import BaseTest
-from questionnaire.tests.factories.skip_rule_factory import SkipQuestionRuleFactory
+from questionnaire.tests.factories.skip_rule_factory import SkipQuestionRuleFactory, SkipSubsectionRuleFactory
 
 
 class AssignQuestionViewTest(BaseTest):
@@ -219,6 +219,13 @@ class UnAssignQuestionViewTest(BaseTest):
 
     def test_deletes_skip_rules_when_unassigning_the_skip_question(self):
         SkipQuestionRuleFactory(subsection=self.subsection,root_question=self.question2, skip_question=self.question1)
+        meta = {'HTTP_REFERER': '/questionnaire/entry/%d/section/%d/' % (self.questionnaire.id, self.section.id)}
+        self.client.post(self.url, {}, **meta)
+
+        self.assertEqual(len(SkipQuestion.objects.all()), 0)
+
+    def test_deletes_skip_rules_when_unassigning_the_root_question_to_skip_subsection(self):
+        SkipSubsectionRuleFactory(subsection=self.subsection,root_question=self.question1)
         meta = {'HTTP_REFERER': '/questionnaire/entry/%d/section/%d/' % (self.questionnaire.id, self.section.id)}
         self.client.post(self.url, {}, **meta)
 
