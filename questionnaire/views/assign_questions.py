@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import View
@@ -6,6 +7,7 @@ from django.views.generic import View
 from questionnaire.forms.assign_question import AssignQuestionForm
 from questionnaire.mixins import RegionAndPermissionRequiredMixin
 from questionnaire.models import SubSection, Question
+from questionnaire.models.skip_rule import SkipQuestion
 
 
 class AssignQuestion(RegionAndPermissionRequiredMixin, View):
@@ -49,5 +51,9 @@ class UnAssignQuestion(RegionAndPermissionRequiredMixin, View):
         groups_in_subsection = subsection.question_group.all()
         question.question_group.remove(*groups_in_subsection)
         question.orders.filter(question_group__in=groups_in_subsection).delete()
+        skip_questions = SkipQuestion.objects.filter(Q(skip_question=question) | Q(root_question=question))
+        if skip_questions.exists():
+            skip_questions.delete()
+
         messages.success(request, "Question successfully unassigned from questionnaire.")
         return HttpResponseRedirect(referer_url)
