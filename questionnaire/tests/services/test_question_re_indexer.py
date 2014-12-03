@@ -1,3 +1,4 @@
+from mock import patch
 from questionnaire.models import Questionnaire, Section, SubSection, Question, QuestionOption, QuestionGroup, \
     QuestionGroupOrder
 from questionnaire.services.question_re_indexer import QuestionReIndexer, OrderBasedReIndexer, GridReorderer
@@ -93,7 +94,9 @@ class TestQuestionReIndexer(BaseTest):
         question_re_indexer = QuestionReIndexer({})
         self.assertEqual([u'179', u'5'], question_re_indexer.clean_values(dirty_values))
 
-    def test_reorder_questions_cross_question_groups(self):
+    @patch("questionnaire.models.QuestionGroup.delete_empty_groups")
+    @patch("questionnaire.utils.model_utils.reindex_orders_in")
+    def test_reorder_questions_cross_question_groups(self, mock_reindex_orders_in,mock_delete_empty_groups):
         question4 = Question.objects.create(text='new group question 1', UID='C00057', answer_type='Number')
         question5 = Question.objects.create(text='new group question 2', UID='C00043', answer_type='Number')
 
@@ -128,6 +131,9 @@ class TestQuestionReIndexer(BaseTest):
         self.assertEqual(order2, updated_orders.get(order=2))
         self.assertIn(self.question1, question_group1.ordered_questions())
         self.assertNotIn(self.question1, self.question_group.ordered_questions())
+
+        mock_delete_empty_groups.assert_called_with(order1.question_group.subsection)
+        mock_reindex_orders_in.assert_called()
 
 
 class SubsectionReIndexerServiceTest(BaseTest):
