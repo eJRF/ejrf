@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Max
 
 from questionnaire.models.base import BaseModel
 from questionnaire.utils.model_utils import map_question_type_with
@@ -59,19 +60,17 @@ class QuestionGroup(BaseModel):
             return self.grid
 
     def parent_group(self):
-        if self.parent is not None:
+        if self.parent:
             return self.parent.parent_group()
-        else:
-            return self
+        return self
 
     def parent_group_id(self):
         return self.parent_group().id
 
     def is_in_hybrid_grid(self):
-        if self.parent is not None:
+        if self.parent:
             return self.hybrid or self.parent.is_in_hybrid_grid()
-        else:
-            return self.hybrid
+        return self.hybrid
 
     def remove_question(self, question):
         self.orders.filter(question=question).delete()
@@ -82,10 +81,8 @@ class QuestionGroup(BaseModel):
     @classmethod
     def next_order_in(cls, subsection):
         first_order = 1
-        existing_orders = cls.objects.filter(subsection=subsection, parent__isnull=True).values_list('order', flat=True)
-        if existing_orders.exists():
-            return max(existing_orders) + 1
-        return first_order
+        max_orders = cls.objects.filter(subsection=subsection, parent__isnull=True).aggregate(Max('order')).get('order__max')
+        return max_orders + 1 if max_orders else first_order
 
     @classmethod
     def delete_empty_groups(cls, subsection):

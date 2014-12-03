@@ -78,7 +78,6 @@ class Question(BaseModel):
 
     def questionnaires(self):
         from questionnaire.models import Questionnaire
-
         return Questionnaire.objects.filter(sections__sub_sections__question_group__in=self.question_group.all())
 
     def is_multichoice(self):

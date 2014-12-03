@@ -4,7 +4,8 @@ from django.db import models
 from django.core.urlresolvers import reverse
 
 from questionnaire.models.base import BaseModel
-from questionnaire.models import Region, Country
+from questionnaire.models import Region, Country, QuestionGroup
+from questionnaire.models.questions import Question
 
 
 class Questionnaire(BaseModel):
@@ -28,16 +29,10 @@ class Questionnaire(BaseModel):
         return SubSection.objects.filter(section__in=sections)
 
     def get_all_questions(self):
-        all_questions = []
-        for subsection in self.sub_sections():
-            all_questions.extend(subsection.all_questions())
-        return all_questions
+        return Question.objects.filter(question_group__subsection__section__in=self.sections.all())
 
     def all_groups(self):
-        all_groups = []
-        for subsection in self.sub_sections():
-            all_groups.extend(subsection.question_group.all())
-        return all_groups
+        return QuestionGroup.objects.filter(subsection__section__in=self.sections.all())
 
     def is_finalized(self):
         return self.status == Questionnaire.FINALIZED
