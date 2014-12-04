@@ -8,15 +8,16 @@ ngModule.controller('SkipRuleController', ['$scope', '$http', 'skipRuleService',
     $scope.fns.createRule = function () {
     };
     $scope.questions = [];
-    $scope.existingRules = [];
 
     $scope.reset = function() {
         $scope.activeTab = "newRuleTab";
+        $scope.existingRules = [];
 
         $scope.filterQuestions = function (question) { return true; };
         $scope.filterRules = function (rule) { return true; };
         $scope.skipRule = {selectedQuestion: {}, rootQuestion: {}, csrfToken: window.csrfToken};
         $scope.skipResult = {show: false};
+        $scope.deleteResult = {};
     };
     $scope.reset();
 
@@ -37,31 +38,6 @@ ngModule.controller('SkipRuleController', ['$scope', '$http', 'skipRuleService',
 
     $scope.matchSelectedQuestion = function (question) {
         return !($scope.skipRule.rootQuestion.pk == question.pk) && question.canSkip;
-    };
-
-    var updateRules = function (subsectionId) {
-        skipRuleService.getRules(subsectionId).
-            then(function(data) {
-                $scope.existingRules = data;
-            });
-    };
-
-    var updateCreateQuestionRuleForm = function (subsectionId) {
-        skipRuleService.getQuestions(subsectionId).
-            then(function(data) {
-                $scope.reset();
-
-                $scope.questions = data.questions;
-            });
-    };
-
-    var updateCreateSubsectionRuleForm = function (subsectionId) {
-        skipRuleService.getSubsections(window.sectionId).
-            then(function(data) {
-                $scope.reset();
-
-                $scope.subsections = data;
-            });
     };
 
     $scope.deleteRule = function (rule) {
@@ -88,21 +64,39 @@ ngModule.controller('SkipRuleController', ['$scope', '$http', 'skipRuleService',
             });
     };
 
+    var updateRules = function (subsectionId) {
+        skipRuleService.getRules(subsectionId).
+            then(function(data) {
+                $scope.existingRules = data;
+            });
+    };
+
+    var updateQuestions = function (subsectionId) {
+        skipRuleService.getQuestions(subsectionId).
+            then(function(data) {
+                $scope.questions = data.questions;
+            });
+    };
+
+    var updateSubsections= function (sectionId) {
+        skipRuleService.getSubsections(sectionId).
+            then(function(data) {
+                $scope.subsections = data;
+            });
+    };
+
     $scope.updateSkipRuleModal = function (subsectionId, gridId) {
+        $scope.reset();
+
         updateRules(subsectionId);
-        updateCreateQuestionRuleForm(subsectionId);
-        updateCreateSubsectionRuleForm(subsectionId);
+        updateQuestions(subsectionId);
+        updateSubsections(window.sectionId);
 
         $scope.subsectionId = subsectionId;
-        $scope.existingGridRulesTabHidden = true;
-        $scope.existingRulesTabHidden = false;
-        $scope.deleteResult = {};
 
         if (gridId != undefined) {
             $scope.subsectionTabHidden = true;
-            $scope.filterQuestions = function (question) {
-                return question.parentQuestionGroup == gridId;
-            };
+            $scope.filterQuestions = function (question) { return question.parentQuestionGroup == gridId; };
             $scope.filterRules = function (rule) { return rule.is_in_hygrid; };
         }
     };
