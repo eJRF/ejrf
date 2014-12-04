@@ -65,7 +65,7 @@
     border-radius: 4px;
     height: auto;
     margin: 10px 0 0 10px;
-    width: 230px;
+    width: 300px;
     background: lightblue;
 }
 
@@ -91,34 +91,32 @@
     color: #ffffff;
 }
 
-#login-logo {
-    height: 266px;
-}
-
 .logos {
     margin-top: 37px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 550px;
 }
 
 #login-logo img {
     margin-top: 25px;
     height: 60px;
     width: 250px;
-
 }
 
 #login-logo img + img {
-    margin-top: 30px;
+    margin: 30px 0 0 15px;
     height: 70px;
     width: 230px;
 }
 
-#header-logo {
-
-}
-
 #login-form-container {
-    border-left: 1px solid #ffffff;
-    padding-bottom: 10px;
+    padding: 10px;
+    width: 650px;
+    border-bottom: #ffffff solid 1px;
+    margin-left: auto;
+    margin-right: auto;
+
 }
 
 #extract-question-list {
