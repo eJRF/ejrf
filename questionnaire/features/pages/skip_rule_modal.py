@@ -36,9 +36,5 @@ class SkipRuleModalPage(PageObject):
         element = self.browser.find_by_id("existingRulesTab")[0]
         return len(element.find_by_css(".existingRule"))
 
-    def number_of_grid_rules(self):
-        element = self.browser.find_by_id("existingGridRulesTab")[0]
-        return len(element.find_by_css(".existingRule"))
-
     def skip_tab_is_present_for(self, element):
         self.is_text_present("New %s Rule" % element)

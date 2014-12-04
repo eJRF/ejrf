@@ -158,6 +158,7 @@ def and_i_click_to_add_a_grid_skip_rule(step):
 @step(u'And I choose to see existing grid skip rules')
 def and_i_choose_to_see_existing_grid_skip_rules(step):
     world.skip_rule_page = SkipRuleModalPage(world.browser)
+    world.skip_rule_page.view_existing_rules()
 
 
 @step(u'When I click create a new hybrid grid question skip rule')
@@ -179,8 +180,7 @@ def and_i_click_save_rule(step):
 
 @step(u'Then I should see \'([^\']*)\' existing grid skip rules')
 def then_i_should_see_group1_existing_grid_skip_rules(step, count):
-    actual_number = world.skip_rule_page.number_of_grid_rules()
-    time.sleep(2)
+    actual_number = world.skip_rule_page.number_of_skip_rules()
     assert (actual_number == int(count)), 'Expecting %s number of rules, got %s number of rules' % (
         int(count), actual_number)
 

@@ -62,6 +62,7 @@ Feature: Skip Rules
     When I click create a new hybrid grid question skip rule
     And I fill in the grid rule form
     And I click save rule
+    And I choose to see existing grid skip rules
     Then I should see '1' existing grid skip rules
 
   Scenario: Regional admin creates and views skip rule

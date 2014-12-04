@@ -23,6 +23,14 @@ while test $# -gt 0; do
             export TASKS='ut'
             shift
             ;;
+        ft)
+            export TASKS='ft'
+            shift
+            ;;
+        js)
+            export TASKS='jsTest'
+            shift
+            ;;
         *)
             export ARG="$1"
             break
@@ -61,6 +69,10 @@ do
             ./manage.py syncdb --noinput
             ./manage.py migrate
             ;;
+        jsTest)
+            echo "running js tests"
+            ./node_modules/karma/bin/karma start
+            ;;
         ut)
             echo "running unit tests"
             echo "Testing $ARG"
@@ -78,7 +90,7 @@ do
             then
                 ./manage.py harvest --tag=-WIP --tag=-Upload -v 2 --settings=$SETTINGS_FILE $ARG
             else
-                ./manage.py harvest --tag=-WIP --tag=-Upload -v 2 $ARG
+                ./manage.py harvest --tag=-WIP --tag=-Upload $ARG
             fi
             ;;
     esac
