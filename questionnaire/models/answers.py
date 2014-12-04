@@ -55,7 +55,7 @@ class NumericalAnswer(Answer):
 
 
 class TextAnswer(Answer):
-    response = models.CharField(max_length=100, null=True)
+    response = models.TextField(null=True)
 
     def __unicode__(self):
         return '%s' % self.format_response()
