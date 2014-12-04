@@ -41,26 +41,10 @@ ngModule.controller('SkipRuleController', ['$scope', '$http', 'skipRuleService',
     };
 
     $scope.deleteRule = function (rule) {
-        $http.delete("/questionnaire/subsection/skiprule/" + rule.id + "/")
-            .success(function (data, status) {
-                var index = $scope.existingRules.indexOf(rule);
-                if (index > -1) {
-                    $scope.existingRules.splice(index, 1);
-                }
-
-                var gridRuleIndex = $scope.existingGridRules.indexOf(rule);
-                if (gridRuleIndex > -1) {
-                    $scope.existingGridRules.splice(index, 1);
-                }
-                $scope.deleteResult = { className: "alert-success", message: "Rule successfully deleted", show: true};
-            })
-            .error(function (data, status) {
-                var message = "Rule was not deleted";
-                if (status == 403) {
-                    message = "You do not have permission to delete this rule";
-                }
-                $scope.deleteResult = { className: "alert-danger", message: message, show: true};
-
+        skipRuleService.deleteRule(rule.id).
+            then(function(data) {
+                $scope.deleteResult = data;
+                updateRules($scope.subsectionId);
             });
     };
 
@@ -181,6 +165,23 @@ ngModule.factory('skipRuleService', ['$http', '$q', function($http, $q) {
     service.getSubsections = function(sectionId) {
         return getData("/questionnaire/section/" + window.sectionId + "/subsections/");
     };
+
+    service.deleteRule = function(ruleId) {
+        var res = $q.defer();
+        $http.delete("/questionnaire/subsection/skiprule/" + ruleId + "/")
+            .success(function (data, status) {
+                res.resolve({ className: "alert-success", message: "Rule successfully deleted", show: true});
+            })
+            .error(function (data, status) {
+                var message = "Rule was not deleted";
+                if (status == 403) {
+                    message = "You do not have permission to delete this rule";
+                }
+                res.resolve({ className: "alert-danger", message: message, show: true});
+            });
+        return res.promise;
+    };
+
     return service;
 }]);
 
