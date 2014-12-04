@@ -48,6 +48,15 @@ ngModule.controller('SkipRuleController', ['$scope', '$http', 'skipRuleService',
             });
     };
 
+    var createSkipRule = function (postData) {
+        skipRuleService.createRule(postData).
+            then(function(data) {
+                $scope.reset();
+                $scope.skipResult = data;
+                updateRules($scope.subsectionId);
+            });
+    };
+
     var updateRules = function (subsectionId) {
         skipRuleService.getRules(subsectionId).
             then(function(data) {
@@ -101,31 +110,9 @@ ngModule.controller('SkipRuleController', ['$scope', '$http', 'skipRuleService',
     };
 
     var getSubsectionFormData = function () {
-        return getSkipRuleFormdata("skip_subsection", $scope.skipRule.subsection.id);
+        return getSkipRuleFormData("skip_subsection", $scope.skipRule.subsection.id);
     };
 
-    var createSkipRule = function (postData) {
-        $.post(window.url, postData)
-            .done(function (data) {
-                $scope.reset();
-                $scope.$apply(function () {
-                    $scope.skipResult = { className: "alert-success", message: data.result, show: true};
-                });
-                $scope.skipRule.subsectionId = postData.subsection;
-                updateRules(postData.subsection);
-            })
-            .fail(function (data) {
-                if (data.result) {
-                    $scope.$apply(function () {
-                        $scope.skipResult = { className: "alert-danger", message: data.result, show: true};
-                    });
-                } else {
-                    $scope.$apply(function () {
-                        $scope.skipResult = { className: "alert-danger", message: data.responseJSON.result.join(","), show: true};
-                    });
-                }
-            });
-    };
 
     $scope.submitQuestionForm = function () {
         var postData = getQuestionFormData();
@@ -178,6 +165,22 @@ ngModule.factory('skipRuleService', ['$http', '$q', function($http, $q) {
                     message = "You do not have permission to delete this rule";
                 }
                 res.resolve({ className: "alert-danger", message: message, show: true});
+            });
+        return res.promise;
+    };
+
+    service.createRule = function(postData) {
+        var res = $q.defer();
+        $.post(window.url, postData)
+            .done(function (data) {
+                res.resolve({ className: "alert-success", message: data.result, show: true});
+            })
+            .fail(function (data) {
+                if (data.result) {
+                    res.resolve({ className: "alert-danger", message: data.result, show: true});
+                } else {
+                    res.resolve({ className: "alert-danger", message: data.responseJSON.result.join(","), show: true});
+                }
             });
         return res.promise;
     };
