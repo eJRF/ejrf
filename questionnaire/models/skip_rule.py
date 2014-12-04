@@ -35,12 +35,16 @@ class SkipQuestion(SkipRule):
     def is_in_hybrid_grid(self):
         return self._get_question_group().parent_group().hybrid
 
+    def _parent_group_id(self):
+        return self._get_question_group().parent_group_id()
+
     def to_dictionary(self, user):
         return {'id': self.id,
                 'skip_question': self.skip_question.text,
                 'root_question': self.root_question.text,
                 'response': self.response.text,
                 'is_in_hygrid': self.is_in_hybrid_grid(),
+                'group_id': self._parent_group_id(),
                 'can_delete': user.user_profile.is_global_admin or user.user_profile.region == self.region
         }
 

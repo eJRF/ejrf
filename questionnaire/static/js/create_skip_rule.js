@@ -91,7 +91,7 @@ var skipRuleController = function ($scope, skipRuleService) {
         if (gridId != undefined) {
             $scope.subsectionTabHidden = true;
             $scope.filterQuestions = function (question) { return question.parentQuestionGroup == gridId; };
-            $scope.filterRules = function (rule) { return rule.is_in_hygrid; };
+            $scope.filterRules = function (rule) { return rule.group_id == gridId; };
         }
     };
 
