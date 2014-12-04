@@ -2,6 +2,7 @@ var skipRules = skipRules || {};
 skipRules.subsection = "";
 
 var ngModule = angular.module('questionnaireApp', []);
+
 var skipRuleController = function ($scope, skipRuleService) {
     $scope.questions = [];
 
