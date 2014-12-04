@@ -38,3 +38,9 @@
   script: load-fixtures.sh
   args:
     chdir: /srv/checkout/
+
+- service: name=nginx state=restarted
+  sudo: yes
+
+- service: name=uwsgi state=restarted
+  sudo: yes
