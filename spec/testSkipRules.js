@@ -1,7 +1,7 @@
 var unselectedOptions = '<div>'
                     + '<option class="singleElementNoAttr" data-skip-rules></option>'
                     + '<option class="singleElementWithAttr" data-skip-rules="23"></option>'
-                    +'</div>'
+                    +'</div>';
 
 var gridInstance = '<div class="hybrid-group-row">' +
                     '<div class="col-sm-5 center-fields">' +
@@ -17,7 +17,7 @@ var gridInstance = '<div class="hybrid-group-row">' +
                                     '<input checked="checked" id="id_MultiChoice-1-response_1" name="MultiChoice-1-response" type="radio" value="62"> Whole cell </label>'+
                             '</li>' +
                         '</ul>' +
-                    '</div>'
+                    '</div>';
 var otherSelectedOption =  '<div class="col-sm-5 center-fields">' +
                            '<input type="hidden" id="id_MultiChoice-6-response" name="MultiChoice-6-response" value="0,56">' +
                            '     <select id="id_MultiChoice-6-response" name="MultiChoice-6-response">' +
@@ -27,7 +27,7 @@ var otherSelectedOption =  '<div class="col-sm-5 center-fields">' +
                            '         <option value="72">government agency</option>' +
                            '         <option value="75">other</option>' +
                            '     </select>' +
-                           ' </div>'
+                           ' </div>';
 
 function setUpHTMLFixture(html) {
     $('body').append(html);
@@ -80,7 +80,7 @@ describe("skip rules", function() {
                 expect(fns.show.calls.length).toEqual(0);
             });
         });
-    })
+    });
 
     describe('Skipping In Hybrid Group', function(){
 
@@ -89,23 +89,23 @@ describe("skip rules", function() {
             it('should get empty collection when no radions are selected in the body', function(){
                 setUpHTMLFixture(unselectedOptions);
 
-                var selectedOptions = applySkipRules.getAllSelectedResponses($('.hybrid-group-row'))
-                expect(selectedOptions.length).toEqual(0)
+                var selectedOptions = applySkipRules.getAllSelectedResponses($('.hybrid-group-row'));
+                expect(selectedOptions.length).toEqual(0);
             });
 
             it('should get all selected checkboxes in a grid', function(){
                 setUpHTMLFixture(gridInstance);
 
-                var selectedOptions = applySkipRules.getAllSelectedResponses($('.hybrid-group-row'))
-                expect(selectedOptions.length).toEqual(1)
+                var selectedOptions = applySkipRules.getAllSelectedResponses($('.hybrid-group-row'));
+                expect(selectedOptions.length).toEqual(1);
             });
 
             it('should get all selected checkboxes in the page', function(){
-                var gridInstance = gridInstance + otherSelectedOption
+                var gridInstance = gridInstance + otherSelectedOption;
                 setUpHTMLFixture(gridInstance);
 
-                var selectedOptions = applySkipRules.getAllSelectedResponses($('body'))
-                expect(selectedOptions.length).toEqual(2)
+                var selectedOptions = applySkipRules.getAllSelectedResponses($('body'));
+                expect(selectedOptions.length).toEqual(2);
             });
         });
     });

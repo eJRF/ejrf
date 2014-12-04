@@ -2,9 +2,13 @@ var skipRules = skipRules || {};
 skipRules.subsection = "";
 
 var ngModule = angular.module('questionnaireApp', []);
-ngModule.controller('SkipRuleController', ['$scope', '$http', 'skipRuleService', function ($scope, $http, skipRuleService) {
-
+var skipRuleController = function ($scope, skipRuleService) {
     $scope.questions = [];
+
+    $scope.resetResults = function() {
+        $scope.skipResult = {show: false};
+        $scope.deleteResult = {};
+    };
 
     $scope.reset = function() {
         $scope.activeTab = "newRuleTab";
@@ -13,13 +17,12 @@ ngModule.controller('SkipRuleController', ['$scope', '$http', 'skipRuleService',
         $scope.filterQuestions = function (question) { return true; };
         $scope.filterRules = function (rule) { return true; };
         $scope.skipRule = {selectedQuestion: {}, rootQuestion: {}, csrfToken: window.csrfToken};
-        $scope.skipResult = {show: false};
-        $scope.deleteResult = {};
+        $scope.resetResults();
     };
     $scope.reset();
 
     $scope.setActiveTab = function (activeTabName) {
-        $scope.skipResult = {show: false};
+        $scope.resetResults();
         $scope.activeTab = activeTabName;
     };
 
@@ -121,9 +124,9 @@ ngModule.controller('SkipRuleController', ['$scope', '$http', 'skipRuleService',
         var postData = getSubsectionFormData();
         createSkipRule(postData);
     };
-}]).run(function ($http) {
-    $http.defaults.headers.common['X-CSRFToken'] = window.csrfToken;
-});
+};
+
+ngModule.controller('SkipRuleController', ['$scope', 'skipRuleService', skipRuleController]);
 
 ngModule.factory('skipRuleService', ['$http', '$q', function($http, $q) {
     var service = {};
@@ -184,6 +187,9 @@ ngModule.factory('skipRuleService', ['$http', '$q', function($http, $q) {
 
     return service;
 }]);
+ngModule.run(function ($http) {
+    $http.defaults.headers.common['X-CSRFToken'] = window.csrfToken;
+});
 
 skipRules.updateSubsection = function (subsectionId) {
     angular.element(document.getElementById('skip-rule-controller')).scope().updateSkipRuleModal(subsectionId);
