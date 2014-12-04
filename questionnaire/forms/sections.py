@@ -3,6 +3,7 @@ from django import forms
 
 from questionnaire.models import Section, SubSection
 from questionnaire.services.question_re_indexer import OrderBasedReIndexer
+from questionnaire.utils.form_utils import _set_is_core
 
 
 class SectionForm(ModelForm):
@@ -39,20 +40,10 @@ class SectionForm(ModelForm):
         self._clean_is_core()
         return super(SectionForm, self).clean()
 
-    def _set_is_core(self, section):
-        user = self.initial.get('user')
-        if section.id:
-            return section
-        elif user and user.user_profile.region:
-            section.is_core = False
-        else:
-            section.is_core = True
-        return section
-
     def save(self, commit=True, *args, **kwargs):
         section = super(SectionForm, self).save(commit=False)
         region = self.initial.get('region', None)
-        section = self._set_is_core(section)
+        section = _set_is_core(self.initial, section)
         if commit:
             based_re_indexer = OrderBasedReIndexer(section, self.cleaned_data['order'],
                                                    questionnaire=section.questionnaire, region=region)
@@ -65,6 +56,7 @@ class SubSectionForm(ModelForm):
         subsection = super(SubSectionForm, self).save(commit=False, *args, **kwargs)
         if not self.instance.order:
             subsection.order = SubSection.get_next_order(self.instance.section.id)
+            subsection = _set_is_core(self.initial, subsection)
         if commit:
             subsection.save()
         return subsection

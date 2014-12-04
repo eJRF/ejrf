@@ -128,7 +128,7 @@ class NewSubSection(RegionAndPermissionRequiredMixin, CreateView):
         questionnaire_id = kwargs.get('questionnaire_id')
         section_id = kwargs.get('section_id')
         self.section = Section.objects.get(id=section_id)
-        self.form = SubSectionForm(instance=SubSection(section=self.section), data=request.POST)
+        self.form = SubSectionForm(instance=SubSection(section=self.section), data=request.POST, initial={'user': request.user})
         self.referer_url = reverse('questionnaire_entry_page', args=(questionnaire_id, section_id))
         if self.form.is_valid():
             return self._form_valid()

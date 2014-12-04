@@ -58,7 +58,7 @@ class Entry(DoesNotExistExceptionHandlerMixin, AdvancedMultiplePermissionsRequir
                    'ordered_sections': questionnaire.sections.order_by('order'),
                    'section_form': SectionForm(initial=section_initial),
                    'new_section_action': reverse('new_section_page', args=(questionnaire.id, )),
-                   'subsection_form': SubSectionForm(),
+                   'subsection_form': SubSectionForm(initial=section_initial),
                    'subsection_action': reverse('new_subsection_page', args=(questionnaire.id, section.id)),
                    'the_version': version or get_version,
                    'country': country,

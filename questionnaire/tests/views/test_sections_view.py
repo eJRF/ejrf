@@ -12,6 +12,7 @@ from questionnaire.tests.factories.question_group_factory import QuestionGroupFa
 from questionnaire.tests.factories.section_factory import SectionFactory
 from questionnaire.tests.factories.skip_rule_factory import SkipQuestionRuleFactory, SkipSubsectionRuleFactory
 from questionnaire.tests.factories.sub_section_factory import SubSectionFactory
+from questionnaire.tests.factories.questionnaire_factory import QuestionnaireFactory
 
 
 class SectionsViewTest(BaseTest):
@@ -41,11 +42,13 @@ class SectionsViewTest(BaseTest):
         self.assertIsInstance(response.context['form'], SectionForm)
         self.assertEqual("CREATE", response.context['btn_label'])
 
-    def test_post_create_section(self):
+    def test_post_create_global_section(self):
         self.failIf(Section.objects.filter(**self.form_data))
         response = self.client.post(self.url, data=self.form_data)
         section = Section.objects.get(**self.form_data)
+
         self.failUnless(section)
+        self.assertTrue(section.is_core)
         self.assertEqual(self.region, section.region)
         self.assertRedirects(response,
                              expected_url='/questionnaire/entry/%s/section/%s/' % (self.questionnaire.id, section.id))
@@ -293,15 +296,43 @@ class SubSectionsViewTest(BaseTest):
         self.assertIsInstance(response.context['form'], SubSectionForm)
         self.assertEqual("CREATE", response.context['btn_label'])
 
-    def test_post_create_subsection(self):
+    def test_post_create_global_subsection(self):
         self.failIf(SubSection.objects.filter(section=self.section, **self.form_data))
         response = self.client.post(self.url, data=self.form_data)
-        subsection = SubSection.objects.filter(section=self.section, **self.form_data)
+        subsection = SubSection.objects.get(section=self.section, **self.form_data)
+
         self.failUnless(subsection)
-        self.assertEqual(1, subsection.count())
+        self.assertTrue(subsection.is_core)
         self.assertIn('Subsection successfully created.', response.cookies['messages'].value)
         self.assertRedirects(response, expected_url='/questionnaire/entry/%s/section/%s/' % (
             self.questionnaire.id, self.section.id))
+
+
+    def test_post_create_regional_subsection(self):
+        self.client.logout()
+
+        client = Client()
+        user = self.create_user(username='african_chick', group=self.REGIONAL_ADMIN, org="WHO", region='AFR')
+        region = user.user_profile.region
+        questionnaire = QuestionnaireFactory(region=region)
+        section = SectionFactory(region=region, questionnaire=questionnaire)
+        subsection1 = SubSectionFactory(region=region, section=section)
+        subsection2 = SubSectionFactory(region=region, section=section)
+        self.assign('can_edit_questionnaire', user)
+        client.login(username=user.username, password='pass')
+
+        url = '/questionnaire/entry/%s/section/%s/subsection/new/' % (questionnaire.id, section.id)
+
+        self.failIf(SubSection.objects.filter(section=self.section, **self.form_data))
+
+        response = client.post(url, data=self.form_data)
+        subsection = SubSection.objects.get(section=section, **self.form_data)
+
+        self.failUnless(subsection)
+        self.assertFalse(subsection.is_core)
+        self.assertIn('Subsection successfully created.', response.cookies['messages'].value)
+        self.assertRedirects(response, expected_url='/questionnaire/entry/%s/section/%s/' % (
+            questionnaire.id, section.id))
 
     def test_post_with_form_increments_order_before_saving(self):
         SubSection.objects.create(title="Some", order=1, section=self.section)
