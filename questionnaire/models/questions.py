@@ -1,4 +1,5 @@
 from django.core.exceptions import ValidationError
+from django.core.validators import MaxLengthValidator
 from django.db import models, IntegrityError
 
 from questionnaire.models.base import BaseModel
@@ -9,7 +10,7 @@ from questionnaire.utils.model_utils import largest_uid, stringify
 class Question(BaseModel):
     text = models.TextField(blank=False, null=False)
     export_label = models.TextField(blank=True, null=False)
-    instructions = models.TextField(blank=True, null=True)
+    instructions = models.TextField(blank=True, null=True, validators=[MaxLengthValidator(750)])
     UID = models.CharField(blank=False, null=False, max_length=6)
 
     answer_type = models.CharField(blank=False, null=False, max_length=20, choices=AnswerTypes.answer_types())

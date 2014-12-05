@@ -35,7 +35,7 @@ class QuestionForm(ModelForm):
         fields = (
             'text', 'export_label', 'instructions', 'answer_type', 'answer_sub_type', 'options', 'theme', 'is_primary')
         widgets = {'text': forms.Textarea(attrs={"rows": 6, "cols": 50}),
-                   'instructions': forms.Textarea(attrs={"rows": 25, "cols": 50}),
+                   'instructions': forms.Textarea(attrs={"maxlength": 750, "cols":50, "rows": 10},),
                    'answer_type': forms.Select(attrs={"data-ng-model": "answerType"}),
                    'answer_sub_type': forms.Select(attrs={"data-ng-model": "answerSubType",
                                                           "data-ng-options": ANGULAR_OPTIONS_AND_FILTER}),

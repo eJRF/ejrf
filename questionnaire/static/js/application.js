@@ -182,12 +182,6 @@ $('.add-row').on('click', function(event) {
     event.preventDefault();
 });
 
-$('textarea').on('keyup', function(){
-  var maxLength = 256;
-  if($(this).val().length >= maxLength)
-    $(this).val($(this).val().substring(0, maxLength));
-});
-
 $('#export-section').on('click', function(event) {
     $(this).toggleClass('active');
     var filename = "";
