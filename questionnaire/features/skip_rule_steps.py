@@ -25,7 +25,6 @@ def when_i_have_selected_delete(step):
 @step(u'Then I should see the rule disappear and a message that the skip rule was successfully deleted')
 def then_i_should_see_the_rule_disappear_and_a_message_that_the_skip_rule_was_successfully_deleted(step):
     world.page.is_text_present('Rule successfully deleted')
-    step.given("Then I should see '0' existing skip rules")
 
 
 @step(u'And I click to add a skip rule')
@@ -34,7 +33,7 @@ def and_i_click_to_add_a_skip_rule(step):
     world.skip_rule_page = SkipRuleModalPage(world.browser)
 
 
-@step(u'And I choose to see existing skip rules')
+@step(u'I choose to see existing skip rules')
 def and_i_choose_to_see_existing_skip_rules(step):
     world.skip_rule_page.view_existing_rules()
 

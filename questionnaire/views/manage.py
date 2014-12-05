@@ -64,7 +64,7 @@ class ManageRegionalJRF(RegionAndPermissionRequiredMixin, View):
 
     def get(self, *args, **kwargs):
         region = Region.objects.get(id=kwargs['region_id'])
-        questionnaires = region.questionnaire.all()
+        questionnaires = region.questionnaire.all().order_by('-created')
         context = {'region': region,
                    'finalized_questionnaires': questionnaires.filter(
                        status__in=[Questionnaire.FINALIZED, Questionnaire.PUBLISHED]),

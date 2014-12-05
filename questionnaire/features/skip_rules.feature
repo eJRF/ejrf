@@ -50,6 +50,7 @@ Feature: Skip Rules
     Then I should see an option to delete skip rules
     When I have selected delete
     Then I should see the rule disappear and a message that the skip rule was successfully deleted
+    Then I should see '0' existing skip rules"
 
   Scenario: Create Hybrid grid skip rule
     Given I am logged in as a global admin
@@ -65,7 +66,7 @@ Feature: Skip Rules
     And I choose to see existing grid skip rules
     Then I should see '1' existing grid skip rules
 
-  Scenario: Regional admin creates and views skip rule
+  Scenario: Regional admin creates, views and delets skip rule
     Given that I am logged in as a regional admin
     And there is questionnaire for my region
     And I have core and regional questions assigned to the questionnaire
@@ -78,3 +79,8 @@ Feature: Skip Rules
     Then I should see '1' existing skip rules
     When I create a new subsection skip rule
     Then I should see '2' existing skip rules
+    When I choose to see existing skip rules
+    Then I should see an option to delete skip rules
+    When I have selected delete
+    Then I should see the rule disappear and a message that the skip rule was successfully deleted
+    Then I should see '1' existing skip rules
