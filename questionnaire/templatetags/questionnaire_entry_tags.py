@@ -1,4 +1,5 @@
 from django import template
+from questionnaire.models.skip_rule import SkipQuestion
 
 register = template.Library()
 
@@ -18,3 +19,7 @@ def get_value(key, a_dict):
 @register.filter
 def _filename(path):
     return str(path).split('/')[1]
+
+@register.filter
+def get_questions_to_skip(option):
+    return SkipQuestion.objects.filter(response=option).values_list('skip_question', flat=True)

@@ -23,19 +23,23 @@
         {% endfor %}
         {% for question in a_group.all_non_primary_questions %}
             {% for field in question|get_form:formsets %}
-                <td>
-                    {% if field.errors %}
-                        <div class="field-error grid-error" data-toggle="popover" data-html="true"
-                             data-placement="right" data-trigger="hover"
-                             data-content="{{ field.errors|striptags }}">
+        <td >
+            {% if question.id in option|get_questions_to_skip%}
+            <input type="text" disabled class="form-control"/>
+            {% else %}
+                {% if field.errors %}
+                    <div class="field-error grid-error" data-toggle="popover" data-html="true"
+                         data-placement="right" data-trigger="hover"
+                         data-content="{{ field.errors|striptags }}">
 
-                    {% endif %}
-                    {{ field }}
-                    {% if field.errors %}
-                        </div>
-                    {% endif %}
+                {% endif %}
+                {{ field }}
+                {% if field.errors %}
+                    </div>
+                {% endif %}
 
-                </td>
+            {% endif %}
+            </td>
             {% endfor %}
         {% endfor %}
     </tr>

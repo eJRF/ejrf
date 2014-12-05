@@ -2,8 +2,11 @@ from questionnaire.forms.theme import ThemeForm
 from questionnaire.models import Question, QuestionOption, Theme
 from questionnaire.templatetags.generic_tags import display_list, bootstrap_message, get_url_with_ids, \
     divide_to_paginate, ASSIGN_QUESTION_PAGINATION_SIZE, add_string, get_questionnaire_from, \
-    bootstrap_class, packaged_options, custom_options, get_theme_form_with_instance
+    bootstrap_class, packaged_options, custom_options, get_theme_form_with_instance, \
+    get_questions_to_skip
+
 from questionnaire.tests.base_test import BaseTest
+from questionnaire.tests.factories.skip_rule_factory import SkipQuestionRuleFactory
 
 
 class GeneralTemplateTagTest(BaseTest):
@@ -61,3 +64,10 @@ class GeneralTemplateTagTest(BaseTest):
 
         self.assertIsInstance(get_theme_form_with_instance(theme), ThemeForm)
         self.assertEqual(get_theme_form_with_instance(theme).instance, theme)
+
+    def test_gets_all_questions_to_be_skipped(self):
+        skip_rule = SkipQuestionRuleFactory()
+        questions_to_skip = get_questions_to_skip(skip_rule.response)
+
+        self.assertEqual(1, len(questions_to_skip))
+        self.assertEqual([skip_rule.skip_question.id], list(questions_to_skip))
