@@ -69,7 +69,7 @@ def when_i_select_to_add_skip_rules_for_skipping_subsections(step):
 
 @step(u'And I have skip rules applied to a question')
 def and_i_have_skip_rules_applied_to_a_question(step):
-    SkipQuestion.objects.create(skip_question=world.question_to_skip, response=world.response,
+    SkipQuestion.objects.create(skip_question=world.skip_question01, response=world.response,
                                 root_question=world.root_question, subsection=world.sub_section)
 
 
@@ -82,20 +82,24 @@ def and_i_have_skip_rules_applied_to_a_subsection(step):
 @step(u'And I have questions and responses in the correct section')
 def and_i_have_questions_and_responses_in_the_correct_section(step):
     world.root_question = QuestionFactory()
-    world.question_to_skip = QuestionFactory(text="question 2")
+    world.skip_question01 = QuestionFactory(text="Skip Question 01")
+    world.skip_question02 = QuestionFactory(text="Skip Question 02")
+
     world.response = QuestionOptionFactory(question=world.root_question)
     question_group = QuestionGroupFactory(subsection=world.sub_section, order=1)
     QuestionGroupOrder.objects.create(question=world.root_question, order=1, question_group=question_group)
-    QuestionGroupOrder.objects.create(question=world.question_to_skip, order=2, question_group=question_group)
+    QuestionGroupOrder.objects.create(question=world.skip_question01, order=2, question_group=question_group)
+    QuestionGroupOrder.objects.create(question=world.skip_question02, order=3, question_group=question_group)
 
     world.root_question.question_group.add(question_group)
-    world.question_to_skip.question_group.add(question_group)
+    world.skip_question01.question_group.add(question_group)
+    world.skip_question02.question_group.add(question_group)
 
 
 @step(u'I should see the questions in that subsection listed')
 def i_should_see_the_questions_in_that_subsection_listed(step):
     world.browser.find_by_name('skip_question')[0].click()
-    world.page.is_text_present('question 2')
+    world.page.is_text_present(world.skip_question01.text)
 
 
 @step(u'I should see the subsections in that section listed')
@@ -113,7 +117,7 @@ def and_the_questionnaire_has_been_published_to_the_data_submitter(step):
 
 @step(u'Then I should see the all the questions and subsections in that section')
 def then_i_should_see_the_all_the_questions_in_that_section_and_subsection(step):
-    world.page.is_text_present(world.question_to_skip.text)
+    world.page.is_text_present(world.skip_question01.text)
     world.page.is_text_present(world.root_question.text)
     world.page.is_text_present(world.sub_section_2.title)
 
@@ -125,7 +129,7 @@ def when_i_select_a_response_that_skips_a_question(step):
 
 @step(u'Then that question should no longer be displayed')
 def then_that_question_should_no_longer_be_displayed(step):
-    world.page.is_text_present(world.question_to_skip.text, status=False)
+    world.page.is_text_present(world.skip_question01.text, status=False)
 
 
 @step(u'When I create a new subsection skip rule')
@@ -239,3 +243,33 @@ def and_there_is_questionnaire_for_my_region(step):
     world.regional_subsection = SubSection.objects.create(title="Other regional subsection", order=2, section=world.section1, region=world.region)
     world.sub_section_1 = SubSection.objects.create(title="other R subs", order=1, section=world.section_1, region=world.region)
     world.core_sub_section = SubSection.objects.create(title="core subs", order=2, section=world.section_1)
+
+
+@step(u'And I have skip rules applied to another question')
+def and_i_have_skip_rules_applied_to_another_question(step):
+    SkipQuestion.objects.create(skip_question=world.skip_question02, response=world.response,
+                                root_question=world.root_question, subsection=world.sub_section)
+
+
+@step(u'When I un-assign a question with a skip rule')
+def when_i_un_assign_a_question_with_a_skip_rule(step):
+    #step.given('And I visit that questionnaires section page')
+    world.page.click_by_id('close-skip-rule')
+    time.sleep(1)
+    world.page.click_by_id('unassign-question-%s' % world.skip_question02.id)
+    time.sleep(1)
+    world.page.click_by_id('confirm-unassign-question-%s' % world.skip_question02.id)
+
+@step(u'When I un-assign the root question to a skip rule')
+def when_i_un_assign_the_root_question_to_a_skip_rule(step):
+    step.given('And I visit that questionnaires section page')
+    world.page.click_by_id('unassign-question-%s' % world.question_to_skip.id)
+    time.sleep(1)
+    world.page.click_by_id('confirm-unassign-question-%s' % world.question_to_skip.id)
+
+@step(u'When I delete a subsection with a skip rule')
+def when_i_delete_a_subsection_with_a_skip_rule(step):
+    step.given('And I visit that questionnaires section page')
+    world.page.click_by_id('delete-subsection-%s' % world.sub_section_2.id)
+    time.sleep(1)
+    world.page.click_by_id('confirm-delete-subsection-%s' % world.sub_section_2.id)
