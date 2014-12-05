@@ -12,13 +12,14 @@ class QuestionnaireFilterForm(forms.Form):
         empty_label="Select Questionnaire",
         widget=forms.Select(attrs={"class": 'form-control'}), required=True)
     year = forms.ChoiceField(widget=forms.Select(attrs={"class": 'form-control'}), required=True, choices=[])
-    name = forms.CharField(widget=forms.HiddenInput(), required=True)
+    name = forms.CharField(widget=forms.TextInput(), required=True)
 
     def __init__(self, *args, **kwargs):
         super(QuestionnaireFilterForm, self).__init__(*args, **kwargs)
         self.fields['year'].choices = _set_year_choices()
         self.fields['year'].label = "Reporting Year"
         self.fields['questionnaire'].label = "Finalized Questionnaires"
+        self.fields['name'].label = "New Questionnaire"
 
 
 class PublishQuestionnaireForm(forms.Form):

@@ -269,6 +269,7 @@ $('.reorder-subsection').on('click', function(){
     activateSortable($modal);
     disableInputFields(false);
     $modal.modal('show');
+    return false;
 });
 
 
