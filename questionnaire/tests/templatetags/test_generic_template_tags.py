@@ -2,8 +2,8 @@ from questionnaire.forms.theme import ThemeForm
 from questionnaire.models import Question, QuestionOption, Theme
 from questionnaire.templatetags.generic_tags import display_list, bootstrap_message, get_url_with_ids, \
     divide_to_paginate, ASSIGN_QUESTION_PAGINATION_SIZE, add_string, get_questionnaire_from, \
-    bootstrap_class, packaged_options, custom_options, get_theme_form_with_instance, \
-    get_questions_to_skip
+    bootstrap_class, packaged_options, custom_options, get_theme_form_with_instance
+from questionnaire.templatetags.questionnaire_entry_tags import get_questions_to_skip
 
 from questionnaire.tests.base_test import BaseTest
 from questionnaire.tests.factories.skip_rule_factory import SkipQuestionRuleFactory
