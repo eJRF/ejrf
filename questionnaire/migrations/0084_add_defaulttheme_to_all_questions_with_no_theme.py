@@ -7,18 +7,10 @@ from django.db import models
 class Migration(DataMigration):
 
     def forwards(self, orm):
-        for section in orm.section.objects.filter(title='Immunization Schedule for 2013'):
-            subsection = orm.subsection.objects.filter(section=section)
-            question_grids = orm.questiongroup.objects.filter(subsection__section=section, hybrid=True, grid=True, parent=None)
-            if question_grids.count() > 1:
-                question_groups = question_grids[1]
-                next_order = section.sub_sections.count() + 1
-                new_subsection = orm.subsection.objects.create(section=section, order=next_order, is_core=subsection[0].is_core, region=subsection[0].region)
-                question_groups.subsection = new_subsection
-                question_groups.save()
-                for group in question_groups.sub_group.all():
-                    group.subsection = new_subsection
-                    group.save()
+        default, _ = orm.theme.objects.get_or_create(name='Common theme')
+        for question in orm.question.objects.filter(theme=None):
+            question.theme = default
+            question.save()
 
     def backwards(self, orm):
         "Write your backwards methods here."
@@ -267,7 +259,7 @@ class Migration(DataMigration):
         'questionnaire.textanswer': {
             'Meta': {'object_name': 'TextAnswer', '_ormbases': ['questionnaire.Answer']},
             u'answer_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['questionnaire.Answer']", 'unique': 'True', 'primary_key': 'True'}),
-            'response': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True'})
+            'response': ('django.db.models.fields.TextField', [], {'null': 'True'})
         },
         'questionnaire.theme': {
             'Meta': {'object_name': 'Theme'},
