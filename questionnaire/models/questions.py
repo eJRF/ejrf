@@ -113,6 +113,7 @@ class QuestionOption(BaseModel):
     text = models.CharField(max_length=100, blank=False, null=False)
     question = models.ForeignKey(Question, related_name="options")
     instructions = models.TextField(blank=True, null=True)
+    order = models.IntegerField(blank=False, null=True)
     UID = models.CharField(blank=False, max_length=6, unique=True, null=True)
 
     def __unicode__(self):

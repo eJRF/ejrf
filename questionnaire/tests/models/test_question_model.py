@@ -346,8 +346,8 @@ class QuestionOptionTest(BaseTest):
     def test_question_option_fields(self):
         question = QuestionOption()
         fields = [str(item.attname) for item in question._meta.fields]
-        self.assertEqual(7, len(fields))
-        for field in ['id', 'created', 'modified', 'text', 'instructions', 'question_id', 'UID']:
+        self.assertEqual(8, len(fields))
+        for field in ['id', 'created', 'modified', 'text', 'instructions', 'question_id', 'UID', 'order']:
             self.assertIn(field, fields)
 
     def test_question_store(self):
