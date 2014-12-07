@@ -128,10 +128,10 @@
                                                 <a href="" class="btn btn-default btn-xs"
                                                    id="id-approve-questionnaire-{{ questionnaire.id }}"
                                                    data-toggle="modal"
-                                                   data-target="#approve-questionnaire-modal-{{ questionnaire.id }}">
-                                                    <span class="glyphicon glyphicon-thumbs-up"></span> Approve
+                                                   data-target="#accept-questionnaire-modal-{{ questionnaire.id }}">
+                                                    <span class="glyphicon glyphicon-thumbs-up"></span> Accept
                                                 </a>
-                                                {% include 'base/modals/_confirm.html' with object_type='Questionnaire' title='Confirm Questionnaire Approval' action="approve" url=questionnaire.id|get_url_with_ids:"approve_questionnaire_page" object=questionnaire confirm='Yes' %}
+                                                {% include 'base/modals/_confirm.html' with object_type='Questionnaire' title='Confirm Questionnaire Acceptance' action="accept" url=questionnaire.id|get_url_with_ids:"approve_questionnaire_page" object=questionnaire confirm='Yes' %}
                                             {% endif %}
                                             {% if questionnaire.is_published %}
                                                 <span class="label label-success">Published</span>

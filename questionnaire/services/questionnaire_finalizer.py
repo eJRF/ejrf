@@ -5,7 +5,7 @@ class QuestionnaireFinalizeService(object):
     FINALIZED_SUCCESSFULLY_MESSAGE = "The questionnaire has been finalized successfully."
     PUBLISHED_MESSAGE = "The questionnaire could not be unlocked because its published."
     IN_PROGRESS_MESSAGE = "The questionnaire is now in progress."
-    APPROVED_SUCCESSFULLY_MESSAGE = "The questionnaire has been approved successfully."
+    APPROVED_SUCCESSFULLY_MESSAGE = "The questionnaire has been accepted successfully."
 
     def __init__(self, questionnaire):
         self.questionnaire = questionnaire

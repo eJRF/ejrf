@@ -299,18 +299,18 @@ def when_i_select_to_approve_the_regional_questionnaire(step):
 
 @step(u'Then I should see a confirmation prompt to approve the questionnaire')
 def then_i_should_see_a_confirmation_prompt_to_approve_the_questionnaire(step):
-    world.page.is_text_present('Confirm Questionnaire Approval')
-    world.page.is_text_present('Are you sure you want to approve this questionnaire?')
+    world.page.is_text_present('Confirm Questionnaire Acceptance')
+    world.page.is_text_present('Are you sure you want to accept this questionnaire?')
 
 
 @step(u'When I confirm the questionnaire approval')
 def when_i_confirm_the_questionnaire_approval(step):
-    world.page.click_by_id('confirm-approve-questionnaire-%s' % world.finalised_regional_questionnaire.id)
+    world.page.click_by_id('confirm-accept-questionnaire-%s' % world.finalised_regional_questionnaire.id)
 
 
 @step(u'Then I should see a message that the questionnaire was approved')
 def then_i_should_see_a_message_that_the_questionnaire_was_approved(step):
-    world.page.is_text_present('The questionnaire has been approved successfully.')
+    world.page.is_text_present('The questionnaire has been accepted successfully.')
 
 
 @step(u'And I should see a new status indicating that the questionnaire was approved')

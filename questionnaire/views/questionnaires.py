@@ -219,7 +219,7 @@ class ApproveQuestionnaire(MultiplePermissionsRequiredMixin, View):
 
     def get(self, *args, **kwargs):
         questionnaire = Questionnaire.objects.get(id=kwargs['questionnaire_id'])
-        context = {'questionnaire': questionnaire, 'btn_label': "Approve",
+        context = {'questionnaire': questionnaire, 'btn_label': "Accept",
                    'cancel_url': reverse('manage_jrf_page')}
         return render(self.request, self.template_name, context)
 
