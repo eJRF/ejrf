@@ -146,10 +146,10 @@ class MultiChoiceAnswerForm(AnswerForm):
         return forms.Select()
 
     def _get_response_choices(self, kwargs):
-        all_options = self.question.options.all()
+        all_options = self.question.options.order_by('order')
         if 'option' in self._initial:
-            return all_options.filter(id=self._initial.get('option').id).order_by('text')
-        return all_options.order_by('text')
+            return all_options.filter(id=self._initial.get('option').id).order_by('order')
+        return all_options.order_by('order')
 
     def save(self, commit=True, *args, **kwargs):
         answer = super(MultiChoiceAnswerForm, self).save(commit=False, *args, **kwargs)
