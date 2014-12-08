@@ -2,7 +2,6 @@
 
 source ../ejrf_env/bin/activate
 cp eJRF/snap-ci/snap-settings.py eJRF/localsettings.py
-cp eJRF/snap-ci/initial_steps.py questionnaire/features/initial_steps.py
 
 echo "booting sauce connect tunnel"
 
@@ -32,4 +31,4 @@ source ../ejrf_env/bin/activate
 cp eJRF/snap-ci/snap-settings.py eJRF/localsettings.py
 echo "setup for tests done"
 
-./manage.py harvest --tag=-WIP --tag=-Upload
+./manage.py harvest -t-sauce --tag=-WIP --tag=-Upload
