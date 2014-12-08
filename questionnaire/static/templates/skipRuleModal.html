@@ -43,7 +43,7 @@
                                     <input type="radio" name="response" required
                                            data-ng-model="skipRule.questionResponse"
                                            ng-value="option.pk" id="id-question-option-{{ option.pk }}"/>
-                                           &nbsp;{{ option.fields.text }}
+                                    &nbsp;{{ option.fields.text }}
                                 </label>
                             </li>
                         </ul>
@@ -61,8 +61,10 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button tyep="button" class="btn btn-default" id="save-skip-rule-button">
+                <button type="submit" class="btn btn-default" id="save-skip-rule-button">
                     <span class="green bold"><i class="glyphicon glyphicon-ok"></i> Create</span></button>
+                <a type="button" class="btn btn-default" id="close-skip-rule-button" data-dismiss="modal">
+                    <span class="red bold"><i class="glyphicon glyphicon-remove"></i> Cancel</span></a>
             </div>
         </form>
     </div>
@@ -114,8 +116,10 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button tyep="button" class="btn btn-default" id="save-subsection-skip-rule-button">
+                <button type="submit" class="btn btn-default" id="save-subsection-skip-rule-button">
                     <span class="green bold"><i class="glyphicon glyphicon-ok"></i> Create</span></button>
+                <a type="button" class="btn btn-default" data-dismiss="modal">
+                    <span class="red bold"><i class="glyphicon glyphicon-remove"></i> Cancel</span></a>
             </div>
         </form>
     </div>
@@ -126,7 +130,8 @@
                     {{ deleteResult.message }}
                 </div>
                 <div data-ng-repeat="rule in existingRules | filter:filterRules | orderBy:'id'" class="existingRule">
-                    <button  id="delete-rule-{{ rule.id }}" class="btn btn-default pull-right" value="delete" data-ng-click="deleteRule(rule)" data-ng-show="rule.can_delete">
+                    <button id="delete-rule-{{ rule.id }}" class="btn btn-default pull-right" value="delete"
+                            data-ng-click="deleteRule(rule)" data-ng-show="rule.can_delete">
                         <span class="red bold"><span class="glyphicon glyphicon-remove"></span> Delete</span>
                     </button>
                     <div class="form-group" style="display:none;"><label class="col-sm-3 control-label">Rule
@@ -147,8 +152,11 @@
                 </div>
             </div>
         </div>
+
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">
+                <span class="red bold"><i class="glyphicon glyphicon-remove"></i> Cancel</span></button>
+        </div>
     </div>
-    <div class="modal-footer">
-    </div>
-    </div>
+</div>
 </div>
