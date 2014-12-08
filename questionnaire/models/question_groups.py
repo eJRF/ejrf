@@ -2,7 +2,7 @@ from django.db import models
 from django.db.models import Max
 
 from questionnaire.models.base import BaseModel
-from questionnaire.utils.model_utils import map_question_type_with
+from questionnaire.utils.model_utils import map_question_type_with, profiles_that_can_edit
 
 
 class QuestionGroup(BaseModel):

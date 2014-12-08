@@ -90,7 +90,7 @@ class GridForm(forms.Form):
 
     def _get_grid_attributes(self):
         order = self.subsection.next_group_order() if self.subsection else 0
-        attributes = {'order': order, 'subsection': self.subsection, 'grid': True}
+        attributes = { 'order': order, 'subsection': self.subsection, 'grid': True, 'is_core': not self.region }
         type_ = self.cleaned_data.get('type')
         attributes[type_] = True
         if type_ == 'hybrid':
@@ -103,4 +103,3 @@ class GridForm(forms.Form):
         for index, question_id in enumerate(question_ids):
             question = filter(lambda question: question.id == int(question_id), non_primary_questions)
             grid_group.orders.create(order=index + 1, question=question[0])
-

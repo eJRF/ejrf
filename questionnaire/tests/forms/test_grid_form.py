@@ -1,6 +1,7 @@
 from questionnaire.forms.grid import GridForm
 from questionnaire.models import Questionnaire, Section, SubSection, Question, QuestionOption, Region, Theme
 from questionnaire.tests.base_test import BaseTest
+from questionnaire.tests.factories.question_factory import QuestionFactory
 
 
 class GridFormTest(BaseTest):
@@ -138,9 +139,37 @@ class DisplayAllGridFormTest(BaseTest):
             'columns': [str(self.question2.id), str(self.question3.id)]
         }
 
-    def test_valid(self):
-        grid_form = GridForm(self.form_data)
+    def test_valid_and_is_core_when_region_is_none(self):
+        user =self.create_user(org='WHO', group=self.GLOBAL_ADMIN)
+        grid_form = GridForm(self.form_data, subsection=self.sub_section, region=user.user_profile.region)
+
         self.assertTrue(grid_form.is_valid())
+        new_grid = grid_form.save()
+
+        self.assertIsNone(new_grid.region)
+        self.assertTrue(new_grid.is_core)
+
+    def test_valid_and_not_is_core_when_region_is_not_none(self):
+        user =self.create_user(username='username', org='WHO', group=self.REGIONAL_ADMIN, region='AFR')
+
+        question1 = QuestionFactory(region=user.user_profile.region, text='Some text 1', is_primary=True, answer_type='MultiChoice')
+        question2 = QuestionFactory(region=user.user_profile.region, text='Some text 2', answer_type='Text')
+        question3 = QuestionFactory(region=user.user_profile.region, text='Some text 3', answer_type='Text')
+
+        form_data = {
+            'type': 'display_all',
+            'primary_question': question1.id,
+            'columns': [question2.id, question3.id]
+        }
+
+        grid_form = GridForm(form_data, subsection=self.sub_section, region=user.user_profile.region)
+        grid_form.is_valid()
+        self.assertTrue(grid_form.is_valid())
+
+        new_grid = grid_form.save()
+
+        self.assertEqual(new_grid.region, user.user_profile.region)
+        self.assertFalse(new_grid.is_core)
 
     def test_invalid_primary_question(self):
         data = self.form_data.copy()

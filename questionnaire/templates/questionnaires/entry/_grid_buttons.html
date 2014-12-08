@@ -16,14 +16,11 @@
                 onclick="selectMove('down', 'move-grid-form-{{group.id}}')">
             <span class="cyan"><span class="glyphicon glyphicon-circle-arrow-down"></span>Move Down</span></button>
 
-        {% if user.user_profile.region == None or user.user_profile.region == group.region and not group.is_core %}
+        {% if user.user_profile.region == None  and user.user_profile.region == group.region or user.user_profile.region == group.region and not group.is_core %}
         <a href="" class="btn btn-default btn-sm" data-toggle="modal" data-target="#create-skip-rule"
            data-target="#" onClick="skipRules.updateGrid({{ subsection.id }}, {{ group.id }})" id="grid-question-{{ group.id}}">
             <span class="cyan"><span class="glyphicon glyphicon-plus-sign"></span>Add Grid Rules</span>
         </a>
-        {% endif %}
-
-        {% if user.user_profile.region == None %}
         <a href="" class="delete-grid btn btn-default btn-sm" data-toggle="modal"
            data-target="#delete-grid-modal-{{ group.id }}"
            id="delete-grid-{{ group.id }}">
