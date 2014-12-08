@@ -10,9 +10,9 @@ var skipRuleController = function ($scope, skipRuleService) {
         $scope.skipResult = {show: false};
         $scope.deleteResult = {};
     };
+    $scope.activeTab = "newRuleTab";
 
     $scope.reset = function() {
-        $scope.activeTab = "newRuleTab";
         $scope.existingRules = [];
 
         $scope.filterQuestions = function (question) { return true; };
