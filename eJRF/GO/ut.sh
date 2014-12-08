@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -e
 cd ..
 source ejrf_env/bin/activate
 cd ejrf

@@ -132,6 +132,7 @@ class QuestionForm(ModelForm):
         options = dict(self.data).get('options', [])
         options = filter(lambda text: text.strip(), options)
         if options and AnswerTypes.is_mutlichoice_or_multiple(question.answer_type):
+            existing_question_options = QuestionOption.objects.filter(question=question).exclude(text__in=options).delete()
             for grouped_option in options:
                 for index, option in enumerate(grouped_option.split(',')):
                     option, _ = QuestionOption.objects.get_or_create(text=option.strip(), question=question)

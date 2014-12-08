@@ -36,4 +36,4 @@ class QuestionnaireFinalizeServiceTest(BaseTest):
         message = QuestionnaireFinalizeService(self.finalized_questionnaire).approve()
         self.assertEqual(Questionnaire.PUBLISHED, self.finalized_questionnaire.status)
         self.assertNotEqual(Questionnaire.FINALIZED, self.finalized_questionnaire.status)
-        self.assertEqual(message, "The questionnaire has been approved successfully.")
+        self.assertEqual(message, "The questionnaire has been accepted successfully.")

@@ -206,7 +206,7 @@ class ApproveQuestionnaireToDataSubmittersViewTest(BaseTest):
         self.assertEqual(200, response.status_code)
         self.assertEqual(self.questionnaire, response.context['questionnaire'])
         self.assertEqual("/manage/", response.context['cancel_url'])
-        self.assertEqual("Approve", response.context['btn_label'])
+        self.assertEqual("Accept", response.context['btn_label'])
 
     def test_permission_reguired(self):
         self.assert_permission_required("/manage/")

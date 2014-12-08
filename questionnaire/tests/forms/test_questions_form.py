@@ -3,6 +3,8 @@ from questionnaire.models import Question, QuestionOption, Questionnaire, Sectio
     Theme
 from questionnaire.tests.base_test import BaseTest
 from questionnaire.utils.answer_type import AnswerTypes
+from questionnaire.tests.factories.question_factory import QuestionFactory
+from questionnaire.tests.factories.question_option_factory import QuestionOptionFactory
 
 
 class QuestionFormTest(BaseTest):
@@ -373,3 +375,30 @@ class QuestionHistoryTest(BaseTest):
         duplicate_question_options = duplicate_question.options.all()
         self.assertEqual(3, duplicate_question_options.count())
         [self.assertIn(question_option.text, changed_options) for question_option in duplicate_question_options]
+
+    def test_edit_removes_deleted_options_from_the_question(self):
+        question = QuestionFactory(text='whats up?', answer_type=AnswerTypes.MULTI_CHOICE)
+
+        option1 = QuestionOptionFactory(question=question, text='Yes', order=1)
+        option2 = QuestionOptionFactory(question=question, text='NR', order=2)
+        option3 = QuestionOptionFactory(question=question, text='No', order=3)
+
+        changed_options = ['Yes', 'No', 'Maybe']
+
+        data = {'text': 'changed text',
+                'instructions': 'Some instructions',
+                'export_label': 'blah',
+                'answer_type': 'MultiChoice',
+                'theme': self.theme.id,
+                'options': changed_options}
+
+        history_form = QuestionForm(data=data, instance=question)
+
+        self.assertTrue(history_form.is_valid())
+        edited_question = history_form.save()
+
+        question1_options = edited_question.options.all()
+
+        self.assertEqual(3, question1_options.count())
+        [self.assertIn(question_option.text, changed_options) for question_option in question1_options]
+

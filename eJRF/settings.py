@@ -122,6 +122,9 @@ STATIC_URL = '/static/'
 ACCEPTED_EXTENSIONS = [".doc", ".docx", ".htm", ".html", ".jpg", ".pdf", ".ppt", ".pptx", ".rtf", ".tif", ".txt",
                        ".xls", ".xlsx"]
 MAX_UPLOAD_SIZE = 52428800
+
+SOUTH_TESTS_MIGRATE = False
+
 # Importing server specific settings
 try:
     from localsettings import *
