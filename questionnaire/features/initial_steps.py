@@ -56,7 +56,7 @@ def open_browser():
     if "-t-sauce" in sys.argv:
         world.browser = Browser(**sauce_browser_options)
         logging.warning("browser set - using sauce")
-    if "-t-remote" in sys.argv:
+    elif "-t-remote" in sys.argv:
         world.browser = Browser(**remote_browser_options)
         logging.warning("browser set - using remote")
     else:
