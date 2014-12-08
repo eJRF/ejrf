@@ -2,6 +2,9 @@ $(document).ready(function () {
     $('#id_organization').on('change', function () {
         getRegionsFor($(this), '#id_region');
     });
+    $("#cancel_button").on('click', function(){
+        window.history.go(-1);
+    });
 });
 
 $(document).on('change', '#organization', function () {
