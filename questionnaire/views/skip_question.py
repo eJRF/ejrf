@@ -7,6 +7,7 @@ from braces.views import PermissionRequiredMixin
 from questionnaire.forms.skip_rule_form import SkipRuleForm, SkipQuestionForm, SkipSubsectionForm
 from questionnaire.models import SkipRule
 from questionnaire.utils.view_utils import get_regions
+from django.utils.cache import add_never_cache_headers
 
 
 class SkipRuleView(PermissionRequiredMixin, View):
@@ -41,7 +42,9 @@ class SkipRuleView(PermissionRequiredMixin, View):
         data = SkipRule.objects.filter(subsection_id=subsection_id).select_subclasses()
         response_data = map(lambda x: x.to_dictionary(request.user), data)
 
-        return HttpResponse(json.dumps(response_data), content_type="application/json", status=200)
+        response = HttpResponse(json.dumps(response_data), content_type="application/json", status=200)
+        add_never_cache_headers(response)
+        return response
 
     def delete(self, request, rule_id, *args, **kwargs):
         status = 204
