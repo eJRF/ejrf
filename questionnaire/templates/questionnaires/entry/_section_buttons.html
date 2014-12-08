@@ -14,9 +14,13 @@
             data-toggle="tooltip" data-placement="top" title="Preview">
         <i class="glyphicon glyphicon-eye-open"></i>
     </a>
-    <a class="btn btn-default pull-right button-section has-spinner" id="export-section" data-toggle="tooltip" data-placement="top" title="Export section as PDF"><span class="spinner"><img
-            class="spinner-image" src="{{ STATIC_URL }}img/spinner.gif"></span><span class="cyan">
-        <span class="glyphicon glyphicon-export red"></span></span>
+    <a class="btn btn-default pull-right button-section has-spinner" id="export-section" data-toggle="tooltip" data-placement="top" title="Export section as PDF">
+        <span class="spinner">
+            <img class="spinner-image" src="{{ STATIC_URL }}img/spinner.gif">
+        </span>
+        <span class="cyan">
+            <img class="spinner-image" src="{{ STATIC_URL }}img/pdficon_large.png">
+        </span>
     </a>
 </div>
 {% include 'questionnaires/entry/preview_modal.html'%}
