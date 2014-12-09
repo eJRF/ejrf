@@ -108,3 +108,14 @@ Feature: Skip Rules
     When I un-assign the root question to a skip rule
     And I click to add a skip rule
     Then I should see '0' existing skip rules"
+
+  Scenario: Turn off cells in display all grid
+    Given I am logged in as a global admin
+    And I have a questionnaire with a grid
+    Then I should see the option to add skip rules to the grid
+    When I select the option to add skip rules to the grid
+    And I choose to see existing skip rules
+    Then I should see '0' existing skip rules"
+    When I specify a cell to skip in the grid
+    Then I should see '1' existing skip rules"
+    And that cell should be disabled

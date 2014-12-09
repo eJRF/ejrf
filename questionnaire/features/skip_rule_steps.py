@@ -253,7 +253,6 @@ def and_i_have_skip_rules_applied_to_another_question(step):
 
 @step(u'When I un-assign a question with a skip rule')
 def when_i_un_assign_a_question_with_a_skip_rule(step):
-    #step.given('And I visit that questionnaires section page')
     world.page.click_by_id('close-skip-rule')
     time.sleep(1)
     world.page.click_by_id('unassign-question-%s' % world.skip_question02.id)
@@ -273,3 +272,24 @@ def when_i_delete_a_subsection_with_a_skip_rule(step):
     world.page.click_by_id('delete-subsection-%s' % world.sub_section_2.id)
     time.sleep(1)
     world.page.click_by_id('confirm-delete-subsection-%s' % world.sub_section_2.id)
+
+@step(u'Then I should see the option to add skip rules to the grid')
+def then_i_should_see_the_option_to_add_skip_rules_to_the_grid(step):
+    world.page.is_text_present('Add Grid Rules')
+    assert world.page.is_element_present_by_id('grid-question-1')
+
+@step(u'When I select the option to add skip rules to the grid')
+def when_i_select_the_option_to_add_skip_rules_to_the_grid(step):
+    world.page.click_by_id('grid-question-1')
+    world.skip_rule_page = SkipRuleModalPage(world.browser)
+    world.skip_rule_page.view_existing_rules()
+
+@step(u'When I specify a cell to skip in the grid')
+def when_i_specify_a_cell_to_skip_in_the_grid(step):
+    world.skip_rule_page.create_new_qn_rule()
+
+@step(u'And that cell should be disabled')
+def and_that_cell_should_be_disabled(step):
+    world.page.click_by_id('close-skip-rule-button')
+    time.sleep(1)
+    assert world.browser.find_by_css('.form-control').first['Disabled']
