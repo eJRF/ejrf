@@ -11,7 +11,9 @@
     - psycopg2
     - virtualenv
 
-- file: path=/srv/checkout owner=ubuntu  mode=0755 state=directory
+- file: path=/srv/checkout owner=www-data  mode=0755 state=directory
+
+- file: path=/srv/checkout/export owner=www-data  mode=0755 state=directory
 
 - name: ejrf repo
   git: repo=https://github.com/eJRF/ejrf.git dest=/srv/checkout version="{{ version }}"
