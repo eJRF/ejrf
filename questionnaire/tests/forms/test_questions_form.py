@@ -86,7 +86,7 @@ class QuestionFormTest(BaseTest):
         self.assertIn(('Decimal', 'Decimal'), question_form.fields['answer_sub_type'].choices)
 
     def test_save_multichoice_question_saves_packaged_options(self):
-        options = ['', 'Yes, No, Maybe']
+        options = ['', 'Yes, No', 'Maybe']
         form = {'text': 'How many kids were immunised this year?',
                 'instructions': 'Some instructions',
                 'short_instruction': 'short version',
@@ -99,8 +99,8 @@ class QuestionFormTest(BaseTest):
         question = question_form.save(commit=True)
         question_options = QuestionOption.objects.filter(question=question)
 
-        self.assertEqual(3, question_options.count())
-        [self.assertIn(question_option.text, ['Yes', 'No', 'Maybe']) for question_option in question_options]
+        self.assertEqual(2, question_options.count())
+        [self.assertIn(question_option.text, ['Yes, No', 'Maybe']) for question_option in question_options]
 
     def test_save_multichoice_question_saves_listed_options(self):
         options = ['', 'Yes', 'No', 'Maybe']
@@ -175,24 +175,6 @@ class QuestionFormTest(BaseTest):
 
         self.assertEqual(3, question_options.count())
         [self.assertIn(question_option.text, ['Yes', 'No', 'Maybe']) for question_option in question_options]
-
-    def test_save_multiple_response_question_saves_packaged_options(self):
-        options = ['', 'Yes, No, Maybe']
-        form = {'text': 'How many kids were immunised this year?',
-                'instructions': 'Some instructions',
-                'short_instruction': 'short version',
-                'export_label': 'blah',
-                'answer_type': AnswerTypes.MULTIPLE_RESPONSE,
-                'options': options,
-                'theme': self.theme.id}
-
-        question_form = QuestionForm(data=form)
-        question = question_form.save(commit=True)
-        question_options = QuestionOption.objects.filter(question=question)
-
-        self.assertEqual(3, question_options.count())
-        [self.assertIn(question_option.text, ['Yes', 'No', 'Maybe']) for question_option in question_options]
-
 
 class QuestionHistoryTest(BaseTest):
     def setUp(self):

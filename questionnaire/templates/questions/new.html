@@ -1,5 +1,6 @@
 {% extends 'base/form.html' %}
 {% block display_form_fields %}
+{% load generic_tags %}
 <script src="{{ STATIC_URL }}js/lib/angular.min.js" type="text/javascript" charset="utf-8"></script>
 
 <script src="{{ STATIC_URL }}js/newQuestion.js" type="text/javascript" charset="utf-8"></script>
@@ -8,6 +9,7 @@
     var options = {{ question_options |safe }};
     var answerType = "{{ form.instance.answer_type }}";
     var answerSubType = "{{ form.instance.answer_sub_type }}";
+    var questionOptions = {{ form.instance.options.all|to_json|safe}};
 </script>
 
 <div  data-ng-app="questionnaireApp" data-ng-controller="newQuestionController">
@@ -15,39 +17,24 @@
     <h3>{{ title }}</h3>
     <hr/>
     {% include 'base/naked_form.html' with a_form=form %}
-    {% include 'base/_question_options.html' %}
-    {% if form.instance.id and form.instance.is_multichoice or form.instance.is_multi_response %}
-
-        <div id="option-choices" class="show">
+        <div id="option-choices" data-ng-show="isAnswerTypeIsMultiChoice()">
             <label id="option-choices-label">Options</label>
             {% for options in form.KNOWN_OPTIONS %}
                 <label class="radio-inline">
-                    <input type="radio" id="options-{{ forloop.counter }}" value="{{ options }}"
-                            {{ form.instance|packaged_options:options }} name="options"> {{ options }}
+                    <input data-ng-model="knowOptions" type="radio" id="options-{{ forloop.counter }}" value="{{ options }}"
+                            {{ form.instance|packaged_options:options }} name="questions-options"> {{ options }}
                 </label>
             {% endfor %}
             <label class="radio-inline">
-                <input type="radio" id="options-{{ forloop.counter|add:1 }}" value="custom"
-                        {{ form.instance|custom_options }} name="options-custom"> Custom
+                <input data-ng-model="knowOptions" type="radio" id="options-{{ forloop.counter|add:1 }}" value="custom"
+                        {{ form.instance|custom_options }} name="questions-options" checked> Custom
             </label>
-        </div>
-        {% if form.instance|custom_options %}
-            {% for option in form.instance.options.all %}
-                <div class="input-group" id="option-input-group">
-                    <label class="option-control-label">Option <span
-                            class="number"> {{ forloop.counter }}</span></label>
-                    <input type="text" maxlength="100" name="options" value="{{ option }}">
-                    <a href="javascript:;" class="input-group-addon btn btn-sm btn-primary add-option"><i
-                            class="glyphicon glyphicon-plus"></i></a>
-                    <a href="javascript:;" class="input-group-addon btn btn-sm  btn-primary remove-option"><i
-                            class="glyphicon glyphicon-remove"></i></a>
-                </div>
-            {% endfor %}
 
-        {% endif %}
-    {% endif %}
+            <div ng-include="'/static/templates/questionOptions.html'"></div>
+        </div>
+
     <script type="text/template" id="question-option-template">
-        <div class="input-group" id="option-input-group">
+        <div class="input-group" id="option-input-group" data-ng-show="isAnswerTypeIsMultiChoice()">
             <label class="option-control-label">Option <span class="number"></span></label>
             <input type="text" maxlength="100" name="options">
             <a href="javascript:;" class="input-group-addon btn btn-sm btn-primary add-option"><i

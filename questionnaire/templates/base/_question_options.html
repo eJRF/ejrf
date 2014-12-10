@@ -1,31 +1,9 @@
-
-<div id="option-choices" class="hide">
-<label id="option-choices-label">Options</label>
-    <label class="radio-inline">
-        <input type="radio" id="options-1" value="Yes, No" name="options"> Yes, No
-    </label>
-
-    <label class="radio-inline">
-        <input type="radio" id="options-2" value="Yes, No, NR" name="options"> Yes, No, NR
-    </label>
-
-    <label class="radio-inline">
-        <input type="radio" id="options-3" value="Yes, No, NR, ND" name="options"> Yes, No, NR, ND
-    </label>
-
-    <label class="radio-inline">
-        <input type="radio" id="options-4" value="Male, Female, Both" name="options"> Male, Female, Both
-    </label>
-
-    <label class="radio-inline">
-        <input type="radio" id="options-5" value="Local currency, US $" name="options"> Local currency, US $
-    </label>
-
-    <label class="radio-inline">
-        <input type="radio" id="options-6" value="National, Sub national" name="options"> National, Sub national
-    </label>
-
-    <label class="radio-inline">
-        <input type="radio" id="options-7" value="custom" name="options-custom"> Custom
-    </label>
+<div class="input-group" id="option-input-group" data-ng-repeat="opton in existingQuestionOptions">
+    <label class="option-control-label">Option {{ option.text }}<span
+            class="number"> </span></label>
+    <input type="text" maxlength="100" name="options" value="{{ option.text }}">
+    <a href="javascript:;" class="input-group-addon btn btn-sm btn-primary add-option"><i
+            class="glyphicon glyphicon-plus"></i></a>
+    <a href="javascript:;" class="input-group-addon btn btn-sm  btn-primary remove-option"><i
+            class="glyphicon glyphicon-remove"></i></a>
 </div>

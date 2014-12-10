@@ -1,5 +1,7 @@
 from django import template
 from django.core.urlresolvers import reverse
+from django.core import serializers
+import json
 
 from questionnaire.forms.questions import QuestionForm
 from questionnaire.forms.theme import ThemeForm
@@ -74,3 +76,7 @@ def custom_options(question):
 @register.filter
 def get_theme_form_with_instance(theme):
     return ThemeForm(instance=theme)
+
+@register.filter
+def to_json(options):
+    return json.dumps(list(options.values('id', 'text')))

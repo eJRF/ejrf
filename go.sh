@@ -88,7 +88,7 @@ do
             echo "Testing $ARG"
             if [ -a $SETTINGS_FILE ]
             then
-                ./manage.py harvest --tag=-WIP --tag=-Upload -v 2 --settings=$SETTINGS_FILE $ARG
+                ./manage.py harvest --tag=-WIP --tag=-Upload --settings=$SETTINGS_FILE $ARG
             else
                 ./manage.py harvest --tag=-WIP --tag=-Upload $ARG
             fi
