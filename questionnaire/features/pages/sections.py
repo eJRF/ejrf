@@ -7,7 +7,13 @@ class CreateSectionPage(PageObject):
         self.url = '/questionnaire/entry/%s/section/new/' % questionnaire.id
 
     def verify_current_position_of_section(self, position):
-        self.assert_page_html_contains("selected=\"selected\">%s<" % position)
+        if self.browser.driver.name == 'internet explorer':
+            self.assert_page_html_contains(
+                "<option selected=\"selected\" value=\"%s\">%s</option>" % (position, position))
+        else:
+            self.assert_page_html_contains(
+                "<option value=\"%s\" selected=\"selected\">%s</option>" % (position, position))
+
 
 class CreateSubSectionPage(PageObject):
     def __init__(self, browser, questionnaire, section):
