@@ -17,7 +17,8 @@
             <span class="cyan"><span class="glyphicon glyphicon-circle-arrow-down"></span>Move Down</span></button>
 
         {% if user.user_profile.region == None  and user.user_profile.region == group.region or user.user_profile.region == group.region and not group.is_core %}
-        <a href="" class="btn btn-default btn-sm" data-toggle="modal" data-target="#create-skip-rule"
+        <!-- #TODO: Show after the bug with defining skip rules is fixed -->
+        <a href="" class="btn btn-default btn-sm hide" data-toggle="modal" data-target="#create-skip-rule"
            data-target="#" onClick="skipRules.updateGrid({{ subsection.id }}, {{ group.id }})" id="grid-question-{{ group.id}}">
             <span class="cyan"><span class="glyphicon glyphicon-plus-sign"></span>Add Grid Rules</span>
         </a>
