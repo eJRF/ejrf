@@ -1,10 +1,12 @@
 var app = angular.module('questionnaireApp', [])
     .controller('newQuestionController', ['$scope', function ($scope) {
-
         $scope.options = window.options ? window.options : [];
 
         $scope.answerType = window.answerType || "";
-        $scope.answerSubType = window.answerSubType || "";
+
+        if (typeof window.answerSubType !== 'undefined'){
+            $scope.answerSubType = { text: window.answerSubType, value: window.answerSubType }
+        }
 
         var answerTypes = Object.keys(window.options);
         var options = answerTypes.map(function (key) {
