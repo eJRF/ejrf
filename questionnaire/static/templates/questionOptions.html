@@ -1,7 +1,7 @@
 
 	<div class="input-group" id="option-input-group" data-ng-repeat="option in existingQuestionOptions">
 	    <label class="option-control-label">Option <span class="number">{{ $index + 1}}</span></label>
-	    <input type="text" maxlength="100" name="options" value="{{ option.text }}">
+	    <input type="text" maxlength="100" name="options" data-ng-model="option.text" value="{{ option.text }}">
 	    <a href="javascript:;" class="input-group-addon btn btn-sm btn-primary add-option" data-ng-click="addOption()	"><i
 	            class="glyphicon glyphicon-plus"></i></a>
 	    <a href="javascript:;" class="input-group-addon btn btn-sm  btn-primary remove-option" data-ng-click="removeOption($index)"><i

@@ -1,6 +1,8 @@
 var app = angular.module('questionnaireApp', [])
     .controller('newQuestionController', ['$scope', function ($scope) {
-        $scope.options = window.options ? window.options : [];
+        $scope.options = window.options || {};
+        var questionOptions = window.questionOptions;
+
         $scope.knowOptions = 'custom';
 
         $scope.answerType = window.answerType || "";
@@ -10,8 +12,14 @@ var app = angular.module('questionnaireApp', [])
         };
 
         $scope.addOption = function() {
-            $scope.existingQuestionOptions.push({});
+            // var count = $scope.existingQuestionOptions.filter(function(option) { return option === ""; }).length;
+            // if(count == 0) {
+                $scope.existingQuestionOptions.push({});
+            // }
         };
+
+        $scope.existingQuestionOptions = window.questionOptions; //.map(function(o) { return {text: o}; });
+        $scope.addOption();
 
         $scope.removeOption = function(index) {
             if($scope.existingQuestionOptions.length > 1) {
@@ -48,10 +56,7 @@ var app = angular.module('questionnaireApp', [])
             if (knownOption && knownOption != 'custom') {
                 $scope.existingQuestionOptions = createOptions(knownOption);
             }else{
-                $scope.existingQuestionOptions = window.questionOptions || [];
-                if($scope.existingQuestionOptions.length === 0) {
-                    $scope.addOption();
-                }
+                $scope.existingQuestionOptions = [{}];
             }
         });
 

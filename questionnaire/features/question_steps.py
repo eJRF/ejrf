@@ -82,6 +82,7 @@ def when_i_click_add_more_button(step):
 
 @step(u'Then I should see another option field')
 def then_i_should_see_another_option_field(step):
+
     world.page.is_text_present('Option 2')
 
 
@@ -201,6 +202,7 @@ def when_i_update_the_question_with_valid_details(step):
                      'theme': world.theme.id}
     world.page.fill_form(question_data)
     world.page.select('answer_type', 'MultiChoice')
+    world.page.click_by_css('input[value="Yes, No, NR"]')
     world.page.submit()
 
 @step(u'Then I should see a message that the question was successfully updated')

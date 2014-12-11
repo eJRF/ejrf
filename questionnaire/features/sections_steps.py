@@ -1,4 +1,4 @@
-from time import sleep
+from time import sleep, time
 from lettuce import step, world
 from questionnaire.features.pages.home import HomePage
 from questionnaire.features.pages.questionnaires import QuestionnairePage
@@ -269,4 +269,5 @@ def when_i_choose_to_update_that_section_again(step):
 
 @step(u'Then I should see its new position')
 def then_i_should_see_its_new_position(step):
+    sleep(2)
     world.page.verify_current_position_of_section(world.new_section_position)

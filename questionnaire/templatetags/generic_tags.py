@@ -79,4 +79,4 @@ def get_theme_form_with_instance(theme):
 
 @register.filter
 def to_json(options):
-    return json.dumps(list(options.values('id', 'text')))
+    return json.dumps(map(lambda o: str(o), options.values_list('text', flat=True)))

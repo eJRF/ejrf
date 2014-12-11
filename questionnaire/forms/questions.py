@@ -15,7 +15,7 @@ class QuestionForm(ModelForm):
                      "National, Sub national",
     ]
 
-    options = forms.CharField(widget=forms.HiddenInput(), required=False)
+    question_options = []
 
     def __init__(self, region=None, *args, **kwargs):
         super(QuestionForm, self).__init__(*args, **kwargs)
@@ -33,7 +33,7 @@ class QuestionForm(ModelForm):
         ANGULAR_OPTIONS_AND_FILTER = "option.text for option in allOptions track by option.value"
         model = Question
         fields = (
-            'text', 'export_label', 'instructions', 'answer_type', 'answer_sub_type', 'options', 'theme', 'is_primary')
+            'text', 'export_label', 'instructions', 'answer_type', 'answer_sub_type', 'theme', 'is_primary')
         widgets = {'text': forms.Textarea(attrs={"rows": 6, "cols": 50}),
                    'instructions': forms.Textarea(attrs={"maxlength": 750, "cols":50, "rows": 10},),
                    'answer_type': forms.Select(attrs={"data-ng-model": "answerType"}),
@@ -61,7 +61,6 @@ class QuestionForm(ModelForm):
             message = "%s questions must have at least one option" % answer_type
             self._errors['answer_type'] = self.error_class([message])
             del self.cleaned_data['answer_type']
-        return options
 
     def _clean_answer_sub_type(self):
         answer_type = self.cleaned_data.get('answer_type', None)
@@ -132,7 +131,7 @@ class QuestionForm(ModelForm):
         options = dict(self.data).get('options', [])
         options = filter(lambda text: text.strip(), options)
         if options and AnswerTypes.is_mutlichoice_or_multiple(question.answer_type):
-            existing_question_options = QuestionOption.objects.filter(question=question).exclude(text__in=options).delete()
+            QuestionOption.objects.filter(question=question).exclude(text__in=options).delete()
             for index, option in enumerate(options):
                 option, _ = QuestionOption.objects.get_or_create(text=option.strip(), question=question)
                 option.order = index
