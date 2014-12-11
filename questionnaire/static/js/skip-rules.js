@@ -151,6 +151,7 @@ var applySkipRules = (function () {
         },
         bindSkipRulesOn: function (gridInstance) {
             $(gridInstance).find('div[class^="form-group form-group-question-"]').show();
+            $(gridInstance).find('li[class^="form-group-question-"]').show();
             this.bindOnChangeEventListener(gridInstance);
         }
     };
