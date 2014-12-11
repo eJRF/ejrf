@@ -28,7 +28,7 @@
                         {% if order.question.is_first_in_group %}
                             <ul class="horizontal-ul">
                         {% endif %}
-                                <li>
+                                <li class="form-group-question-{{ order.question.id }}">
                                     <label> {{ order.question.text }} </label>
                                     {% for field in order.question|get_form:formsets %}
                                         {% if field.errors %}
