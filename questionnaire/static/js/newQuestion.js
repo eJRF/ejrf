@@ -7,20 +7,23 @@ var app = angular.module('questionnaireApp', [])
 
         $scope.isAnswerTypeIsMultiChoice = function(){
             return $scope.answerType == 'MultipleResponse' || $scope.answerType == 'MultiChoice';
-        }
+        };
 
         $scope.addOption = function() {
             $scope.existingQuestionOptions.push({});
         };
 
         $scope.removeOption = function(index) {
-            $scope.existingQuestionOptions.splice(index, 1);
-
+            if($scope.existingQuestionOptions.length > 1) {
+                $scope.existingQuestionOptions.splice(index, 1);
+            } else {
+                $scope.existingQuestionOptions[0].text = "";
+            }
         };
-        $scope.answerTypeIsMultiChoice = $scope.answerType && $scope.isAnswerTypeIsMultiChoice()
+        $scope.answerTypeIsMultiChoice = $scope.answerType && $scope.isAnswerTypeIsMultiChoice();
 
         if (typeof window.answerSubType !== 'undefined'){
-            $scope.answerSubType = { text: window.answerSubType, value: window.answerSubType }
+            $scope.answerSubType = { text: window.answerSubType, value: window.answerSubType };
         }
 
         $scope.existingQuestionOptions = window.questionOptions || [];
@@ -30,7 +33,7 @@ var app = angular.module('questionnaireApp', [])
         var options = answerTypes.map(function (key) {
             return { ansType: key, subTypes: $scope.options[key].map(function (subType) {
                 return { 'text': subType, 'value': subType };
-            })}
+            })};
         });
 
         var createOptions = function(strOptions) {
@@ -54,9 +57,9 @@ var app = angular.module('questionnaireApp', [])
 
         $scope.$watch('answerType', function (answerType) {
             var answerTypeToShow = options.filter(function (option) {
-                return option.ansType == answerType
+                return option.ansType == answerType;
             })[0];
 
-            $scope.allOptions = answerTypeToShow && answerTypeToShow.subTypes
+            $scope.allOptions = answerTypeToShow && answerTypeToShow.subTypes;
         });
     }]);
