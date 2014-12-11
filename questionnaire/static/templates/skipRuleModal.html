@@ -12,7 +12,7 @@
                                    data-ng-hide="existingRulesTabHidden">Existing Rules</a></li>
     </ul>
     <div id="newRuleTab" data-ng-show="activeTab == 'newRuleTab'">
-        <form method="post" class="form-horizontal" id="sumbit-skip-rule" name="skipForm"
+        <form method="post" class="form-horizontal sumbit-skip-rule" id="sumbit-question-skip-rule" name="skipForm"
               data-ng-submit="submitQuestionForm()">
             <div class="modal-body question-group indent">
                 <div data-ng-class="skipResult.className" class="alert" data-ng-show="skipResult.show">
@@ -26,7 +26,7 @@
                     <label class="col-sm-3 control-label">Select Root Question</label>
 
                     <div class="col-sm-7 center-fields">
-                        <select required name="root_question" id="root-question"
+                        <select  name="root_question" id="root-question"
                                 data-ng-model="skipRule.rootQuestion"
                                 data-ng-options="q.fields.text for q in questions | filter: {fields:{answer_type: 'MultiChoice'}} | filter:filterQuestions track by q.pk">
                             <option value="">Select Root Question</option>
@@ -40,7 +40,7 @@
                         <ul>
                             <li data-ng-repeat="option in skipRule.rootQuestion.options">
                                 <label style="display:block;">
-                                    <input type="radio" name="response" required
+                                    <input type="radio" name="response"
                                            data-ng-model="skipRule.questionResponse"
                                            ng-value="option.pk" id="id-question-option-{{ option.pk }}"/>
                                     &nbsp;{{ option.fields.text }}
@@ -53,7 +53,7 @@
                     <label class="col-sm-3 control-label">Select Question to Skip</label>
 
                     <div class="col-sm-7 center-fields">
-                        <select name="skip_question" required data-ng-model="skipRule.skipQuestion"
+                        <select name="skip_question"  data-ng-model="skipRule.skipQuestion"
                                 data-ng-options="q.fields.text for q in questions | filter:matchSelectedQuestion | filter:filterQuestions  track by q.pk">
                             <option value="">Select Question</option>
                         </select>
@@ -69,7 +69,7 @@
         </form>
     </div>
     <div id="newSubsectionRuleTab" data-ng-show="activeTab == 'newSubsectionRuleTab'">
-        <form method="post" class="form-horizontal" name="skipForm" data-ng-submit="submitSubsectionForm()">
+        <form method="post" class="form-horizontal sumbit-skip-rule" name="skipForm" id ='sumbit-subsection-skip-rule' data-ng-submit="submitSubsectionForm()">
             <div class="modal-body question-group indent">
                 <div data-ng-class="skipResult.className" class="alert" data-ng-show="skipResult.show">
                     {{ skipResult.message }}
@@ -82,7 +82,7 @@
                     <label class="col-sm-3 control-label">Select Root Question</label>
 
                     <div class="col-sm-7 center-fields">
-                        <select required name="subsection_root_question"
+                        <select  name="subsection_root_question"
                                 data-ng-model="skipRule.rootQuestion"
                                 data-ng-options="q.fields.text for q in questions | filter: {fields:{answer_type: 'MultiChoice'}}">
                             <option value="">Select Root Question</option>
@@ -96,7 +96,7 @@
                         <ul>
                             <li data-ng-repeat="option in skipRule.rootQuestion.options">
                                 <label style="display:block;">
-                                    <input type="radio" name="subsection_response" required
+                                    <input type="radio" name="subsection_response"
                                            data-ng-model="skipRule.questionResponse"
                                            ng-value="option.pk"/>&nbsp;{{ option.fields.text }}
                                 </label>
@@ -108,7 +108,7 @@
                     <label class="col-sm-3 control-label">Select Subsection To Skip</label>
 
                     <div class="col-sm-7 center-fields">
-                        <select name="skip_subsection" required data-ng-model="skipRule.subsection"
+                        <select name="skip_subsection"  data-ng-model="skipRule.subsection"
                                 data-ng-options="getSubsectionTitle(q) for q in subsections track by q.id">
                             <option value="">Select SubSection</option>
                         </select>

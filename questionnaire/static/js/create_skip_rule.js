@@ -50,9 +50,12 @@ var skipRuleController = function ($scope, skipRuleService) {
     };
 
     var createSkipRule = function (postData) {
-        skipRuleService.createRule(postData).
+        skipRuleService.createRule(postData, $scope.activeTab).
             then(function(data) {
-                $scope.reset();
+
+                if(!data.formFailed){
+                    $scope.reset();
+                }
                 $scope.skipResult = data;
                 updateRules($scope.subsectionId);
             });
@@ -107,11 +110,11 @@ var skipRuleController = function ($scope, skipRuleService) {
     };
 
     var getQuestionFormData = function () {
-        return getSkipRuleFormData("skip_question", $scope.skipRule.skipQuestion.pk);
+        return getSkipRuleFormData("skip_question", $scope.skipRule.skipQuestion && $scope.skipRule.skipQuestion.pk);
     };
 
     var getSubsectionFormData = function () {
-        return getSkipRuleFormData("skip_subsection", $scope.skipRule.subsection.id);
+        return getSkipRuleFormData("skip_subsection", $scope.skipRule.subsection && $scope.skipRule.subsection.id);
     };
 
 
@@ -170,17 +173,31 @@ ngModule.factory('skipRuleService', ['$http', '$q', function($http, $q) {
         return res.promise;
     };
 
-    service.createRule = function(postData) {
-        var res = $q.defer();
+    service.createRule = function(postData, visibleTab) {
+        var getVisibleFormElement = function(){
+            if (visibleTab == 'newRuleTab')
+                return $('#sumbit-question-skip-rule');
+            return skipRuleForm = $('#sumbit-subsection-skip-rule');
+
+        };
+
+        var res = $q.defer(),
+            skipRuleForm = getVisibleFormElement();
+
+        if(!skipRuleForm.valid()) {
+            res.resolve({ className: "alert-danger", message: 'There are some errors with this form .', show: true, formFailed:  true});
+            return res.promise;
+        }
+
         $.post(window.url, postData)
             .done(function (data) {
-                res.resolve({ className: "alert-success", message: data.result, show: true});
+                res.resolve({ className: "alert-success", message: data.result, show: true, formFailed:  false});
             })
             .fail(function (data) {
                 if (data.result) {
-                    res.resolve({ className: "alert-danger", message: data.result, show: true});
+                    res.resolve({ className: "alert-danger", message: data.result, show: true,formFailed:  true});
                 } else {
-                    res.resolve({ className: "alert-danger", message: data.responseJSON.result.join(","), show: true});
+                    res.resolve({ className: "alert-danger", message: data.responseJSON.result.join(","), show: true, formFailed:  true});
                 }
             });
         return res.promise;

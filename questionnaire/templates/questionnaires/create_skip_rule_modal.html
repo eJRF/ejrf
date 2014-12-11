@@ -17,10 +17,15 @@
 <script type="text/javascript">
     var csrfToken = '{{ csrf_token }}';
     var url = "{% url 'skip_rules' %}";
-    var sectionId = "{{ section.id }}";
+    var sectionId = "{{ section.id }}",
+            createSkipRuleForm = $('#create-skip-rule');
 
-    $('#create-skip-rule').on('hide.bs.modal', function (e) {
+    createSkipRuleForm.on('hide.bs.modal', function (e) {
         window.location.href = window.location.pathname;
     });
 
+    createSkipRuleForm.on('show.bs.modal', function (e) {
+       $('#sumbit-question-skip-rule').validate({rules: { 'root_question': 'required', 'response': 'required', 'skip_question': 'required'}});
+       $('#sumbit-subsection-skip-rule').validate({rules: { 'subsection_root_question': 'required', 'response': 'required', 'skip_subsection': 'required'}});
+    });
 </script>
