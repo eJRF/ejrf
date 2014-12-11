@@ -24,7 +24,7 @@
         {% for question in a_group.all_non_primary_questions %}
             {% for field in question|get_form:formsets %}
         <td >
-            {% if question.id in option|get_questions_to_skip%}
+            {% if question.id in option|get_questions_to_skip:a_group.subsection%}
             <input type="text" disabled class="form-control"/>
             {% else %}
                 {% if field.errors %}

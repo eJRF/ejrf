@@ -21,5 +21,5 @@ def _filename(path):
     return str(path).split('/')[1]
 
 @register.filter
-def get_questions_to_skip(option):
-    return SkipQuestion.objects.filter(response=option).values_list('skip_question', flat=True)
+def get_questions_to_skip(option, subsection):
+    return SkipQuestion.objects.filter(response=option, subsection=subsection).values_list('skip_question', flat=True)
