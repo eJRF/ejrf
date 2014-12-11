@@ -6,6 +6,7 @@ from django.views.generic import View
 from questionnaire.forms.grid import GridForm
 from questionnaire.mixins import RegionAndPermissionRequiredMixin
 from questionnaire.models import SubSection, QuestionGroup
+from questionnaire.utils.model_utils import reindex_orders_in
 
 
 class CreateGrid(RegionAndPermissionRequiredMixin, View):
@@ -44,5 +45,6 @@ class DeleteGrid(RegionAndPermissionRequiredMixin, View):
         referer_url = request.META.get('HTTP_REFERER', None)
         subsection = SubSection.objects.get(id=kwargs['subsection_id'])
         QuestionGroup.objects.filter(id=kwargs['questionGroup_id']).delete()
+        reindex_orders_in(QuestionGroup, subsection=subsection)
         messages.success(request, "Grid successfully removed from questionnaire.")
         return HttpResponseRedirect(referer_url)

@@ -241,6 +241,9 @@ class RemoveGridViewTest(BaseTest):
                                                  UID='C00005', answer_type='Date', region=self.region)
         self.grid = self.question1.question_group.create(subsection=self.sub_section, order=1, grid=True,
                                                          display_all=True)
+        QuestionGroup.objects.create(subsection=self.sub_section, order=2, grid=True)
+        QuestionGroup.objects.create(subsection=self.sub_section, order=3)
+
         self.grid.question.add(self.question2, self.question3, self.question4)
         self.grid.orders.create(question=self.question1, order=1)
         self.grid.orders.create(question=self.question2, order=2)
@@ -251,8 +254,11 @@ class RemoveGridViewTest(BaseTest):
 
     def test_post_deletes_grid(self):
         meta = {'HTTP_REFERER': '/questionnaire/entry/%d/section/%d/' % (self.questionnaire.id, self.section1.id)}
-        response = self.client.post(self.url, {}, **meta)
+        self.client.post(self.url, {}, **meta)
         self.failIf(QuestionGroup.objects.filter(id=self.grid.id))
+        question_groups = QuestionGroup.objects.filter(subsection=self.sub_section).values_list('order', flat=True)
+        self.assertEqual(question_groups.count(), 2)
+        self.assertEqual(list(question_groups), [1, 2])
 
     def test_post_deletes_orders(self):
         meta = {'HTTP_REFERER': '/questionnaire/entry/%d/section/%d/' % (self.questionnaire.id, self.section1.id)}
