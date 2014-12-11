@@ -67,7 +67,8 @@ class GeneralTemplateTagTest(BaseTest):
 
     def test_gets_all_questions_to_be_skipped(self):
         skip_rule = SkipQuestionRuleFactory()
-        questions_to_skip = get_questions_to_skip(skip_rule.response)
+        questions_to_skip = get_questions_to_skip(skip_rule.response, subsection=skip_rule.subsection)
 
         self.assertEqual(1, len(questions_to_skip))
         self.assertEqual([skip_rule.skip_question.id], list(questions_to_skip))
+        self.assertTrue(False)
