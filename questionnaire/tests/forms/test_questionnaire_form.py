@@ -34,7 +34,7 @@ class QuestionnaireFilterFormTest(BaseTest):
     def test_has_years_of_existing_questionnaires(self):
         questionnaire_filter = QuestionnaireFilterForm(self.form_data)
         self.assertIn(('', 'Choose a year'), questionnaire_filter.fields['year'].choices)
-        for count in range(0, 10):
+        for count in range(0, 20):
             year_option = date.today().year + count
             self.assertIn((year_option, year_option), questionnaire_filter.fields['year'].choices)
 
