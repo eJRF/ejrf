@@ -67,7 +67,7 @@ Feature: Skip Rules
     And I choose to see existing grid skip rules
     Then I should see '1' existing grid skip rules
 
-  Scenario: Regional admin creates, views and delets skip rule
+  Scenario: Regional admin creates, views and deletes skip rule
     Given that I am logged in as a regional admin
     And there is questionnaire for my region
     And I have core and regional questions assigned to the questionnaire
@@ -86,6 +86,7 @@ Feature: Skip Rules
     Then I should see the rule disappear and a message that the skip rule was successfully deleted
     Then I should see '1' existing skip rules
 
+  @WIP
   Scenario: Skip rules are deleted when questions are unassigned
     Given I have a questionnaire with sections and subsections
     And I have questions and responses in the correct section

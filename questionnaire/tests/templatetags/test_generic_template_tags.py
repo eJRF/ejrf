@@ -71,4 +71,3 @@ class GeneralTemplateTagTest(BaseTest):
 
         self.assertEqual(1, len(questions_to_skip))
         self.assertEqual([skip_rule.skip_question.id], list(questions_to_skip))
-        self.assertTrue(False)
