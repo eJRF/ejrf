@@ -3,9 +3,10 @@ from urllib import quote
 from django.test import Client
 
 from questionnaire.forms.assign_question import AssignQuestionForm
-from questionnaire.models import Questionnaire, Section, SubSection, Question, Region
+from questionnaire.models import Questionnaire, Section, SubSection, Question, Region, QuestionGroup
 from questionnaire.models.skip_rule import SkipQuestion
 from questionnaire.tests.base_test import BaseTest
+from questionnaire.tests.factories.question_group_factory import QuestionGroupFactory
 from questionnaire.tests.factories.skip_rule_factory import SkipQuestionRuleFactory, SkipSubsectionRuleFactory
 
 
@@ -157,7 +158,7 @@ class UnAssignQuestionViewTest(BaseTest):
         self.subsection = SubSection.objects.create(title="subsection 1", section=self.section, order=1)
         self.question1 = Question.objects.create(text='Q1', UID='C00003', answer_type='Number', region=None)
         self.question2 = Question.objects.create(text='Q2', UID='C00002', answer_type='Number', region=None)
-        self.question_group = self.question1.question_group.create(subsection=self.subsection)
+        self.question_group = self.question1.question_group.create(subsection=self.subsection, order=1)
         self.question1.orders.create(question_group=self.question_group, order=1)
         self.question_group.question.add(self.question2)
         self.question2.orders.create(question_group=self.question_group, order=2)
@@ -224,9 +225,13 @@ class UnAssignQuestionViewTest(BaseTest):
 
         self.assertEqual(len(SkipQuestion.objects.all()), 0)
 
-    def test_deletes_skip_rules_when_unassigning_the_root_question_to_skip_subsection(self):
-        SkipSubsectionRuleFactory(subsection=self.subsection,root_question=self.question1)
+    def test_deletes_skip_rules_and_empty_groups_when_unassigning_the_root_question_to_skip_subsection(self):
+        SkipSubsectionRuleFactory(subsection=self.subsection, root_question=self.question1)
+        order = self.question_group.order + 1
+
+        QuestionGroupFactory(subsection=self.subsection, order=order)
         meta = {'HTTP_REFERER': '/questionnaire/entry/%d/section/%d/' % (self.questionnaire.id, self.section.id)}
         self.client.post(self.url, {}, **meta)
 
-        self.assertEqual(len(SkipQuestion.objects.all()), 0)
+        self.assertEqual(SkipQuestion.objects.count(), 0)
+        self.assertEqual(QuestionGroup.objects.count(), 1)
