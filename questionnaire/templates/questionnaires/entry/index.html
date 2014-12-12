@@ -40,7 +40,7 @@
             {{ form_set.management_form }}
             {% endfor %}
             <div id='section-content'>
-                {% for subsection in section.sub_sections.all %}
+                {% for subsection in section.sub_sections.all.distinct %}
                 <div class="subsection-content" id="subsection-{{ subsection.id }}-content"
                      data-attribute-subsection-order="{{ subsection.order }}"
                      data-attribute-subsection-name="{{ subsection.title }}"

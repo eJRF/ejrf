@@ -3,6 +3,7 @@
     <tr>
         <td>
             <div class="question-number">
+                {% if order.question.region %}<span>{{ order.question.region.name }} - </span>{% endif %}
                 {% spaceless %}
                     <span>{{ section.order }}</span>
                     {% if section.has_at_least_two_subsections %}
