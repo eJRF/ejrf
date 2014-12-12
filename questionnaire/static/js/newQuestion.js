@@ -2,8 +2,8 @@ var app = angular.module('questionnaireApp', [])
     .controller('newQuestionController', ['$scope', function ($scope) {
         $scope.options = window.options || {};
         var questionOptions = window.questionOptions;
-
         $scope.knowOptions = 'custom';
+        var clickCustomCount = 0;
 
         $scope.answerType = window.answerType || "";
 
@@ -12,14 +12,9 @@ var app = angular.module('questionnaireApp', [])
         };
 
         $scope.addOption = function() {
-            // var count = $scope.existingQuestionOptions.filter(function(option) { return option === ""; }).length;
-            // if(count == 0) {
-                $scope.existingQuestionOptions.push({});
-            // }
+            $scope.existingQuestionOptions.push({});
         };
 
-        $scope.existingQuestionOptions = window.questionOptions; //.map(function(o) { return {text: o}; });
-        $scope.addOption();
 
         $scope.removeOption = function(index) {
             if($scope.existingQuestionOptions.length > 1) {
@@ -52,13 +47,23 @@ var app = angular.module('questionnaireApp', [])
             });
         };
 
+
+
         $scope.$watch('knowOptions', function(knownOption) {
-            if (knownOption && knownOption != 'custom') {
+            if (knownOption === 'custom') {
+                if(clickCustomCount === 0) {
+                    $scope.existingQuestionOptions = window.questionOptions
+                        .filter(function(o) { return o != "" && o != null; })
+                        .map(function(o) { return {text: o}; });
+                } else {
+                    $scope.existingQuestionOptions = [{}];
+                }
+                clickCustomCount ++;
+            } else {
                 $scope.existingQuestionOptions = createOptions(knownOption);
-            }else{
-                $scope.existingQuestionOptions = [{}];
             }
         });
+
 
         $scope.$watch('answerType', function (answerType) {
             var answerTypeToShow = options.filter(function (option) {
