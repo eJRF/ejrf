@@ -32,10 +32,12 @@ class QuestionReIndexer(object):
         self._delete_empty_groups_and_reorder()
 
     def _delete_empty_groups_and_reorder(self):
-        order = self.get_old_orders().keys()[0]
-        group_subsection = order.question_group.subsection
-        QuestionGroup.delete_empty_groups(group_subsection)
-        reindex_orders_in(QuestionGroup, subsection=group_subsection)
+        old_orders = self.get_old_orders()
+        if len(old_orders) > 0:
+            order = old_orders.keys()[0]
+            group_subsection = order.question_group.subsection
+            QuestionGroup.delete_empty_groups(group_subsection)
+            reindex_orders_in(QuestionGroup, subsection=group_subsection)
 
     def get_old_orders(self):
         orders = {}

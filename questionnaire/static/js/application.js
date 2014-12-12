@@ -1,7 +1,7 @@
 var form_has_changed = false;
 var editable = false;
 
-$(document).ready(function() {
+$(document).ready(function () {
     $('.pagination').children('ul').addClass('pagination');
     $('a[data-toggle=popover]').popover();
     $('a[data-toggle=tooltip]').tooltip();
@@ -11,20 +11,21 @@ $(document).ready(function() {
     $('.datetimepicker').datepicker({ pickTime: false, autoclose: true });
     $('textarea').autosize();
 
-    $('.grid-error').hover(function(){
-        $(this).popover('show');}, function(){
+    $('.grid-error').hover(function () {
+        $(this).popover('show');
+    }, function () {
         $(this).popover('hide');
     });
 
-    $('#first_row').find('input[type=hidden]').each(function(index, element){
+    $('#first_row').find('input[type=hidden]').each(function (index, element) {
         $(element).val(0);
     });
 
-    $('select[name^=MultiChoice]').on('change', function(){
+    $('select[name^=MultiChoice]').on('change', function () {
         var selectedText = $(this).find('option:selected').text();
-       if(selectedText.toLowerCase() === "other"){
+        if (selectedText.toLowerCase() === "other") {
             addSpecifyField($(this));
-       }
+        }
     });
 
 });
@@ -32,11 +33,11 @@ $(document).ready(function() {
 
 function replaceAttributes($el, index) {
     return {'name': _replace($el, 'name', index),
-            'id': _replace($el, 'id', index)};
+        'id': _replace($el, 'id', index)};
 }
 
-function _replace($el, attr, index){
-    return $($el).attr(attr).replace(/-[\d]+-/g, '-'+ index.toString()+'-');
+function _replace($el, attr, index) {
+    return $($el).attr(attr).replace(/-[\d]+-/g, '-' + index.toString() + '-');
 }
 
 function reIndexFieldNames() {
@@ -72,27 +73,27 @@ function reIndexFieldNames() {
 }
 
 function removeUsedOptions(new_row, $table) {
-    var  new_row_primary_select = new_row.find('select').first();
-    $table.find('tbody tr').each(function(){
-       var used_option = $(this).find("td:eq(1)").find("select").find("option:selected");
-       new_row_primary_select.find('option[value='+ used_option.val() + ']').remove();
+    var new_row_primary_select = new_row.find('select').first();
+    $table.find('tbody tr').each(function () {
+        var used_option = $(this).find("td:eq(1)").find("select").find("option:selected");
+        new_row_primary_select.find('option[value=' + used_option.val() + ']').remove();
     });
     new_row_primary_select.append('<option value="">Choose One</option>');
-    new_row.find(':input[type!=hidden]').each(function(){
+    new_row.find(':input[type!=hidden]').each(function () {
         $(this).val('');
-        });
+    });
 }
 
 function prependHiddenColumnFields(newElement) {
     var previous_name = '';
-    newElement.find(':input').each(function(){
+    newElement.find(':input').each(function () {
         var $el = $(this);
         var name = $el.attr('name'),
             type = $el.attr('type');
-        if (!(previous_name == name && type == 'radio')){
+        if (!(previous_name == name && type == 'radio')) {
             $el.before('<input type="hidden" name="' + name + '" />')
         }
-        if(previous_name !=name && type == 'radio'){
+        if (previous_name != name && type == 'radio') {
             $el.before('<input type="hidden" exclude="true" value="" name="' + name + '" />')
         }
         previous_name = name;
@@ -102,8 +103,12 @@ function prependHiddenColumnFields(newElement) {
 function duplicateRow(selector, $table) {
     var $selector = $(selector);
     var newElement = $selector.clone(true);
-    newElement.find('input[type=hidden]').each(function(){ $(this).remove()});
-    newElement.find('.primary-question').each(function(){ $(this).removeAttr('data-primary-question')});
+    newElement.find('input[type=hidden]').each(function () {
+        $(this).remove()
+    });
+    newElement.find('.primary-question').each(function () {
+        $(this).removeAttr('data-primary-question')
+    });
     resetClonedInputs(newElement);
     prependHiddenColumnFields(newElement);
     $selector.after(newElement);
@@ -113,8 +118,8 @@ function duplicateRow(selector, $table) {
     return newElement;
 }
 
-function assignRowNumbers($table){
-    $table.find("span.number").each(function(i, element){
+function assignRowNumbers($table) {
+    $table.find("span.number").each(function (i, element) {
         $(element).text(++i);
     });
 }
@@ -126,16 +131,16 @@ function showSeparator($selector) {
 }
 
 function resetDatePicker(newElement) {
-    newElement.find('.datetimepicker').each(function(){
+    newElement.find('.datetimepicker').each(function () {
         var $this = $(this);
         $this.removeData('datepicker').unbind();
         $this.datepicker({ pickTime: false, autoclose: true });
     });
 }
 
-function resetClonedInputs(newElement){
-    newElement.find(':input').each(function() {
-        if($(this).attr('type') != 'radio')
+function resetClonedInputs(newElement) {
+    newElement.find(':input').each(function () {
+        if ($(this).attr('type') != 'radio')
             $(this).val('');
         $(this).removeAttr('checked');
         $(this).removeAttr('selected');
@@ -143,9 +148,9 @@ function resetClonedInputs(newElement){
 }
 
 function addRowAndColumnHiddenInputs($table, group_id, row_selector) {
-    $table.find(row_selector).each(function(i, el){
+    $table.find(row_selector).each(function (i, el) {
         var $tr = $(this);
-        $tr.find('input[type=hidden][exclude!=true]').each(function(index, element){
+        $tr.find('input[type=hidden][exclude!=true]').each(function (index, element) {
             $(element).val([i, group_id]);
         });
     });
@@ -160,14 +165,14 @@ function addRowOn($el, row_selector, table_selector) {
     return $new_row;
 }
 
-$('input[type=radio]').on('click', function(){
+$('input[type=radio]').on('click', function () {
     var $el = $(this),
         name = $el.attr('name'),
-        $redundant_hidden_radio = $el.parents('.form-group').find('input[name='+ name +'][exclude=true]');
+        $redundant_hidden_radio = $el.parents('.form-group').find('input[name=' + name + '][exclude=true]');
     $redundant_hidden_radio.remove();
 });
 
-$('.add-more').on('click', function(event) {
+$('.add-more').on('click', function (event) {
     var $el = $(this);
     var $new_row = addRowOn($el, '.hybrid-group-row', '.question-group');
     showSeparator($new_row);
@@ -177,37 +182,37 @@ $('.add-more').on('click', function(event) {
     event.preventDefault();
 });
 
-$('.add-row').on('click', function(event) {
+$('.add-row').on('click', function (event) {
     var $el = $(this);
     addRowOn($el, 'tr', 'table');
     event.preventDefault();
 });
 
-$('#export-section').on('click', function(event) {
+$('#export-section').on('click', function (event) {
     $(this).toggleClass('active');
     var filename = "";
     $.ajax({
         type: "GET",
         async: false,
         url: "/export-section",
-        success: function(data){
+        success: function (data) {
             var obj = JSON.parse(data);
             filename = obj['filename']
         }
     });
 
-    setTimeout(function(){
-      $('#export-section').toggleClass('active');
-      return_file(filename)
+    setTimeout(function () {
+        $('#export-section').toggleClass('active');
+        return_file(filename)
     }, 8000);
     event.preventDefault();
 });
 
-function return_file(filename){
-    window.location = "/export-section/"+filename;
+function return_file(filename) {
+    window.location = "/export-section/" + filename;
 }
 
-$('#id-older-jrf').on('click', function(event) {
+$('#id-older-jrf').on('click', function (event) {
     $('.hide').toggleClass('show');
     $(this).html($(this).html() === "More" ? "Less" : "More");
     event.preventDefault()
@@ -220,12 +225,12 @@ function disableInputFields(status) {
     $('.add-more').prop('disabled', status);
 }
 
-$('.unassign-question').hover(function(){
+$('.unassign-question').hover(function () {
     var parent_question = $(this).parents('div[class^="form-group"]');
     $(parent_question).toggleClass('question-form');
 });
 
-$('.remove-table-row').on('click', function(evt){
+$('.remove-table-row').on('click', function (evt) {
     var $row = $(this).parents('tr'),
         $table = $row.parents('table'),
         $grid_rows = $table.find('tr.grid_row');
@@ -233,7 +238,7 @@ $('.remove-table-row').on('click', function(evt){
     evt.preventDefault();
 });
 
-$('.remove-hybrid-row').on('click', function(evt){
+$('.remove-hybrid-row').on('click', function (evt) {
     var $row = $(this).parents('.hybrid-group-row'),
         $table = $row.parents('.question-group'),
         $grid_rows = $table.find('.hybrid-group-row');
@@ -242,7 +247,7 @@ $('.remove-hybrid-row').on('click', function(evt){
 });
 
 function deleteRow($row, $table, $grid_rows, min_number_of_rows) {
-    if ($grid_rows.length > min_number_of_rows){
+    if ($grid_rows.length > min_number_of_rows) {
         deleteRowFromServer($row, $table);
         $row.remove();
         assignRowNumbers($table);
@@ -250,21 +255,22 @@ function deleteRow($row, $table, $grid_rows, min_number_of_rows) {
     }
 }
 
-function deleteRowFromServer($row,$table) {
+function deleteRowFromServer($row, $table) {
     var group_id = $table.attr('data-group-id');
     var url = window.location.pathname + "delete/" + group_id + "/";
     var $primary_answer = $row.find('.primary-question').attr('data-primary-question'),
         $csrf = $('input[name=csrfmiddlewaretoken]'),
         data = {'primary_answer': $primary_answer, 'csrfmiddlewaretoken': $csrf.val()};
-    if ($primary_answer){
-        $.post(url, data, function(){});
+    if ($primary_answer) {
+        $.post(url, data, function () {
+        });
     }
 }
 
 
-$('.reorder-subsection').on('click', function(){
+$('.reorder-subsection').on('click', function () {
     var $element = $(this),
-    $modal = getModalWithSubSectionQuestions($element);
+        $modal = getModalWithSubSectionQuestions($element);
     removeButtons($modal, ['.add-more', '.btn-group', '.unassign-question']);
     highlightOnHover($modal);
     activateSortable($modal);
@@ -274,40 +280,41 @@ $('.reorder-subsection').on('click', function(){
 });
 
 
-function getTableRow($questionForm,$index) {
-    if($($questionForm).hasClass('group-hr')){
+function getTableRow($questionForm, $index) {
+    if ($($questionForm).hasClass('group-hr')) {
         return "<tr class='group-tr' " +
-               "data-group-id='"+ $($questionForm).attr('data-group-id') +"'>" +
-               "<td><hr class='group-hr'/></td></tr>";
-    } else if ($($questionForm).hasClass('grid-group')){
-        // return "";
-        return "<tr><td class='group-tr'>Grid question</td></tr>";
+            "data-group-id='" + $($questionForm).attr('data-group-id') + "'>" +
+            "<td><hr class='group-hr'/></td></tr>";
+    } else if ($($questionForm).hasClass('grid-group')) {
+        return "<tr><td class='group-tr ' align='center'>" +
+            "<div class='well well-large'><h5> Reordering of Grid Question is not supported </h5></div></td></tr>";
+    } else if ($($questionForm).hasClass('none-grid-qns')) {
+        return "<tr id='question-" + $index + "' class='sortable-tr'><td>" + $($questionForm).html() + "</td></tr>"
     }
-    return "<tr id='question-"+ $index + "' class='sortable-tr'><td>" + $($questionForm).html() + "</td></tr>"
+    return '';
 }
 
 function getModalWithSubSectionQuestions($element) {
-    var data = $element.parents('div .subsection-content').html(),
-        $modal = $('#reorder_modal_label'),
+    var $modal = $('#reorder_modal_label'),
         action = $element.attr('data-href'),
         questionFormsAsTableRows = "";
-        getQuestionsInSubsection($element).map(function(index, $questionForm){
-            questionFormsAsTableRows += getTableRow($questionForm,index)
-        });
-        $modal.find('#reorder-content-table').html(questionFormsAsTableRows);
-        $modal.find('#re-order-questions-form').attr('action', action);
+    getQuestionsInSubsection($element).map(function (index, $questionForm) {
+        questionFormsAsTableRows += getTableRow($questionForm, index)
+    });
+    $modal.find('#reorder-content-table').html(questionFormsAsTableRows);
+    $modal.find('#re-order-questions-form').attr('action', action);
     return $modal;
 }
 
 function removeButtons($modal, btnClasses) {
-    for(var i=0; i < btnClasses.length; i++){
+    for (var i = 0; i < btnClasses.length; i++) {
         $modal.find(btnClasses[i]).remove();
     }
 }
 
 function highlightOnHover($modal) {
-    $modal.find('table tr').each(function(){
-        $(this).hover(function(){
+    $modal.find('table tr').each(function () {
+        $(this).hover(function () {
             $(this).toggleClass('question-form');
         });
     });
@@ -321,47 +328,47 @@ function callOnDropSuper($item) {
 function reIndexOrderFields($item, container) {
     var $table = $item.parents('table');
     var groupTableRows = $table.find('tr.group-tr');
-    for(var i=0; i < groupTableRows.length; i++){
+    for (var i = 0; i < groupTableRows.length; i++) {
         var $sameGroupRows = $(groupTableRows[i]).prevUntil('tr.group-tr');
         var totalQuestionRows = $sameGroupRows.length;
-        $sameGroupRows.each(function(index, questionTableRow){
-            var reverseIndex =  parseInt(totalQuestionRows) - parseInt(index),
+        $sameGroupRows.each(function (index, questionTableRow) {
+            var reverseIndex = parseInt(totalQuestionRows) - parseInt(index),
                 $hiddenOrderField = $(questionTableRow).find('input[type=hidden]'),
                 hiddenFieldValue = $hiddenOrderField.val(),
                 orderId = hiddenFieldValue && hiddenFieldValue.split(",")[1];
             $hiddenOrderField.val('');
-            $hiddenOrderField.val($(groupTableRows[i]).attr('data-group-id') + "," + orderId +","+ reverseIndex);
+            $hiddenOrderField.val($(groupTableRows[i]).attr('data-group-id') + "," + orderId + "," + reverseIndex);
         });
     }
 }
 
-function activateSortable($modal){
-    $modal.find('table').each(function(){
+function activateSortable($modal) {
+    $modal.find('table').each(function () {
         $(this).sortable({
             containerSelector: 'table',
             itemPath: '>tbody',
             itemSelector: '.sortable-tr',
             placeholder: '<tr class="placeholder"/>',
-            onDrop :function ($item, container, _super) {
+            onDrop: function ($item, container, _super) {
                 callOnDropSuper($item);
                 reIndexOrderFields($item, container);
-             }
+            }
         });
     })
 }
 
 
-function getQuestionsInSubsection($element){
+function getQuestionsInSubsection($element) {
     var $subsectionContainer = $element.parents('div .subsection-content');
-    return  $subsectionContainer.find('.form-group, .group-hr, .grid-group');
+    return   $subsectionContainer.find('.form-group, .group-hr, .grid-group');
 }
 
 
-function addSpecifyField($element){
+function addSpecifyField($element) {
     var parentElementName = $element.attr('name'),
         newElementName = parentElementName.replace('response', 'specified_option'),
         $otherField = "<input type='text' id='specified_response' maxlength='100'" +
-            "name='"+ newElementName +"' class='form-control input-sm specified_response'" +
+            "name='" + newElementName + "' class='form-control input-sm specified_response'" +
             "placeholder='Specify'>";
     $element.after($otherField);
 }
