@@ -59,6 +59,13 @@ class ReorderSubsectionQuestionsViewTest(BaseTest):
         self.assertEqual(self.order1, updated_orders.get(order=3))
         self.assertEqual(self.order2, updated_orders.get(order=2))
         self.assertEqual(self.order3, updated_orders.get(order=1))
+        self.assertIn('The questions were reordered successfully', response.cookies['messages'].value)
+
+    def test_redirects_with_warning_when_nothing_is_posted(self):
+        data = {'csrfmiddlewaretoken': 'xnkjzbckjhgiughbsii4e7329hzxb'}
+        response = self.client.post(self.url, data=data)
+        self.assertRedirects(response, expected_url=self.sub_section.get_absolute_url())
+        self.assertIn('There was nothing to re-order.', response.cookies['messages'].value)
 
     def test_permissions_required(self):
         self.assert_login_required(self.url)
@@ -113,6 +120,8 @@ class RegionalAdminReorderSubsectionQuestionsViewTest(BaseTest):
         response = self.client.post('/subsection/%d/reorder/' % self.sub_section.id, data=data)
         self.assertRedirects(response, expected_url=self.sub_section.get_absolute_url())
         updated_orders = self.question_group.question_orders()
+
+        self.assertIn('The questions were reordered successfully', response.cookies['messages'].value)
         self.assertEqual(3, updated_orders.count())
         self.assertEqual(self.order1, updated_orders.get(order=3))
         self.assertEqual(self.order2, updated_orders.get(order=2))

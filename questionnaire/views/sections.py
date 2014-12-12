@@ -203,13 +203,23 @@ class GetSubSections(OwnerAndPermissionRequiredMixin, View):
             return SubSection.objects.filter(section_id=section_id, region__isnull=True, is_core=True)
         return SubSection.objects.filter(section_id=section_id, region=request.user.user_profile.region, is_core=False)
 
+
 class ReOrderQuestions(PermissionRequiredMixin, View):
     permission_required = 'auth.can_edit_questionnaire'
 
     def post(self, *args, **kwargs):
         sub_section = SubSection.objects.get(id=kwargs.get('subsection_id'))
+        if self._no_questions_to_reorder():
+            messages.warning(self.request, "There was nothing to re-order.")
+            return HttpResponseRedirect(sub_section.get_absolute_url())
+
         QuestionReIndexer(self.request.POST).reorder_questions()
+        messages.success(self.request, "The questions were reordered successfully")
         return HttpResponseRedirect(sub_section.get_absolute_url())
+
+    def _no_questions_to_reorder(self):
+        post_data = self.request.POST
+        return len(post_data.keys()) <= 1 and 'csrfmiddlewaretoken' in post_data.keys()
 
 
 class MoveSubsection(PermissionRequiredMixin, View):
