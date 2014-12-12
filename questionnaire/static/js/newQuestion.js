@@ -56,7 +56,10 @@ var app = angular.module('questionnaireApp', [])
                         .filter(function(o) { return o != "" && o != null; })
                         .map(function(o) { return {text: o}; });
                 } else {
-                    $scope.existingQuestionOptions = [{}];
+                    $scope.existingQuestionOptions = [];
+                }
+                if($scope.existingQuestionOptions.length === 0) {
+                    $scope.addOption();
                 }
                 clickCustomCount ++;
             } else {
