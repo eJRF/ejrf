@@ -19,6 +19,8 @@ class AnswerForm(ModelForm):
         self.is_editing = False
         self._set_instance()
         self.question_group = self._initial['group'] if self._initial else None
+        self.fields['response'].widget.attrs.update({'class': 'input-question-id-%s' % self.question.id})
+
 
     def _set_initial(self, kwargs):
         initial = kwargs['initial'] if 'initial' in kwargs else {}
@@ -103,9 +105,8 @@ class DateAnswerForm(AnswerForm):
             return forms.DateInput(attrs={'class': 'form-control date-time-picker', 'data-date-format': 'mm/yyyy',
                                           'data-date-option': 'mm'})
         else:
-            return forms.DateInput(attrs={'class': 'form-control date-time-picker', 'data-date-format': 'dd/mm/yyyy',
+            return forms.DateInput(attrs={'class': 'form-control date-time-picker input-question-id-%s' % self.question.id, 'data-date-format': 'dd/mm/yyyy',
                                           'data-date-option': 'dd'})
-
 
 class MultiChoiceAnswerForm(AnswerForm):
     response = ModelChoiceField(queryset=None, widget=forms.Select(), required=False)
@@ -140,10 +141,10 @@ class MultiChoiceAnswerForm(AnswerForm):
         if 'option' in self.initial.keys() and self.initial['question'].is_primary:
             return forms.Select(attrs={'class': 'hide'})
         if self.widget_is_radio_button(query_set):
-            return SkipRuleRadioWidget(self.question_group.subsection)
+            return SkipRuleRadioWidget(self.question_group.subsection, attrs={'class': 'input-question-id-%s' % self.question.id})
         if query_set.exclude(instructions=None).exists() or query_set.exclude(skip_rules=None).exists():
-            return MultiChoiceAnswerSelectWidget(self.question_group.subsection, question_options=query_set)
-        return forms.Select()
+            return MultiChoiceAnswerSelectWidget(self.question_group.subsection, question_options=query_set, attrs={'class': 'input-question-id-%s' % self.question.id})
+        return forms.Select(attrs={'class': 'input-question-id-%s' % self.question.id})
 
     def _get_response_choices(self, kwargs):
         all_options = self.question.options.order_by('order')
