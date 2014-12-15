@@ -1,0 +1,7 @@
+.horizontal-ul {
+	display: inline-block;
+}
+
+.horizontal-ul li textarea {
+	width: 120px;
+}
