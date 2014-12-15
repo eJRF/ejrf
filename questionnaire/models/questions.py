@@ -42,7 +42,7 @@ class Question(BaseModel):
         return not self.region
 
     def __unicode__(self):
-        return "%s" % self.text
+        return "%s" % self.export_label
 
     def group(self):
         return self.question_group.all()[0]

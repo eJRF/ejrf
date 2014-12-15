@@ -26,6 +26,7 @@ class QuestionTest(BaseTest):
         self.country = Country.objects.create(name="Uganda")
         self.regions.countries.add(self.country)
         self.question1 = Question.objects.create(text='B. Number of cases tested',
+                                                 export_label='B. Number of cases tested',
                                                  instructions="instructions hahaha",
                                                  UID='C00003', answer_type='Number')
         self.parent_group = QuestionGroup.objects.create(subsection=self.sub_section_1, name="Laboratory Investigation")
@@ -40,7 +41,7 @@ class QuestionTest(BaseTest):
         self.assertEqual(str(self.question1), 'B. Number of cases tested'.encode('utf8'))
 
     def test_question_knows_its_in_questionnaire(self):
-        question1 = Question.objects.create(text='B. Number of cases tested', UID='00023', answer_type='Number')
+        question1 = Question.objects.create(text='B. Number of cases tested', export_label='B. Number of cases tested', UID='00023', answer_type='Number')
         self.assertFalse(question1.is_assigned_to(self.questionnaire))
 
     def test_question_knows_groups_it_is_in_given_a_questionnaire(self):
