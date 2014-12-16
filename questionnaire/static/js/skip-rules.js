@@ -12,15 +12,14 @@ var getElementsToSkip = function(selectedElements, dataAttribute) {
     });
 };
 
-var scopedSkipRules = (function(scope) {
+var scopedSkipRules = (function(scope, dataAttribute, hFn, sFn) {
     var scope = $(scope);
+    var hideFn = function (val) { return hFn(scope, val); }
+    var showFn = function (val) { return sFn(scope, val); }
 
     return {
         hiddenQuestionIds : [],
-        showGridQuestion: function(val) {
-            scope.find('.form-group-question-' + val).show();
-        },
-        showGridElements: function(elementsToBeHidden, showFn) {
+        showGridElements: function(elementsToBeHidden) {
             var self = this;
             $.map(self.hiddenQuestionIds, function(val, _) {
                 if ($.inArray(val, elementsToBeHidden) === -1) {
@@ -39,11 +38,9 @@ var scopedSkipRules = (function(scope) {
         },
         hideQuestions: function() {
             var allSelectedResponses = this.getAllSelectedResponses(scope),
-                questionIdsToHide = getElementsToSkip(allSelectedResponses, 'data-skip-hybrid-grid-rules');
-            this.showGridElements(questionIdsToHide, this.showGridQuestion);
-            $.map(questionIdsToHide, function(val) {
-                scope.find('.form-group-question-' + val).hide();
-            });
+                questionIdsToHide = getElementsToSkip(allSelectedResponses, dataAttribute);
+            this.showGridElements(questionIdsToHide);
+            $.map(questionIdsToHide, hideFn);
             this.hiddenQuestionIds = questionIdsToHide;
         },
         bindOnChangeEventListener: function() {
@@ -63,6 +60,21 @@ var scopedSkipRules = (function(scope) {
     }
 });
 
+var createScopedHybridRules = function(scope) {
+    var questionSelector = '.form-group-question-';
+    var dataAttribute = 'data-skip-hybrid-grid-rules';
+    var hideFn = function(scope, val) {
+        scope.find(questionSelector + val).hide();
+    };
+    var showFn = function(scope, val) {
+        scope.find(questionSelector + val).show();
+    };
+
+    var gridInstanceRule = new scopedSkipRules(scope, dataAttribute, hideFn, showFn);
+    gridInstanceRule.bindAddMoreListener();
+    return gridInstanceRule;
+}
+
 var applySkipRules = (function () {
     var self = this;
     var allRadios = $(":radio"),
@@ -72,9 +84,9 @@ var applySkipRules = (function () {
 
     $(document).ready(function () {
         var allgrids = $('.hybrid-group-row');
+
         for(grid in allgrids.toArray()){
-            var gridInstanceRule = new scopedSkipRules(allgrids[grid]);
-            gridInstanceRule.bindAddMoreListener();
+            createScopedHybridRules(allgrids[grid]);
         }
 
         hideAllQuestions();
@@ -241,8 +253,7 @@ var applySkipRules = (function () {
         bindSkipRulesOn: function (gridInstance) {
             $(gridInstance).find('div[class^="form-group form-group-question-"]').show();
             $(gridInstance).find('li[class^="form-group-question-"]').show();
-            var gridInstanceRule = new scopedSkipRules(gridInstance);
-            gridInstanceRule.bindAddMoreListener();
+            createScopedHybridRules(gridInstance);
         },
         bindSkipRulesOnDisplayAll: function(){
             var self = this;
