@@ -8,6 +8,7 @@ from questionnaire.forms.assign_question import AssignQuestionForm
 from questionnaire.mixins import RegionAndPermissionRequiredMixin
 from questionnaire.models import SubSection, Question, QuestionGroup
 from questionnaire.models.skip_rule import SkipQuestion
+from questionnaire.utils.model_utils import reindex_orders_in
 
 
 class AssignQuestion(RegionAndPermissionRequiredMixin, View):
@@ -55,5 +56,6 @@ class UnAssignQuestion(RegionAndPermissionRequiredMixin, View):
         if skip_questions.exists():
             skip_questions.delete()
         QuestionGroup.objects.annotate(Count('question')).filter(question__count__lte=0, subsection=subsection).delete()
+        reindex_orders_in(QuestionGroup, subsection=subsection)
         messages.success(request, "Question successfully unassigned from questionnaire.")
         return HttpResponseRedirect(referer_url)
