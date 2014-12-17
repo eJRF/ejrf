@@ -7,7 +7,7 @@ from django.db import models
 class Migration(DataMigration):
 
     def forwards(self, orm):
-        for question in orm.question.objects.all():
+        for question in orm.question.objects.exclude(export_label__isnull=False):
             question.export_label = question.text
             question.save()
 
