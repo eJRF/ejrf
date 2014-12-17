@@ -50,11 +50,6 @@
   args:
     chdir: /srv/checkout/
 
-- name: ejrf migrate d
-  script: migrate-data.sh
-  args:
-    chdir: /srv/checkout/
-
 - service: name=nginx state=restarted
   sudo: yes
 
