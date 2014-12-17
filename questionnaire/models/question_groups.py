@@ -52,13 +52,12 @@ class QuestionGroup(BaseModel):
 
     def is_in_grid(self):
         if self.parent is not None:
-            return self.grid or self.parent.is_in_grid()
-        else:
-            return self.grid
+            return self.grid or self.parent.grid
+        return self.grid
 
     def parent_group(self):
         if self.parent:
-            return self.parent.parent_group()
+            return self.parent
         return self
 
     def parent_group_id(self):
@@ -66,7 +65,7 @@ class QuestionGroup(BaseModel):
 
     def is_in_hybrid_grid(self):
         if self.parent:
-            return self.hybrid or self.parent.is_in_hybrid_grid()
+            return self.hybrid or self.parent.hybrid
         return self.hybrid
 
     def remove_question(self, question):
