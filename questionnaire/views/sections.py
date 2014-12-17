@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse
 from django.views.generic import CreateView, UpdateView, DeleteView, View
+from django.utils.cache import add_never_cache_headers
 
 from questionnaire.forms.sections import SectionForm, SubSectionForm
 from questionnaire.mixins import RegionAndPermissionRequiredMixin, DoesNotExistExceptionHandlerMixin, \
@@ -196,7 +197,9 @@ class GetSubSections(OwnerAndPermissionRequiredMixin, View):
         section_id = kwargs.get("section_id")
         subsections = self._get_subsections(section_id, request)
         subsections_dict = map(lambda subsection: subsection.to_dict(), subsections)
-        return HttpResponse(json.dumps(subsections_dict), content_type="application/json", status=200)
+        response = HttpResponse(json.dumps(subsections_dict), content_type="application/json", status=200)
+        add_never_cache_headers(response)
+        return response
 
     def _get_subsections(self, section_id, request):
         if request.user.user_profile.is_global_admin:

@@ -3,6 +3,7 @@ import json
 from django.http import HttpResponse
 from django.views.generic import View
 from django.core import serializers
+from django.utils.cache import add_never_cache_headers
 from braces.views import PermissionRequiredMixin
 
 from questionnaire.models import QuestionGroup
@@ -28,4 +29,6 @@ class SubsectionQuestions(PermissionRequiredMixin, View):
                 question_dict['inGrid'] = qg.is_in_grid()
                 questions.append(question_dict)
         data = {'questions': questions}
-        return HttpResponse(json.dumps(data), content_type="application/json")
+        response = HttpResponse(json.dumps(data), content_type="application/json")
+        add_never_cache_headers(response)
+        return response
