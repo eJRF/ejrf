@@ -9,7 +9,8 @@
                         <label class="column-label">Column <span class="number"> {{ forloop.counter }} </span></label>
                         <select  name="columns" class="required">
                             {% for question in non_primary_questions %}
-                                <option value="{{ question.id }}" {% if question.id|slugify == id %}selected{% endif %}>{{ question.text }}</option>
+                                <option value="{{ question.id }}" {% if question.id|slugify == id %}selected{% endif %}>
+                                {{ question.export_label }}</option>
                             {% endfor %}
                         </select>
                         <a href="javascript:;" class="input-group-addon btn btn-sm btn-primary add-column"><i class="glyphicon glyphicon-plus"></i></a>
