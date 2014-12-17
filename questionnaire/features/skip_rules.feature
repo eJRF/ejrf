@@ -77,7 +77,7 @@ Feature: Skip Rules
     Then I should see '0' existing skip rules
     When I create a new question skip rule
     Then I should see '1' existing skip rules
-    When I create a new subsection skip rule
+    When I create a new regional subsection skip rule
     Then I should see '2' existing skip rules
     When I choose to see existing skip rules
     Then I should see an option to delete skip rules

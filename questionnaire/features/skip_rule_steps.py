@@ -134,7 +134,7 @@ def then_that_question_should_no_longer_be_displayed(step):
 
 @step(u'When I create a new subsection skip rule')
 def when_i_create_a_new_subsection_skip_rule(step):
-    world.skip_rule_page.create_new_sub_rule()
+    world.skip_rule_page.create_new_sub_rule(world.root_question, world.sub_section_2)
 
 
 @step(u'And I have a hybrid group with multichoice question and other questions')
@@ -210,6 +210,9 @@ def then_i_should_see_options_to_add_skip_rules(step):
     world.page.is_text_present('Add Skip Rule')
     world.page.is_element_present_by_id('id-create-skip-rule-%s' % world.sub_section.id)
 
+@step(u'When I create a new regional subsection skip rule')
+def when_i_create_a_new_regional_subsection_skip_rule(step):
+    world.skip_rule_page.create_new_sub_rule(world.core_qn01, world.regional_subsection)
 
 @step(u'When I select the option to add skip rules to a subsection')
 def when_i_select_the_option_to_add_skip_rules_to_a_subsection(step):

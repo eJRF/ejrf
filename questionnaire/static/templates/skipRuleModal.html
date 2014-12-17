@@ -84,7 +84,7 @@
                     <div class="col-sm-7 center-fields">
                         <select  name="subsection_root_question"
                                 data-ng-model="skipRule.rootQuestion"
-                                data-ng-options="q.fields.export_label for q in questions | filter: {fields:{answer_type: 'MultiChoice'}}">
+                                data-ng-options="q.fields.export_label for q in questions | filter: {fields:{answer_type: 'MultiChoice'}} | filter:filterQuestions track by q.pk">
                             <option value="">Select Root Question</option>
                         </select>
                     </div>

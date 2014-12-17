@@ -16,12 +16,12 @@ class SkipRuleModalPage(PageObject):
         self.browser.find_by_id("save-skip-rule-button")[0].click()
         time.sleep(2)
 
-    def create_new_sub_rule(self):
+    def create_new_sub_rule(self, root_qn, skip_subsection):
         self.view_create_new_sub_rules()
-        self.browser.find_by_name('skip_subsection')[0].select('2')
-        self.browser.find_by_name('subsection_root_question')[0].select('0')
-        self.browser.find_by_name('subsection_response')[0].click()
-        self.browser.find_by_id("save-subsection-skip-rule-button")[0].click()
+        self.browser.find_by_name('skip_subsection').first.select('%s' % skip_subsection.id)
+        self.browser.find_by_name('subsection_root_question').first.select('%s' % root_qn.id)
+        self.browser.find_by_name('subsection_response').first.click()
+        self.browser.find_by_id("save-subsection-skip-rule-button").first.click()
         time.sleep(2)
 
     def view_create_new_qn_rules(self):
