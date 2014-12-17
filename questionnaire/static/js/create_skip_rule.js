@@ -95,6 +95,8 @@ var skipRuleController = function ($scope, skipRuleService) {
             $scope.subsectionTabHidden = true;
             $scope.filterQuestions = function (question) { return question.parentQuestionGroup == gridId; };
             $scope.filterRules = function (rule) { return rule.group_id == gridId; };
+        }else{
+            $scope.filterQuestions = function (question) { return !question.inGrid };
         }
     };
 

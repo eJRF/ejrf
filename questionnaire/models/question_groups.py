@@ -42,10 +42,7 @@ class QuestionGroup(BaseModel):
         other_group.save()
 
     def contains_or_sub_group_contains(self, question):
-        if question in self.all_questions():
-            return True
-        else:
-            return True in map(lambda group: group.contains_or_sub_group_contains(question), self.sub_groups())
+        return question in self.ordered_questions()
 
     def sub_groups(self):
         all_groups = list(self.sub_group.all())

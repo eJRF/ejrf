@@ -20,10 +20,13 @@ class QuestionGroupTest(BaseTest):
     def test_contains_or_sub_group_contains_where_question_is_in_parent(self):
         question = QuestionFactory()
         self.parent_question_group.question.add(question)
+        QuestionGroupOrder.objects.create(question=question, order=1, question_group=self.parent_question_group)
         self.assertTrue(self.parent_question_group.contains_or_sub_group_contains(question))
 
 
     def test_contains_or_sub_group_contains_where_question_is_in_sub_group(self):
+        QuestionGroupOrder.objects.create(question=self.question, order=1, question_group=self.parent_question_group)
+
         self.assertTrue(self.parent_question_group.contains_or_sub_group_contains(self.question))
 
 
