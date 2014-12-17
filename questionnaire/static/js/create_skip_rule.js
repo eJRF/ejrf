@@ -15,8 +15,6 @@ var skipRuleController = function ($scope, skipRuleService) {
     $scope.reset = function() {
         $scope.existingRules = [];
 
-        $scope.filterQuestions = function (question) { return true; };
-        $scope.filterRules = function (rule) { return true; };
         $scope.skipRule = {selectedQuestion: {}, rootQuestion: {}, csrfToken: window.csrfToken};
         $scope.resetResults();
     };
