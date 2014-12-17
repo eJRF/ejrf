@@ -100,15 +100,6 @@ class EditQuestion(OwnerAndPermissionRequiredMixin, UpdateView):
                         'question_options': options})
         return context
 
-    # def post(self, request, *args, **kwargs):
-    #     # UpdateView.post(self, request, *args, **kwargs)
-    #     region = self.request.user.user_profile.region
-    #     self.form = QuestionForm(region=region, data=request.POST)
-    #     self.form.question_options = map(lambda o: str(o), dict(request.POST).get('options', []))
-    #     if self.form.is_valid():
-    #         return self.form_valid(self.form)
-    #     return self.form_invalid(self.form)
-
     def form_valid(self, form):
         message = "Question successfully updated."
         messages.success(self.request, message)

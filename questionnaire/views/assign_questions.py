@@ -52,9 +52,8 @@ class UnAssignQuestion(RegionAndPermissionRequiredMixin, View):
         groups_in_subsection = subsection.question_group.all()
         question.question_group.remove(*groups_in_subsection)
         question.orders.filter(question_group__in=groups_in_subsection).delete()
-        skip_questions = SkipQuestion.objects.filter(Q(skip_question=question) | Q(root_question=question))
-        if skip_questions.exists():
-            skip_questions.delete()
+        question.root_skip_rules.filter(subsection=subsection).delete()
+        question.skip_rules.filter(subsection=subsection).delete()
         QuestionGroup.objects.annotate(Count('question')).filter(question__count__lte=0, subsection=subsection).delete()
         reindex_orders_in(QuestionGroup, subsection=subsection)
         messages.success(request, "Question successfully unassigned from questionnaire.")
