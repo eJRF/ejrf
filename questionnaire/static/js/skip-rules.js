@@ -138,10 +138,13 @@ var applySkipRules = (function() {
         createSkipSubsectionRules();
     });
     return {
-        bindSkipRulesOn: function(gridInstance) {
-            $(gridInstance).find('div[class^="form-group form-group-question-"]').show();
-            $(gridInstance).find('li[class^="form-group-question-"]').show();
+        bindSkipRulesOn: function(gridInstance, showFn) {
+            showFn(gridInstance)
             createScopedHybridRules(gridInstance);
+        },
+        bindAddMoreSkipRulesOn: function(tableRow, showFn){
+            showFn(tableRow)
+            createScopedDisplayAllRules(tableRow);
         }
     };
 })();

@@ -172,19 +172,30 @@ $('input[type=radio]').on('click', function () {
     $redundant_hidden_radio.remove();
 });
 
+var showHybridRows = function(gridInstance){
+    $(gridInstance).find('div[class^="form-group form-group-question-"]').show();
+    $(gridInstance).find('li[class^="form-group-question-"]').show();
+}
+
 $('.add-more').on('click', function (event) {
     var $el = $(this);
     var $new_row = addRowOn($el, '.hybrid-group-row', '.question-group');
     showSeparator($new_row);
 
     //applySkipRules.bindSkipRulesOn is exported by skip-rules.js
-    applySkipRules.bindSkipRulesOn($new_row);
+    applySkipRules.bindSkipRulesOn($new_row, showHybridRows);
     event.preventDefault();
 });
 
+var showAddMoreRows = function(tableRow){
+    $(tableRow).find('input[class^="input-question-id-"]').prop('disabled', false);
+    $(tableRow).find('select[class^="input-question-id-"]').prop('disabled', false);
+}
+
 $('.add-row').on('click', function (event) {
     var $el = $(this);
-    addRowOn($el, 'tr', 'table');
+    var $newRow = addRowOn($el, 'tr', 'table');
+    applySkipRules.bindAddMoreSkipRulesOn($newRow, showAddMoreRows)
     event.preventDefault();
 });
 
