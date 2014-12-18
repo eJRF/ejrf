@@ -2,7 +2,16 @@ function setUpHTMLFixture(html) {
     $('body').append(html);
 }
 
+var fns = {
+    hide: function(val) { return; },
+    show: function(val) { return; }
+};
+
 describe("skip rules", function() {
+
+    beforeEach(function() {
+        $('body').html('<div></div>');
+    });
 
     describe('Skipping Simple Questions', function(){
         describe("getElementsToSkip", function() {
@@ -15,17 +24,7 @@ describe("skip rules", function() {
 
             setUpHTMLFixture(unselectedOptions);
 
-            var questionSelector = '.form-group-question-';
-            var scope = $('body');
-
-            var hideFn = function(val) {
-                scope.find(questionSelector + val).hide();
-            };
-            var showFn = function(val) {
-                scope.find(questionSelector + val).show();
-            };
-
-            var gridInstanceRule = new scopedSkipRules(scope, 'data-skip-rules', hideFn, showFn);
+            var gridInstanceRule = new scopedSkipRules($('body'), 'data-skip-rules', fns.hide, fns.show);
 
             it("should return an empty collection when passed an empty collection", function(){
                 expect(gridInstanceRule.getElementsToSkip().length).toEqual(0);
@@ -35,53 +34,69 @@ describe("skip rules", function() {
                 var html = '<div>'
                     + '<select>'
                     + '<option class="singleElementNoAttr" data-skip-rules></option>'
-                    + '<option class="singleElementWithAttr" data-skip-rules="23" selected></option>'
+                    + '<option class="singleElementWithAttr" data-skip-rules="23" selected="selected"></option>'
                     + '</select>'
                     +'</div>'
                 setUpHTMLFixture(html)
 
                 var actualResult = gridInstanceRule.getElementsToSkip();
+                gridInstanceRule.hideQuestions()
                 expect(actualResult.length).toEqual(1);
                 expect(actualResult[0]).toEqual('23');
             });
         });
 
         describe("showElements", function() {
-           var html = '<div class="grid-group">'
-            + '<select>'
-            + '<option class="singleElementNoAttr" data-skip-rules></option>'
-            + '<option class="singleElementWithAttr" data-skip-rules="23" selected></option>'
-            + '</select>'
-            +'</div>'
-
-            var fns = {
-                hide: function(val) { return; },
-                show: function(val) { return; }
-            };
-
-            var gridInstanceRule = new scopedSkipRules($('.grid-group'), 'data-skip-rules', fns.hide, fns.show);
-
             it("should not call show if both lists are empty", function() {
                 spyOn(fns, 'show');
+                var gridInstanceRule = new scopedSkipRules($('body'), 'data-skip-rules', fns.hide, fns.show);
+
                 gridInstanceRule.showGridElements([]);
                 expect(fns.show.calls.length).toEqual(0);
             });
 
-            xit("should call show once if currently hidden questions has an id that is not in the questions to hide", function() {
+            it("should call show once if currently hidden questions has an id that is not in the questions to hide", function() {
                 spyOn(fns, 'show');
-                gridInstanceRule.hiddenQuestionIds.push("22")
+                var gridInstanceRule = new scopedSkipRules($('body'), 'data-skip-rules', fns.hide, fns.show);
+
+                gridInstanceRule.hiddenQuestionIds.push("22", '43')
                 gridInstanceRule.showGridElements(["23"]);
-                expect(fns.show.calls.length).toEqual(1);
+
+                expect(fns.show).toHaveBeenCalledWith("22");
+                expect(fns.show).toHaveBeenCalledWith("43");
              });
-            xit("should not call show currently hidden questions no ids", function() {
+
+            it("should not call show currently hidden questions no ids", function() {
                 spyOn(fns, 'show');
-                applySkipRules.showGridElements([],["23","43"], fns.show);
+                var gridInstanceRule = new scopedSkipRules($('body'), 'data-skip-rules', fns.hide, fns.show);
+
+                gridInstanceRule.showGridElements(["23"]);
                 expect(fns.show.calls.length).toEqual(0);
             });
-            xit("should not call show if both lists contain the same elements", function() {
+
+            it("should not call show if both lists contain the same elements", function() {
                 spyOn(fns, 'show');
-                applySkipRules.showGridElements(["23","43"],["23","43"], fns.show);
+                var gridInstanceRule = new scopedSkipRules($('body'), 'data-skip-rules', fns.hide, fns.show);
+
+                gridInstanceRule.hiddenQuestionIds.push("23", '43')
+
+                gridInstanceRule.showGridElements(["23","43"]);
                 expect(fns.show.calls.length).toEqual(0);
+            });
+        });
+
+        describe('getAllSelectedResponses', function(){
+            it('returns the selected HTML nodes', function(){
+                var html = '<div>'
+                    + '<select>'
+                    + '<option class="singleElementNoAttr" data-skip-rules></option>'
+                    + '<option class="singleElementWithAttr" data-skip-rules="23" selected="selected"></option>'
+                    + '</select>'
+                    +'</div>'
+                setUpHTMLFixture(html)
+                var gridInstanceRule = new scopedSkipRules($('body'), 'data-skip-rules', fns.hide, fns.show);
+                var actualResult = gridInstanceRule.getAllSelectedResponses()
+                expect(actualResult.length).toEqual(1);
             });
         });
     });

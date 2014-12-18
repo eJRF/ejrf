@@ -5,16 +5,13 @@ var scopedSkipRules = (function(scope, dataAttribute, hideFn, showFn) {
         hiddenQuestionIds: [],
         getElementsToSkip: function() {
             var selectedElements = this.getAllSelectedResponses();
-            var elements = $.map(selectedElements, function(val) {
+            return $.map(selectedElements, function(val) {
                 if (val.attributes[dataAttribute]) {
                     var data = val.attributes[dataAttribute];
                     return data && data.value.split(",");
-                } else {
-                    return '';
                 }
-            });
-            return $.grep(elements, function(val, _) {
-                return val !== '';
+            }).filter(function(questionId) {
+                return questionId !== ''
             });
         },
         showGridElements: function(elementsToBeHidden) {
@@ -87,7 +84,7 @@ var createScopedDisplayAllRules = function(scope) {
 };
 
 
-var createSkipQuestionRules = function(){
+var createSkipQuestionRules = function() {
     var questionSelector = '.form-group-question-';
     var scope = $('body');
 
@@ -104,7 +101,7 @@ var createSkipQuestionRules = function(){
     return gridInstanceRule;
 }
 
-var createSkipSubsectionRules = function(){
+var createSkipSubsectionRules = function() {
     var scope = $('body');
 
     var hideFn = function(id) {
@@ -142,7 +139,7 @@ var applySkipRules = (function() {
             showFn(gridInstance)
             createScopedHybridRules(gridInstance);
         },
-        bindAddMoreSkipRulesOn: function(tableRow, showFn){
+        bindAddMoreSkipRulesOn: function(tableRow, showFn) {
             showFn(tableRow)
             createScopedDisplayAllRules(tableRow);
         }
