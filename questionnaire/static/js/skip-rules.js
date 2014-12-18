@@ -69,12 +69,14 @@ var createScopedDisplayAllRules = function(scope) {
     var questionSelector = '.input-question-id-';
 
     var hideFn = function(val) {
-        var element = $(scope).find(questionSelector + val);
-        element.prop('disabled', true);
+        var element = $(scope).find(questionSelector + val)
+        .prop('disabled', true)
+        .addClass('grayed-out');
     };
     var showFn = function(val) {
-        var element = $(scope).find(questionSelector + val);
-        element.prop('disabled', false);
+        var element = $(scope).find(questionSelector + val)
+        .prop('disabled', false)
+        .removeClass('grayed-out');
     };
 
     var gridInstanceRule = new scopedSkipRules($(scope), 'data-skip-rules', hideFn, showFn);

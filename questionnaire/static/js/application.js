@@ -188,8 +188,8 @@ $('.add-more').on('click', function (event) {
 });
 
 var showAddMoreRows = function(tableRow){
-    $(tableRow).find('input[class^="input-question-id-"]').prop('disabled', false);
-    $(tableRow).find('select[class^="input-question-id-"]').prop('disabled', false);
+    $(tableRow).find('input[class^="input-question-id-"]').prop('disabled', false).removeClass('grayed-out');
+    $(tableRow).find('select[class^="input-question-id-"]').prop('disabled', false).removeClass('grayed-out');
 }
 
 $('.add-row').on('click', function (event) {

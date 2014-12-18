@@ -584,3 +584,8 @@ select.hide {
 .hybrid-group-row {
     padding-top: 40px;
 }
+
+.grayed-out{
+    background-color: lightgray;
+    border: 0;
+}
