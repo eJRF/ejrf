@@ -9,7 +9,7 @@
             <select  name="columns">
                 <option value=''>Choose One</option>
                 {% for question in non_primary_questions %}
-                    <option value="{{ question.id }}" theme="{{ question.theme.id }}">{{ question.text }}</option>
+                    <option value="{{ question.id }}" theme="{{ question.theme.id }}">{{ question.export_label }}</option>
                 {% endfor %}
             </select>
             <input type="hidden" name="subgroup" />
@@ -22,7 +22,7 @@
         <select  name="columns">
             <option value=''>Choose One</option>
             {% for question in non_primary_questions %}
-                <option value="{{ question.id }}" theme="{{ question.theme.id }}">{{ question.text }}</option>
+                <option value="{{ question.id }}" theme="{{ question.theme.id }}">{{ question.export_label }}</option>
             {% endfor %}
         </select>
         <a href="javascript:;" class="input-group-addon btn btn-sm btn-primary add-column"><i class="glyphicon glyphicon-plus"></i></a>
