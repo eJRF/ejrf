@@ -383,3 +383,21 @@ function addSpecifyField($element) {
             "placeholder='Specify'>";
     $element.after($otherField);
 }
+
+function assignOptionNumbers($form) {
+    assignOptionNumbersUsing($form, "span.number");
+    assignOptionNumbersUsing($form, "span.mid-table-number");
+    assignIdsWithNumbers($form, 'select[name=columns]');
+}
+
+function assignOptionNumbersUsing($form, number_selector) {
+    $form.find(number_selector).each(function (i, element) {
+        $(element).text(++i);
+    });
+}
+
+function assignIdsWithNumbers($form, inputName) {
+    $form.find(inputName).each(function (i, element) {
+        $(element).attr('id', 'id-column-' + i);
+    });
+}

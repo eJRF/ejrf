@@ -160,7 +160,7 @@ class SkipQuestionGetTest(BaseTest):
         response = self.client.get(self.url)
         expected_data = {"skip_question": "A nice question",
                          "root_question": "A nice question",
-                         "is_in_hygrid": True,
+                         "is_in_grid": True,
                          "group_id": self.question_group.id,
                          "id": self.skip_rule.id,
                          "response": "Yes",
@@ -202,7 +202,7 @@ class RegionalSkipQuestionGetTest(BaseTest):
         response = self.client.get(self.url)
         global_rules = {"skip_question": "A nice question",
                         "root_question": "A nice question",
-                        "is_in_hygrid": True,
+                        u"is_in_grid": True,
                         "group_id": self.global_question_group.id,
                         "id": self.global_skip_rule.id,
                         "response": "Yes",
@@ -211,7 +211,7 @@ class RegionalSkipQuestionGetTest(BaseTest):
 
         regional_rules = {u"skip_question": u"A nice question",
                           u"root_question": u"regional question",
-                          u"is_in_hygrid": True,
+                          u"is_in_grid": True,
                           u"group_id": self.question_group.id,
                           u"id": self.skip_rule.id,
                           u"response": u"Yes",

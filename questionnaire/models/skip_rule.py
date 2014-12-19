@@ -1,4 +1,6 @@
+from django.db.models import Q
 from django.db import models
+
 from model_utils.managers import InheritanceManager
 
 from questionnaire.models.base import BaseModel
@@ -33,7 +35,10 @@ class SkipQuestion(SkipRule):
             return groups[0]
 
     def is_in_hybrid_grid(self):
-        return self._get_question_group().parent_group().hybrid
+        return Question.objects.filter(Q(id=self.root_question.id, question_group__hybrid=True) | Q(id=self.skip_question.id, question_group__hybrid=True)).exists()
+
+    def is_in_grid(self):
+        return Question.objects.filter(Q(id=self.root_question.id, question_group__grid=True) | Q(id=self.skip_question.id, question_group__grid=True)).exists()
 
     def _parent_group_id(self):
         return self._get_question_group().parent_group_id()
@@ -43,7 +48,7 @@ class SkipQuestion(SkipRule):
                 'skip_question': self.skip_question.text,
                 'root_question': self.root_question.text,
                 'response': self.response.text,
-                'is_in_hygrid': self.is_in_hybrid_grid(),
+                'is_in_grid': self.is_in_grid() or self.is_in_hybrid_grid(),
                 'group_id': self._parent_group_id(),
                 'can_delete': user.user_profile.is_global_admin or user.user_profile.region == self.region
         }
