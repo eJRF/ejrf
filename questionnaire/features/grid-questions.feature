@@ -17,6 +17,7 @@ Feature: Grid questions display all
     Then I should see a message that a draft of my responses has been saved
   I should see my responses filled out
 
+  @IE
   Scenario: Response to Grid -- Failure
     When I respond wrongly questions
     And I click the save button

@@ -31,4 +31,4 @@ source ../ejrf_env/bin/activate
 cp eJRF/snap-ci/snap-settings.py eJRF/localsettings.py
 echo "setup for tests done"
 
-./manage.py harvest -t-sauce --tag=-WIP --tag=-Upload
+./manage.py harvest -t-sauce --tag=-WIP --tag=-Upload --tag=-IE
