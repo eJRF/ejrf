@@ -25,7 +25,7 @@
             createSkipRuleForm = $('#create-skip-rule');
 
     createSkipRuleForm.on('hide.bs.modal', function (e) {
-        window.location.href = window.location.pathname;
+        window.location.reload()
     });
 
     createSkipRuleForm.on('show.bs.modal', function (e) {
