@@ -1,4 +1,5 @@
 import json
+from django.contrib.auth.forms import AdminPasswordChangeForm
 
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
@@ -6,7 +7,7 @@ from django.core.urlresolvers import reverse
 from django.test import Client
 
 from questionnaire.forms.filter import UserFilterForm
-from questionnaire.forms.user_profile import UserProfileForm, EditUserProfileForm, ResetPasswordForm
+from questionnaire.forms.user_profile import UserProfileForm, EditUserProfileForm
 from questionnaire.models import Organization, Region, Country, UserProfile
 from questionnaire.tests.base_test import BaseTest
 
@@ -348,7 +349,7 @@ class ResetPasswordViewTest(BaseTest):
         self.client = Client()
         self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
         self.assign('can_edit_questionnaire', self.user)
-        self.assign('can_edit_users', self.user)
+        self.assign('can_view_users', self.user)
 
         self.login_user()
 
@@ -362,30 +363,27 @@ class ResetPasswordViewTest(BaseTest):
 
         self.assertEqual(200, response.status_code)
         self.assertIn('users/reset_password.html', templates)
-        self.assertIsInstance(response.context['reset_password_form'], ResetPasswordForm)
+        self.assertIsInstance(response.context['form'], AdminPasswordChangeForm)
 
     def test_post_with_valid_form_data_resets_userpassword(self):
         form_data = {'password1': 'p@55word', 'password2': 'p@55word'}
-        response = self.client.post(self.url, data=form_data, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        response = self.client.post(self.url, data=form_data)
 
-        self.assertEqual(200, response.status_code)
+        self.assertRedirects(response, expected_url=reverse('list_users_page'))
         self.assertTrue(User.objects.get(id=self.other_user.id).check_password('p@55word'))
 
-        json_loads = json.loads(response.content)
-        expected_data = { 'message': 'The password was succesfully reset' }
-        self.assertIn(expected_data, json_loads)
-
+        expected_data = 'The password was succesfully reset'
+        self.assertIn(expected_data, response.cookies['messages'].value)
 
     def test_with_post_invalid_data_returns_error_message_and_bad_request(self):
         form_data = {'password1': 'p@55word', 'password2': 'p@ssword'}
         response = self.client.post(self.url, data=form_data, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
 
-        self.assertEqual(400, response.status_code)
-        self.assertFalse(self.other_user.check_password('p@55word'))
+        self.assertFalse(User.objects.get(id=self.other_user.id).check_password('p@55word'))
+        self.assertTrue(User.objects.get(id=self.other_user.id).check_password('pass'))
 
-        json_loads = json.loads(response.content)
-        expected_data = { 'message': 'The two password fields didn\'t match.' }
-        self.assertIn(expected_data, json_loads)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(len(response.context['form'].errors), 1)
 
 
 class GetRegionsForOrganizationTest(BaseTest):

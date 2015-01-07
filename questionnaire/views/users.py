@@ -1,14 +1,13 @@
 from braces.views import PermissionRequiredMixin
 from django.contrib import messages
+from django.contrib.auth.forms import AdminPasswordChangeForm
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.db.models import Q
-from django.http import HttpResponse
-import json
-from django.views.generic import ListView, CreateView, UpdateView
+from django.views.generic import ListView, CreateView, UpdateView, FormView
 
 from questionnaire.forms.filter import UserFilterForm
-from questionnaire.forms.user_profile import UserProfileForm, EditUserProfileForm, ResetPasswordForm
+from questionnaire.forms.user_profile import UserProfileForm, EditUserProfileForm
 from questionnaire.models import Organization, Region, Country
 
 
@@ -117,27 +116,33 @@ class EditUser(PermissionRequiredMixin, UpdateView):
         return super(EditUser, self).form_invalid(form)
 
 
-class ResetPassword(PermissionRequiredMixin, UpdateView):
-    permission_required = 'auth.can_edit_users'
+class ResetPassword(PermissionRequiredMixin, FormView):
+    permission_required = 'auth.can_view_users'
 
     def __init__(self, **kwargs):
         super(ResetPassword, self).__init__(**kwargs)
         self.template_name = 'users/reset_password.html'
         self.model = User
-        self.form_class = ResetPasswordForm
         self.success_url = reverse('list_users_page')
-        self.pk_url_kwarg = 'user_id'
+        self.form_class = AdminPasswordChangeForm
+        self.kwargs = kwargs
+
+    def get_form(self, form_class):
+        return form_class(user=self.get_object(), **self.get_form_kwargs())
 
     def get_context_data(self, **kwargs):
         context = super(ResetPassword, self).get_context_data(**kwargs)
-        context['reset_password_form'] = self.form_class()
+        context.update({'btn_label': 'Update Password'})
         return context
 
     def form_valid(self, form):
         form.save()
-        data = [{'message': 'The password was succesfully reset'}]
-        return HttpResponse(json.dumps(data), content_type="application/json", status=200)
+        messages.success(self.request, 'The password was succesfully reset')
+        return super(ResetPassword, self).form_valid(form)
 
     def form_invalid(self, form):
-        messages = "".join([",".join(m) for m in form.errors.values()])
-        return HttpResponse(json.dumps([{'message': messages}]), content_type="application/json", status=400)
+        messages.error(self.request, 'The password was not reset successfully')
+        return super(ResetPassword, self).form_invalid(form)
+
+    def get_object(self):
+        return self.model.objects.get(id=self.kwargs['user_id'])
