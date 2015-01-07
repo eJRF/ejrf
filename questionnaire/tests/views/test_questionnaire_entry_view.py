@@ -1,4 +1,5 @@
 from urllib import quote
+from datetime import datetime
 
 from django.test import Client
 
@@ -775,8 +776,9 @@ class QuestionnaireEntrySubmitTest(BaseTest):
 
 class QuestionnaireCloneViewTest(BaseTest):
     def setUp(self):
+        self.this_year = datetime.now().year
         self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", status=Questionnaire.FINALIZED,
-                                                          year=2013)
+                                                          year=(self.this_year - 1))
         self.section_1 = Section.objects.create(title="Reported Cases of Selected Vaccine Preventable Diseases (VPDs)",
                                                 order=1,
                                                 questionnaire=self.questionnaire, name="Reported Cases")
@@ -823,7 +825,7 @@ class QuestionnaireCloneViewTest(BaseTest):
     def test_post_clone_questionnaire(self):
         form_data = {
             'questionnaire': self.questionnaire.id,
-            'year': 2014,
+            'year': self.this_year,
             'name': 'New name'
         }
         self.assertEqual(1, Questionnaire.objects.all().count())
