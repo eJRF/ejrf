@@ -1,5 +1,6 @@
 from time import sleep
 from lettuce import world, step
+from datetime import datetime
 
 from questionnaire.features.pages.home import HomePage
 from questionnaire.features.pages.manage import ManageJrfPage
@@ -88,7 +89,7 @@ def then_i_should_see_options_for_selecting_a_finalized_questionnaire_and_a_repo
 @step(u'When I select a finalized questionnaire and a reporting year')
 def when_i_select_a_finalized_questionnaire_and_a_reporting_year(step):
     world.page.select('questionnaire', world.questionnaire1.id)
-    world.page.select('year', world.questionnaire1.year + 2)
+    world.page.select('year', (datetime.now().year + 1))
 
 
 @step(u'And I give it a new name')
