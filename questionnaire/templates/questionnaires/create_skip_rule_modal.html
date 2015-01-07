@@ -25,6 +25,7 @@
             createSkipRuleForm = $('#create-skip-rule');
 
     createSkipRuleForm.on('hide.bs.modal', function (e) {
+        $('.add-skip-rule-btn').addClass('disabled');
         window.location.reload()
     });
 
