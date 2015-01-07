@@ -15,6 +15,10 @@
 </div>
 
 <script type="text/javascript">
+    $(document).ready(function(){
+        $('.add-skip-rule-btn').removeClass('disabled');
+    });
+
     var csrfToken = '{{ csrf_token }}';
     var url = "{% url 'skip_rules' %}";
     var sectionId = "{{ section.id }}",
