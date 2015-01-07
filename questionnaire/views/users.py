@@ -3,10 +3,12 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.db.models import Q
+from django.http import HttpResponse
+import json
 from django.views.generic import ListView, CreateView, UpdateView
 
 from questionnaire.forms.filter import UserFilterForm
-from questionnaire.forms.user_profile import UserProfileForm, EditUserProfileForm
+from questionnaire.forms.user_profile import UserProfileForm, EditUserProfileForm, ResetPasswordForm
 from questionnaire.models import Organization, Region, Country
 
 
@@ -113,3 +115,29 @@ class EditUser(PermissionRequiredMixin, UpdateView):
         message = "User was not updated, see errors below"
         messages.error(self.request, message)
         return super(EditUser, self).form_invalid(form)
+
+
+class ResetPassword(PermissionRequiredMixin, UpdateView):
+    permission_required = 'auth.can_edit_users'
+
+    def __init__(self, **kwargs):
+        super(ResetPassword, self).__init__(**kwargs)
+        self.template_name = 'users/reset_password.html'
+        self.model = User
+        self.form_class = ResetPasswordForm
+        self.success_url = reverse('list_users_page')
+        self.pk_url_kwarg = 'user_id'
+
+    def get_context_data(self, **kwargs):
+        context = super(ResetPassword, self).get_context_data(**kwargs)
+        context['reset_password_form'] = self.form_class()
+        return context
+
+    def form_valid(self, form):
+        form.save()
+        data = [{'message': 'The password was succesfully reset'}]
+        return HttpResponse(json.dumps(data), content_type="application/json", status=200)
+
+    def form_invalid(self, form):
+        messages = "".join([",".join(m) for m in form.errors.values()])
+        return HttpResponse(json.dumps([{'message': messages}]), content_type="application/json", status=400)

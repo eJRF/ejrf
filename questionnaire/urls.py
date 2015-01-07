@@ -17,7 +17,7 @@ from questionnaire.views.questionnaires import Entry, SubmitQuestionnaire, Dupli
     FinalizeQuestionnaire, UnfinalizeQuestionnaire, PublishQuestionnaire, ApproveQuestionnaire, DeleteAnswerRow
 from questionnaire.views.theme import ThemeList, NewTheme, EditTheme, DeleteTheme
 from questionnaire.views.upload_document import UploadDocument, DownloadDocument, DeleteDocument
-from questionnaire.views.users import UsersList, CreateUser, EditUser
+from questionnaire.views.users import UsersList, CreateUser, EditUser, ResetPassword
 
 
 urlpatterns = patterns('',
@@ -118,4 +118,5 @@ urlpatterns = patterns('',
                        url(r'^users/$', UsersList.as_view(), name="list_users_page"),
                        url(r'^users/new/$', CreateUser.as_view(), name="create_user_page"),
                        url(r'^users/(?P<user_id>\d+)/edit/$', EditUser.as_view(), name="edit_user"),
+                       url(r'^users/(?P<user_id>\d+)/reset_password/$', ResetPassword.as_view(), name="reset_user_password"),
 )

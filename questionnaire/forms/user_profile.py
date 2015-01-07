@@ -126,3 +126,13 @@ class EditUserProfileForm(ModelForm):
             self._errors[attribute_name] = self.error_class([message])
             del self.cleaned_data[attribute_name]
         return data_attr
+
+
+class ResetPasswordForm(UserCreationForm):
+    class Meta:
+        model = User
+        fields = ("password1", "password2")
+
+    def __init__(self, *args, **kwargs):
+        super(ResetPasswordForm, self).__init__(*args, **kwargs)
+        self.fields['username'].required = False

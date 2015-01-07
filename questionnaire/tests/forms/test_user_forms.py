@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User, Group
 
-from questionnaire.forms.user_profile import UserProfileForm, EditUserProfileForm
+from questionnaire.forms.user_profile import UserProfileForm, EditUserProfileForm, ResetPasswordForm
 from questionnaire.models import Country, Region, UserProfile, Organization
 from questionnaire.tests.base_test import BaseTest
 
@@ -208,3 +208,29 @@ class EditUserProfileFormTest(BaseTest):
         self.assertFalse(edit_user_profile_form.is_valid())
         message = "%s is already associated to a different user." % form_data['email']
         self.assertEquals(edit_user_profile_form.errors['email'], [message])
+
+class ResetPasswordFormTest(BaseTest):
+    def setUp(self):
+        self.saved_user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
+
+        self.form_data = {
+            'password1': 'p@55word',
+            'password2': 'p@55word', }
+
+    def test_is_valid_if_all_passwords_are_eql(self):
+        valid_form = ResetPasswordForm(data=self.form_data, instance=self.saved_user)
+        invalid_form = ResetPasswordForm(data={'password1': 'password', 'password2': 'p@55word'}, instance=self.saved_user)
+
+        self.assertTrue(valid_form.is_valid())
+        self.assertFalse(invalid_form.is_valid())
+
+    def test_save_updates_user_password(self):
+        self.assertFalse(self.saved_user.check_password('p@55word'))
+
+        valid_form = ResetPasswordForm(data=self.form_data, instance=self.saved_user)
+        valid_form.save()
+
+        edited_user = User.objects.get(id=self.saved_user.id)
+
+        self.assertTrue(edited_user.check_password('p@55word'))
+        self.assertEqual(edited_user, self.saved_user)
