@@ -31,7 +31,7 @@ class ViewUtilTest(BaseTest):
         request = self.factory.get('/')
         request.user = self.user
         questionnaire_status = get_questionnaire_status(request)
-        self.assertEqual(3, len(questionnaire_status))
+        self.assertEqual(4, len(questionnaire_status))
         [self.assertIn(status, questionnaire_status) for status in
          [Questionnaire.PUBLISHED, Questionnaire.DRAFT, Questionnaire.FINALIZED]]
 

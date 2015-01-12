@@ -39,6 +39,7 @@ class Entry(DoesNotExistExceptionHandlerMixin, AdvancedMultiplePermissionsRequir
         questionnaire = Questionnaire.objects.get(**query_params)
         section = Section.objects.get(id=self.kwargs['section_id'])
         country = get_country(self.request)
+
         self.user_questionnaire_service = UserQuestionnaireService(country, questionnaire, request.GET.get("version"))
         get_version = self.user_questionnaire_service.GET_version
         initial = {'status': 'Draft', 'country': country,
@@ -229,6 +230,25 @@ class ApproveQuestionnaire(MultiplePermissionsRequiredMixin, View):
         messages.success(self.request, message)
         referer_url = request.META['HTTP_REFERER']
         return HttpResponseRedirect(referer_url)
+
+
+class Archive(MultiplePermissionsRequiredMixin, View):
+    permissions = {'any': ('auth.can_view_users',)}
+    template_name = 'base/modals/_confirm.html'
+
+    def post(self, request, questionnaire_id, *args, **kwargs):
+        questionnaire = Questionnaire.objects.get(id=questionnaire_id)
+        print questionnaire.is_archivable()
+
+        if questionnaire.is_archivable():
+            questionnaire.status = Questionnaire.ARCHIVED
+            questionnaire.save()
+            message = 'The questionnaire %s was archived successfully.' % questionnaire.name
+            messages.success(request, message)
+            return HttpResponseRedirect(questionnaire.absolute_url())
+        message = 'The questionnaire \'%s\' could not be archived, because it is ' % questionnaire.status
+        messages.warning(request, message)
+        return HttpResponseRedirect(questionnaire.absolute_url())
 
 
 class DeleteAnswerRow(PermissionRequiredMixin, View):

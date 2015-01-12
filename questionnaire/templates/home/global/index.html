@@ -63,11 +63,14 @@
                                        id="id-publish-questionnaire-{{ questionnaire.id }}">
                                         <span class="glyphicon glyphicon-send"></span> Send to Regions
                                     </a>
-                                    <a href="#"
-                                       class="btn btn-default btn-xs"
-                                       id="id-publish-questionnaire-{{ questionnaire.id }}">
-                                        <span class="icon-archive"> <i class="fontastic-fonts"></i>Archive</span>
-                                    </a>
+                                    {% if questionnaire.is_archivable %}
+                                        <a href="#" data-target="#archive-questionnaire-modal-{{ questionnaire.id }}"
+                                           class="btn btn-default btn-xs" data-toggle="modal"
+                                           id="id-archive-questionnaire-{{ questionnaire.id }}">
+                                            <span class="icon-archive"> <i class="fontastic-fonts"></i>Archive</span>
+                                        </a>
+                                        {% include 'base/modals/_confirm.html' with object_type='Questionnaire' title='Confirm Archive Questionnaire' action="archive" url=questionnaire.id|get_url_with_ids:"approve_questionnaire_page" object=questionnaire confirm='Yes' extra_message="If any regional adaptions exist, they will be archived too and you will have to resend this revison to all the regional admins." %}
+                                    {% endif %}
 
                                     {% if questionnaire.is_finalized %}
                                         <a class="btn btn-xs btn-default" id="id-unfinalize-{{ questionnaire.id }}"
@@ -153,7 +156,6 @@
             </div>
         {% endfor %}
     </div>
-
     <div class="modal fade create-grid" id="duplicate-questionnaire-modal" tabindex="-1" role="dialog"
      aria-labelledby="preview_modal_label" aria-hidden="true">
     <div class="modal-dialog modal-medium">

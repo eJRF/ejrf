@@ -13,6 +13,13 @@ class Questionnaire(BaseModel):
     PUBLISHED = 'published'
     FINALIZED = 'finalized'
     ARCHIVED = 'archived'
+
+    PERMS_STATUS_MAP = {
+        'auth.can_edit_questionnaire': [PUBLISHED, DRAFT, FINALIZED, ARCHIVED],
+        'auth.can_view_users': [PUBLISHED, DRAFT, FINALIZED, ARCHIVED],
+        'auth.can_submit_responses': [PUBLISHED]
+    }
+
     STATUS = Choices(FINALIZED, PUBLISHED, DRAFT, ARCHIVED)
     name = models.CharField(max_length=256, null=False, blank=False)
     description = models.TextField(null=True, blank=True)

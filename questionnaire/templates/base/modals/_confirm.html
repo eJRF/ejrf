@@ -7,7 +7,15 @@
                 <h4 class="modal-title cyan" id="confirm_modal_{{ object.id }}_label">{{ title }}</h4>
             </div>
             <div class="modal-body">
-                Are you sure you want to {{ action }} this {{ object_type.lower }}?
+                <p>
+                    Are you sure you want to {{ action }} this {{ object_type.lower }}?
+                </p>
+
+                {% if  extra_message %}
+                    <p class="alert alert-warning">
+                        {{ extra_message }}
+                    </p>
+                {% endif %}
             </div>
             <div class="modal-footer">
                 <form action="{{ url }}" method="post">

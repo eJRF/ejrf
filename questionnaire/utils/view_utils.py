@@ -1,11 +1,5 @@
 from questionnaire.models import Country, Questionnaire
 
-PERMS_STATUS_MAP = {
-    'auth.can_edit_questionnaire': [Questionnaire.PUBLISHED, Questionnaire.DRAFT, Questionnaire.FINALIZED],
-    'auth.can_view_users': [Questionnaire.PUBLISHED, Questionnaire.DRAFT, Questionnaire.FINALIZED],
-    'auth.can_submit_responses': [Questionnaire.PUBLISHED]}
-
-
 def get_country(request):
     country_id = request.GET.get('country', '')
     if country_id.isdigit():
@@ -28,7 +22,7 @@ def get_regions(request):
 def get_questionnaire_status(request):
     statuses = []
     for perm in request.user.get_all_permissions():
-        map_get = PERMS_STATUS_MAP.get(perm, None)
+        map_get =  Questionnaire.PERMS_STATUS_MAP.get(perm, None)
         if map_get:
             statuses.extend(map_get)
     return set(filter(None, statuses))

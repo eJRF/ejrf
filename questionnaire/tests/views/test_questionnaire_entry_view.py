@@ -9,6 +9,8 @@ from questionnaire.models import Questionnaire, Section, SubSection, Question, Q
     Region
 from questionnaire.services.questionnaire_entry_form_service import QuestionnaireEntryFormService
 from questionnaire.tests.base_test import BaseTest
+from questionnaire.tests.factories.section_factory import SectionFactory
+from questionnaire.tests.factories.questionnaire_factory import QuestionnaireFactory
 
 
 class QuestionnaireEntrySaveDraftTest(BaseTest):
@@ -1048,3 +1050,38 @@ class PreviewModeQuestionnaireEntryTest(BaseTest):
         response = self.client.get(url + '?preview=1')
         self.assertEqual(200, response.status_code)
         self.assertTrue(response.context['preview'])
+
+
+class ArchiveQuestionnaireViewTest(BaseTest):
+
+    def setUp(self):
+        self.client = Client()
+        self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
+        self.assign('can_view_users', self.user)
+        self.client.login(username=self.user.username, password='pass')
+        self.questionnaire = QuestionnaireFactory(status=Questionnaire.FINALIZED)
+        self.section = SectionFactory(questionnaire=self.questionnaire)
+
+
+
+    def test_post_archive_questionnaire_sets_questionnaire_status_to_archived(self):
+        response = self.client.post('/questionnaire/%d/archive/' % self.questionnaire.id)
+        expected_url = '/questionnaire/entry/%d/section/%d/' % (self.questionnaire.id, self.section.id)
+        archived_questionnaire = Questionnaire.objects.get(id=self.questionnaire.id)
+        self.assertRedirects(response, expected_url, status_code=302)
+        self.assertEqual(archived_questionnaire.status, Questionnaire.ARCHIVED)
+
+        message = 'The questionnaire %s was archived successfully.' % self.questionnaire.name
+        self.assertIn(message, response.cookies['messages'].value)
+
+    def test_post_archive_questionnaire_sets_questionnaire_status_to_archived(self):
+        questionnaire = QuestionnaireFactory(status=Questionnaire.PUBLISHED)
+        section = SectionFactory(questionnaire=questionnaire)
+
+        response = self.client.post('/questionnaire/%d/archive/' % questionnaire.id)
+        expected_url = '/questionnaire/entry/%d/section/%d/' % (questionnaire.id, section.id)
+        archived_questionnaire = Questionnaire.objects.get(id=questionnaire.id)
+        self.assertRedirects(response, expected_url, status_code=302)
+
+        message = 'The questionnaire \'%s\' could not be archived, because it is ' % questionnaire.status
+        self.assertIn(message, response.cookies['messages'].value)
