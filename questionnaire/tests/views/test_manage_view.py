@@ -24,12 +24,15 @@ class ManageJRFViewTest(BaseTest):
                                                      status=Questionnaire.PUBLISHED)
         core2 = Questionnaire.objects.create(name="JRF Brazil core", description="bla", year=2013,
                                              status=Questionnaire.DRAFT)
+        core_archived = Questionnaire.objects.create(name="JRF Brazil core", description="bla", year=2013,
+                                             status=Questionnaire.ARCHIVED)
         questionnaire1 = Questionnaire.objects.create(name="JRF Jamaica paho", description="bla", year=2012,
                                                       status=Questionnaire.FINALIZED, region=self.paho)
         questionnaire2 = Questionnaire.objects.create(name="JRF Brazil Paho", description="bla", year=2013,
                                                       status=Questionnaire.DRAFT, region=self.paho)
         Section.objects.create(title="section", order=1, questionnaire=core2, name="section")
         Section.objects.create(title="section", order=1, questionnaire=core1, name="section")
+        Section.objects.create(title="section", order=1, questionnaire=core_archived, name="section")
         Section.objects.create(title="section", order=1, questionnaire=questionnaire1, name="section")
         Section.objects.create(title="section", order=1, questionnaire=questionnaire2, name="section")
         Section.objects.create(title="section", order=1, questionnaire=core1_publish, name="section")
@@ -41,6 +44,7 @@ class ManageJRFViewTest(BaseTest):
         self.assertIn(core1, response.context['finalized_questionnaires'])
         self.assertIn(core1_publish, response.context['finalized_questionnaires'])
         self.assertIn(core2, response.context['draft_questionnaires'])
+        self.assertIn(core_archived, response.context['archived_questionnaires'])
         self.assertIsInstance(response.context['filter_form'], QuestionnaireFilterForm)
         self.assertEqual(reverse('duplicate_questionnaire_page'), response.context['action'])
 

@@ -1068,7 +1068,7 @@ class ArchiveQuestionnaireViewTest(BaseTest):
         response = self.client.post('/questionnaire/%d/archive/' % self.questionnaire.id)
         expected_url = '/manage/'
         archived_questionnaire = Questionnaire.objects.get(id=self.questionnaire.id)
-        expected_message = 'The questionnaire %s was archived successfully.' % self.questionnaire.name
+        expected_message = "The questionnaire '%s' was archived successfully." % self.questionnaire.name
 
         self.assertRedirects(response, expected_url, status_code=302)
         self.assertEqual(archived_questionnaire.status, Questionnaire.ARCHIVED)
@@ -1080,7 +1080,7 @@ class ArchiveQuestionnaireViewTest(BaseTest):
 
         response = self.client.post('/questionnaire/%d/archive/' % questionnaire.id)
         expected_url = '/manage/'
-        expected_message = 'The questionnaire \'%s\' could not be archived, because it is ' % questionnaire.status
+        expected_message = "The questionnaire '%s' could not be archived, because it is " % questionnaire.status
         archived_questionnaire = Questionnaire.objects.get(id=questionnaire.id)
 
         self.assertRedirects(response, expected_url, status_code=302)

@@ -24,6 +24,7 @@ class ManageJRF(MultiplePermissionsRequiredMixin, View):
         context = {'finalized_questionnaires': core_questionnaires.filter(
             status__in=[Questionnaire.FINALIZED, Questionnaire.PUBLISHED]),
                    'draft_questionnaires': core_questionnaires.filter(status=Questionnaire.DRAFT),
+                   'archived_questionnaires': core_questionnaires.filter(status=Questionnaire.ARCHIVED),
                    'filter_form': QuestionnaireFilterForm(),
                    'regions_questionnaire_map': self.map_region_with_questionnaires(),
                    'regions': self.regions,
@@ -38,7 +39,8 @@ class ManageJRF(MultiplePermissionsRequiredMixin, View):
             regional = {region: {'finalized': regional_questionnaires.filter(region=region,
                                                                              status__in=[Questionnaire.FINALIZED,
                                                                                          Questionnaire.PUBLISHED]),
-                                 'drafts': regional_questionnaires.filter(region=region, status=Questionnaire.DRAFT)}}
+                                 'drafts': regional_questionnaires.filter(region=region, status=Questionnaire.DRAFT),
+                                 'archived': regional_questionnaires.filter(region=region, status=Questionnaire.ARCHIVED)}}
             questionnaire_region_map.update(regional)
         return questionnaire_region_map
 
@@ -66,7 +68,7 @@ class ManageRegionalJRF(RegionAndPermissionRequiredMixin, View):
         region = Region.objects.get(id=kwargs['region_id'])
         questionnaires = region.questionnaire.all().order_by('-created')
         context = {'region': region,
-                   'finalized_questionnaires': questionnaires.filter(
-                       status__in=[Questionnaire.FINALIZED, Questionnaire.PUBLISHED]),
-                   'draft_questionnaires': questionnaires.filter(status=Questionnaire.DRAFT), }
+                   'finalized_questionnaires': questionnaires.filter(status__in=[Questionnaire.FINALIZED, Questionnaire.PUBLISHED]),
+                   'draft_questionnaires': questionnaires.filter(status=Questionnaire.DRAFT),
+                   'archived_questionnaires': questionnaires.filter(status=Questionnaire.ARCHIVED) }
         return render(self.request, self.template_name, context)

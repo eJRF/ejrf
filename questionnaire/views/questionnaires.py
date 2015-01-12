@@ -243,10 +243,10 @@ class Archive(MultiplePermissionsRequiredMixin, View):
         if questionnaire.is_archivable():
             questionnaire.status = Questionnaire.ARCHIVED
             questionnaire.save()
-            message = 'The questionnaire %s was archived successfully.' % questionnaire.name
+            message = "The questionnaire '%s' was archived successfully." % questionnaire.name
             messages.success(request, message)
             return HttpResponseRedirect(reverse('manage_jrf_page'))
-        message = 'The questionnaire \'%s\' could not be archived, because it is ' % questionnaire.status
+        message = "The questionnaire '%s' could not be archived, because it is " % questionnaire.status
         messages.warning(request, message)
         return HttpResponseRedirect(reverse('manage_jrf_page'))
 

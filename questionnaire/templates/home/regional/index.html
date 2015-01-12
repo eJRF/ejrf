@@ -7,7 +7,7 @@
             <h2>{{ region.name }} Questionnaire Templates</h2>
             <hr/>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <span>
@@ -32,6 +32,29 @@
                                        pdata='{"questionnaire_id": {{ questionnaire.id }}, "csrfmiddlewaretoken": "{{ csrf_token }}"}'><span><img
                                             class="glyph-icon" src="/static/img/glyphicons_lock.png"></span></a>
                                 </span>
+                                {% endwith %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <span>
+                        <h3 class="panel-title">Archived</h3>
+                    </span>
+                </div>
+                <div class="panel-body">
+                    <ul class="list-group">
+                        {% for questionnaire in archived_questionnaires %}
+                            <li class="list-group-item">
+                                {% with questionnaire.sections.all|first as first_section %}
+                                    <a id="questionnaire-{{ questionnaire.id }}"
+                                       href="{% url 'questionnaire_entry_page' questionnaire.id first_section.id %}">
+                                        {{ questionnaire.name }} {{ questionnaire.year }}
+                                    </a>
                                 {% endwith %}
                             </li>
                         {% endfor %}

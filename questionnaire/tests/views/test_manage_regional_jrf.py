@@ -5,6 +5,8 @@ from django.test import Client
 
 from questionnaire.models import Organization, Questionnaire, Section
 from questionnaire.tests.base_test import BaseTest
+from questionnaire.tests.factories.questionnaire_factory import QuestionnaireFactory
+from questionnaire.tests.factories.section_factory import SectionFactory
 
 
 class ManageJRFViewTest(BaseTest):
@@ -20,13 +22,17 @@ class ManageJRFViewTest(BaseTest):
         self.url = "/manage/region/%d/" % self.region.id
 
     def test_get_returns_region_specific_questionnaires(self):
-        finalized_questionnaire = Questionnaire.objects.create(name="JRF Jamaica core", description="bla", year=2012,
+        finalized_questionnaire = QuestionnaireFactory(name="JRF Jamaica core", description="bla", year=2012,
                                                                status=Questionnaire.FINALIZED, region=self.region)
-        draft_questionnaire = Questionnaire.objects.create(name="JRF Jamaica core", description="bla", year=2011,
+        draft_questionnaire = QuestionnaireFactory(name="JRF Jamaica core", description="bla", year=2011,
                                                            status=Questionnaire.DRAFT, region=self.region)
-        Section.objects.create(title="section", order=1, questionnaire=finalized_questionnaire, name="section",
+        archived_questionnaire = QuestionnaireFactory(name="JRF Jamaica core", description="bla", year=2011,
+                                                           status=Questionnaire.ARCHIVED, region=self.region)
+        SectionFactory(title="section", order=1, questionnaire=finalized_questionnaire, name="section",
                                region=self.region)
-        Section.objects.create(title="section", order=1, questionnaire=draft_questionnaire, name="section",
+        SectionFactory(title="section", order=1, questionnaire=draft_questionnaire, name="section",
+                               region=self.region)
+        SectionFactory(title="section", order=1, questionnaire=archived_questionnaire, name="section",
                                region=self.region)
 
         response = self.client.get(self.url)
@@ -35,6 +41,7 @@ class ManageJRFViewTest(BaseTest):
         self.assertIn('home/regional/index.html', templates)
         self.assertIn(finalized_questionnaire, response.context['finalized_questionnaires'])
         self.assertIn(draft_questionnaire, response.context['draft_questionnaires'])
+        self.assertIn(archived_questionnaire, response.context['archived_questionnaires'])
         self.assertEqual(self.region, response.context['region'])
 
     def test_permission_required_for_create_section(self):
