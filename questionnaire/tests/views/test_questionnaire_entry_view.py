@@ -1033,6 +1033,27 @@ class PreviewModeQuestionnaireEntryTest(BaseTest):
         self.assertEqual(200, response.status_code)
         self.assertTrue(response.context['preview'])
 
+    def test_global_damin_is_on_preview_mode_even_if_not_requested_from_url_when_questionnaire_is_archived(self):
+        self.client = Client()
+        self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
+        self.region = Region.objects.create(name="AFRO")
+
+        self.assign('can_edit_questionnaire', self.user)
+        self.client.login(username=self.user.username, password='pass')
+
+        self.questionnaire = Questionnaire.objects.create(name="q", status=Questionnaire.ARCHIVED, region=self.region)
+        self.section_1 = Section.objects.create(title="section1", order=1, questionnaire=self.questionnaire,
+                                                name="section1")
+
+        url = '/questionnaire/entry/%d/section/%d/' % (self.questionnaire.id, self.section_1.id)
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        self.assertTrue(response.context['preview'])
+
+        response = self.client.get(url + '?preview=1')
+        self.assertEqual(200, response.status_code)
+        self.assertTrue(response.context['preview'])
+
     def test_global_damin_is_NOT_preview_mode_when_questionnaire_is_draft_unless_requested_from_url(self):
         self.client = Client()
         self.user = self.create_user(group=self.REGIONAL_ADMIN, org="WHO", region="AFRO")

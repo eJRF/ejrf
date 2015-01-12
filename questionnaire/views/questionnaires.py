@@ -71,7 +71,7 @@ class Entry(DoesNotExistExceptionHandlerMixin, AdvancedMultiplePermissionsRequir
         user = self.request.user
         perm = None
         if user.has_perm('auth.can_edit_questionnaire'):
-            perm = questionnaire.is_finalized() or questionnaire.is_published()
+            perm = questionnaire.is_finalized() or questionnaire.is_published() or questionnaire.is_archived()
         return perm or self.user_questionnaire_service.preview() or 'preview' in self.request.GET
 
     def post(self, request, *args, **kwargs):

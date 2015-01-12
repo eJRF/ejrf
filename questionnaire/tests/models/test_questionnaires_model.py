@@ -82,6 +82,12 @@ class QuestionnaireTest(BaseTest):
         questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", status=Questionnaire.FINALIZED)
         self.assertTrue(questionnaire.is_finalized())
 
+    def test_questionnaire_knows_its_archived(self):
+        self.assertFalse(self.questionnaire.is_archived())
+
+        questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", status=Questionnaire.ARCHIVED)
+        self.assertTrue(questionnaire.is_archived())
+
     def test_questionnaire_knows_its_published(self):
         self.assertFalse(self.questionnaire.is_published())
 

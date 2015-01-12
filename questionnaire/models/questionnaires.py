@@ -49,6 +49,9 @@ class Questionnaire(BaseModel):
     def is_published(self):
         return self.status == Questionnaire.PUBLISHED
 
+    def is_archived(self):
+        return self.status == Questionnaire.ARCHIVED
+
     def absolute_url(self):
         args = self.id, self.first_section().id
         return reverse('questionnaire_entry_page', args=args)
@@ -73,6 +76,9 @@ class Questionnaire(BaseModel):
     def archive(self):
         self.status = self.ARCHIVED
         self.save()
+        self._archive_children()
+
+    def _archive_children(self):
         for child in self.children.all():
             child.archive()
 
