@@ -69,7 +69,7 @@
                                            id="id-archive-questionnaire-{{ questionnaire.id }}">
                                             <span class="icon-archive"> <i class="fontastic-fonts"></i>Archive</span>
                                         </a>
-                                        {% include 'base/modals/_confirm.html' with object_type='Questionnaire' title='Confirm Archive Questionnaire' action="archive" url=questionnaire.id|get_url_with_ids:"approve_questionnaire_page" object=questionnaire confirm='Yes' extra_message="If any regional adaptions exist, they will be archived too and you will have to resend this revison to all the regional admins." %}
+                                        {% include 'base/modals/_confirm.html' with object_type='Questionnaire' title='Confirm Archive Questionnaire' action="archive" url=questionnaire.id|get_url_with_ids:"archive_questionnaire_page" object=questionnaire confirm='Yes' extra_message="If any regional adaptions exist, they will be archived too and you will have to resend this revison to all the regional admins." %}
                                     {% endif %}
 
                                     {% if questionnaire.is_finalized %}

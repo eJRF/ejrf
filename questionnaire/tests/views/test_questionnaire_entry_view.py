@@ -1066,22 +1066,22 @@ class ArchiveQuestionnaireViewTest(BaseTest):
 
     def test_post_archive_questionnaire_sets_questionnaire_status_to_archived(self):
         response = self.client.post('/questionnaire/%d/archive/' % self.questionnaire.id)
-        expected_url = '/questionnaire/entry/%d/section/%d/' % (self.questionnaire.id, self.section.id)
+        expected_url = '/manage/'
         archived_questionnaire = Questionnaire.objects.get(id=self.questionnaire.id)
+        expected_message = 'The questionnaire %s was archived successfully.' % self.questionnaire.name
+
         self.assertRedirects(response, expected_url, status_code=302)
         self.assertEqual(archived_questionnaire.status, Questionnaire.ARCHIVED)
-
-        message = 'The questionnaire %s was archived successfully.' % self.questionnaire.name
-        self.assertIn(message, response.cookies['messages'].value)
+        self.assertIn(expected_message, response.cookies['messages'].value)
 
     def test_post_archive_questionnaire_sets_questionnaire_status_to_archived(self):
         questionnaire = QuestionnaireFactory(status=Questionnaire.PUBLISHED)
         section = SectionFactory(questionnaire=questionnaire)
 
         response = self.client.post('/questionnaire/%d/archive/' % questionnaire.id)
-        expected_url = '/questionnaire/entry/%d/section/%d/' % (questionnaire.id, section.id)
+        expected_url = '/manage/'
+        expected_message = 'The questionnaire \'%s\' could not be archived, because it is ' % questionnaire.status
         archived_questionnaire = Questionnaire.objects.get(id=questionnaire.id)
-        self.assertRedirects(response, expected_url, status_code=302)
 
-        message = 'The questionnaire \'%s\' could not be archived, because it is ' % questionnaire.status
-        self.assertIn(message, response.cookies['messages'].value)
+        self.assertRedirects(response, expected_url, status_code=302)
+        self.assertIn(expected_message, response.cookies['messages'].value)

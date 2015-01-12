@@ -245,10 +245,10 @@ class Archive(MultiplePermissionsRequiredMixin, View):
             questionnaire.save()
             message = 'The questionnaire %s was archived successfully.' % questionnaire.name
             messages.success(request, message)
-            return HttpResponseRedirect(questionnaire.absolute_url())
+            return HttpResponseRedirect(reverse('manage_jrf_page'))
         message = 'The questionnaire \'%s\' could not be archived, because it is ' % questionnaire.status
         messages.warning(request, message)
-        return HttpResponseRedirect(questionnaire.absolute_url())
+        return HttpResponseRedirect(reverse('manage_jrf_page'))
 
 
 class DeleteAnswerRow(PermissionRequiredMixin, View):
