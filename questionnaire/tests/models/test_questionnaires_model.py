@@ -125,3 +125,9 @@ class QuestionnaireTest(BaseTest):
         NumericalAnswerFactory(questionnaire=questionnaire)
 
         self.assertFalse(questionnaire.is_archivable())
+
+    def test_archiving_questionnaire_changes_its_status(self):
+        questionnaire = QuestionnaireFactory(status=Questionnaire.FINALIZED)
+        questionnaire.archive()
+
+        self.assertEqual(Questionnaire.ARCHIVED, questionnaire.status)

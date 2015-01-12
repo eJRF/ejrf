@@ -69,6 +69,11 @@ class Questionnaire(BaseModel):
     def is_archivable(self):
         return self.status == self.FINALIZED and not self.answers.exists()
 
+    def archive(self):
+        self.status = self.ARCHIVED
+        self.save()
+
+
 class CountryQuestionnaireSubmission(BaseModel):
     country = models.ForeignKey(Country, blank=False, related_name="submissions")
     questionnaire = models.ForeignKey('Questionnaire', blank=False, related_name="submissions")
