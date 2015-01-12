@@ -63,6 +63,11 @@ class QuestionnaireClonerServiceTest(BaseTest):
         self.assertIn(self.questionnaire, questionnaires)
         self.assertEqual(Questionnaire.FINALIZED, old.status)
 
+    def test_cloned_questionnaire_knows_its_origin(self):
+        questionnaire, old = QuestionnaireClonerService(self.questionnaire).clone()
+        self.assertEqual(old, self.questionnaire)
+        self.assertEqual(old, questionnaire.parent)
+
     def test_returns_all_a_old_sections_on_the_new_questionnaire_instance_when_clone_is_called(self):
         questionnaire, old = QuestionnaireClonerService(self.questionnaire).clone()
         old_sections = old.sections.all()

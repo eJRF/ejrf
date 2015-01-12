@@ -26,6 +26,7 @@ class Questionnaire(BaseModel):
     year = models.PositiveIntegerField(null=True, blank=True)
     status = StatusField(choices_name="STATUS", default=DRAFT)
     region = models.ForeignKey(Region, blank=True, null=True, related_name="questionnaire")
+    parent = models.ForeignKey('Questionnaire', blank=True, null=True, related_name="children")
 
     def __unicode__(self):
         return '%s' % self.name

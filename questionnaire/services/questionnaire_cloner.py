@@ -20,6 +20,7 @@ class QuestionnaireClonerService(object):
         self.questionnaire.pk = None
         self.questionnaire.status = Questionnaire.DRAFT
         self.questionnaire.region = self.region
+        self.questionnaire.parent = self.original_questionnaire
         self.questionnaire.save()
         self.sections = self._clone_sections()
         self.sub_sections = self._clone_sub_sections()
