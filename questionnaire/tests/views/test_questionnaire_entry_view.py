@@ -1085,8 +1085,6 @@ class ArchiveQuestionnaireViewTest(BaseTest):
         self.questionnaire = QuestionnaireFactory(status=Questionnaire.FINALIZED)
         self.section = SectionFactory(questionnaire=self.questionnaire)
 
-
-
     def test_post_archive_questionnaire_sets_questionnaire_and_its_children_status_to_archived(self):
         afr = RegionFactory(name='AFR')
         amr = RegionFactory(name='AMR')
@@ -1107,16 +1105,21 @@ class ArchiveQuestionnaireViewTest(BaseTest):
         self.assertEqual(archived_questionnaire.status, Questionnaire.ARCHIVED)
         self.assertIn(expected_message, response.cookies['messages'].value)
 
-    def test_post_archive_questionnaire_sets_questionnaire_status_to_archived(self):
+    def test_post_archive_to_non_archivable_questionnaire(self):
         questionnaire = QuestionnaireFactory(status=Questionnaire.PUBLISHED)
         section = SectionFactory(questionnaire=questionnaire)
 
-        NumericalAnswerFactory(questionnaire=questionnaire)
+        regional_questionnaire = QuestionnaireFactory(status=Questionnaire.PUBLISHED, parent=questionnaire)
+        section = SectionFactory(questionnaire=regional_questionnaire)
+        NumericalAnswerFactory(questionnaire=regional_questionnaire)
 
         response = self.client.post('/questionnaire/%d/archive/' % questionnaire.id)
         expected_url = '/manage/'
-        expected_message = "The questionnaire '%s' could not be archived, because it is " % questionnaire.status
-        archived_questionnaire = Questionnaire.objects.get(id=questionnaire.id)
+        expected_message = "The questionnaire '%s' could not be archived, because it is %s." % (questionnaire.name, questionnaire.status)
+        reloaded_questionnaire = Questionnaire.objects.get(id=questionnaire.id)
+        reloaded_regional_questionnaire = Questionnaire.objects.get(id=regional_questionnaire.id)
 
         self.assertRedirects(response, expected_url, status_code=302)
         self.assertIn(expected_message, response.cookies['messages'].value)
+        self.assertTrue(reloaded_questionnaire.is_published())
+        self.assertTrue(reloaded_regional_questionnaire.is_published())

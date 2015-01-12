@@ -4,7 +4,7 @@ from django.db import models
 from django.core.urlresolvers import reverse
 
 from questionnaire.models.base import BaseModel
-from questionnaire.models import Region, Country, QuestionGroup
+from questionnaire.models import Region, Country, QuestionGroup, Answer
 from questionnaire.models.questions import Question
 
 
@@ -70,8 +70,11 @@ class Questionnaire(BaseModel):
         if answers.exists():
             return answers.latest('modified').version
 
+    def _children_answers(self):
+        return Answer.objects.filter(questionnaire__in=self.children.all())
+
     def is_archivable(self):
-        return self.status == self.FINALIZED or self.status == self.PUBLISHED and not self.answers.exists()
+        return self.status == self.FINALIZED or (self.status == self.PUBLISHED and not self._children_answers().exists())
 
     def archive(self):
         self.status = self.ARCHIVED
