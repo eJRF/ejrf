@@ -118,10 +118,10 @@ class QuestionnaireTest(BaseTest):
         self.assertFalse(questionnaire.is_archivable())
 
         questionnaire = QuestionnaireFactory(status=Questionnaire.PUBLISHED)
-        self.assertFalse(questionnaire.is_archivable())
+        self.assertTrue(questionnaire.is_archivable())
 
-    def test_questionnaire_is_archivable_if_finalised_and_no_answers_submitted(self):
-        questionnaire = QuestionnaireFactory(status=Questionnaire.FINALIZED)
+    def test_questionnaire_is_archivable_if_published_and_no_answers_submitted(self):
+        questionnaire = QuestionnaireFactory(status=Questionnaire.PUBLISHED)
         NumericalAnswerFactory(questionnaire=questionnaire)
 
         self.assertFalse(questionnaire.is_archivable())

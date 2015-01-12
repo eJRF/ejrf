@@ -11,6 +11,8 @@ from questionnaire.services.questionnaire_entry_form_service import Questionnair
 from questionnaire.tests.base_test import BaseTest
 from questionnaire.tests.factories.section_factory import SectionFactory
 from questionnaire.tests.factories.questionnaire_factory import QuestionnaireFactory
+from questionnaire.tests.factories.region_factory import RegionFactory
+from questionnaire.tests.factories.answer_factory import NumericalAnswerFactory
 
 
 class QuestionnaireEntrySaveDraftTest(BaseTest):
@@ -1064,19 +1066,31 @@ class ArchiveQuestionnaireViewTest(BaseTest):
 
 
 
-    def test_post_archive_questionnaire_sets_questionnaire_status_to_archived(self):
+    def test_post_archive_questionnaire_sets_questionnaire_and_its_children_status_to_archived(self):
+        afr = RegionFactory(name='AFR')
+        amr = RegionFactory(name='AMR')
+
+        afro_child_questionnaire = QuestionnaireFactory(parent=self.questionnaire, region=afr)
+        amr_child_questionnaire = QuestionnaireFactory(parent=self.questionnaire, region=amr)
+
         response = self.client.post('/questionnaire/%d/archive/' % self.questionnaire.id)
         expected_url = '/manage/'
         archived_questionnaire = Questionnaire.objects.get(id=self.questionnaire.id)
+        afro_archived_questionnaire = Questionnaire.objects.get(id=afro_child_questionnaire.id)
+        amr_archived_questionnaire = Questionnaire.objects.get(id=amr_child_questionnaire.id)
         expected_message = "The questionnaire '%s' was archived successfully." % self.questionnaire.name
 
         self.assertRedirects(response, expected_url, status_code=302)
+        self.assertEqual(afro_archived_questionnaire.status, Questionnaire.ARCHIVED)
+        self.assertEqual(amr_archived_questionnaire.status, Questionnaire.ARCHIVED)
         self.assertEqual(archived_questionnaire.status, Questionnaire.ARCHIVED)
         self.assertIn(expected_message, response.cookies['messages'].value)
 
     def test_post_archive_questionnaire_sets_questionnaire_status_to_archived(self):
         questionnaire = QuestionnaireFactory(status=Questionnaire.PUBLISHED)
         section = SectionFactory(questionnaire=questionnaire)
+
+        NumericalAnswerFactory(questionnaire=questionnaire)
 
         response = self.client.post('/questionnaire/%d/archive/' % questionnaire.id)
         expected_url = '/manage/'

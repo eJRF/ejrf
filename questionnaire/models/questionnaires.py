@@ -68,11 +68,13 @@ class Questionnaire(BaseModel):
             return answers.latest('modified').version
 
     def is_archivable(self):
-        return self.status == self.FINALIZED and not self.answers.exists()
+        return self.status == self.FINALIZED or self.status == self.PUBLISHED and not self.answers.exists()
 
     def archive(self):
         self.status = self.ARCHIVED
         self.save()
+        for child in self.children.all():
+            child.archive()
 
 
 class CountryQuestionnaireSubmission(BaseModel):

@@ -238,7 +238,6 @@ class Archive(MultiplePermissionsRequiredMixin, View):
 
     def post(self, request, questionnaire_id, *args, **kwargs):
         questionnaire = Questionnaire.objects.get(id=questionnaire_id)
-        print questionnaire.is_archivable()
 
         if questionnaire.is_archivable():
             questionnaire.archive()

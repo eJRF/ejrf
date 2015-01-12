@@ -36,6 +36,7 @@
                                 </span>
                                 {% endwith %}
                             </li>
+                            {% include 'base/modals/edit_name.html' with a_form=filter_form modal_id='edit_questionnaire_name' action=action %}
                         {% endfor %}
                     </ul>
                 </div>
@@ -58,7 +59,6 @@
                                        href="{% url 'questionnaire_entry_page' questionnaire.id first_section.id %}">{{ questionnaire.name }} {{ questionnaire.year }}</a>
                                 {% endwith %}
                             </li>
-                            {% include 'base/modals/edit_name.html' with a_form=filter_form modal_id='edit_questionnaire_name' action=action %}
                         {% endfor %}
                     </ul>
                 </div>
