@@ -69,6 +69,7 @@ function groupRolesBootstrap() {
         $country_element = $('#create-user-form #id_country');
 
 
+    $('#id-reset-password-form').validate();
     $('#create-user-form').validate();
     $region_element.html('<option value>Choose a Region</option>');
 

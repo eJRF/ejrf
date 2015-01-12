@@ -132,7 +132,7 @@ class ResetPassword(PermissionRequiredMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super(ResetPassword, self).get_context_data(**kwargs)
-        context.update({'btn_label': 'Update Password'})
+        context.update({'btn_label': 'Update Password', 'id': 'id-reset-password-form'})
         return context
 
     def form_valid(self, form):

@@ -364,6 +364,7 @@ class ResetPasswordViewTest(BaseTest):
         self.assertEqual(200, response.status_code)
         self.assertIn('users/reset_password.html', templates)
         self.assertIsInstance(response.context['form'], AdminPasswordChangeForm)
+        self.assertEqual(response.context['id'], 'id-reset-password-form')
 
     def test_post_with_valid_form_data_resets_userpassword(self):
         form_data = {'password1': 'p@55word', 'password2': 'p@55word'}
