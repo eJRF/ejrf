@@ -12,7 +12,8 @@ class Questionnaire(BaseModel):
     DRAFT = 'draft'
     PUBLISHED = 'published'
     FINALIZED = 'finalized'
-    STATUS = Choices(FINALIZED, PUBLISHED, DRAFT)
+    ARCHIVED = 'archived'
+    STATUS = Choices(FINALIZED, PUBLISHED, DRAFT, ARCHIVED)
     name = models.CharField(max_length=256, null=False, blank=False)
     description = models.TextField(null=True, blank=True)
     year = models.PositiveIntegerField(null=True, blank=True)
@@ -58,6 +59,8 @@ class Questionnaire(BaseModel):
         if answers.exists():
             return answers.latest('modified').version
 
+    def is_archivable(self):
+        return self.status == self.FINALIZED and not self.answers.exists()
 
 class CountryQuestionnaireSubmission(BaseModel):
     country = models.ForeignKey(Country, blank=False, related_name="submissions")

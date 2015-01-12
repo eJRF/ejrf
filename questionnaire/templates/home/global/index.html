@@ -63,6 +63,12 @@
                                        id="id-publish-questionnaire-{{ questionnaire.id }}">
                                         <span class="glyphicon glyphicon-send"></span> Send to Regions
                                     </a>
+                                    <a href="#"
+                                       class="btn btn-default btn-xs"
+                                       id="id-publish-questionnaire-{{ questionnaire.id }}">
+                                        <span class="icon-archive"> <i class="fontastic-fonts"></i>Archive</span>
+                                    </a>
+
                                     {% if questionnaire.is_finalized %}
                                         <a class="btn btn-xs btn-default" id="id-unfinalize-{{ questionnaire.id }}"
                                            post="true" phref="/questionnaire/{{ questionnaire.id }}/unfinalize/"

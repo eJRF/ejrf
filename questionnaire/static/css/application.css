@@ -589,3 +589,6 @@ select.hide {
     background-color: lightgray;
     border: 0;
 }
+.fontastic-fonts {
+    font-size: 13px !important;
+}

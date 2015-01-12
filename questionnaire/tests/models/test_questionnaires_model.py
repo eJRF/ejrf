@@ -2,6 +2,8 @@ from questionnaire.models import Section, SubSection, Organization, Region, Coun
     QuestionGroup
 from questionnaire.models.questionnaires import Questionnaire
 from questionnaire.tests.base_test import BaseTest
+from questionnaire.tests.factories.questionnaire_factory import QuestionnaireFactory
+from questionnaire.tests.factories.answer_factory import NumericalAnswerFactory
 
 
 class QuestionnaireTest(BaseTest):
@@ -107,3 +109,16 @@ class QuestionnaireTest(BaseTest):
                                        status=Answer.DRAFT_STATUS, response=23, version=2,
                                        questionnaire=self.questionnaire)
         self.assertEqual(2, self.questionnaire.current_answer_version())
+
+    def test_questionnaire_is_archivable_only_if_finalized(self):
+        questionnaire = QuestionnaireFactory(status=Questionnaire.FINALIZED)
+        self.assertTrue(questionnaire.is_archivable())
+
+        questionnaire = QuestionnaireFactory(status=Questionnaire.DRAFT)
+        self.assertFalse(questionnaire.is_archivable())
+
+    def test_questionnaire_is_archivable_if_finalised_and_no_answers_submitted(self):
+        questionnaire = QuestionnaireFactory(status=Questionnaire.FINALIZED)
+        NumericalAnswerFactory(questionnaire=questionnaire)
+
+        self.assertFalse(questionnaire.is_archivable())
