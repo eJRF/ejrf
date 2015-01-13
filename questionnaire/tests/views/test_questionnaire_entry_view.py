@@ -1123,3 +1123,6 @@ class ArchiveQuestionnaireViewTest(BaseTest):
         self.assertIn(expected_message, response.cookies['messages'].value)
         self.assertTrue(reloaded_questionnaire.is_published())
         self.assertTrue(reloaded_regional_questionnaire.is_published())
+
+    def test_permission_required(self):
+        self.assert_permission_required('/questionnaire/1/archive/')
