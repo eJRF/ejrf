@@ -88,3 +88,16 @@ Feature: Manage JRF
         Then I should see a message that the questionnaire was approved
         And I should see a new status indicating that the questionnaire was approved
         And there should no longer be an option to approve the questionnaire
+
+    Scenario: Global admin archives a core questionnaire
+        Given I am logged in as a global admin
+        And I have regions and countries
+        And I have a finalised core questionnaire
+        When I visit the manage JRF page
+        Then I should see the finalised core questionnaire and an option to archive it
+        When I click archive button on that core questionnaire
+        Then I should see a confirmation modal
+        When I confirm archiving the questionnaire
+        Then I should see the questionnaire archived
+        When I click on the archived questionnaire
+        Then I should view it in preview mode

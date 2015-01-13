@@ -106,9 +106,11 @@
                                 </span>
                             </li>
                         {% endfor %}
+                        {% if finalized_questionnaires.count > 3 %}
                         <li class="list-group-item more-toggle">
                             <a href="" id="id-older-jrf">More</a>
                         </li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>

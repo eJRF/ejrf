@@ -1,10 +1,13 @@
 from time import sleep
 from lettuce import world, step
 from datetime import datetime
+from nose.tools import assert_false
 
 from questionnaire.features.pages.home import HomePage
 from questionnaire.features.pages.manage import ManageJrfPage
 from questionnaire.models import Questionnaire, Section, Organization, Region, SubSection, Question, QuestionGroup
+from questionnaire.tests.factories.questionnaire_factory import QuestionnaireFactory
+from questionnaire.tests.factories.section_factory import SectionFactory
 
 
 @step(u'I have four finalised questionnaires')
@@ -347,3 +350,39 @@ def then_i_should_see_a_message_that_questionnaire_was_updated(step):
 def and_i_should_see_the_questionnaire_with_its_new_name(step):
     sleep(10)
     world.page.is_text_present('Updated Questionnaire Name')
+
+@step(u'And I have a finalised core questionnaire')
+def and_i_have_a_finalised_core_questionnaire(step):
+    world.finalised_core_questionnaire = QuestionnaireFactory(status=Questionnaire.FINALIZED)
+    world.finalised_section = SectionFactory(questionnaire=world.finalised_core_questionnaire)
+
+
+@step(u'Then I should see the finalised core questionnaire and an option to archive it')
+def then_i_should_see_the_finalised_core_questionnaire_and_an_option_to_archive_it(step):
+    world.page.is_text_present('%s %s' % (world.finalised_core_questionnaire.name, world.finalised_core_questionnaire.year))
+    world.page.is_text_present('Archive')
+
+@step(u'When I click archive button on that core questionnaire')
+def when_i_click_archive_button_on_that_core_questionnaire(step):
+    world.page.click_by_id('id-archive-questionnaire-%s' % world.finalised_core_questionnaire.id)
+
+@step(u'Then I should see a confirmation modal')
+def then_i_should_see_a_confirmation_modal(step):
+    world.page.is_text_present('Are you sure you want to archive this questionnaire')
+
+@step(u'When I confirm archiving the questionnaire')
+def when_i_confirm_archiving_the_questionnaire(step):
+    world.page.click_by_id('confirm-archive-questionnaire-%s' % world.finalised_core_questionnaire.id)
+
+@step(u'Then I should see the questionnaire archived')
+def then_i_should_see_the_questionnaire_archived(step):
+    world.page.is_text_present('The questionnaire \'%s\' was archived successfully.' % world.finalised_core_questionnaire.name)
+
+@step(u'When I click on the archived questionnaire')
+def when_i_click_on_the_archived_questionnaire(step):
+    world.page.click_by_id('questionnaire-%s' % world.finalised_core_questionnaire.id)
+
+@step(u'Then I should view it in preview mode')
+def then_i_should_view_it_in_preview_mode(step):
+    assert_false(world.page.is_element_present_by_id('id-edit-section-%s' % world.finalised_section.id))
+    assert_false(world.page.is_element_present_by_id('id-delete-section-%s' % world.finalised_section.id))
