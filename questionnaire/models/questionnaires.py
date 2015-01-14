@@ -77,7 +77,10 @@ class Questionnaire(BaseModel):
         return self.status == self.FINALIZED or (self.status == self.PUBLISHED and not self._children_answers().exists())
 
     def is_deletable(self):
-        return not (self._children_answers().exists() or self.answers.exists())
+        return not (self._children_answers().exists() or self.answers.exists()) and not self.is_last_questionnaire()
+
+    def is_last_questionnaire(self):
+        return Questionnaire.objects.count() == 1
 
     def archive(self):
         self.status = self.ARCHIVED

@@ -156,7 +156,15 @@ class QuestionnaireTest(BaseTest):
 
     def test_questionnaire_is_deletable_if_published_and_no_answers_submitted_in_region(self):
         questionnaire = QuestionnaireFactory(status=Questionnaire.PUBLISHED)
+
         regional_questionaire = QuestionnaireFactory(status=Questionnaire.PUBLISHED, parent=questionnaire)
         NumericalAnswerFactory(questionnaire=regional_questionaire)
 
+        self.assertFalse(questionnaire.is_deletable())
+        self.assertFalse(regional_questionaire.is_deletable())
+
+    def test_questionnaire_is_not_deletable_whn_its_last_questionnaire(self):
+        Questionnaire.objects.all().delete()
+
+        questionnaire = QuestionnaireFactory(status=Questionnaire.FINALIZED)
         self.assertFalse(questionnaire.is_deletable())

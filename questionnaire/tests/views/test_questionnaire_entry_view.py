@@ -1173,6 +1173,10 @@ class DeleteQiuestionnaireViewTest(BaseTest):
         self.failUnless(Questionnaire.objects.filter(id=self.questionnaire.id))
         self.assertIn(expected_message, response.cookies['messages'].value)
 
+    def test_permission_required(self):
+        self.assert_permission_required('/questionnaire/%s/delete/' % self.questionnaire.id)
+
+
 class RegionalDeleteQiuestionnaireViewTest(BaseTest):
     def setUp(self):
         self.client = Client()
@@ -1184,16 +1188,17 @@ class RegionalDeleteQiuestionnaireViewTest(BaseTest):
         self.afr = self.user.user_profile.region
         self.section = SectionFactory(questionnaire=self.questionnaire)
         self.expected_url = '/manage/region/%s/' % self.afr.id
+        self.afro_child_questionnaire = QuestionnaireFactory(parent=self.questionnaire, region=self.afr)
+        SectionFactory(questionnaire=self.afro_child_questionnaire)
 
     def test_delete_a_regional_questionnaire(self):
-        afro_child_questionnaire = QuestionnaireFactory(parent=self.questionnaire, region=self.afr)
 
-        response = self.client.post('/questionnaire/%d/delete/' % afro_child_questionnaire.id)
-        expected_message = "The questionnaire '%s' was deleted successfully." % afro_child_questionnaire.name
+        response = self.client.post('/questionnaire/%d/delete/' % self.afro_child_questionnaire.id)
+        expected_message = "The questionnaire '%s' was deleted successfully." % self.afro_child_questionnaire.name
 
         self.assertRedirects(response, self.expected_url, status_code=302)
         self.failUnless(Questionnaire.objects.filter(id=self.questionnaire.id))
-        self.failIf(Questionnaire.objects.filter(id=afro_child_questionnaire.id))
+        self.failIf(Questionnaire.objects.filter(id=self.afro_child_questionnaire.id))
         self.assertIn(expected_message, response.cookies['messages'].value)
 
     def test_delete_a_questionnaire_redirects_with_error_message_if_questionnaire_is_not_deleteable(self):
@@ -1207,3 +1212,6 @@ class RegionalDeleteQiuestionnaireViewTest(BaseTest):
         self.assertRedirects(response, self.expected_url, status_code=302)
         self.failUnless(Questionnaire.objects.filter(id=afro_child_questionnaire.id))
         self.assertIn(expected_message, response.cookies['messages'].value)
+
+    def test_permission_required(self):
+        self.assert_permission_required('/questionnaire/%s/delete/' % self.afro_child_questionnaire.id )

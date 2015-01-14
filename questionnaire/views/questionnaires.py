@@ -255,7 +255,6 @@ class Delete(OwnerAndPermissionRequiredMixin, View):
 
     def post(self, request, questionnaire_id, *args, **kwargs):
         questionnaire = Questionnaire.objects.get(id=questionnaire_id)
-        print questionnaire.is_deletable()
         if questionnaire.is_deletable():
             questionnaire.disasociate_and_archive_children()
             questionnaire.delete()
