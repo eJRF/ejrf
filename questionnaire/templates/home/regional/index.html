@@ -55,6 +55,12 @@
                                        href="{% url 'questionnaire_entry_page' questionnaire.id first_section.id %}">
                                         {{ questionnaire.name }} {{ questionnaire.year }}
                                     </a>
+                                   {% if questionnaire.is_deletable %}
+                                        <a href="#" data-target="#delete-questionnaire-modal-{{ questionnaire.id }}"
+                                        class="btn btn-default btn-xs" data-toggle="modal" id="id-delete-questionnaire-{{ questionnaire.id }}">
+                                            <span class="glyphicon glyphicon-trash"></span>Delete </a>
+                                        {% include 'base/modals/_confirm.html' with object_type='Questionnaire' title='Confirm Delete Questionnaire' action="delete" url=questionnaire.id|get_url_with_ids:"delete_questionnaire_page" object=questionnaire confirm='Yes' extra_message="Only this instance will be deleted. All regional adapations will be archived and can be deleted by regional admins." %}
+                                    {% endif %}
                                 {% endwith %}
                             </li>
                         {% endfor %}
