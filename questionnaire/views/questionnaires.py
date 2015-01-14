@@ -249,6 +249,23 @@ class Archive(MultiplePermissionsRequiredMixin, View):
         return HttpResponseRedirect(reverse('manage_jrf_page'))
 
 
+class Delete(MultiplePermissionsRequiredMixin, View):
+    permissions = {'any': ('auth.can_view_users',)}
+    template_name = 'base/modals/_confirm.html'
+
+    def post(self, request, questionnaire_id, *args, **kwargs):
+        questionnaire = Questionnaire.objects.get(id=questionnaire_id)
+        if questionnaire.is_deletable():
+            questionnaire.disasociate_and_archive_children()
+            questionnaire.delete()
+            message = "The questionnaire '%s' was deleted successfully." % questionnaire.name
+            messages.success(request, message)
+            return HttpResponseRedirect(reverse('manage_jrf_page'))
+        message = "The questionnaire '%s' could not be deleted. Because it has responses." % questionnaire.name
+        messages.warning(request, message)
+        return HttpResponseRedirect(reverse('manage_jrf_page'))
+
+
 class DeleteAnswerRow(PermissionRequiredMixin, View):
     permission_required = 'auth.can_submit_responses'
 

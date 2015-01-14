@@ -14,7 +14,7 @@ from questionnaire.views.sections import NewSection, NewSubSection, EditSection,
     DeleteSubSection, ReOrderQuestions, MoveSubsection, GetSubSections, MoveGrid
 from questionnaire.views.questions import QuestionList, CreateQuestion, DeleteQuestion, EditQuestion
 from questionnaire.views.questionnaires import Entry, SubmitQuestionnaire, DuplicateQuestionnaire, \
-    FinalizeQuestionnaire, UnfinalizeQuestionnaire, PublishQuestionnaire, ApproveQuestionnaire, DeleteAnswerRow, Archive
+    FinalizeQuestionnaire, UnfinalizeQuestionnaire, PublishQuestionnaire, ApproveQuestionnaire, DeleteAnswerRow, Archive, Delete
 from questionnaire.views.theme import ThemeList, NewTheme, EditTheme, DeleteTheme
 from questionnaire.views.upload_document import UploadDocument, DownloadDocument, DeleteDocument
 from questionnaire.views.users import UsersList, CreateUser, EditUser, ResetPassword
@@ -54,6 +54,8 @@ urlpatterns = patterns('',
                            NewSubSection.as_view(), name="new_subsection_page"),
                        url(r'^questionnaire/(?P<questionnaire_id>\d+)/archive/$', Archive.as_view(),
                            name="archive_questionnaire_page"),
+                       url(r'^questionnaire/(?P<questionnaire_id>\d+)/delete/$', Delete.as_view(),
+                           name="delete_questionnaire_page"),
                        url(r'^questionnaire/(?P<questionnaire_id>\d+)/approve/$', ApproveQuestionnaire.as_view(),
                            name="approve_questionnaire_page"),
                        url(r'^questionnaire/(?P<questionnaire_id>\d+)/finalize/$', FinalizeQuestionnaire.as_view(),

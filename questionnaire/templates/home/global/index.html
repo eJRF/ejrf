@@ -29,6 +29,9 @@
                                     <a href="" class="btn btn-xs btn-default" data-toggle="modal"
                                        data-target="#edit_questionnaire_name_{{ questionnaire.id }}" id="id-edit-questionnaire-{{ questionnaire.id }}"><span
                                             class="glyphicon glyphicon-pencil"></span> Edit</a>
+                                    <a href="#" data-target="#delete-questionnaire-modal-{{ questionnaire.id }}"
+                                        class="btn btn-default btn-xs" data-toggle="modal" id="id-delete-questionnaire-{{ questionnaire.id }}">
+                                            <span class="glyphicon glyphicon-trash"></span>Delete </a>
                                     <a class="btn btn-xs btn-default" id="id-finalize-{{ questionnaire.id }}"
                                        post="true" phref="/questionnaire/{{ questionnaire.id }}/finalize/"
                                        pdata='{"questionnaire_id": {{ questionnaire.id }}, "csrfmiddlewaretoken": "{{ csrf_token }}"}'><span><img
@@ -37,6 +40,8 @@
                                 {% endwith %}
                             </li>
                             {% include 'base/modals/edit_name.html' with a_form=filter_form modal_id='edit_questionnaire_name' action=action %}
+                            {% include 'base/modals/_confirm.html' with object_type='Questionnaire' title='Confirm Delete Questionnaire' action="delete" url=questionnaire.id|get_url_with_ids:"delete_questionnaire_page" object=questionnaire confirm='Yes' extra_message="Only this instance will be deleted. All regional adapations will be archived and can be deleted by regional admins." %}
+
                         {% endfor %}
                     </ul>
                 </div>

@@ -76,6 +76,9 @@ class Questionnaire(BaseModel):
     def is_archivable(self):
         return self.status == self.FINALIZED or (self.status == self.PUBLISHED and not self._children_answers().exists())
 
+    def is_deletable(self):
+      return not self._children_answers().exists()
+
     def archive(self):
         self.status = self.ARCHIVED
         self.save()
@@ -84,6 +87,12 @@ class Questionnaire(BaseModel):
     def _archive_children(self):
         for child in self.children.all():
             child.archive()
+
+    def disasociate_and_archive_children(self):
+      for child in self.children.all():
+        child.parent = None
+        child.status = Questionnaire.ARCHIVED
+        child.save()
 
 
 class CountryQuestionnaireSubmission(BaseModel):
