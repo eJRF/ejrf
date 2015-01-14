@@ -8,7 +8,7 @@ from braces.views import MultiplePermissionsRequiredMixin, PermissionRequiredMix
 
 from questionnaire.forms.questionnaires import QuestionnaireFilterForm, PublishQuestionnaireForm
 from questionnaire.forms.sections import SectionForm, SubSectionForm
-from questionnaire.mixins import AdvancedMultiplePermissionsRequiredMixin, DoesNotExistExceptionHandlerMixin
+from questionnaire.mixins import AdvancedMultiplePermissionsRequiredMixin, DoesNotExistExceptionHandlerMixin, OwnerAndPermissionRequiredMixin
 from questionnaire.services.questionnaire_cloner import QuestionnaireClonerService
 from questionnaire.services.questionnaire_finalizer import QuestionnaireFinalizeService
 from questionnaire.services.questionnaire_entry_form_service import QuestionnaireEntryFormService
@@ -249,21 +249,29 @@ class Archive(MultiplePermissionsRequiredMixin, View):
         return HttpResponseRedirect(reverse('manage_jrf_page'))
 
 
-class Delete(MultiplePermissionsRequiredMixin, View):
-    permissions = {'any': ('auth.can_view_users',)}
+class Delete(OwnerAndPermissionRequiredMixin, View):
+    permission_required = 'auth.can_edit_questionnaire'
     template_name = 'base/modals/_confirm.html'
 
     def post(self, request, questionnaire_id, *args, **kwargs):
         questionnaire = Questionnaire.objects.get(id=questionnaire_id)
+        print questionnaire.is_deletable()
         if questionnaire.is_deletable():
             questionnaire.disasociate_and_archive_children()
             questionnaire.delete()
             message = "The questionnaire '%s' was deleted successfully." % questionnaire.name
             messages.success(request, message)
-            return HttpResponseRedirect(reverse('manage_jrf_page'))
+            return HttpResponseRedirect(self.redirect_url())
         message = "The questionnaire '%s' could not be deleted. Because it has responses." % questionnaire.name
         messages.warning(request, message)
-        return HttpResponseRedirect(reverse('manage_jrf_page'))
+        return HttpResponseRedirect(self.redirect_url())
+
+    def redirect_url(self):
+        user = self.request.user
+        region = user.user_profile.region
+        if region:
+            return reverse('manage_regional_jrf_page', args=(region.id, ))
+        return reverse('manage_jrf_page')
 
 
 class DeleteAnswerRow(PermissionRequiredMixin, View):

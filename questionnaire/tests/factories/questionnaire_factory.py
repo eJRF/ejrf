@@ -11,3 +11,4 @@ class QuestionnaireFactory(factory.DjangoModelFactory):
     description = 'description'
     year = 2014
     status = Questionnaire.DRAFT
+    parent =  None

@@ -77,7 +77,7 @@ class Questionnaire(BaseModel):
         return self.status == self.FINALIZED or (self.status == self.PUBLISHED and not self._children_answers().exists())
 
     def is_deletable(self):
-      return not self._children_answers().exists()
+        return not (self._children_answers().exists() or self.answers.exists())
 
     def archive(self):
         self.status = self.ARCHIVED
@@ -85,14 +85,11 @@ class Questionnaire(BaseModel):
         self._archive_children()
 
     def _archive_children(self):
-        for child in self.children.all():
-            child.archive()
+        self.children.all().update(status=self.ARCHIVED)
 
     def disasociate_and_archive_children(self):
-      for child in self.children.all():
-        child.parent = None
-        child.status = Questionnaire.ARCHIVED
-        child.save()
+        self._archive_children()
+        self.children.clear()
 
 
 class CountryQuestionnaireSubmission(BaseModel):
