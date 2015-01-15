@@ -283,14 +283,6 @@ def and_i_have_a_finalised_regional_questionnaire(step):
     parent = QuestionGroup.objects.create(subsection=world.regional_subsection, order=1)
     parent.question.add(world.regional_question1)
 
-
-@step(u'Then I should see the finalised regional questionnaire and an option to approve it')
-def then_i_should_see_the_finalised_regional_questionnaire_and_an_option_to_approve_it(step):
-    assert world.page.is_element_present_by_id("questionnaire-%s" % world.finalised_regional_questionnaire.id)
-    assert world.page.is_element_present_by_id(
-        "id-approve-questionnaire-%s" % world.finalised_regional_questionnaire.id)
-
-
 @step(u'When I click that regional questionnaire')
 def when_i_click_that_regional_questionnaire(step):
     world.page.click_by_id('questionnaire-%s' % world.finalised_regional_questionnaire.id)
@@ -351,38 +343,42 @@ def and_i_should_see_the_questionnaire_with_its_new_name(step):
     sleep(10)
     world.page.is_text_present('Updated Questionnaire Name')
 
-@step(u'And I have a finalised core questionnaire')
-def and_i_have_a_finalised_core_questionnaire(step):
-    world.finalised_core_questionnaire = QuestionnaireFactory(status=Questionnaire.FINALIZED)
-    world.finalised_section = SectionFactory(questionnaire=world.finalised_core_questionnaire)
-
-
-@step(u'Then I should see the finalised core questionnaire and an option to archive it')
-def then_i_should_see_the_finalised_core_questionnaire_and_an_option_to_archive_it(step):
-    world.page.is_text_present('%s %s' % (world.finalised_core_questionnaire.name, world.finalised_core_questionnaire.year))
-    world.page.is_text_present('Archive')
-
-@step(u'When I click archive button on that core questionnaire')
-def when_i_click_archive_button_on_that_core_questionnaire(step):
-    world.page.click_by_id('id-archive-questionnaire-%s' % world.finalised_core_questionnaire.id)
-
-@step(u'Then I should see a confirmation modal')
-def then_i_should_see_a_confirmation_modal(step):
-    world.page.is_text_present('Are you sure you want to archive this questionnaire')
-
-@step(u'When I confirm archiving the questionnaire')
-def when_i_confirm_archiving_the_questionnaire(step):
-    world.page.click_by_id('confirm-archive-questionnaire-%s' % world.finalised_core_questionnaire.id)
-
-@step(u'Then I should see the questionnaire archived')
-def then_i_should_see_the_questionnaire_archived(step):
-    world.page.is_text_present('The questionnaire \'%s\' was archived successfully.' % world.finalised_core_questionnaire.name)
-
-@step(u'When I click on the archived questionnaire')
-def when_i_click_on_the_archived_questionnaire(step):
-    world.page.click_by_id('questionnaire-%s' % world.finalised_core_questionnaire.id)
-
 @step(u'Then I should view it in preview mode')
 def then_i_should_view_it_in_preview_mode(step):
     assert_false(world.page.is_element_present_by_id('id-edit-section-%s' % world.finalised_section.id))
     assert_false(world.page.is_element_present_by_id('id-delete-section-%s' % world.finalised_section.id))
+
+@step(u'And I have "([^"]*)" "([^"]*)" core questionnaire')
+def and_i_have_group1_group2_core_questionnaire(step, number, status):
+    create_questionnaire(world, number, status)
+
+@step(u'When I click "([^"]*)" button on that core questionnaire')
+def when_i_click_group1_button_on_that_core_questionnaire(step, action):
+    world.page.click_by_id('id-%s-questionnaire-%s' % (action, world.finalised_core_questionnaire.id))
+
+@step(u'When I confirm "([^"]*)" the questionnaire')
+def when_i_confirm_group1_the_questionnaire(step, action):
+    world.page.click_by_id('confirm-%s-questionnaire-%s' % (action, world.finalised_core_questionnaire.id))
+
+@step(u'Then I should see the questionnaire "([^"]*)"')
+def then_i_should_see_the_questionnaire_group1(step, status):
+    world.page.is_text_present('The questionnaire \'%s\' was %s successfully.' % (world.finalised_core_questionnaire.name, status))
+
+@step(u'When I click on the "([^"]*)" questionnaire')
+def when_i_click_on_the_group1_questionnaire(step, status):
+    world.page.click_by_id('questionnaire-%s' % world.finalised_core_questionnaire.id)
+
+def create_questionnaire(world, number, status):
+    for i in range(int(number)):
+        world.finalised_core_questionnaire = Questionnaire.objects.create(name="JRF %s Regional %d" % (status.capitalize(), i),
+                                                                              description="Description",
+                                                                              year='201%d' % i, status=status,
+                                                                              region=None)
+        world.finalised_section = SectionFactory(questionnaire=world.finalised_core_questionnaire)
+        world.finalized_subsection = SubSection.objects.create(order=1, section=world.finalised_section)
+
+        world.refinalized_question1 = Question.objects.create(text='Name of person in Ministry of Health', UID='C001%s' % i,
+                                                           answer_type='Text')
+
+        parent = QuestionGroup.objects.create(subsection=world.finalized_subsection, order=i)
+        parent.question.add(world.refinalized_question1)

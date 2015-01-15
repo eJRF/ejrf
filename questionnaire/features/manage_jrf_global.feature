@@ -78,7 +78,6 @@ Feature: Manage JRF
         And I have regions and countries
         And I have a finalised regional questionnaire
         When I visit the manage JRF page
-        Then I should see the finalised regional questionnaire and an option to approve it
         When I click that regional questionnaire
         Then it should open in a preview mode
         When I visit the manage JRF page
@@ -92,12 +91,20 @@ Feature: Manage JRF
     Scenario: Global admin archives a core questionnaire
         Given I am logged in as a global admin
         And I have regions and countries
-        And I have a finalised core questionnaire
+        And I have "1" "finalized" core questionnaire
         When I visit the manage JRF page
-        Then I should see the finalised core questionnaire and an option to archive it
-        When I click archive button on that core questionnaire
-        Then I should see a confirmation modal
-        When I confirm archiving the questionnaire
-        Then I should see the questionnaire archived
-        When I click on the archived questionnaire
+        When I click "archive" button on that core questionnaire
+        When I confirm "archive" the questionnaire
+        Then I should see the questionnaire "archived"
+        When I click on the "archived" questionnaire
         Then I should view it in preview mode
+
+
+    Scenario: Global admin deletes a core questionnaire
+        Given I am logged in as a global admin
+        And I have regions and countries
+        And I have "2" "draft" core questionnaire
+        When I visit the manage JRF page
+        When I click "delete" button on that core questionnaire
+        When I confirm "delete" the questionnaire
+        Then I should see the questionnaire "deleted"
