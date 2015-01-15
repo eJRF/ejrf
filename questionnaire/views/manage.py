@@ -45,7 +45,7 @@ class ManageJRF(MultiplePermissionsRequiredMixin, View):
         return questionnaire_region_map
 
 
-class EditQuestionnaireNameView(PermissionRequiredMixin, View):
+class EditQuestionnaireView(PermissionRequiredMixin, View):
     permission_required = 'auth.can_edit_questionnaire'
 
     def post(self, *args, **kwargs):

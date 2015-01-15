@@ -1,8 +1,13 @@
 from datetime import date
 
-from questionnaire.forms.questionnaires import QuestionnaireFilterForm, PublishQuestionnaireForm
+from questionnaire.forms.questionnaires import QuestionnaireFilterForm, PublishQuestionnaireForm, EditQuestionnaireForm
 from questionnaire.models import Questionnaire, Region, Organization
 from questionnaire.tests.base_test import BaseTest
+from questionnaire.tests.factories.questionnaire_factory import QuestionnaireFactory
+from questionnaire.tests.factories.region_factory import RegionFactory
+from questionnaire.tests.factories.organization_factory import OrganizationFactory
+from questionnaire.tests.factories.answer_factory import NumericalAnswerFactory
+
 
 
 class QuestionnaireFilterFormTest(BaseTest):
@@ -126,3 +131,60 @@ class PublishQuestionnaireFormTest(BaseTest):
         self.assertEqual(1, self.afro.questionnaire.all().count())
         questionnaire = Questionnaire.objects.filter(id=self.questionnaire.id)[0]
         self.assertEqual(questionnaire.status, Questionnaire.PUBLISHED)
+
+class EditQuestionnaireFormTest(BaseTest):
+
+    def setUp(self):
+        self.questionnaire_1 = QuestionnaireFactory(name="JRF 2011 Core English",
+                                                  status=Questionnaire.FINALIZED,
+                                                  year=2016)
+        self.draft_questionnaire = QuestionnaireFactory(name="JRF 2012 Core English",
+                                                  status=Questionnaire.DRAFT,
+                                                  year=2017)
+        self.who = OrganizationFactory(name="WHO")
+        self.afro = RegionFactory(name="The Afro", organization=self.who)
+        self.this_year = date.today().year
+
+
+        self.form_data = {
+            'name': self.draft_questionnaire.name,
+            'year': self.this_year
+        }
+
+    def test_valid(self):
+        edit_questionnaire_form = EditQuestionnaireForm(initial={'questionnaire': self.draft_questionnaire},
+                                                           data=self.form_data)
+
+        self.assertTrue(edit_questionnaire_form.is_valid())
+        for i in range(self.this_year, self.this_year + 10):
+            self.assertIn((i, i), edit_questionnaire_form.fields['year'].choices)
+
+    def test_year_for_published_questionnaire_without_answers_is_valid(self):
+        three_years_from_now = self.this_year + 3
+        form_data = self.form_data.copy()
+        form_data['year'] = three_years_from_now
+
+        questionnaire_1 = QuestionnaireFactory(name="JRF 2011 Core English",
+                                                  status=Questionnaire.PUBLISHED,
+                                                  year=three_years_from_now)
+        edit_questionnaire_form = EditQuestionnaireForm(initial={'questionnaire': questionnaire_1},
+                                                           data=form_data)
+
+        self.assertTrue(edit_questionnaire_form.is_valid())
+        self.assertIn((three_years_from_now, three_years_from_now), edit_questionnaire_form.fields['year'].choices)
+
+    def test_year_for_published_questionnaire_with_answers_is_invalid(self):
+        three_years_from_now = self.this_year + 3
+        form_data = self.form_data.copy()
+        form_data['year'] = three_years_from_now
+
+        questionnaire_1 = QuestionnaireFactory(name="JRF 2011 Core English",
+                                                  status=Questionnaire.PUBLISHED,
+                                                  year=three_years_from_now)
+        child_questionnaire = QuestionnaireFactory(name="JRF 2011 Core English child", parent=questionnaire_1)
+        NumericalAnswerFactory(questionnaire=child_questionnaire)
+        edit_questionnaire_form = EditQuestionnaireForm(initial={'questionnaire': questionnaire_1},
+                                                           data=form_data)
+
+        self.assertFalse(edit_questionnaire_form.is_valid())
+        self.assertNotIn((three_years_from_now, three_years_from_now), edit_questionnaire_form.fields['year'].choices)

@@ -21,6 +21,19 @@ class QuestionnaireFilterForm(forms.Form):
         self.fields['questionnaire'].label = "Finalized Questionnaires"
         self.fields['name'].label = "New Questionnaire"
 
+class EditQuestionnaireForm(forms.Form):
+    name = forms.CharField(widget=forms.TextInput(), required=True)
+    year = forms.ChoiceField(widget=forms.Select(attrs={"class": 'form-control'}), required=True, choices=[])
+
+    def __init__(self, *args, **kwargs):
+        super(EditQuestionnaireForm, self).__init__(*args, **kwargs)
+        self.fields['year'].choices = self._year_choices()
+        self.fields['year'].label = "Reporting Year"
+        self.fields['name'].label = "Revision Name"
+
+    def _year_choices(self):
+        exclude_query_set = Questionnaire.objects.filter(status=Questionnaire.PUBLISHED, children__answers__isnull=False)
+        return _set_year_choices(excluded_query_set=exclude_query_set)
 
 class PublishQuestionnaireForm(forms.Form):
     regions = forms.ModelMultipleChoiceField(queryset=Region.objects.none(),

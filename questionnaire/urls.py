@@ -8,7 +8,7 @@ from questionnaire.views.export_to_text import ExportToTextView, ExportSectionPD
 from questionnaire.views.grid import CreateGrid, DeleteGrid
 from questionnaire.views.home import Home
 from questionnaire.views.locations import ListRegions, ListCountries, RegionsForOrganization, CountriesForRegion
-from questionnaire.views.manage import ManageJRF, ManageRegionalJRF, EditQuestionnaireNameView
+from questionnaire.views.manage import ManageJRF, ManageRegionalJRF, EditQuestionnaireView
 from questionnaire.views.questionnaire_preview import PreviewQuestionnaire
 from questionnaire.views.sections import NewSection, NewSubSection, EditSection, EditSubSection, DeleteSection, \
     DeleteSubSection, ReOrderQuestions, MoveSubsection, GetSubSections, MoveGrid
@@ -39,7 +39,7 @@ urlpatterns = patterns('',
                            name="list_country_page"),
                        url(r'^manage/$', ManageJRF.as_view(), name='manage_jrf_page'),
                        url(r'^manage/questionnaire/(?P<questionnaire_id>\d+)/edit_name/$',
-                           EditQuestionnaireNameView.as_view(), name="edit_questionnaire_name"),
+                           EditQuestionnaireView.as_view(), name="edit_questionnaire_name"),
                        url(r'^manage/region/(?P<region_id>\d+)/$', ManageRegionalJRF.as_view(),
                            name='manage_regional_jrf_page'),
                        url(r'^questionnaire/entry/(?P<questionnaire_id>\d+)/section/(?P<section_id>\d+)/$',
