@@ -362,6 +362,7 @@ def when_i_confirm_group1_the_questionnaire(step, action):
 
 @step(u'Then I should see the questionnaire "([^"]*)"')
 def then_i_should_see_the_questionnaire_group1(step, status):
+    sleep(2)
     world.page.is_text_present('The questionnaire \'%s\' was %s successfully.' % (world.finalised_core_questionnaire.name, status))
 
 @step(u'When I click on the "([^"]*)" questionnaire')
