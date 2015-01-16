@@ -88,7 +88,7 @@ class Questionnaire(BaseModel):
         self._archive_children()
 
     def _archive_children(self):
-        self.children.all().update(status=self.ARCHIVED)
+        self.children.filter(region__isnull=False).update(status=self.ARCHIVED)
 
     def disasociate_and_archive_children(self):
         self._archive_children()

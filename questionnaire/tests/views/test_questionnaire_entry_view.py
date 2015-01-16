@@ -1089,6 +1089,9 @@ class ArchiveQuestionnaireViewTest(BaseTest):
         afr = RegionFactory(name='AFR')
         amr = RegionFactory(name='AMR')
 
+        core_child_questionnaire = QuestionnaireFactory(parent=self.questionnaire, region=None, status=Questionnaire.FINALIZED)
+        SectionFactory(questionnaire=core_child_questionnaire)
+
         afro_child_questionnaire = QuestionnaireFactory(parent=self.questionnaire, region=afr)
         amr_child_questionnaire = QuestionnaireFactory(parent=self.questionnaire, region=amr)
 
@@ -1103,6 +1106,7 @@ class ArchiveQuestionnaireViewTest(BaseTest):
         self.assertEqual(afro_archived_questionnaire.status, Questionnaire.ARCHIVED)
         self.assertEqual(amr_archived_questionnaire.status, Questionnaire.ARCHIVED)
         self.assertEqual(archived_questionnaire.status, Questionnaire.ARCHIVED)
+        self.assertTrue(Questionnaire.objects.get(id=core_child_questionnaire.id).is_finalized())
         self.assertIn(expected_message, response.cookies['messages'].value)
 
     def test_post_archive_to_non_archivable_questionnaire(self):
@@ -1142,6 +1146,8 @@ class DeleteQuestionnaireViewTest(BaseTest):
         afr = RegionFactory(name='AFR')
         amr = RegionFactory(name='AMR')
 
+        core_child_questionnaire = QuestionnaireFactory(parent=self.questionnaire, region=None, status=Questionnaire.FINALIZED)
+        SectionFactory(questionnaire=core_child_questionnaire)
         afro_child_questionnaire = QuestionnaireFactory(parent=self.questionnaire, region=afr)
         amr_child_questionnaire = QuestionnaireFactory(parent=self.questionnaire, region=amr)
 
@@ -1157,6 +1163,7 @@ class DeleteQuestionnaireViewTest(BaseTest):
         self.failIf(Questionnaire.objects.filter(id=self.questionnaire.id))
         self.assertEqual(amr_archived_questionnaire.status, Questionnaire.ARCHIVED)
         self.assertEqual(afro_archived_questionnaire.status, Questionnaire.ARCHIVED)
+        self.assertTrue(Questionnaire.objects.get(id=core_child_questionnaire.id).is_finalized())
         self.assertIn(expected_message, response.cookies['messages'].value)
 
     def test_delete_a_questionnaire_redirects_with_error_message_if_questionnaire_is_not_deleteable(self):
