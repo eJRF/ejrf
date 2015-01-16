@@ -4,12 +4,13 @@ from questionnaire.models import Questionnaire
 
 
 def _set_year_choices(**kwargs):
-    query_set = kwargs.get('excluded_query_set', Questionnaire.objects.all())
+    query_set = Questionnaire.objects.filter(status=Questionnaire.PUBLISHED,
+                                             children__answers__isnull=False)
     choices = []
     choices.insert(0, ('', 'Choose a year', ))
     questionnaire_years = query_set.values_list('year', flat=True)
-    this_year = date.today().year
-    twenty_year_range = [this_year + count for count in range(0, 20)]
+    start_year = 2014
+    twenty_year_range = [start_year + count for count in range(0, 20)]
     all_years = filter(lambda year: year not in questionnaire_years, twenty_year_range)
     choices.extend((year, year) for year in list(all_years))
     return choices
