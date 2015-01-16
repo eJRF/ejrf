@@ -1128,12 +1128,12 @@ class ArchiveQuestionnaireViewTest(BaseTest):
         self.assert_permission_required('/questionnaire/1/archive/')
 
 
-class DeleteQiuestionnaireViewTest(BaseTest):
+class DeleteQuestionnaireViewTest(BaseTest):
     def setUp(self):
         self.client = Client()
         self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
-        self.assign('can_edit_questionnaire', self.user)
         self.assign('can_view_users', self.user)
+        self.assign('can_edit_questionnaire', self.user)
         self.client.login(username=self.user.username, password='pass')
         self.questionnaire = QuestionnaireFactory(status=Questionnaire.FINALIZED)
         self.section = SectionFactory(questionnaire=self.questionnaire)
@@ -1172,46 +1172,3 @@ class DeleteQiuestionnaireViewTest(BaseTest):
         self.assertRedirects(response, expected_url, status_code=302)
         self.failUnless(Questionnaire.objects.filter(id=self.questionnaire.id))
         self.assertIn(expected_message, response.cookies['messages'].value)
-
-    def test_permission_required(self):
-        self.assert_permission_required('/questionnaire/%s/delete/' % self.questionnaire.id)
-
-
-class RegionalDeleteQiuestionnaireViewTest(BaseTest):
-    def setUp(self):
-        self.client = Client()
-        self.user = self.create_user(group=self.REGIONAL_ADMIN, org="WHO", region='AFR')
-        self.assign('can_edit_questionnaire', self.user)
-
-        self.client.login(username=self.user.username, password='pass')
-        self.questionnaire = QuestionnaireFactory(status=Questionnaire.FINALIZED)
-        self.afr = self.user.user_profile.region
-        self.section = SectionFactory(questionnaire=self.questionnaire)
-        self.expected_url = '/manage/region/%s/' % self.afr.id
-        self.afro_child_questionnaire = QuestionnaireFactory(parent=self.questionnaire, region=self.afr)
-        SectionFactory(questionnaire=self.afro_child_questionnaire)
-
-    def test_delete_a_regional_questionnaire(self):
-
-        response = self.client.post('/questionnaire/%d/delete/' % self.afro_child_questionnaire.id)
-        expected_message = "The questionnaire '%s' was deleted successfully." % self.afro_child_questionnaire.name
-
-        self.assertRedirects(response, self.expected_url, status_code=302)
-        self.failUnless(Questionnaire.objects.filter(id=self.questionnaire.id))
-        self.failIf(Questionnaire.objects.filter(id=self.afro_child_questionnaire.id))
-        self.assertIn(expected_message, response.cookies['messages'].value)
-
-    def test_delete_a_questionnaire_redirects_with_error_message_if_questionnaire_is_not_deleteable(self):
-        afro_child_questionnaire = QuestionnaireFactory(parent=self.questionnaire, region=self.afr)
-        SectionFactory(questionnaire=afro_child_questionnaire)
-        NumericalAnswerFactory(questionnaire=afro_child_questionnaire)
-
-        response = self.client.post('/questionnaire/%d/delete/' % afro_child_questionnaire.id)
-        expected_message = "The questionnaire \'%s\' could not be deleted. Because it has responses." % afro_child_questionnaire.name
-
-        self.assertRedirects(response, self.expected_url, status_code=302)
-        self.failUnless(Questionnaire.objects.filter(id=afro_child_questionnaire.id))
-        self.assertIn(expected_message, response.cookies['messages'].value)
-
-    def test_permission_required(self):
-        self.assert_permission_required('/questionnaire/%s/delete/' % self.afro_child_questionnaire.id )

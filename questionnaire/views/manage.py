@@ -5,9 +5,10 @@ from django.shortcuts import render
 from django.views.generic import View
 from braces.views import MultiplePermissionsRequiredMixin, PermissionRequiredMixin
 
-from questionnaire.forms.questionnaires import QuestionnaireFilterForm
+from questionnaire.forms.questionnaires import QuestionnaireFilterForm, EditQuestionnaireForm
 from questionnaire.mixins import RegionAndPermissionRequiredMixin
 from questionnaire.models import Questionnaire, Region
+from questionnaire.utils.form_utils import _set_year_choices
 
 
 class ManageJRF(MultiplePermissionsRequiredMixin, View):
@@ -29,7 +30,8 @@ class ManageJRF(MultiplePermissionsRequiredMixin, View):
                    'regions_questionnaire_map': self.map_region_with_questionnaires(),
                    'regions': self.regions,
                    'btn_label': 'Duplicate',
-                   'action': reverse('duplicate_questionnaire_page')}
+                   'action': reverse('duplicate_questionnaire_page'),
+                   'edit_questionnaire_form': EditQuestionnaireForm()}
         return render(self.request, self.template_name, context)
 
     def map_region_with_questionnaires(self):
@@ -50,10 +52,14 @@ class EditQuestionnaireView(PermissionRequiredMixin, View):
 
     def post(self, *args, **kwargs):
         questionnaire = Questionnaire.objects.get(id=kwargs['questionnaire_id'])
-        questionnaire.name = self.request.POST['name']
-        questionnaire.save()
-        message = "Name of Questionnaire updated successfully."
-        messages.success(self.request, message)
+        edit_questionnaire_form = EditQuestionnaireForm(instance=questionnaire, data=self.request.POST)
+        if edit_questionnaire_form.is_valid():
+            edit_questionnaire_form.save()
+            message = 'The revision was updated successfully.'
+            messages.success(self.request, message)
+            return HttpResponseRedirect(reverse('manage_jrf_page'))
+        message = 'The revision was not updated.'
+        messages.error(self.request, message)
         return HttpResponseRedirect(reverse('manage_jrf_page'))
 
 

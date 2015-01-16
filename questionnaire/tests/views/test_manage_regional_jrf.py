@@ -58,30 +58,6 @@ class ManageJRFViewTest(BaseTest):
                              status_code=302, target_status_code=200, msg_prefix='')
 
 
-class EditQuestionnaireNameViewTest(BaseTest):
-    def setUp(self):
-        self.client = Client()
-        self.user = self.create_user(group=self.REGIONAL_ADMIN, region="AFRO", org="WHO")
-        self.region = self.user.user_profile.region
-        self.assign('can_edit_questionnaire', self.user)
-
-        self.who = Organization.objects.create(name="WHO")
-        self.assign('can_edit_questionnaire', self.user)
-        self.assign('can_view_users', self.user)
-        self.client.login(username=self.user.username, password='pass')
-        self.questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", year=2013, region=self.region)
-        self.url = "/manage/questionnaire/%d/edit_name/" % self.questionnaire.id
-
-    def test_post(self):
-        data = {'name': 'Edit Name Of Questionnaire'}
-        self.failIf(Questionnaire.objects.filter(**data))
-        response = self.client.post(self.url, data=data)
-        questionnaire = Questionnaire.objects.get(**data)
-        self.failUnless(questionnaire)
-        self.assertRedirects(response, expected_url='/manage/')
-        self.assertIn('Name of Questionnaire updated successfully.', response.cookies['messages'].value)
-
-
 class FinalizeRegionalQuestionnaireViewTest(BaseTest):
     def setUp(self):
         self.client = Client()

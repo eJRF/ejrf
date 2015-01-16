@@ -18,6 +18,7 @@ from questionnaire.views.questionnaires import Entry, SubmitQuestionnaire, Dupli
 from questionnaire.views.theme import ThemeList, NewTheme, EditTheme, DeleteTheme
 from questionnaire.views.upload_document import UploadDocument, DownloadDocument, DeleteDocument
 from questionnaire.views.users import UsersList, CreateUser, EditUser, ResetPassword
+from questionnaire.validators.questionnaires import ValidateQuestionnaireFields
 
 
 urlpatterns = patterns('',
@@ -38,8 +39,10 @@ urlpatterns = patterns('',
                        url(r'^locations/region/(?P<region_id>\d+)/country/$', ListCountries.as_view(),
                            name="list_country_page"),
                        url(r'^manage/$', ManageJRF.as_view(), name='manage_jrf_page'),
-                       url(r'^manage/questionnaire/(?P<questionnaire_id>\d+)/edit_name/$',
+                       url(r'^questionnaire/(?P<questionnaire_id>\d+)/edit/$',
                            EditQuestionnaireView.as_view(), name="edit_questionnaire_name"),
+                       url(r'^questionnaire/validate/$',
+                           ValidateQuestionnaireFields.as_view(), name="validate_questionnaire"),
                        url(r'^manage/region/(?P<region_id>\d+)/$', ManageRegionalJRF.as_view(),
                            name='manage_regional_jrf_page'),
                        url(r'^questionnaire/entry/(?P<questionnaire_id>\d+)/section/(?P<section_id>\d+)/$',

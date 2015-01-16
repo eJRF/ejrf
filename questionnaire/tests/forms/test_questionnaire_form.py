@@ -136,7 +136,7 @@ class EditQuestionnaireFormTest(BaseTest):
 
     def setUp(self):
         self.questionnaire_1 = QuestionnaireFactory(name="JRF 2011 Core English",
-                                                  status=Questionnaire.FINALIZED,
+                                                  status=Questionnaire.PUBLISHED,
                                                   year=2016)
         self.draft_questionnaire = QuestionnaireFactory(name="JRF 2012 Core English",
                                                   status=Questionnaire.DRAFT,
@@ -165,13 +165,32 @@ class EditQuestionnaireFormTest(BaseTest):
         form_data['year'] = three_years_from_now
 
         questionnaire_1 = QuestionnaireFactory(name="JRF 2011 Core English",
-                                                  status=Questionnaire.PUBLISHED,
-                                                  year=three_years_from_now)
-        edit_questionnaire_form = EditQuestionnaireForm(initial={'questionnaire': questionnaire_1},
-                                                           data=form_data)
+                                               status=Questionnaire.PUBLISHED,
+                                               year=three_years_from_now,
+                                               parent=self.questionnaire_1,
+                                               region=RegionFactory(name='AFRO'))
+
+        edit_questionnaire_form = EditQuestionnaireForm(instance=self.questionnaire_1, data=form_data)
 
         self.assertTrue(edit_questionnaire_form.is_valid())
         self.assertIn((three_years_from_now, three_years_from_now), edit_questionnaire_form.fields['year'].choices)
+
+    def test_save_archives_regional_adapttions_from_the_revision_s_year(self):
+        three_years_from_now = self.this_year + 3
+        form_data = self.form_data.copy()
+        form_data['year'] = 2016
+
+        questionnaire_1 = QuestionnaireFactory(name="JRF 2011 Core English",
+                                               status=Questionnaire.PUBLISHED,
+                                               year=three_years_from_now,
+                                               parent=self.questionnaire_1,
+                                               region=self.afro)
+        edit_questionnaire_form = EditQuestionnaireForm(instance=self.draft_questionnaire, data=form_data)
+
+        self.assertTrue(edit_questionnaire_form.is_valid())
+        edit_questionnaire_form.save()
+        self.assertTrue(Questionnaire.objects.get(id=self.questionnaire_1.id).is_archived())
+        self.assertEqual(Questionnaire.objects.get(id=self.draft_questionnaire.id).year, 2016)
 
     def test_year_for_published_questionnaire_with_answers_is_invalid(self):
         three_years_from_now = self.this_year + 3

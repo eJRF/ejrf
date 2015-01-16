@@ -390,3 +390,39 @@ def then_that_user_should_be_unable_to_log_in(step):
 @step(u'And they should see a message that their account is inactive when they try to log in')
 def and_they_should_see_a_message_that_their_account_is_inactive_when_they_try_to_log_in(step):
     world.page.is_text_present('This account is inactive')
+
+@step(u'And I select to change the password of that user')
+def and_i_select_to_change_the_password_of_that_user(step):
+    world.page.click_by_id('id-reset-password-user-%s' % world.datasubmitxteruser.id)
+
+@step(u'And I fill in the new password twice')
+def and_i_fill_in_the_new_password_twice(step):
+    world.page.fill_form({'password1': 'p@ss',
+                          'password2': 'p@ss'})
+
+@step(u'And I click save button')
+def and_i_click_save_button(step):
+    world.page.submit()
+
+@step(u'Then I should see that the users password was reset successfully')
+def then_i_should_see_that_the_users_password_was_reset_successfully(step):
+    world.page.is_text_present('The password was succesfully reset')
+
+@step(u'And the user should not be able to login successfully using old password')
+def and_the_user_should_not_be_able_to_login_successfully_using_old_password(step):
+    world.page.logout()
+    login(world.page, world.datasubmitteruser, 'pass')
+    world.page.is_text_present('Invalid password')
+    world.page.validate_url()
+@step(u'And the user should be able to loggin successfully using the new password')
+def and_the_user_should_be_able_to_loggin_successfully_using_the_new_password(step):
+    login(world.page, world.datasubmitteruser, 'p@ss')
+    world.page.is_text_present('Invalid password')
+    world.page = QuestionnairePage(world.browser)
+    world.page.validate_url()
+
+def login(page, username, password):
+    page.visit()
+    page.fill_form({'username': username,
+                    'password': password})
+    page.submit()
