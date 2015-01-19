@@ -12,6 +12,7 @@ from questionnaire.tests.factories.section_factory import SectionFactory
 
 @step(u'I have four finalised questionnaires')
 def given_i_have_four_finalised_questionnaires(step):
+    world.finalized_questionnaire_year = 2015
     world.questionnaire1 = Questionnaire.objects.create(name="JRF Jamaica version", description="description",
                                                         year=2012, status=Questionnaire.FINALIZED)
 
@@ -24,7 +25,7 @@ def given_i_have_four_finalised_questionnaires(step):
                                                         year=2011, status=Questionnaire.FINALIZED)
     Section.objects.create(title="Section1", order=0, questionnaire=world.questionnaire3, name="School Imm. Delivery")
     world.questionnaire4 = Questionnaire.objects.create(name="JRF kampala version", description="description",
-                                                        year=2010, status=Questionnaire.FINALIZED)
+                                                        year=world.finalized_questionnaire_year, status=Questionnaire.FINALIZED)
     Section.objects.create(title="Section1", order=0, questionnaire=world.questionnaire4, name="School Imm. Delivery")
 
 
@@ -283,6 +284,7 @@ def and_i_have_a_finalised_regional_questionnaire(step):
     parent = QuestionGroup.objects.create(subsection=world.regional_subsection, order=1)
     parent.question.add(world.regional_question1)
 
+
 @step(u'When I click that regional questionnaire')
 def when_i_click_that_regional_questionnaire(step):
     world.page.click_by_id('questionnaire-%s' % world.finalised_regional_questionnaire.id)
@@ -319,10 +321,12 @@ def and_there_should_no_longer_be_an_option_to_approve_the_questionnaire(step):
     assert world.page.is_element_not_present_by_id(
         "id-approve-questionnaire-%s" % world.finalised_regional_questionnaire.id)
 
+
 @step(u'Then I should see modal with the questionnaires current name')
 def then_i_should_see_modal_with_the_questionnaires_current_name(step):
     world.page.is_text_present('Edit Name Of Questionnaire')
     world.page.is_text_present(world.questionnaire5.name)
+
 
 @step(u'When I update the name of the questionnaire and save my changes')
 def when_i_update_the_name_of_the_questionnaire_and_save_my_changes(step):
@@ -330,52 +334,64 @@ def when_i_update_the_name_of_the_questionnaire_and_save_my_changes(step):
     world.page.select('year', 2014)
     world.page.click_by_id('save-questionnaire-name-%s' % world.questionnaire5.id)
 
+
 @step(u'Then I should see a message that questionnaire was updated')
 def then_i_should_see_a_message_that_questionnaire_was_updated(step):
     world.page.is_text_present('The revision was updated successfully.')
+
 
 @step(u'And I should see the questionnaire with its new name')
 def and_i_should_see_the_questionnaire_with_its_new_name(step):
     sleep(10)
     world.page.is_text_present('Updated Questionnaire Name')
 
+
 @step(u'Then I should view it in preview mode')
 def then_i_should_view_it_in_preview_mode(step):
     assert_false(world.page.is_element_present_by_id('id-edit-section-%s' % world.finalised_section.id))
     assert_false(world.page.is_element_present_by_id('id-delete-section-%s' % world.finalised_section.id))
 
+
 @step(u'And I have "([^"]*)" "([^"]*)" core questionnaire')
 def and_i_have_group1_group2_core_questionnaire(step, number, status):
     create_questionnaire(world, number, status)
+
 
 @step(u'When I click "([^"]*)" button on that core questionnaire')
 def when_i_click_group1_button_on_that_core_questionnaire(step, action):
     world.page.click_by_id('id-%s-questionnaire-%s' % (action, world.finalised_core_questionnaire.id))
 
+
 @step(u'When I confirm "([^"]*)" the questionnaire')
 def when_i_confirm_group1_the_questionnaire(step, action):
     world.page.click_by_id('confirm-%s-questionnaire-%s' % (action, world.finalised_core_questionnaire.id))
 
+
 @step(u'Then I should see the questionnaire "([^"]*)"')
 def then_i_should_see_the_questionnaire_group1(step, status):
     sleep(2)
-    world.page.is_text_present('The questionnaire \'%s\' was %s successfully.' % (world.finalised_core_questionnaire.name, status))
+    world.page.is_text_present(
+        'The questionnaire \'%s\' was %s successfully.' % (world.finalised_core_questionnaire.name, status))
+
 
 @step(u'When I click on the "([^"]*)" questionnaire')
 def when_i_click_on_the_group1_questionnaire(step, status):
-    world.page.click_by_id('questionnaire-%s' % world.finalised_core_questionnaire.id)
+    world.page.click_by_id('%s-questionnaire-%s' % (status, world.finalised_core_questionnaire.id))
+
 
 def create_questionnaire(world, number, status):
     for i in range(int(number)):
-        world.finalised_core_questionnaire = Questionnaire.objects.create(name="JRF %s Regional %d" % (status.capitalize(), i),
-                                                                              description="Description",
-                                                                              year='201%d' % i, status=status,
-                                                                              region=None)
+        world.finalised_core_questionnaire = Questionnaire.objects.create(
+            name="JRF %s Regional %d" % (status.capitalize(), i),
+            description="Description",
+            year='201%d' % i, status=status,
+            region=None)
         world.finalised_section = SectionFactory(questionnaire=world.finalised_core_questionnaire)
         world.finalized_subsection = SubSection.objects.create(order=1, section=world.finalised_section)
 
-        world.refinalized_question1 = Question.objects.create(text='Name of person in Ministry of Health', UID='C001%s' % i,
-                                                           answer_type='Text')
+        world.refinalized_question1 = Question.objects.create(text='Name of person in Ministry of Health',
+                                                              UID='C001%s' % i,
+                                                              answer_type='Text')
 
         parent = QuestionGroup.objects.create(subsection=world.finalized_subsection, order=i)
         parent.question.add(world.refinalized_question1)
@@ -384,3 +400,25 @@ def create_questionnaire(world, number, status):
 @step(u'When I click the edit questionnaire button')
 def when_i_click_the_edit_questionnaire_button(step):
     world.page.click_by_id('id-edit-questionnaire-%s' % world.questionnaire5.id)
+    sleep(2)
+
+
+@step(u'I update the year to one of the finalized questionnaire year')
+def and_i_update_the_year_to_2014(step):
+    world.page.select('year', world.finalized_questionnaire_year)
+
+
+@step(u'Then I should see a warning message')
+def then_i_should_see_a_warning_message(step):
+    warning_message = 'A Revision of the year %s already exists. If you go ahead, that revision will be archived.' % world.finalized_questionnaire_year
+    world.page.is_text_present(warning_message)
+
+
+@step(u'When I save my changes')
+def when_i_save_my_changes(step):
+    world.page.click_by_id('save-questionnaire-name-%s' % world.questionnaire5.id)
+
+
+@step(u'I should see the corresponding existing finalized questionnaire is archived')
+def then_i_should_see_the_existing_2012_questionnaire_is_archived(step):
+    world.page.is_element_present_by_id('archived-questionnaire-%s' % world.questionnaire4.id)

@@ -12,7 +12,12 @@ Feature: Manage JRF
     When I update the name of the questionnaire and save my changes
     Then I should see a message that questionnaire was updated
     And I should see the questionnaire with its new name
-#    When I choose the option to edit the name of a questionnaire
+    When I click the edit questionnaire button
+    And I update the year to one of the finalized questionnaire year
+    Then I should see a warning message
+    When I save my changes
+    Then I should see the corresponding existing finalized questionnaire is archived
+
 
 
   Scenario: Viewing older finalised questionnaires
