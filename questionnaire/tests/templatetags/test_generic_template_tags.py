@@ -1,11 +1,13 @@
+from questionnaire.forms.questionnaires import EditQuestionnaireForm
 from questionnaire.forms.theme import ThemeForm
 from questionnaire.models import Question, QuestionOption, Theme
 from questionnaire.templatetags.generic_tags import display_list, bootstrap_message, get_url_with_ids, \
     divide_to_paginate, ASSIGN_QUESTION_PAGINATION_SIZE, add_string, get_questionnaire_from, \
-    bootstrap_class, packaged_options, custom_options, get_theme_form_with_instance
+    bootstrap_class, packaged_options, custom_options, get_theme_form_with_instance, get_generic_form
 from questionnaire.templatetags.questionnaire_entry_tags import get_questions_to_skip
 
 from questionnaire.tests.base_test import BaseTest
+from questionnaire.tests.factories.questionnaire_factory import QuestionnaireFactory
 from questionnaire.tests.factories.skip_rule_factory import SkipQuestionRuleFactory
 
 
@@ -71,3 +73,10 @@ class GeneralTemplateTagTest(BaseTest):
 
         self.assertEqual(1, len(questions_to_skip))
         self.assertEqual([skip_rule.skip_question.id], list(questions_to_skip))
+
+    def test_get_form(self):
+        a_form = 'EditQuestionnaireForm'
+        an_instance = QuestionnaireFactory()
+        result = get_generic_form(a_form, an_instance)
+        self.assertEqual(an_instance, result.instance)
+        self.assertIsInstance(result, EditQuestionnaireForm)

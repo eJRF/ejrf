@@ -39,7 +39,7 @@
                                 </span>
                                 {% endwith %}
                             </li>
-                            {% include 'base/modals/edit_name.html' with a_form=filter_form modal_id='edit_questionnaire_name' action=action %}
+                            {% include 'base/modals/edit_name.html' with a_form=edit_questionnaire_form_class|get_generic_form:questionnaire modal_id='edit_questionnaire_name' action=action %}
                             {% include 'base/modals/_confirm.html' with object_type='Questionnaire' title='Confirm Delete Questionnaire' action="delete" url=questionnaire.id|get_url_with_ids:"delete_questionnaire_page" object=questionnaire confirm='Yes' extra_message="Only this instance will be deleted. All regional adapations will be archived and can be deleted by regional admins." %}
 
                         {% endfor %}

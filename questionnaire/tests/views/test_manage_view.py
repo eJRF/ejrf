@@ -2,7 +2,7 @@ from django.core.urlresolvers import reverse
 from django.test import Client
 from datetime import date
 
-from questionnaire.forms.questionnaires import QuestionnaireFilterForm, PublishQuestionnaireForm
+from questionnaire.forms.questionnaires import QuestionnaireFilterForm, PublishQuestionnaireForm, EditQuestionnaireForm
 from questionnaire.models import Questionnaire, Section, Organization, Region, SubSection
 from questionnaire.tests.base_test import BaseTest
 from questionnaire.tests.factories.questionnaire_factory import QuestionnaireFactory
@@ -52,6 +52,7 @@ class ManageJRFViewTest(BaseTest):
         self.assertIn(core2, response.context['draft_questionnaires'])
         self.assertIn(core_archived, response.context['archived_questionnaires'])
         self.assertIsInstance(response.context['filter_form'], QuestionnaireFilterForm)
+        self.assertEqual(response.context['edit_questionnaire_form_class'], 'EditQuestionnaireForm')
         self.assertEqual(reverse('duplicate_questionnaire_page'), response.context['action'])
 
         question_map = response.context['regions_questionnaire_map']

@@ -22,8 +22,7 @@ class ManageJRF(MultiplePermissionsRequiredMixin, View):
 
     def get(self, *args, **kwargs):
         core_questionnaires = self.questionnaires.filter(region__isnull=True)
-        context = {'finalized_questionnaires': core_questionnaires.filter(
-            status__in=[Questionnaire.FINALIZED, Questionnaire.PUBLISHED]),
+        context = {'finalized_questionnaires': core_questionnaires.filter(status__in=[Questionnaire.FINALIZED, Questionnaire.PUBLISHED]),
                    'draft_questionnaires': core_questionnaires.filter(status=Questionnaire.DRAFT),
                    'archived_questionnaires': core_questionnaires.filter(status=Questionnaire.ARCHIVED),
                    'filter_form': QuestionnaireFilterForm(),
@@ -31,7 +30,8 @@ class ManageJRF(MultiplePermissionsRequiredMixin, View):
                    'regions': self.regions,
                    'btn_label': 'Duplicate',
                    'action': reverse('duplicate_questionnaire_page'),
-                   'edit_questionnaire_form': EditQuestionnaireForm()}
+                   'edit_questionnaire_form_class': 'EditQuestionnaireForm',
+                   }
         return render(self.request, self.template_name, context)
 
     def map_region_with_questionnaires(self):

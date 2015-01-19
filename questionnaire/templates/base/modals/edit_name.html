@@ -13,11 +13,11 @@
                     <div id="notification"></div>
                     <p>
                         <label for="questionnaire_name_{{ questionnaire.id }}">Revision Name</label>
-                        <input id="questionnaire_name_{{ questionnaire.id }}" maxlength="100" name="name" type="text" value="{{ questionnaire.name }}"/>
+                        {{ a_form.name }}
                     </p>
                     <p>
                         <label for="id_year">Revision Year</label>
-                        {{ edit_questionnaire_form.year }}
+                        {{ a_form.year }}
                     </p>
                 </div>
                 <div class="modal-footer">

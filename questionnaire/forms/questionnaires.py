@@ -28,7 +28,6 @@ class EditQuestionnaireForm(forms.ModelForm):
     class Meta:
         model = Questionnaire
         fields = ('name', 'year')
-        widgets = {'name': forms.TextInput(attrs={'class': 'form-control'})}
 
     def __init__(self, *args, **kwargs):
         super(EditQuestionnaireForm, self).__init__(*args, **kwargs)
