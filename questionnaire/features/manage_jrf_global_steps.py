@@ -319,10 +319,6 @@ def and_there_should_no_longer_be_an_option_to_approve_the_questionnaire(step):
     assert world.page.is_element_not_present_by_id(
         "id-approve-questionnaire-%s" % world.finalised_regional_questionnaire.id)
 
-@step(u'When I choose the option to edit the name of a questionnaire')
-def when_i_choose_the_option_to_edit_the_name_of_a_questionnaire(step):
-    world.page.click_by_id('id-edit-questionnaire-%s' % world.questionnaire5.id)
-
 @step(u'Then I should see modal with the questionnaires current name')
 def then_i_should_see_modal_with_the_questionnaires_current_name(step):
     world.page.is_text_present('Edit Name Of Questionnaire')
@@ -330,13 +326,13 @@ def then_i_should_see_modal_with_the_questionnaires_current_name(step):
 
 @step(u'When I update the name of the questionnaire and save my changes')
 def when_i_update_the_name_of_the_questionnaire_and_save_my_changes(step):
-    world.page.fill_this_element('questionnaire_name_%s' % world.questionnaire5.id, 'Updated Questionnaire Name')
-    sleep(5)
+    world.page.fill_this_element('id_name', 'Updated Questionnaire Name')
+    world.page.select('year', 2014)
     world.page.click_by_id('save-questionnaire-name-%s' % world.questionnaire5.id)
 
 @step(u'Then I should see a message that questionnaire was updated')
 def then_i_should_see_a_message_that_questionnaire_was_updated(step):
-    world.page.is_text_present('Name of Questionnaire updated successfully')
+    world.page.is_text_present('The revision was updated successfully.')
 
 @step(u'And I should see the questionnaire with its new name')
 def and_i_should_see_the_questionnaire_with_its_new_name(step):
@@ -383,3 +379,8 @@ def create_questionnaire(world, number, status):
 
         parent = QuestionGroup.objects.create(subsection=world.finalized_subsection, order=i)
         parent.question.add(world.refinalized_question1)
+
+
+@step(u'When I click the edit questionnaire button')
+def when_i_click_the_edit_questionnaire_button(step):
+    world.page.click_by_id('id-edit-questionnaire-%s' % world.questionnaire5.id)
