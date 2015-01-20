@@ -5,7 +5,6 @@
         {% include 'base/modals/_delete.html' with object_type='Subsection' title='Confirm Delete Subsection' action="delete" url=subsection_.id|get_url_with_ids:"delete_subsection_page" object=subsection_ confirm='Yes' %}
         {% include 'questionnaires/assign_questions_modal.html' with subsection=subsection_ %}
         {% include 'questionnaires/change_subsection_position.html' with subsection=subsection_ %}
-        {% include 'questionnaires/create_grid_modal.html' with subsection=subsection_ %}
         {% for group in subsection_.parent_question_groups %}
             {% include 'base/modals/_delete.html' with object_type='Grid' title='Confirm Delete Grid' action="delete" url=subsection_.id|add_string:group.id|get_url_with_ids:"delete_grid_page" object=group confirm='Yes' %}
             {% for order in group.question_orders %}

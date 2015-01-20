@@ -3,6 +3,7 @@
 {% include 'questionnaires/entry/_extra_js.html' %}
 <script src="{{ STATIC_URL }}js/lib/angular.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}js/create_skip_rule.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}js/create-grid.js" type="text/javascript" charset="utf-8"></script>
 {% endblock %}
 {% block extra_css %}
 {% include 'questionnaires/entry/_extra_css.html' %}
@@ -13,7 +14,7 @@
 <div id="page-alert-error" class="alert alert-danger" style='display:none;'></div>
 {% include 'questionnaires/entry/_section_buttons.html' %}
 
-{% include 'questionnaires/create_skip_rule_modal.html' %}
+{% include 'questionnaires/subsection_angular_modals.html' %}
 
 {% load questionnaire_entry_tags %}
 {% load generic_tags %}

@@ -1,0 +1,58 @@
+<form method="post" class="form-horizontal" name="newGrid">
+    <div class="form-horizontal" data-ng-submit="">
+        <div class="form-group">
+            <label for="type">Type</label>
+            <select name="type" id="theme" class="form-control"
+                    data-ng-model="gridType"
+                    data-ng-options="type for type in types">
+                <option value="">Select a type</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="theme">Theme</label>
+            <select name="theme" id="theme" class="form-control"
+                    data-ng-model="selectedTheme"
+                    data-ng-options="theme.fields.name for theme in themes track by theme.pk">
+                <option value="">Select a theme</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <tr>
+                <td>
+                    QNO.
+                </td>
+                <td>
+                    <select name="primary_question" id="primary_question" class="form-control"
+                            data-ng-model="selectedQuestions.primary"
+                            data-ng-options="question.fields.text for question in questions | filter: {fields:{is_primary: 'true'}} track by question.pk">
+                        <option value="">Primary Question</option>
+                    </select>
+                </td>
+                <td>
+                    <div class="input-group" id="option-input-group">
+                        <select name="question-{[{ $index }]}" class="form-control"
+                                data-ng-model="selectedQuestions.otherQuestions"
+                                data-ng-options="question.fields.text for question in questions | filter: {fields:{answer_type: 'MultiChoice'}} track by question.pk">
+                            <option value="">Question</option>
+                        </select>
+
+                        <a href="javascript:;" class="input-group-addon btn btn-sm btn-primary add-option" data-ng-click="addOption()	"><i
+                                class="glyphicon glyphicon-plus"></i></a>
+                        <a href="javascript:;" class="input-group-addon btn btn-sm  btn-primary remove-option" data-ng-click="removeOption($index)"><i
+                                class="glyphicon glyphicon-remove"></i></a>
+                    </div>
+                </td>
+            </tr>
+            <tr ng-show="questionOptions" ng-model="questionOption" ng-repeat="option in questionOptions track by option.pk">
+                <td>{[{$index +1}]}</td>
+                <td>
+                    {[{ option.fields.text }]}
+                </td>
+                <td><input class="form-control"/></td>
+            </tr>
+        </table>
+    </div>
+</form>

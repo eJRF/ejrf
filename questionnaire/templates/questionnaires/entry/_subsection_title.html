@@ -18,11 +18,12 @@
            onClick="skipRules.updateSubsection({{ subsection.id }})">
             <span class="cyan"><span class="glyphicon glyphicon-plus-sign"></span> Add Skip Rule</span>
         </a>
-
         <a href="" id="id-create-grid-{{ subsection.id }}" class="btn btn-sm btn-default"
-           data-toggle="modal" data-target="#create-grid-modal-{{ subsection.id }}">
+           data-toggle="modal" data-target="#create-grid-modal"
+           onClick="createGrid.updateCreateGrid({{ questionnaire.id }})">
             <span class="cyan"><span class="glyphicon glyphicon-plus-sign"></span> Grid</span>
         </a>
+
         <a href="" id="id-assign-{{ subsection.id }}" class="btn btn-sm btn-default"
            data-toggle="modal" data-target="#assign-question-modal-{{ subsection.id }}">
             <span class="cyan"><span class="glyphicon glyphicon-plus-sign"></span> Assign Question</span>
@@ -50,9 +51,3 @@
     {{ subsection.description| safe }}
 </div>
 {% endif %}
-
-
-
-
-
-

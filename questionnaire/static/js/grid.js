@@ -3,7 +3,7 @@
 jQuery(function($){
     $('.create-grid').on('show.bs.modal', function(){
         var subsection_id = $(this).attr('subsection-id'),
-            create_grid_url = "/subsection/" + subsection_id +"/grid/new/";
+            create_grid_url = "/subsection/" + 2 +"/grid/new/";
         $.get(create_grid_url, function( data ) {
             var $holder = $('<div></div>').append(String(data));
             var content =  $holder.find("#create-grid-form-content").html();

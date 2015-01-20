@@ -26,7 +26,7 @@
                     <label class="col-sm-3 control-label">Select Root Question</label>
 
                     <div class="col-sm-7 center-fields">
-                        <select  name="root_question" id="root-question"
+                        <select name="root_question" id="root-question"
                                 data-ng-model="skipRule.rootQuestion"
                                 data-ng-options="q.fields.export_label for q in questions | filter: {fields:{answer_type: 'MultiChoice'}} | filter:filterQuestions track by q.pk">
                             <option value="">Select Root Question</option>
@@ -53,7 +53,7 @@
                     <label class="col-sm-3 control-label">Select Question to Skip</label>
 
                     <div class="col-sm-7 center-fields">
-                        <select name="skip_question"  data-ng-model="skipRule.skipQuestion"
+                        <select name="skip_question" data-ng-model="skipRule.skipQuestion"
                                 data-ng-options="q.fields.export_label for q in questions | filter:matchSelectedQuestion | filter:filterQuestions  track by q.pk">
                             <option value="">Select Question</option>
                         </select>
@@ -69,7 +69,8 @@
         </form>
     </div>
     <div id="newSubsectionRuleTab" data-ng-show="activeTab == 'newSubsectionRuleTab'">
-        <form method="post" class="form-horizontal sumbit-skip-rule" name="skipForm" id ='sumbit-subsection-skip-rule' data-ng-submit="submitSubsectionForm()">
+        <form method="post" class="form-horizontal sumbit-skip-rule" name="skipForm" id='sumbit-subsection-skip-rule'
+              data-ng-submit="submitSubsectionForm()">
             <div class="modal-body question-group indent">
                 <div data-ng-class="skipResult.className" class="alert" data-ng-show="skipResult.show">
                     {{ skipResult.message }}
@@ -82,7 +83,7 @@
                     <label class="col-sm-3 control-label">Select Root Question</label>
 
                     <div class="col-sm-7 center-fields">
-                        <select  name="subsection_root_question"
+                        <select name="subsection_root_question"
                                 data-ng-model="skipRule.rootQuestion"
                                 data-ng-options="q.fields.export_label for q in questions | filter: {fields:{answer_type: 'MultiChoice'}} | filter:filterQuestions track by q.pk">
                             <option value="">Select Root Question</option>
@@ -108,7 +109,7 @@
                     <label class="col-sm-3 control-label">Select Subsection To Skip</label>
 
                     <div class="col-sm-7 center-fields">
-                        <select name="skip_subsection"  data-ng-model="skipRule.subsection"
+                        <select name="skip_subsection" data-ng-model="skipRule.subsection"
                                 data-ng-options="getSubsectionTitle(q) for q in subsections track by q.id">
                             <option value="">Select SubSection</option>
                         </select>

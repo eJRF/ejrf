@@ -1,7 +1,7 @@
 <div class="modal fade create-grid" subsection-id="{{ subsection.id }}" id="create-grid-modal-{{ subsection.id }}" tabindex="-1" role="dialog"
-     aria-labelledby="preview_modal_label" aria-hidden="true">
+     aria-labelledby="preview_modal_label" aria-hidden="true" ng-app="questionnaireApp">
     <div class="modal-dialog modal-medium">
-        <div class="modal-content">
+        <div class="modal-content" data-ng-controller="createGridController" id="create-grid-controller">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h4 class="modal-title cyan" id="preview_modal_label"> Create Grid in Subsection: {{ subsection.title|default_if_none:'' }}</h4>
