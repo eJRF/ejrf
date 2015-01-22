@@ -1,9 +1,11 @@
 #login-body {
     background: #0099ff;
 }
-#logo-img{
+
+#logo-img {
     padding-top: 30px;
 }
+
 #logo-img img {
     padding-top: 10px;
     height: 63px;
@@ -585,10 +587,32 @@ select.hide {
     padding-top: 40px;
 }
 
-.grayed-out{
+.grayed-out {
     background-color: lightgray;
     border: 0;
 }
+
 .fontastic-fonts {
     font-size: 13px !important;
+}
+
+.grid-btn-group {
+    border: 1px solid #ccc;
+    margin-top: -9px;
+    margin-right: -9px;
+    padding: 1px 3px;
+    border-radius: 0 0 0 13px;
+    background: #EFEFEF;
+}
+
+.newgrid-filter{
+    margin-left: 10px;
+}
+
+.newgrid-filter-element{
+    margin-bottom: 10px;
+}
+
+.newgrid-filter-element label{
+    width: 50px;
 }

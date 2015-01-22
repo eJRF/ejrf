@@ -5,7 +5,7 @@ if (typeof createGrid == 'undefined') {
 var createGridController = function ($scope, $http) {
     $scope.selectedQuestions = {primary: {}, otherColumns: [{}]};
     $scope.grid = {questions: [], questionOptions: [], gridType: '', selectedTheme: ''};
-    $scope.gridForm = {backendErrors: []};
+    $scope.gridForm = {backendErrors: [], formHasErrors: false};
     $scope.subsectionId = $scope.subsectionId || "";
 
     $scope.grid.addColumn = function () {
@@ -34,7 +34,7 @@ var createGridController = function ($scope, $http) {
             return question && question.pk;
         });
         var payload = {
-            'type': $scope.grid.gridType.value,
+            'type': $scope.grid.gridType && $scope.grid.gridType.value,
             'primary_question': $scope.selectedQuestions.primary.pk,
             'columns': columnsIds,
             'csrfmiddlewaretoken': window.csrfToken
@@ -68,14 +68,14 @@ var createGridController = function ($scope, $http) {
                     data: payload
                 }).success(function (response) {
                     $scope.message = response[0].message;
+                    $scope.gridForm.formHasErrors = false;
                 }).error(function (response) {
                     $scope.error = response[0].message;
-                    $scope.newGrid.primary_question.$invalid = true;
-                    $scope.newGrid.type.$invalid = true;
-
+                    $scope.gridForm.formHasErrors = true;
                     $scope.gridForm.backendErrors = response[0].form_errors;
                 });
             } else {
+                $scope.gridForm.formHasErrors = true;
                 $scope.error = 'The are errors in the form. Please fix them and submit again.';
                 $scope.message = '';
             }
@@ -94,10 +94,15 @@ var createGridController = function ($scope, $http) {
 
     $scope.$watch('selectedQuestions.primary', function (selectedPrimary) {
         $scope.selectedQuestions.primary = selectedPrimary;
-        selectedPrimary && selectedPrimary.pk &&
-        $http.get('/api/v1/question/' + selectedPrimary.pk + '/options/').then(function (response) {
-            $scope.grid.questionOptions = response.data;
-        });
+
+        if (selectedPrimary) {
+            selectedPrimary.pk &&
+            $http.get('/api/v1/question/' + selectedPrimary.pk + '/options/').then(function (response) {
+                $scope.grid.questionOptions = response.data;
+            });
+        } else {
+            $scope.grid.questionOptions = [];
+        }
     });
 };
 

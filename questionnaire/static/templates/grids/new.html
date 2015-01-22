@@ -1,5 +1,5 @@
-<div class="form-horizontal" data-ng-submit="">
-    <div class="form-group">
+<div class="newgrid-filter">
+    <div class="newgrid-filter-element">
         <label for="type">Type</label>
         <select name="type" id="theme" class="form-control"
                 data-ng-model="grid.gridType"
@@ -7,7 +7,7 @@
             <option value="">Select a type</option>
         </select>
 
-        <div class="error-text" ng-show="newGrid.type.$invalid">
+        <div class="error-text" ng-show="newGrid.type.$invalid || gridForm.formHasErrors">
             <p class="text-danger" ng-show="newGrid.type.$error.required">
                 This field is required
             </p>
@@ -16,15 +16,16 @@
                 {[{ error }]}
             </p>
         </div>
-
     </div>
-    <div class="form-group">
+
+    <div class="newgrid-filter-element">
         <label for="theme">Theme</label>
         <select name="theme" id="theme" class="form-control"
                 data-ng-model="grid.selectedTheme"
                 data-ng-options="theme.fields.name for theme in themes track by theme.pk">
             <option value="">Select a theme</option>
         </select>
+
     </div>
 </div>
 
@@ -42,7 +43,7 @@
                         <option value="">Primary Question</option>
                     </select>
 
-                    <div class="error-text" ng-show="newGrid.primary_question.$invalid">
+                    <div class="error-text" ng-show="newGrid.primary_question.$invalid || gridForm.formHasErrors">
                         <p class="text-danger" ng-show="newGrid.primary_question.$error.required">
                             This field is required
                         </p>
@@ -57,7 +58,7 @@
             <td ng-repeat="q in selectedQuestions.otherColumns" ng-mouseenter="editTable=true"
                 ng-mouseleave="editTable=false">
                 <div>
-                    <div ng-show="editTable" class="pull-right">
+                    <div ng-show="editTable" class="pull-right grid-btn-group">
                         <a href="#" class="" data-ng-click="grid.addColumn()	">
                             <i class="glyphicon glyphicon-plus-sign"></i>
                         </a>
@@ -72,7 +73,7 @@
                             <option value="">Question</option>
                         </select>
 
-                        <div class="error-text" ng-show="gridForm.{[{ 'dynamicQuestion'+ $index }]}.columns.$invalid">
+                        <div class="error-text" ng-show="gridForm.{[{ 'dynamicQuestion'+ $index }]}.columns.$invalid || gridForm.formHasErrors">
                             <p class="text-danger"
                                ng-show="gridForm.{[{ 'dynamicQuestion'+ $index }]}.columns.$error.required">
                                 This field is required
@@ -94,7 +95,7 @@
                 {[{ option.fields.text }]}
             </td>
             <td ng-repeat="q in selectedQuestions.otherColumns">
-
+                <input type="text" />
             </td>
         </tr>
     </table>
