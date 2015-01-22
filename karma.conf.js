@@ -25,7 +25,8 @@ module.exports = function(config) {
     // list of files to exclude
     exclude: [
         'questionnaire/static/js/export-section.js',
-        'questionnaire/static/js/application.js'
+        'questionnaire/static/js/application.js',
+        'questionnaire/static/js/create-grid.js'
     ],
 
 

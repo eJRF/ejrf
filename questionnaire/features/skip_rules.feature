@@ -108,6 +108,7 @@ Feature: Skip Rules
     And I click to add a skip rule
     Then I should see '0' existing skip rules"
 
+  @WIP
   Scenario: Turn off cells in display all grid
     Given I am logged in as a global admin
     And I have a questionnaire with a grid

@@ -3,21 +3,21 @@ skipRules.subsection = "";
 
 var ngModule = angular.module('questionnaireApp', []);
 
-ngModule.config(function ( $interpolateProvider) {
-        $interpolateProvider.startSymbol('{[{');
-        $interpolateProvider.endSymbol('}]}');
-    });
+ngModule.config(function ($interpolateProvider) {
+    $interpolateProvider.startSymbol('{[{');
+    $interpolateProvider.endSymbol('}]}');
+});
 
 var skipRuleController = function ($scope, skipRuleService) {
     $scope.questions = [];
 
-    $scope.resetResults = function() {
+    $scope.resetResults = function () {
         $scope.skipResult = {show: false};
         $scope.deleteResult = {};
     };
     $scope.activeTab = "newRuleTab";
 
-    $scope.reset = function() {
+    $scope.reset = function () {
         $scope.existingRules = [];
 
         $scope.skipRule = {selectedQuestion: {}, rootQuestion: {}, csrfToken: window.csrfToken};
@@ -46,7 +46,7 @@ var skipRuleController = function ($scope, skipRuleService) {
 
     $scope.deleteRule = function (rule) {
         skipRuleService.deleteRule(rule.id).
-            then(function(data) {
+            then(function (data) {
                 $scope.deleteResult = data;
                 updateRules($scope.subsectionId);
             });
@@ -54,9 +54,9 @@ var skipRuleController = function ($scope, skipRuleService) {
 
     var createSkipRule = function (postData) {
         skipRuleService.createRule(postData, $scope.activeTab).
-            then(function(data) {
+            then(function (data) {
 
-                if(!data.formFailed){
+                if (!data.formFailed) {
                     $scope.reset();
                 }
                 $scope.skipResult = data;
@@ -66,21 +66,21 @@ var skipRuleController = function ($scope, skipRuleService) {
 
     var updateRules = function (subsectionId) {
         skipRuleService.getRules(subsectionId).
-            then(function(data) {
+            then(function (data) {
                 $scope.existingRules = data;
             });
     };
 
     var updateQuestions = function (subsectionId) {
         skipRuleService.getQuestions(subsectionId).
-            then(function(data) {
+            then(function (data) {
                 $scope.questions = data.questions;
             });
     };
 
-    var updateSubsections= function (sectionId) {
+    var updateSubsections = function (sectionId) {
         skipRuleService.getSubsections(sectionId).
-            then(function(data) {
+            then(function (data) {
                 $scope.subsections = data;
             });
     };
@@ -96,11 +96,19 @@ var skipRuleController = function ($scope, skipRuleService) {
 
         if (gridId != undefined) {
             $scope.subsectionTabHidden = true;
-            $scope.filterQuestions = function (question) { return question.parentQuestionGroup == gridId; };
-            $scope.filterRules = function (rule) { return rule.group_id == gridId; };
-        }else{
-            $scope.filterQuestions = function (question) { return !question.inGrid };
-            $scope.filterRules = function (rule) { return !(rule.is_in_grid || rule.is_in_hybrid) };
+            $scope.filterQuestions = function (question) {
+                return question.parentQuestionGroup == gridId;
+            };
+            $scope.filterRules = function (rule) {
+                return rule.group_id == gridId;
+            };
+        } else {
+            $scope.filterQuestions = function (question) {
+                return !question.inGrid
+            };
+            $scope.filterRules = function (rule) {
+                return !(rule.is_in_grid || rule.is_in_hybrid)
+            };
         }
     };
 
@@ -138,49 +146,49 @@ var skipRuleController = function ($scope, skipRuleService) {
 
 ngModule.controller('SkipRuleController', ['$scope', 'skipRuleService', skipRuleController]);
 
-ngModule.factory('skipRuleService', ['$http', '$q', function($http, $q) {
+ngModule.factory('skipRuleService', ['$http', '$q', function ($http, $q) {
     var service = {};
-    var getData = function(url) {
+    var getData = function (url) {
         var res = $q.defer();
         $http.get(url).
-            success(function(data) {
+            success(function (data) {
                 res.resolve(data);
             }).
-            error(function() {
+            error(function () {
                 res.reject("unable to get data");
             });
         return res.promise;
     };
-    service.getRules = function(subsectionId) {
+    service.getRules = function (subsectionId) {
         return getData("/questionnaire/subsection/" + subsectionId + "/skiprules/");
     };
 
-    service.getQuestions= function(subsectionId) {
+    service.getQuestions = function (subsectionId) {
         return getData("/questionnaire/subsection/" + subsectionId + "/questions/");
     };
 
-    service.getSubsections = function(sectionId) {
+    service.getSubsections = function (sectionId) {
         return getData("/questionnaire/section/" + window.sectionId + "/subsections/");
     };
 
-    service.deleteRule = function(ruleId) {
+    service.deleteRule = function (ruleId) {
         var res = $q.defer();
         $http.delete("/questionnaire/subsection/skiprule/" + ruleId + "/")
             .success(function (data, status) {
-                res.resolve({ className: "alert-success", message: "Rule successfully deleted", show: true});
+                res.resolve({className: "alert-success", message: "Rule successfully deleted", show: true});
             })
             .error(function (data, status) {
                 var message = "Rule was not deleted";
                 if (status == 403) {
                     message = "You do not have permission to delete this rule";
                 }
-                res.resolve({ className: "alert-danger", message: message, show: true});
+                res.resolve({className: "alert-danger", message: message, show: true});
             });
         return res.promise;
     };
 
-    service.createRule = function(postData, visibleTab) {
-        var getVisibleFormElement = function(){
+    service.createRule = function (postData, visibleTab) {
+        var getVisibleFormElement = function () {
             if (visibleTab == 'newRuleTab')
                 return $('#sumbit-question-skip-rule');
             return skipRuleForm = $('#sumbit-subsection-skip-rule');
@@ -190,20 +198,30 @@ ngModule.factory('skipRuleService', ['$http', '$q', function($http, $q) {
         var res = $q.defer(),
             skipRuleForm = getVisibleFormElement();
 
-        if(!skipRuleForm.valid()) {
-            res.resolve({ className: "alert-danger", message: 'There are some errors with this form .', show: true, formFailed:  true});
+        if (!skipRuleForm.valid()) {
+            res.resolve({
+                className: "alert-danger",
+                message: 'There are some errors with this form .',
+                show: true,
+                formFailed: true
+            });
             return res.promise;
         }
 
         $.post(window.url, postData)
             .done(function (data) {
-                res.resolve({ className: "alert-success", message: data.result, show: true, formFailed:  false});
+                res.resolve({className: "alert-success", message: data.result, show: true, formFailed: false});
             })
             .fail(function (data) {
                 if (data.result) {
-                    res.resolve({ className: "alert-danger", message: data.result, show: true,formFailed:  true});
+                    res.resolve({className: "alert-danger", message: data.result, show: true, formFailed: true});
                 } else {
-                    res.resolve({ className: "alert-danger", message: data.responseJSON.result.join(","), show: true, formFailed:  true});
+                    res.resolve({
+                        className: "alert-danger",
+                        message: data.responseJSON.result.join(","),
+                        show: true,
+                        formFailed: true
+                    });
                 }
             });
         return res.promise;

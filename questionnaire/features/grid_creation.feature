@@ -9,6 +9,7 @@ Feature: Grid Creation
     When I choose to create a new grid question for a particular subsection
     Then I should see modal allowing me to select the grid options
 
+  @WIP
   Scenario: Create Grid with All Options Shown
     When I choose to create a grid with all options shown
     Then I should see options to select the primary questions and the columns
@@ -21,6 +22,7 @@ Feature: Grid Creation
     Then I should see a message that the grid was successfully removed
     And I should not see the grid in the questionnaire I am editing
 
+  @WIP
   Scenario: Create Grid with add-more
     When I choose to create an add-more type of grid
     Then I should see options to select the primary questions and the columns
@@ -28,6 +30,7 @@ Feature: Grid Creation
     And I save my grid
     Then I should see add-more grid created
 
+  @WIP
   Scenario: Create hybrid grid
     When I choose to create a hybrid type of grid
     Then I should see options to select hybrid primary questions and the columns
