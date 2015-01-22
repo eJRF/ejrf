@@ -54,7 +54,7 @@ class PublishQuestionnaireForm(forms.Form):
         questionnaire = self.initial.get('questionnaire')
         regions = Region.objects.filter(organization__name="WHO")
         regions_with_questionnaire = Questionnaire.objects.filter(year=questionnaire.year,
-                                                                  region__isnull=False).values_list('region', flat=True)
+                                                                  region__isnull=False).exclude(status=Questionnaire.ARCHIVED).values_list('region', flat=True)
         return regions.exclude(id__in=regions_with_questionnaire)
 
     def save(self):

@@ -123,6 +123,16 @@ class PublishQuestionnaireFormTest(BaseTest):
         self.assertIn((self.paho.id, self.paho.name), region_choices)
         self.assertNotIn((self.afro.id, self.afro.name), region_choices)
 
+    def test_choices_has_regions_when_questionnaire_is_archived(self):
+        questionnaire = Questionnaire.objects.create(name="JRF 2013 Core English", status=Questionnaire.ARCHIVED,
+                                                     year=2013, region=self.afro)
+        data = {'questionnaire': self.questionnaire, 'regions': [self.paho.id]}
+        publish_questionnaire_form = PublishQuestionnaireForm(initial={'questionnaire': self.questionnaire}, data=data)
+        self.assertTrue(publish_questionnaire_form.is_valid())
+        region_choices = [choice for choice in publish_questionnaire_form.fields['regions'].choices]
+        self.assertIn((self.paho.id, self.paho.name), region_choices)
+        self.assertIn((self.afro.id, self.afro.name), region_choices)
+
     def test_creates_copies_for_regions_on_save(self):
         Questionnaire.objects.create(name="JRF 2013 Core English", status=Questionnaire.PUBLISHED, year=2013,
                                      region=self.afro)
