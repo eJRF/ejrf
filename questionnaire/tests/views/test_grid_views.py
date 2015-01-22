@@ -1,3 +1,4 @@
+import json
 from urllib import quote
 
 from django.test import Client
@@ -73,6 +74,8 @@ class CreateGridViewTest(BaseTest):
 
         meta = {'HTTP_REFERER': self.url}
         response = self.client.post(self.url, data=self.data, **meta)
+
+        self.assertEqual(200, response.status_code)
 
         grid_group = self.question1.question_group.get(subsection=self.sub_section, grid=True, display_all=True,
                                                        order=0)
@@ -158,17 +161,12 @@ class CreateGridViewTest(BaseTest):
         self.assertEqual(1, group_orders.filter(question=self.question5, order=3).count())
         self.assertEqual(1, group_orders.filter(question=self.question3, order=4).count())
 
-    def test_successful_post_redirect_to_referer_url(self):
-        meta = {'HTTP_REFERER': self.url}
-        response = self.client.post(self.url, data=self.data, **meta)
-        self.assertRedirects(response, self.url)
-
     def test_successful_post_display_success_message(self):
         referer_url = '/questionnaire/entry/%d/section/%d/' % (self.questionnaire.id, self.section1.id)
         meta = {'HTTP_REFERER': referer_url}
         response = self.client.post(self.url, data=self.data, **meta)
         message = "Grid successfully created."
-        self.assertIn(message, response.cookies['messages'].value)
+        self.assertEqual(message, json.loads(response.content)[0].get('message'))
 
     def test_with_errors_returns_the_form_with_error(self):
         referer_url = '/questionnaire/entry/%d/section/%d/' % (self.questionnaire.id, self.section1.id)
@@ -176,18 +174,8 @@ class CreateGridViewTest(BaseTest):
         data = self.data.copy()
         data['type'] = ''
         response = self.client.post(self.url, data=data, **meta)
-
-        self.assertIsInstance(response.context['grid_form'], GridForm)
-        self.assertIn("This field is required.", response.context['grid_form'].errors['type'])
-        self.assertEqual('Create', response.context['btn_label'])
-        self.assertEqual('create_grid_form', response.context['id'])
-        self.assertEqual('create-grid-form', response.context['class'])
-        self.assertEqual(self.sub_section, response.context['subsection'])
-        questions = response.context['non_primary_questions'].values_list('id', flat=True)
-        self.assertEqual(3, questions.count())
-        self.assertIn(self.question2.id, questions)
-        self.assertIn(self.question3.id, questions)
-        self.assertIn(self.question4.id, questions)
+        errors = json.loads(response.content)[0].get('form_errors')
+        self.assertIn("This field is required.", errors['type'])
 
     def test_login_required(self):
         self.assert_login_required(self.url)
@@ -308,7 +296,7 @@ class RemoveGridViewTest(BaseTest):
     def test_permission_denied_if_subsection_belongs_to_a_user_but_grid_to_another_user(self):
         region = Region.objects.create(name="SEAR")
         core_group = QuestionGroup.objects.create(name="core group", order=1, subsection=self.sub_section, grid=True)
-        core_question = Question.objects.create(text='core question -- not in any region', UID='C00222',
+        core_question = Question.objects.create(text='core questiohvn -- not in any region', UID='C00222',
                                                 answer_type='Text', region=region)
         core_group.question.add(core_question)
 
