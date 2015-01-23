@@ -1,3 +1,4 @@
+from braces.views import PermissionRequiredMixin
 from django.http import HttpResponse
 from django.core import serializers
 from django.views.generic import View
@@ -6,7 +7,8 @@ from questionnaire.models import Question, Questionnaire
 from questionnaire.utils.answer_type import AnswerTypes
 
 
-class QuestionAPIView(View):
+class QuestionAPIView(PermissionRequiredMixin, View):
+    permission_required = 'auth.can_edit_questionnaire'
     template_name = 'questions/index.html'
     model = Question
 

@@ -1,11 +1,11 @@
 import json
+from urllib import quote
 
 from django.test import Client
 
 from questionnaire.tests.base_test import BaseTest
 from questionnaire.tests.factories.question_factory import QuestionFactory
 from questionnaire.tests.factories.question_group_factory import QuestionGroupFactory
-from questionnaire.tests.factories.questionnaire_factory import QuestionnaireFactory
 from questionnaire.tests.factories.region_factory import RegionFactory
 from questionnaire.utils.answer_type import AnswerTypes
 
@@ -56,3 +56,6 @@ class QuestionAPITest(BaseTest):
         self.assertIn(self.multichoice.id, pks)
         self.assertIn(self.numerical.id, pks)
         self.assertNotIn(question_in_questionnaire.id, pks)
+
+    def test_permission_required_for_create_section(self):
+        self.assert_permission_required(self.url)

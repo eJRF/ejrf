@@ -30,3 +30,6 @@ class ThemesAPITest(BaseTest):
         pks = [item['pk'] for item in json_response]
         self.assertIn(self.theme1.id, pks)
         self.assertIn(self.theme2.id, pks)
+
+    def test_permission_required_for_create_section(self):
+        self.assert_permission_required(self.url)
