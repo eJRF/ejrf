@@ -10,7 +10,7 @@ class ThemeAPIView(View):
     model = Theme
 
     def get(self, request, *args, **kwargs):
-        data = Theme.objects.all()
+        data = Theme.objects.filter(region=request.user.user_profile.region)
         serialized_data = serializers.serialize('json', data)
         return HttpResponse(serialized_data, content_type="application/json")
 
