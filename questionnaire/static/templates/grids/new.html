@@ -1,31 +1,33 @@
 <div class="newgrid-filter">
     <div class="newgrid-filter-element">
         <label for="type">Type</label>
-        <select name="type" id="theme" class="form-control"
+        <select required name="type" id="type" class="form-control"
                 data-ng-model="grid.gridType"
                 data-ng-options="type.text for type in types track by type.value">
             <option value="">Select a type</option>
         </select>
 
-        <div class="error-text" ng-show="newGrid.type.$invalid || gridForm.formHasErrors">
-            <p class="text-danger" ng-show="newGrid.type.$error.required">
+        <span class="error-text" ng-show="newGrid.type.$invalid || gridForm.formHasErrors">
+            <span class="text-danger" ng-show="newGrid.type.$error.required">
                 This field is required
-            </p>
+            </span>
 
-            <p class="text-danger" ng-repeat="error in gridForm.backendErrors.type">
+            <span class="text-danger" ng-repeat="error in gridForm.backendErrors.type">
                 {[{ error }]}
-            </p>
-        </div>
+            </span>
+        </span>
     </div>
 
     <div class="newgrid-filter-element">
         <label for="theme">Theme</label>
-        <select name="theme" id="theme" class="form-control"
+        <select required name="theme" id="theme" class="form-control"
                 data-ng-model="grid.selectedTheme"
                 data-ng-options="theme.fields.name for theme in themes track by theme.pk">
             <option value="">Select a theme</option>
         </select>
-
+        <span class="text-danger" ng-show="newGrid.theme.$error.required">
+            This field is required
+        </span>
     </div>
 </div>
 
@@ -39,7 +41,7 @@
                 <div class="form-inline">
                     <select required name="primary_question" id="primary_question" class="form-control"
                             data-ng-model="selectedQuestions.primary"
-                            data-ng-options="question.fields.text for question in grid.questions | filter: {fields:{is_primary: 'true'}} | filter: { fields: {theme: grid.selectedTheme.pk}} track by question.pk">
+                            data-ng-options="question.fields.export_label for question in grid.primaryQuestions | filter: {fields:{is_primary: 'true'}} | filter: { fields: {theme: grid.selectedTheme.pk}} track by question.pk">
                         <option value="">Primary Question</option>
                     </select>
 
@@ -69,11 +71,12 @@
                     <div name="gridForm.{[{ 'dynamicQuestion'+ $index }]}" ng-form="">
                         <select required name="columns" class="form-control"
                                 data-ng-model="selectedQuestions.otherColumns[$index]"
-                                data-ng-options="question.fields.text for question in grid.questions | filter: {fields:{is_primary: 'false'}} | filter: { fields: {theme: grid.selectedTheme.pk}} | notSelected:selectedQuestions.otherColumns:$index  track by question.pk">
+                                data-ng-options="question.fields.export_label for question in grid.questions | filter: {fields:{is_primary: 'false'}} | filter: { fields: {theme: grid.selectedTheme.pk}} | notSelected:selectedQuestions.otherColumns:$index  track by question.pk">
                             <option value="">Question</option>
                         </select>
 
-                        <div class="error-text" ng-show="gridForm.{[{ 'dynamicQuestion'+ $index }]}.columns.$invalid || gridForm.formHasErrors">
+                        <div class="error-text"
+                             ng-show="gridForm.{[{ 'dynamicQuestion'+ $index }]}.columns.$invalid || gridForm.formHasErrors">
                             <p class="text-danger"
                                ng-show="gridForm.{[{ 'dynamicQuestion'+ $index }]}.columns.$error.required">
                                 This field is required
@@ -95,7 +98,7 @@
                 {[{ option.fields.text }]}
             </td>
             <td ng-repeat="q in selectedQuestions.otherColumns">
-                <input type="text" />
+                <input type="text"/>
             </td>
         </tr>
     </table>

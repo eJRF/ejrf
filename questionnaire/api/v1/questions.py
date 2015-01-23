@@ -3,6 +3,7 @@ from django.core import serializers
 from django.views.generic import View
 
 from questionnaire.models import Question, Questionnaire
+from questionnaire.utils.answer_type import AnswerTypes
 
 
 class QuestionAPIView(View):
@@ -18,7 +19,8 @@ class QuestionAPIView(View):
         excluded_params = self._excluded_params()
         QUESTION_FIELDS_MAPPING = {'answer_type': 'answer_type__iexact'}
         query_params = {value: self.request.GET.get(key) for key, value in QUESTION_FIELDS_MAPPING.items() if self.request.GET.get(key)}
-        return Question.objects.filter(region=self.request.user.user_profile.region, **query_params).exclude(**excluded_params)
+        questions = Question.objects.filter(region=self.request.user.user_profile.region, **query_params).exclude(**excluded_params)
+        return questions.exclude(answer_type=AnswerTypes.MULTIPLE_RESPONSE)
 
     def _excluded_params(self):
         questionnaire = Questionnaire.objects.filter(id=self.request.GET.get('questionnaire'))

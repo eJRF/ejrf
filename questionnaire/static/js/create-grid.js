@@ -3,8 +3,22 @@ if (typeof createGrid == 'undefined') {
 }
 
 var createGridController = function ($scope, $http) {
-    $scope.selectedQuestions = {primary: {}, otherColumns: [{}]};
-    $scope.grid = {questions: [], questionOptions: [], gridType: '', selectedTheme: ''};
+    $scope.selectedQuestions =
+    {
+        primary: {},
+        otherColumns: [
+            {}
+        ]
+    };
+
+    $scope.grid = {
+        questions: [],
+        questionOptions: [],
+        gridType: '',
+        selectedTheme: '',
+        primaryQuestions: []
+    };
+
     $scope.gridForm = {backendErrors: [], formHasErrors: false};
     $scope.subsectionId = $scope.subsectionId || "";
 
@@ -18,15 +32,23 @@ var createGridController = function ($scope, $http) {
 
     $scope.createGridModal = function (questionnaireId, subsectionId) {
         $scope.subsectionId = subsectionId;
-        $http.get('/api/v1/questions/?questionnaire=' + questionnaireId + '&unused=true').then(function (response) {
-            $scope.grid.questions = response.data;
-        });
+        $http.get('/api/v1/questions/?questionnaire=' + questionnaireId + '&unused=true')
+            .then(function (response) {
+                var questions = response.data;
+                $scope.grid.questions = questions;
+
+                $scope.grid.primaryQuestions = questions.filter(function (question) {
+                    return question.fields.is_primary && question.fields.answer_type == 'MultiChoice';
+                });
+            });
 
         $http.get('/api/v1/themes/').then(function (response) {
             $scope.themes = response.data;
         });
 
-        $scope.types = [{value: 'display_all', text: 'Display All'}]
+        $scope.types = [
+            {value: 'display_all', text: 'Display All'}
+        ];
     };
 
     $scope.postNewGrid = function () {
@@ -83,7 +105,7 @@ var createGridController = function ($scope, $http) {
 
         var validateDynamicForms = function (dynamicForm) {
             Object.keys(dynamicForm).forEach(function (key) {
-                if (!dynamicForm[key].$valid) {
+                if (dynamicForm[key] && !dynamicForm[key].$valid) {
                     return false;
                 }
             });
@@ -122,5 +144,6 @@ ngModule.run(function ($http) {
 });
 
 createGrid.updateCreateGrid = function (questionnaireId, subsectionId) {
-    angular.element(document.getElementById('create-grid-controller')).scope().createGridModal(questionnaireId, subsectionId);
+    angular.element(document.getElementById('create-grid-controller')).scope()
+        .createGridModal(questionnaireId, subsectionId);
 };
