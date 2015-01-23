@@ -18,7 +18,7 @@ class QuestionAPIView(View):
         excluded_params = self._excluded_params()
         QUESTION_FIELDS_MAPPING = {'answer_type': 'answer_type__iexact'}
         query_params = {value: self.request.GET.get(key) for key, value in QUESTION_FIELDS_MAPPING.items() if self.request.GET.get(key)}
-        return Question.objects.filter(**query_params).exclude(**excluded_params)
+        return Question.objects.filter(region=self.request.user.user_profile.region, **query_params).exclude(**excluded_params)
 
     def _excluded_params(self):
         questionnaire = Questionnaire.objects.filter(id=self.request.GET.get('questionnaire'))

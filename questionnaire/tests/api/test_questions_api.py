@@ -6,20 +6,22 @@ from questionnaire.tests.base_test import BaseTest
 from questionnaire.tests.factories.question_factory import QuestionFactory
 from questionnaire.tests.factories.question_group_factory import QuestionGroupFactory
 from questionnaire.tests.factories.questionnaire_factory import QuestionnaireFactory
+from questionnaire.tests.factories.region_factory import RegionFactory
 from questionnaire.utils.answer_type import AnswerTypes
 
 
 class QuestionAPITest(BaseTest):
     def setUp(self):
         self.client = Client()
-        # self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
-        # self.assign('can_edit_questionnaire', self.user)
-        # self.client.login(username=self.user.username, password='pass')
+        self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
+        self.assign('can_edit_questionnaire', self.user)
+        self.client.login(username=self.user.username, password='pass')
 
         self.url = '/api/v1/questions/'
 
         self.multichoice = QuestionFactory()
         self.numerical = QuestionFactory(answer_type=AnswerTypes.NUMBER)
+        self.regional_numerical = QuestionFactory(answer_type=AnswerTypes.NUMBER, region=RegionFactory())
 
     def test_list_questions(self):
         response = self.client.get(self.url)
