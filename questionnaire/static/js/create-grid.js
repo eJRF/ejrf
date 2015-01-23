@@ -114,6 +114,10 @@ var createGridController = function ($scope, $http) {
         createNewGrid();
     };
 
+    $scope.$watch('grid.selectedTheme', function(){
+        $scope.grid.questionOptions = [];
+    });
+
     $scope.$watch('selectedQuestions.primary', function (selectedPrimary) {
         $scope.selectedQuestions.primary = selectedPrimary;
 
