@@ -52,7 +52,8 @@ var createGridController = function ($scope, QuestionService, ThemeService, Grid
         });
 
         $scope.types = [
-            {value: 'display_all', text: 'Display All'}
+            {value: 'display_all', text: 'Display All', displayAll: true},
+            {value: 'allow_multiples', text: 'Add More', addMore: true}
         ];
     };
 

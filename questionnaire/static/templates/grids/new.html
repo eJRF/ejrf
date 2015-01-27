@@ -64,7 +64,8 @@
                         <a href="#" id='add-column-{[{ $index }]}' data-ng-click="grid.addColumn()">
                             <i class="glyphicon glyphicon-plus-sign"></i>
                         </a>
-                        <a href="#" class="" data-ng-click="grid.removeColumn($index)" id='remove-column-{[{ $index }]}' ng-show="selectedQuestions.otherColumns.length > 1">
+                        <a href="#" class="" data-ng-click="grid.removeColumn($index)" id='remove-column-{[{ $index }]}'
+                           ng-show="selectedQuestions.otherColumns.length > 1">
                             <i class="glyphicon glyphicon-trash"></i>
                         </a>
                     </div>
@@ -90,7 +91,7 @@
                 </div>
             </td>
         </tr>
-        <tr ng-repeat="option in grid.questionOptions">
+        <tr ng-show="grid.gridType.displayAll" ng-repeat="option in grid.questionOptions">
             <td>
                 {[{ $index + 1 }]}
             </td>
@@ -99,6 +100,23 @@
             </td>
             <td ng-repeat="q in selectedQuestions.otherColumns">
                 <input type="text"/>
+            </td>
+        </tr>
+        <tr ng-show="grid.gridType.addMore">
+            <td>
+                1
+            </td>
+            <td>
+                <input type="text"/>
+            </td>
+            <td ng-repeat="q in selectedQuestions.otherColumns">
+                <input type="text"/>
+            </td>
+        </tr>
+        <tr ng-show="grid.gridType.addMore">
+            <td colspan="6">
+                <button type="button" href="#" class="btn btn-default add-row"><span class="cyan bold"><i
+                        class="glyphicon glyphicon-plus"></i> Add More</span></button>
             </td>
         </tr>
     </table>
