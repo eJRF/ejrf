@@ -18,8 +18,9 @@ var createGridController = function ($scope, $http) {
         selectedTheme: '',
         primaryQuestions: []
     };
+    $scope.gridForm = {};
 
-    $scope.gridForm = {backendErrors: [], formHasErrors: false};
+    $scope.gridFormErrors = {backendErrors: [], formHasErrors: false};
     $scope.subsectionId = $scope.subsectionId || "";
 
     $scope.grid.addColumn = function () {
@@ -64,20 +65,6 @@ var createGridController = function ($scope, $http) {
 
         var url = '/subsection/' + $scope.subsectionId + '/grid/new/';
 
-        var transformRequestHelper = function (obj) {
-            var str = [];
-            for (var key in obj) {
-                var value = obj[key];
-                if (Array.isArray(value)) {
-                    value.forEach(function (column) {
-                        str.push(encodeURIComponent(key) + "=" + encodeURIComponent(column));
-                    })
-                } else {
-                    str.push(encodeURIComponent(key) + "=" + encodeURIComponent(value));
-                }
-            }
-            return str.join("&");
-        };
 
         function createNewGrid() {
             if ($scope.newGrid.$valid && validateDynamicForms($scope.gridForm)) {
@@ -90,31 +77,23 @@ var createGridController = function ($scope, $http) {
                     data: payload
                 }).success(function (response) {
                     $scope.message = response[0].message;
-                    $scope.gridForm.formHasErrors = false;
+                    $scope.gridFormErrors.formHasErrors = false;
                 }).error(function (response) {
                     $scope.error = response[0].message;
-                    $scope.gridForm.formHasErrors = true;
-                    $scope.gridForm.backendErrors = response[0].form_errors;
+                    $scope.gridFormErrors.formHasErrors = true;
+                    $scope.gridFormErrors.backendErrors = response[0].form_errors;
                 });
             } else {
-                $scope.gridForm.formHasErrors = true;
+                $scope.gridFormErrors.formHasErrors = true;
                 $scope.error = 'The are errors in the form. Please fix them and submit again.';
                 $scope.message = '';
             }
         }
 
-        var validateDynamicForms = function (dynamicForm) {
-            Object.keys(dynamicForm).forEach(function (key) {
-                if (dynamicForm[key] && !dynamicForm[key].$valid) {
-                    return false;
-                }
-            });
-            return true;
-        };
         createNewGrid();
     };
 
-    $scope.$watch('grid.selectedTheme', function(){
+    $scope.$watch('grid.selectedTheme', function () {
         $scope.grid.questionOptions = [];
     });
 

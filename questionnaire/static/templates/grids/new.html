@@ -7,12 +7,12 @@
             <option value="">Select a type</option>
         </select>
 
-        <span class="error-text" ng-show="newGrid.type.$invalid || gridForm.formHasErrors">
+        <span class="error-text" ng-show="newGrid.type.$invalid || gridFormErrors.formHasErrors">
             <span class="text-danger" ng-show="newGrid.type.$error.required">
                 This field is required
             </span>
 
-            <span class="text-danger" ng-repeat="error in gridForm.backendErrors.type">
+            <span class="text-danger" ng-repeat="error in gridFormErrors.backendErrors.type">
                 {[{ error }]}
             </span>
         </span>
@@ -45,12 +45,12 @@
                         <option value="">Primary Question</option>
                     </select>
 
-                    <div class="error-text" ng-show="newGrid.primary_question.$invalid || gridForm.formHasErrors">
+                    <div class="error-text" ng-show="newGrid.primary_question.$invalid || gridFormErrors.formHasErrors">
                         <p class="text-danger" ng-show="newGrid.primary_question.$error.required">
                             This field is required
                         </p>
 
-                        <p class="text-danger" ng-repeat="error in gridForm.backendErrors.primary_question">
+                        <p class="text-danger" ng-repeat="error in gridFormErrors.backendErrors.primary_question">
                             {[{ error }]}
                         </p>
                     </div>
@@ -64,7 +64,7 @@
                         <a href="#" class="" data-ng-click="grid.addColumn()	">
                             <i class="glyphicon glyphicon-plus-sign"></i>
                         </a>
-                        <a href="#" class="" data-ng-click="grid.removeColumn($index)">
+                        <a href="#" class="" data-ng-click="grid.removeColumn($index)" ng-show="selectedQuestions.otherColumns.length > 1">
                             <i class="glyphicon glyphicon-trash"></i>
                         </a>
                     </div>
@@ -76,13 +76,13 @@
                         </select>
 
                         <div class="error-text"
-                             ng-show="gridForm.{[{ 'dynamicQuestion'+ $index }]}.columns.$invalid || gridForm.formHasErrors">
+                             ng-show="gridForm.{[{ 'dynamicQuestion'+ $index }]}.columns.$invalid || gridFormErrors.formHasErrors">
                             <p class="text-danger"
                                ng-show="gridForm.{[{ 'dynamicQuestion'+ $index }]}.columns.$error.required">
                                 This field is required
                             </p>
 
-                            <p class="text-danger" ng-repeat="error in gridForm.backendErrors.columns">
+                            <p class="text-danger" ng-repeat="error in gridFormErrors.backendErrors.columns">
                                 {[{ error }]}
                             </p>
                         </div>
