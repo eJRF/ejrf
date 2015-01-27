@@ -27,4 +27,5 @@ describe("Helpers", function () {
             expect(filename).toEqual(false);
         });
     });
+
 });

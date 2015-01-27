@@ -1,7 +1,7 @@
 var skipRules = skipRules || {};
 skipRules.subsection = "";
 
-var ngModule = angular.module('questionnaireApp', []);
+var ngModule = angular.module('questionnaireApp', ['gridModule']);
 
 ngModule.config(function ($interpolateProvider) {
     $interpolateProvider.startSymbol('{[{');

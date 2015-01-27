@@ -1,8 +1,12 @@
+//require('grid-service.js');
+
 if (typeof createGrid == 'undefined') {
     var createGrid = {};
 }
 
-var createGridController = function ($scope, $http) {
+var gridModule = angular.module('gridModule', ['gridService']);
+
+var createGridController = function ($scope, QuestionService, ThemeService, GridService) {
     $scope.selectedQuestions =
     {
         primary: {},
@@ -33,7 +37,7 @@ var createGridController = function ($scope, $http) {
 
     $scope.createGridModal = function (questionnaireId, subsectionId) {
         $scope.subsectionId = subsectionId;
-        $http.get('/api/v1/questions/?questionnaire=' + questionnaireId + '&unused=true')
+        QuestionService.filter({questionnaire: questionnaireId, unused: true})
             .then(function (response) {
                 var questions = response.data;
                 $scope.grid.questions = questions;
@@ -43,7 +47,7 @@ var createGridController = function ($scope, $http) {
                 });
             });
 
-        $http.get('/api/v1/themes/').then(function (response) {
+        ThemeService.all().then(function (response) {
             $scope.themes = response.data;
         });
 
@@ -63,26 +67,18 @@ var createGridController = function ($scope, $http) {
             'csrfmiddlewaretoken': window.csrfToken
         };
 
-        var url = '/subsection/' + $scope.subsectionId + '/grid/new/';
-
-
         function createNewGrid() {
             if ($scope.newGrid.$valid && validateDynamicForms($scope.gridForm)) {
                 $scope.error = '';
-                $http({
-                    method: 'POST',
-                    url: url,
-                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                    transformRequest: transformRequestHelper,
-                    data: payload
-                }).success(function (response) {
-                    $scope.message = response[0].message;
-                    $scope.gridFormErrors.formHasErrors = false;
-                }).error(function (response) {
-                    $scope.error = response[0].message;
-                    $scope.gridFormErrors.formHasErrors = true;
-                    $scope.gridFormErrors.backendErrors = response[0].form_errors;
-                });
+                GridService.create($scope.subsectionId, payload)
+                    .success(function (response) {
+                        $scope.message = response[0].message;
+                        $scope.gridFormErrors.formHasErrors = false;
+                    }).error(function (response) {
+                        $scope.error = response[0].message;
+                        $scope.gridFormErrors.formHasErrors = true;
+                        $scope.gridFormErrors.backendErrors = response[0].form_errors;
+                    });
             } else {
                 $scope.gridFormErrors.formHasErrors = true;
                 $scope.error = 'The are errors in the form. Please fix them and submit again.';
@@ -102,16 +98,18 @@ var createGridController = function ($scope, $http) {
 
         if (selectedPrimary) {
             selectedPrimary.pk &&
-            $http.get('/api/v1/question/' + selectedPrimary.pk + '/options/').then(function (response) {
-                $scope.grid.questionOptions = response.data;
-            });
+            QuestionService.options(selectedPrimary)
+                .then(function (response) {
+                    $scope.grid.questionOptions = response.data;
+                });
         } else {
             $scope.grid.questionOptions = [];
         }
     });
 };
 
-ngModule.controller('CreateGridController', ['$scope', '$http', createGridController]);
+gridModule.controller('CreateGridController', ['$scope', 'QuestionService',
+    'ThemeService', 'GridService', createGridController]);
 
 var notSelectedFilter = function () {
     return function (questions, existingColumnQuestions, index) {
@@ -122,9 +120,9 @@ var notSelectedFilter = function () {
     };
 };
 
-ngModule.filter('notSelected', notSelectedFilter);
+gridModule.filter('notSelected', notSelectedFilter);
 
-ngModule.run(function ($http) {
+gridModule.run(function ($http) {
     $http.defaults.headers.common['X-CSRFToken'] = window.csrfToken;
 });
 
