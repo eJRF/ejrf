@@ -84,10 +84,7 @@ def when_i_select_the_primary_questions_and_columns(step):
 
 @step(u'When I select the primary questions and columns for the add-more grid')
 def when_i_select_the_primary_questions_and_columns_for_the_add_more_grid(step):
-    world.page.select('primary_question', world.grid_question1.id)
-    for option in world.grid_question1.options.all():
-        world.page.click_by_css('.add-column')
-
+    when_i_select_the_primary_questions_and_columns(step)
 
 @step(u'When I select the primary questions and columns for the hybrid grid')
 def when_i_select_the_primary_questions_and_columns_for_the_hybrid_grid(step):
@@ -122,10 +119,9 @@ def then_i_should_that_grid_created_in_the_subsection_of_my_questionnaire(step):
 @step(u'Then I should see add-more grid created')
 def then_i_should_see_the_grid_with_add_more_created(step):
     assert world.page.is_element_present_by_id('delete-grid-%d' % world.grid.id)
-    for option in world.grid_question1.options.all():
-        world.page.select('MultiChoice-0-response', option.id)
-    for i in range(2, 4):
-        world.page.is_text_present(eval("world.grid_question%d" % i).text)
+    world.page.is_text_present(world.grid_question1.text)
+    world.page.is_text_present("Choose One")
+    world.page.is_text_present(world.grid_question2.text)
     world.page.is_text_present('Add More')
 
 

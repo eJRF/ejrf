@@ -22,12 +22,12 @@ Feature: Grid Creation
     Then I should see a message that the grid was successfully removed
     And I should not see the grid in the questionnaire I am editing
 
-  @WIP
   Scenario: Create Grid with add-more
     When I choose to create an add-more type of grid
-    Then I should see options to select the primary questions and the columns
+    When I choose a theme
     When I select the primary questions and columns for the add-more grid
     And I save my grid
+    When I close the modal
     Then I should see add-more grid created
 
   @WIP
