@@ -19,3 +19,17 @@ var transformRequestHelper = function (obj) {
     }
     return str.join("&");
 };
+
+var questionFilterCriteria = function (obj, criteria) {
+    var criteriaKeys = Object.keys(criteria);
+    var matched = criteriaKeys.filter(function (key) {
+        return obj[key] != criteria[key];
+    });
+    return matched.length == 0;
+};
+
+var questionFilter = function (questions, filterCriteria) {
+    return questions.filter(function (question) {
+        return questionFilterCriteria(question.fields, filterCriteria);
+    });
+};

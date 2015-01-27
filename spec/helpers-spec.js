@@ -28,4 +28,46 @@ describe("Helpers", function () {
         });
     });
 
-});
+    describe("questions filter", function () {
+
+        var criteria = {is_primary: true, answer_type: 'MultiChoice'};
+
+        it('should accept both fields matching', function () {
+            expect(questionFilterCriteria({is_primary: true, answer_type: 'MultiChoice',
+                other_field: 'hehe1'}, criteria)).toEqual(true);
+        });
+
+        it('should reject if first field not matching', function () {
+            expect(questionFilterCriteria({is_primary: false, answer_type: 'MultiChoice',
+                other_field: 'hehe2'}, criteria)).toEqual(false);
+        });
+
+        it('should reject if second field not matching', function () {
+            expect(questionFilterCriteria({is_primary: true, answer_type: 'Numeric',
+                other_field: 'hehe3'}, criteria)).toEqual(false);
+        });
+
+        it('should reject if  both fields not matching', function () {
+            expect(questionFilterCriteria({is_primary: false, answer_type: 'Numeric',
+                other_field: 'hehe4'}, criteria)).toEqual(false);
+        });
+
+        it('should filter  questions with fields satisfying criteria', function () {
+            var questions = [
+                {name: 'haha1', fields: {is_primary: true, answer_type: 'MultiChoice', other_field: 'hehe1'}},
+                {name: 'haha2', fields: {is_primary: false, answer_type: 'MultiChoice', other_field: 'hehe2'}},
+                {name: 'haha3', fields: {is_primary: true, answer_type: 'Numeric', other_field: 'hehe3'}},
+                {name: 'haha4', fields: {is_primary: false, answer_type: 'Numeric', other_field: 'hehe4'}},
+            ];
+
+            var expected = [
+                {name: 'haha1', fields: {is_primary: true, answer_type: 'MultiChoice', other_field: 'hehe1'}}
+            ];
+
+            expect(questionFilter(questions, criteria)).toEqual(expected);
+        });
+
+    });
+
+})
+;

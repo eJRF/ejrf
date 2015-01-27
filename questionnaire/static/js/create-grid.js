@@ -41,10 +41,6 @@ var createGridController = function ($scope, QuestionService, ThemeService, Grid
             .then(function (response) {
                 var questions = response.data;
                 $scope.grid.questions = questions;
-
-                $scope.grid.primaryQuestions = questions.filter(function (question) {
-                    return question.fields.is_primary && question.fields.answer_type == 'MultiChoice';
-                });
             });
 
         ThemeService.all().then(function (response) {
@@ -52,8 +48,10 @@ var createGridController = function ($scope, QuestionService, ThemeService, Grid
         });
 
         $scope.types = [
-            {value: 'display_all', text: 'Display All', displayAll: true},
-            {value: 'allow_multiples', text: 'Add More', addMore: true}
+            {value: 'display_all', text: 'Display All', displayAll: true,
+                primary_questions_criteria: {is_primary: true, answer_type: 'MultiChoice'}},
+            {value: 'allow_multiples', text: 'Add More', addMore: true,
+                primary_questions_criteria: {is_primary: true}}
         ];
     };
 
@@ -92,6 +90,13 @@ var createGridController = function ($scope, QuestionService, ThemeService, Grid
 
     $scope.$watch('grid.selectedTheme', function () {
         $scope.grid.questionOptions = [];
+    });
+
+    $scope.$watch('grid.gridType', function (type) {
+        if(type){
+            $scope.grid.primaryQuestions = questionFilter($scope.grid.questions,
+                type.primary_questions_criteria);
+        }
     });
 
     $scope.$watch('selectedQuestions.primary', function (selectedPrimary) {

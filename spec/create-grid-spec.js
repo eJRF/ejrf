@@ -1,10 +1,29 @@
 describe("create display all grid", function () {
 
     beforeEach(module('gridModule'));
-    var scope, httpMock, stubQuestions,
+    var scope, httpMock,
         subsectionId = 3,
         questionnaireId = 1,
-        questionService;
+        availableGridTypes = [
+            {value: 'display_all', text: 'Display All', displayAll: true,
+                primary_questions_criteria: {is_primary: true, answer_type: 'MultiChoice'}},
+            {value: 'allow_multiples', text: 'Add More', addMore: true,
+                primary_questions_criteria: {is_primary: true}}
+        ],
+        stubQuestions = [
+            {
+                pk: 186,
+                model: "questionnaire.question",
+                fields: {
+                    UID: "C00097",
+                    created: "2014-12-17T12:31:19.231Z",
+                    text: "PAB (protection at birth)",
+                    theme: 6,
+                    answer_type: "MultiChoice",
+                    is_primary: true
+                }
+            }
+        ];
 
 
     describe("CreateGridController", function () {
@@ -19,11 +38,7 @@ describe("create display all grid", function () {
                     name: "Common theme",
                     created: "2014-04-03T15:05:03.215Z"
                 }
-            },
-            availableGridTypes = [
-                {value: 'display_all', text: 'Display All', displayAll: true},
-                {value: 'allow_multiples', text: 'Add More', addMore: true}
-            ];
+            };
 
         beforeEach(function () {
 
@@ -101,20 +116,6 @@ describe("create display all grid", function () {
         it('should create grid modal', function () {
             initController();
 
-            stubQuestions = [
-                {
-                    pk: 186,
-                    model: "questionnaire.question",
-                    fields: {
-                        UID: "C00097",
-                        created: "2014-12-17T12:31:19.231Z",
-                        text: "PAB (protection at birth)",
-                        theme: 6,
-                        answer_type: "MultiChoice",
-                        is_primary: true
-                    }
-                }
-            ];
             var url = '/api/v1/questions/?questionnaire=' + questionnaireId + '&unused=true';
             scope.createGridModal(questionnaireId, subsectionId);
 
@@ -240,6 +241,68 @@ describe("create display all grid", function () {
                 expect(scope.error).toEqual(errorMessage);
             });
         });
+
+        describe("grid primary question column", function () {
+            it("should filter primary questions that are multichoice for display all grids", function () {
+
+                initController();
+                var url = '/api/v1/questions/?questionnaire=' + questionnaireId + '&unused=true';
+                var non_primary_question = {
+                    pk: 186,
+                    model: "questionnaire.question",
+                    fields: {
+                        UID: "C00097",
+                        created: "2014-12-17T12:31:19.231Z",
+                        text: "PAB (protection at birth)",
+                        theme: 6,
+                        answer_type: "MultiChoice",
+                        is_primary: false
+                    }
+                };
+
+                var stubQuestions_with_non_primary = [stubQuestions[0], non_primary_question];
+                httpMock.when('GET', url).respond(stubQuestions_with_non_primary);
+                scope.createGridModal(questionnaireId, subsectionId);
+                httpMock.flush();
+
+                scope.grid.gridType = availableGridTypes[0];
+                scope.$apply();
+
+                expect(scope.grid.primaryQuestions).toEqual(stubQuestions);
+
+            });
+
+            it("should filter primary questions even non-multichoice for add more grids", function () {
+
+                initController();
+                var url = '/api/v1/questions/?questionnaire=' + questionnaireId + '&unused=true';
+                var non_multi_choice_primary_question = {
+                    pk: 186,
+                    model: "questionnaire.question",
+                    fields: {
+                        UID: "C00097",
+                        created: "2014-12-17T12:31:19.231Z",
+                        text: "PAB (protection at birth)",
+                        theme: 6,
+                        answer_type: "numeric",
+                        is_primary: true
+                    }
+                };
+
+                var stubQuestions_with_non_multichoice_primary = [stubQuestions[0], non_multi_choice_primary_question];
+                httpMock.when('GET', url).respond(stubQuestions_with_non_multichoice_primary);
+                scope.createGridModal(questionnaireId, subsectionId);
+                httpMock.flush();
+
+                scope.grid.gridType = availableGridTypes[1];
+                scope.$apply();
+
+                expect(scope.grid.primaryQuestions).toEqual(stubQuestions_with_non_multichoice_primary);
+
+            });
+
+        });
+
     });
     describe("notSelectedFilter", function () {
         it('should return unselected questions', function () {
@@ -259,4 +322,5 @@ describe("create display all grid", function () {
             expect(unselectedQuestionsFilter(allQuestions, selectedQuestions, 0)).toEqual([11, 22, 44, 55]);
         });
     });
+
 });
