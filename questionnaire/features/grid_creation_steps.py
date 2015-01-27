@@ -166,6 +166,6 @@ def and_i_should_not_see_the_grid_in_the_questionnaire_i_am_editing(step):
     for i in range(1, 4):
         world.page.is_text_present(eval("world.grid_question%d" % i).text, status=False)
 
-@step(u'When I select a theme')
+@step(u'When I choose a theme')
 def when_i_select_a_theme(step):
     world.page.select('theme', world.theme.id)

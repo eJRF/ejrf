@@ -352,14 +352,14 @@ def then_i_should_see_questions_displayed_filtered_by_answer_type(step):
     world.page.is_text_present(world.question1.export_label)
     world.page.is_text_present(world.question3.export_label)
 
-@step(u'When I select a theme from theme and answer type')
-def when_i_select_a_theme_from_theme_and_answer_type(step):
+@step(u'When I select a theme and number answer type')
+def when_i_select_a_theme_and_number_answer_type(step):
     world.page.select('answer_type', 'Number')
     world.page.select('theme', '1')
 
 @step(u'Then I should see questions displayed filtered by both the theme and answer type selected')
 def then_i_should_see_questions_displayed_filtered_by_both_the_theme_and_answer_type_selected(step):
-      world.page.is_text_present(world.question2.export_label)
+	world.page.is_text_present(world.question2.export_label)
 
 @step(u'Then I should see the default questions displayed')
 def then_i_should_see_the_default_questions_displayed(step):

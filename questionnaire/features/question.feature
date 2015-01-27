@@ -116,7 +116,7 @@ Feature: Questions feature
         When I select an answer type from answer filter field
         And I click on the filter link
         Then I should see questions displayed filtered by answer type
-        When I select a theme from theme and answer type
+        When I select a theme and number answer type
         And I click on the filter link
         Then I should see questions displayed filtered by both the theme and answer type selected
 

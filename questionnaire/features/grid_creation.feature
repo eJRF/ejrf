@@ -11,7 +11,7 @@ Feature: Grid Creation
 
   Scenario: Create Grid with All Options Shown
     When I choose to create a grid with all options shown
-    When I select a theme
+    When I choose a theme
     When I select the primary questions and columns for the all options grid
     And I save my grid
     When I close the modal
