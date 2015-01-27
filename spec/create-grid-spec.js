@@ -99,6 +99,37 @@ describe("create display all grid", function () {
             expect(scope.types).toEqual([{value: 'display_all', text: 'Display All'}]);
         });
 
+        it('should get question options when themes change', function () {
+            initController ();
+
+            var questionId = 1;
+            var url = '/api/v1/question/' + questionId + '/options/';
+            var questionsOptions = [{text: 'Disease', pk: 1, question_id: questionId}];
+            httpMock.expectGET(url).respond(questionsOptions);
+
+            scope.selectedQuestions = {primary : {pk: questionId}};
+            scope.$apply();
+            httpMock.flush();
+
+            expect(scope.grid.questionOptions).toEqual(questionsOptions);
+        });
+
+        it('should get question options when primary question changes', function () {
+            initController ();
+            scope.selectedQuestions = {primary : ''};
+            scope.$apply();
+
+            expect(scope.grid.questionOptions).toEqual([]);
+        });
+
+        it('should get question options when theme changes', function () {
+            initController ();
+            scope.selectedTheme = '';
+            scope.$apply();
+
+            expect(scope.grid.questionOptions).toEqual([]);
+        });
+
         it('should post new grid', function () {
             initController();
 
@@ -172,6 +203,24 @@ describe("create display all grid", function () {
                 scope.postNewGrid();
                 expect(scope.error).toEqual(errorMessage);
             });
+        });
+    });
+    describe("notSelectedFilter", function () {
+        it('should return unselected questions', function () {
+            var allQuestions = [11, 22, 33, 44, 55],
+                selectedQuestions = [22, 33];
+
+            var unselectedQuestionsFilter = notSelectedFilter();
+            expect(unselectedQuestionsFilter(allQuestions, selectedQuestions, 4)).toEqual([11, 44, 55]);
+        });
+
+        it('should return question even if selected', function () {
+            var allQuestions = [11, 22, 33, 44, 55],
+                selectedQuestions = [22, 33];
+
+            var unselectedQuestionsFilter = notSelectedFilter();
+            expect(unselectedQuestionsFilter(allQuestions, selectedQuestions, 1)).toEqual([11, 33, 44, 55]);
+            expect(unselectedQuestionsFilter(allQuestions, selectedQuestions, 0)).toEqual([11, 22, 44, 55]);
         });
     });
 });

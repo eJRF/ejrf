@@ -113,14 +113,16 @@ var createGridController = function ($scope, $http) {
 
 ngModule.controller('CreateGridController', ['$scope', '$http', createGridController]);
 
-ngModule.filter('notSelected', function () {
+var notSelectedFilter = function () {
     return function (questions, existingColumnQuestions, index) {
         return questions.filter(function (question) {
             var questionIndex = existingColumnQuestions.indexOf(question);
             return questionIndex == -1 || questionIndex == index;
         });
     };
-});
+};
+
+ngModule.filter('notSelected', notSelectedFilter);
 
 ngModule.run(function ($http) {
     $http.defaults.headers.common['X-CSRFToken'] = window.csrfToken;
