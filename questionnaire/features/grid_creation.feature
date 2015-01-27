@@ -9,12 +9,12 @@ Feature: Grid Creation
     When I choose to create a new grid question for a particular subsection
     Then I should see modal allowing me to select the grid options
 
-  @WIP
   Scenario: Create Grid with All Options Shown
     When I choose to create a grid with all options shown
-    Then I should see options to select the primary questions and the columns
+    When I select a theme
     When I select the primary questions and columns for the all options grid
     And I save my grid
+    When I close the modal
     Then I should see the all-options shown grid created
     When I choose to remove the grid
     Then I should see a delete grid confirmation prompt

@@ -1,3 +1,4 @@
+from time import sleep
 from lettuce import world, step
 from questionnaire.features.pages.questionnaires import QuestionnairePage
 from questionnaire.models import Question, QuestionOption, Theme
@@ -5,22 +6,25 @@ from questionnaire.models import Question, QuestionOption, Theme
 
 @step(u'And I have both simple and primary questions in my Question Bank')
 def and_i_have_both_simple_and_primary_questions_in_my_question_bank(step):
-    theme = Theme.objects.create(name="Grid Questions Theme")
+    world.theme = Theme.objects.create(name="Grid Questions Theme")
 
     world.grid_question1 = Question.objects.create(text='Primary Option', UID='C00021', answer_type='MultiChoice',
-                                                   is_primary=True, theme=theme)
+                                                   is_primary=True, theme=world.theme)
     QuestionOption.objects.create(text='Option A', question=world.grid_question1)
     QuestionOption.objects.create(text='Option B', question=world.grid_question1)
     QuestionOption.objects.create(text='Option C', question=world.grid_question1)
 
-    world.grid_question2 = Question.objects.create(text='First Column Question', UID='C00022', answer_type='Number',
-                                                   theme=theme)
-    world.grid_question3 = Question.objects.create(text='Second Column Question', UID='C00023', answer_type='Number',
-                                                   theme=theme)
-    world.grid_question4 = Question.objects.create(text='Third Column Question', UID='C00024', answer_type='Number',
-                                                   theme=theme)
-    world.grid_question5 = Question.objects.create(text='Fourth Column Question', UID='C00025', answer_type='Number',
-                                                   theme=theme)
+    world.grid_question2 = Question.objects.create(text='First Column Question',
+                                                   export_label='First Column Question', UID='C00022', answer_type='Number',
+                                                   theme=world.theme)
+    world.grid_question3 = Question.objects.create(text='Second Column Question', export_label='Second Column Question', UID='C00023', answer_type='Number',
+                                                   theme=world.theme)
+    world.grid_question4 = Question.objects.create(text='Third Column Question',
+                                                   export_label='Third Column Question', UID='C00024', answer_type='Number',
+                                                   theme=world.theme)
+    world.grid_question5 = Question.objects.create(text='Fourth Column Question',
+                                                   export_label='Fourth Column Question', UID='C00025', answer_type='Number',
+                                                   theme=world.theme)
 
 
 @step(u'And I am editing that questionnaire')
@@ -59,12 +63,6 @@ def when_i_choose_to_create_a_hybrid_type_of_grid(step):
     world.page.select('type', 'hybrid')
 
 
-@step(u'Then I should see options to select the primary questions and the columns')
-def then_i_should_see_options_to_select_the_primary_questions_and_the_columns(step):
-    world.page.is_text_present('Primary question')
-    world.page.is_text_present('Column 1')
-
-
 @step(u'Then I should see options to select hybrid primary questions and the columns')
 def then_i_should_see_options_to_select_hybrid_primary_questions_and_the_columns(step):
     world.page.is_text_present('Primary question')
@@ -76,12 +74,13 @@ def then_i_should_see_options_to_select_hybrid_primary_questions_and_the_columns
 
 @step(u'When I select the primary questions and columns for the all options grid')
 def when_i_select_the_primary_questions_and_columns(step):
-    world.page.click_by_css('.add-column')
-    world.page.choose_this_value_in_this_select_order_by_this_name(world.grid_question2.id, 1, 'columns')
-    world.page.choose_this_value_in_this_select_order_by_this_name(world.grid_question3.id, 2, 'columns')
-    world.page.click_by_css('.add-column')
-    world.page.choose_this_value_in_this_select_order_by_this_name(world.grid_question4.id, 2, 'columns')
-
+    # def choose_this_value_in_this_select_order_by_this_name(self, value, select_order, name):
+    world.page.select('primary_question', world.grid_question1.id)
+    world.browser.find_by_id('column-0').select(world.grid_question2.id)
+    world.browser.find_by_id('td-0').mouse_over()
+    world.page.click_by_id('add-column-0')
+    world.browser.find_by_id('td-1').mouse_over()
+    world.page.click_by_id('remove-column-1')
 
 @step(u'When I select the primary questions and columns for the add-more grid')
 def when_i_select_the_primary_questions_and_columns_for_the_add_more_grid(step):
@@ -102,6 +101,11 @@ def when_i_select_the_primary_questions_and_columns_for_the_hybrid_grid(step):
 @step(u'And I save my grid')
 def and_i_save_my_grid(step):
     world.page.click_by_id('save_grid_button')
+
+@step(u'When I close the modal')
+def when_i_close_the_modal(step):
+    world.page.click_by_id('close-create-grid-modal')
+    sleep(3)
     world.grid = world.grid_question1.group()
 
 
@@ -111,8 +115,8 @@ def then_i_should_that_grid_created_in_the_subsection_of_my_questionnaire(step):
     world.page.is_text_present(world.grid_question1.text)
     for option in world.grid_question1.options.all():
         world.page.is_text_present(option.text)
-    for i in range(4, 5):
-        world.page.is_text_present(eval("world.grid_question%d" % i).text)
+
+    world.page.is_text_present(world.grid_question2.text)
 
 
 @step(u'Then I should see add-more grid created')
@@ -161,3 +165,7 @@ def and_i_should_not_see_the_grid_in_the_questionnaire_i_am_editing(step):
     assert world.page.is_element_not_present_by_id('delete-grid-%d' % world.grid.id)
     for i in range(1, 4):
         world.page.is_text_present(eval("world.grid_question%d" % i).text, status=False)
+
+@step(u'When I select a theme')
+def when_i_select_a_theme(step):
+    world.page.select('theme', world.theme.id)

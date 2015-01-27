@@ -58,18 +58,18 @@
             </td>
 
             <td ng-repeat="q in selectedQuestions.otherColumns" ng-mouseenter="editTable=true"
-                ng-mouseleave="editTable=false">
+                ng-mouseleave="editTable=false" id="td-{[{  $index }]}">
                 <div>
                     <div ng-show="editTable" class="pull-right grid-btn-group">
-                        <a href="#" class="" data-ng-click="grid.addColumn()	">
+                        <a href="#" id='add-column-{[{ $index }]}' data-ng-click="grid.addColumn()">
                             <i class="glyphicon glyphicon-plus-sign"></i>
                         </a>
-                        <a href="#" class="" data-ng-click="grid.removeColumn($index)" ng-show="selectedQuestions.otherColumns.length > 1">
+                        <a href="#" class="" data-ng-click="grid.removeColumn($index)" id='remove-column-{[{ $index }]}' ng-show="selectedQuestions.otherColumns.length > 1">
                             <i class="glyphicon glyphicon-trash"></i>
                         </a>
                     </div>
                     <div name="gridForm.{[{ 'dynamicQuestion'+ $index }]}" ng-form="">
-                        <select required name="columns" class="form-control"
+                        <select required name="columns" class="form-control" id="column-{[{ $index }]}"
                                 data-ng-model="selectedQuestions.otherColumns[$index]"
                                 data-ng-options="question.fields.export_label for question in grid.questions | filter: {fields:{is_primary: 'false'}} | filter: { fields: {theme: grid.selectedTheme.pk}} | notSelected:selectedQuestions.otherColumns:$index  track by question.pk">
                             <option value="">Question</option>

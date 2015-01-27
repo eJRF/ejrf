@@ -134,8 +134,9 @@ class PageObject(object):
         return self.browser.find_by_id(id).first.text
 
     def choose_this_value_in_this_select_order_by_this_name(self, value, select_order, name):
-        script = "document.getElementsByName('%s')[%s].value = %s" % (name, select_order, value)
-        self.browser.execute_script(script)
+        script1 = "document.getElementsByName('%s')[%s].value = %s;" % (name, select_order, value)
+        script2 = "$(document.getElementsByName('%s')[%s]).find('option[value=%s]').attr('selected', true);" % (name, select_order, value)
+        self.browser.execute_script(script1+script2)
 
     def click_label_by_for_attribute(self, for_attr):
         script = '$($("label[for=%s]")[0]).click()' % for_attr
