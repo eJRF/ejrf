@@ -1,5 +1,3 @@
-//require('grid-service.js');
-
 if (typeof createGrid == 'undefined') {
     var createGrid = {};
 }

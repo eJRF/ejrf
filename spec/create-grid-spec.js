@@ -42,14 +42,14 @@ describe("create display all grid", function () {
 
         beforeEach(function () {
 
-            inject(function ($controller, $rootScope, $httpBackend, QuestionService) {
+            inject(function ($controller, $rootScope, $httpBackend) {
                 scope = $rootScope.$new();
                 httpMock = $httpBackend;
 
                 httpMock.when('GET', '/api/v1/themes/').respond(themeStub);
 
                 initController = function () {
-                    $controller('createGridController', {$scope: scope, 'QuestionService': QuestionService});
+                    $controller('createGridController', {$scope: scope});
                 };
 
             });
