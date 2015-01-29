@@ -11,10 +11,6 @@ gridModule.factory('hybridGridService', function () {
         hybridGrid[rowIndex].push({});
     };
 
-    var createNewRow = function (rowIndex) {
-        hybridGrid[rowIndex].splice(rowIndex, 0, []);
-    };
-
     var addRow = function (rowIndex) {
         hybridGrid[rowIndex] = [];
         addElement(rowIndex, 0);
@@ -212,6 +208,9 @@ var createGridController = function ($scope, QuestionService, ThemeService, Grid
 
         createNewGrid();
     };
+    $scope.isNotMultiChoice = function(question){
+        return !(question.fields.answer_type == 'MultiChoice' || question.fields.answer_type == 'MultipleResponse');
+    }
 
     $scope.$watch('grid.selectedTheme', function () {
         $scope.grid.questionOptions = [];
