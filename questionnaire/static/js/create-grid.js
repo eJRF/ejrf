@@ -208,9 +208,10 @@ var createGridController = function ($scope, QuestionService, ThemeService, Grid
 
         createNewGrid();
     };
-    $scope.isNotMultiChoice = function(question){
+
+    $scope.isNotMultiChoice = function (question) {
         return !(question.fields.answer_type == 'MultiChoice' || question.fields.answer_type == 'MultipleResponse');
-    }
+    };
 
     $scope.$watch('grid.selectedTheme', function () {
         $scope.grid.questionOptions = [];
@@ -250,6 +251,21 @@ var notSelectedFilter = function () {
 };
 
 gridModule.filter('notSelected', notSelectedFilter);
+
+gridModule.filter('notInHybridGrid', function () {
+    return function (questions, otherColumnMatrix, rowIndex, columnIndex) {
+        var otherColumnQuestions = otherColumnMatrix.reduce(function (prev, curr) {
+            return prev.concat(curr);
+        });
+
+        return questions.filter(function (question) {
+            var indexInMatrix = otherColumnQuestions.indexOf(question);
+
+            var questionIndex = otherColumnMatrix[rowIndex].indexOf(question);
+            return indexInMatrix == -1 || questionIndex == columnIndex;
+        });
+    }
+});
 
 gridModule.run(function ($http) {
     $http.defaults.headers.common['X-CSRFToken'] = window.csrfToken;
