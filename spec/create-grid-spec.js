@@ -4,11 +4,27 @@ describe("create display all grid", function () {
     var scope, httpMock,
         subsectionId = 3,
         questionnaireId = 1,
+        expectedTypes = ['display_all', 'allow_multiples', 'hybrid'],
         availableGridTypes = [
-            {value: 'display_all', text: 'Display All', displayAll: true,
-                primary_questions_criteria: {is_primary: true, answer_type: 'MultiChoice'}},
-            {value: 'allow_multiples', text: 'Add More', addMore: true,
-                primary_questions_criteria: {is_primary: true}}
+            {
+                value: 'display_all',
+                text: 'Display All',
+                displayAll: true,
+                primary_questions_criteria: {is_primary: true, answer_type: 'MultiChoice'}
+            },
+            {
+                value: 'allow_multiples',
+                text: 'Add More',
+                addMore: true,
+                primary_questions_criteria: {is_primary: true}
+            },
+            {
+                value: 'hybrid',
+                text: 'Hybrid',
+                hybrid: true,
+                addMore: true,
+                primary_questions_criteria: {is_primary: true}
+            }
         ],
         stubQuestions = [
             {
@@ -124,7 +140,12 @@ describe("create display all grid", function () {
 
             expect(scope.grid.questions).toEqual(stubQuestions);
             expect(scope.themes).toEqual(themeStub);
-            expect(scope.types).toEqual(availableGridTypes);
+            var types = scope.types.map(function (type) {
+                return type.value;
+            });
+
+            expect(types.length).toEqual(3);
+            expect(types).toEqual(expectedTypes);
         });
 
         it('should get question options when themes change', function () {
@@ -185,8 +206,12 @@ describe("create display all grid", function () {
 
             expect(scope.grid.questions).toEqual(stubQuestions);
             expect(scope.themes).toEqual(themeStub);
+            var types = scope.types.map(function (type) {
+                return type.value;
+            });
 
-            expect(scope.types).toEqual(availableGridTypes);
+            expect(types.length).toEqual(3);
+            expect(types).toEqual(expectedTypes);
         });
 
         describe('Post Grid', function () {

@@ -90,7 +90,7 @@ class GridForm(forms.Form):
 
     def _get_grid_attributes(self):
         order = self.subsection.next_group_order() if self.subsection else 0
-        attributes = { 'order': order, 'subsection': self.subsection, 'grid': True, 'is_core': not self.region }
+        attributes = {'order': order, 'subsection': self.subsection, 'grid': True, 'is_core': not self.region }
         type_ = self.cleaned_data.get('type')
         attributes[type_] = True
         if type_ == 'hybrid':

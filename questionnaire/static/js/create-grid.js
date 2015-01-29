@@ -4,7 +4,45 @@ if (typeof createGrid == 'undefined') {
 
 var gridModule = angular.module('gridModule', ['gridService']);
 
-var createGridController = function ($scope, QuestionService, ThemeService, GridService) {
+gridModule.factory('hybridGridService', function () {
+    var hybridGrid = [[{}]];
+
+    var addElement = function (rowIndex) {
+        hybridGrid[rowIndex].push({});
+    };
+
+    var createNewRow = function (rowIndex) {
+        hybridGrid[rowIndex].splice(rowIndex, 0, []);
+    };
+
+    var addRow = function (rowIndex) {
+        hybridGrid[rowIndex] = [];
+        addElement(rowIndex, 0);
+    };
+
+    var rows = function () {
+        return hybridGrid
+    };
+
+    var columns = function (rowIndex) {
+        return hybridGrid[rowIndex];
+    };
+
+    var removeElement = function (rowIndex, columnIndex) {
+        hybridGrid[rowIndex].splice(columnIndex, 1);
+    };
+
+    return {
+        rows: rows,
+        columns: columns,
+        addElement: addElement,
+        addRow: addRow,
+        removeElement: removeElement
+    }
+});
+
+var createGridController = function ($scope, QuestionService, ThemeService, GridService, hybridGridService) {
+
     $scope.selectedQuestions =
     {
         primary: {},
@@ -13,12 +51,32 @@ var createGridController = function ($scope, QuestionService, ThemeService, Grid
         ]
     };
 
+
+    $scope.hybridGrid = {
+        selectedQuestions: {
+            primaryQuestion: {},
+            dynamicGridQuestion: [[]]
+        },
+        rows: hybridGridService.rows,
+        columns: hybridGridService.columns,
+        addElement: hybridGridService.addElement,
+        addRow: function (rowIndex) {
+            $scope.hybridGrid.selectedQuestions.dynamicGridQuestion[rowIndex] = [];
+            hybridGridService.addRow(rowIndex);
+        },
+        removeElement: function (rowIndex, columnIndex) {
+            $scope.hybridGrid.selectedQuestions.dynamicGridQuestion[rowIndex].splice(columnIndex, 1);
+            hybridGridService.removeElement(rowIndex, columnIndex);
+        }
+    };
+
     $scope.grid = {
         questions: [],
         questionOptions: [],
         gridType: '',
         selectedTheme: '',
-        primaryQuestions: []
+        primaryQuestions: [],
+        addGridRow: false
     };
     $scope.gridForm = {};
 
@@ -37,37 +95,106 @@ var createGridController = function ($scope, QuestionService, ThemeService, Grid
         $scope.subsectionId = subsectionId;
         QuestionService.filter({questionnaire: questionnaireId, unused: true})
             .then(function (response) {
-                var questions = response.data;
-                $scope.grid.questions = questions;
+                $scope.grid.questions = response.data;
             });
 
         ThemeService.all().then(function (response) {
             $scope.themes = response.data;
         });
 
-        $scope.types = [
-            {value: 'display_all', text: 'Display All', displayAll: true,
-                primary_questions_criteria: {is_primary: true, answer_type: 'MultiChoice'}},
-            {value: 'allow_multiples', text: 'Add More', addMore: true,
-                primary_questions_criteria: {is_primary: true}}
-        ];
+        var hybridGrid = function () {
+            return {
+                value: 'hybrid',
+                text: 'Hybrid',
+                hybrid: true,
+                addMore: true,
+                primary_questions_criteria: {is_primary: true},
+                payload: function (selectedQuestions) {
+                    var hybridNonPrimaryQuestionMatrix = selectedQuestions.dynamicGridQuestion;
+
+                    function getIds(question) {
+                        return question.pk;
+                    }
+
+                    var columns = hybridNonPrimaryQuestionMatrix.reduce(function (prev, curr) {
+                        return prev.concat(curr);
+                    }, []).map(getIds);
+
+                    var subgroup = hybridNonPrimaryQuestionMatrix.filter(function (column) {
+                        return column.length > 1;
+                    })[0];
+
+                    var subGroupQuestions = subgroup && subgroup.map(getIds);
+
+                    return {
+                        'csrfmiddlewaretoken': window.csrfToken,
+                        'type': $scope.grid.gridType && $scope.grid.gridType.value,
+                        'primary_question': $scope.selectedQuestions.primary.pk,
+                        'columns': columns,
+                        'subgroup': subGroupQuestions
+                    }
+                }
+            }
+        };
+
+
+        var addMoreGrid = function () {
+            return {
+                value: 'allow_multiples',
+                text: 'Add More',
+                addMore: true,
+                hybrid: false,
+                primary_questions_criteria: {is_primary: true},
+                payload: function (selectedQuestions) {
+                    var columnsIds = selectedQuestions.otherColumns.map(function (question) {
+                        return question && question.pk;
+                    });
+                    var gridType = $scope.grid.gridType;
+                    return {
+                        'type': gridType && gridType.value,
+                        'primary_question': selectedQuestions.primary.pk,
+                        'columns': columnsIds,
+                        'csrfmiddlewaretoken': window.csrfToken
+                    };
+                }
+            }
+        };
+
+        var DisplayAllGrid = function () {
+            return {
+                value: 'display_all',
+                text: 'Display All',
+                displayAll: true,
+                primary_questions_criteria: {
+                    is_primary: true,
+                    answer_type: 'MultiChoice'
+                },
+                payload: function (selectedQuestions) {
+                    var columnsIds = selectedQuestions.otherColumns.map(function (question) {
+                        return question && question.pk;
+                    });
+                    var gridType = $scope.grid.gridType;
+                    return {
+                        'type': gridType && gridType.value,
+                        'primary_question': selectedQuestions.primary.pk,
+                        'columns': columnsIds,
+                        'csrfmiddlewaretoken': window.csrfToken
+                    };
+                }
+
+            }
+        };
+
+        $scope.types = [new DisplayAllGrid(), new addMoreGrid(), new hybridGrid()];
     };
 
     $scope.postNewGrid = function () {
-        var columnsIds = $scope.selectedQuestions.otherColumns.map(function (question) {
-            return question && question.pk;
-        });
-        var payload = {
-            'type': $scope.grid.gridType && $scope.grid.gridType.value,
-            'primary_question': $scope.selectedQuestions.primary.pk,
-            'columns': columnsIds,
-            'csrfmiddlewaretoken': window.csrfToken
-        };
-
         function createNewGrid() {
             if ($scope.newGrid.$valid && validateDynamicForms($scope.gridForm)) {
                 $scope.error = '';
-                GridService.create($scope.subsectionId, payload)
+                var gridType = $scope.grid.gridType;
+                var selectedQuestions = gridType.value == 'hybrid' ? $scope.hybridGrid.selectedQuestions : $scope.selectedQuestions;
+                GridService.create($scope.subsectionId, gridType && gridType.payload(selectedQuestions))
                     .success(function (response) {
                         $scope.message = response[0].message;
                         $scope.gridFormErrors.formHasErrors = false;
@@ -91,9 +218,8 @@ var createGridController = function ($scope, QuestionService, ThemeService, Grid
     });
 
     $scope.$watch('grid.gridType', function (type) {
-        if(type){
-            $scope.grid.primaryQuestions = questionFilter($scope.grid.questions,
-                type.primary_questions_criteria);
+        if (type) {
+            $scope.grid.primaryQuestions = questionFilter($scope.grid.questions, type.primary_questions_criteria);
         }
     });
 
@@ -113,7 +239,7 @@ var createGridController = function ($scope, QuestionService, ThemeService, Grid
 };
 
 gridModule.controller('CreateGridController', ['$scope', 'QuestionService',
-    'ThemeService', 'GridService', createGridController]);
+    'ThemeService', 'GridService', 'hybridGridService', createGridController]);
 
 var notSelectedFilter = function () {
     return function (questions, existingColumnQuestions, index) {
@@ -131,6 +257,5 @@ gridModule.run(function ($http) {
 });
 
 createGrid.updateCreateGrid = function (questionnaireId, subsectionId) {
-    angular.element(document.getElementById('create-grid-controller')).scope()
-        .createGridModal(questionnaireId, subsectionId);
+    angular.element(document.getElementById('create-grid-controller')).scope().createGridModal(questionnaireId, subsectionId);
 };

@@ -31,7 +31,7 @@
     </div>
 </div>
 
-<div class="table-responsive">
+<div class="table-responsive" ng-if="!grid.gridType.hybrid">
     <table class="table table-bordered">
         <tr>
             <td>
@@ -121,4 +121,41 @@
         </tr>
     </table>
 
+</div>
+<div class="table-responsive" ng-if="grid.gridType.hybrid">
+    <table class="table">
+        <tr>
+            <td>1</td>
+            <td>
+                <select required name="primary_question" id="primary_question" class="form-control"
+                        data-ng-model="selectedQuestions.primary"
+                        data-ng-options="question.fields.export_label for question in grid.primaryQuestions | filter: {fields:{is_primary: 'true'}} | filter: { fields: {theme: grid.selectedTheme.pk}} track by question.pk">
+                    <option value="">Primary Question</option>
+                </select>
+            </td>
+        </tr>
+
+        <tr ng-repeat="row in hybridGrid.rows()" ng-init="rowIndex = $index">
+            <td>{[{ rowIndex +  2}]}</td>
+            <td ng-mouseleave="grid.addGridRow[rowIndex][columnIndex]=false" ng-mouseenter="grid.addGridRow[rowIndex][columnIndex]=true" ng-repeat="column in hybridGrid.columns(rowIndex)" ng-init="columnIndex = $index">
+                <div>
+                    <div class="input-group">
+                        <select required name="columns" class="form-control"
+                                data-ng-model="hybridGrid.selectedQuestions.dynamicGridQuestion[rowIndex][columnIndex]"
+                                data-ng-options="question.fields.export_label for question in grid.questions | filter: {fields:{is_primary: 'false'}} | filter: { fields: {theme: grid.selectedTheme.pk}}|| notSelected:hybridGrid.selectedQuestions.dynamicGridQuestion:rowIndex track by question.pk">
+                            <option value="">Question</option>
+                        </select>
+
+                        <div class="input-group-addon" ng-show="grid.addGridRow[rowIndex][columnIndex]">
+                            <a href="#" data-ng-click="hybridGrid.removeElement(rowIndex, columnIndex)"><i class="glyphicon glyphicon-trash"></i></a>
+                            <a href="#" data-ng-click="hybridGrid.addRow(rowIndex + 1)"><i
+                                    class="glyphicon glyphicon-circle-arrow-down"></i></a>
+                            <a href="#" data-ng-click="hybridGrid.addElement(rowIndex, columnIndex + 1)"><i
+                                    class="glyphicon glyphicon-circle-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
 </div>
