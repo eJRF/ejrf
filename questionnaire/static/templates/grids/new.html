@@ -138,7 +138,7 @@
         <tr ng-repeat="row in hybridGrid.rows()" ng-init="rowIndex = $index">
             <td>{[{ rowIndex +  2}]}</td>
             <td ng-mouseleave="grid.addGridRow[rowIndex][columnIndex]=false" ng-mouseenter="grid.addGridRow[rowIndex][columnIndex]=true" ng-repeat="column in hybridGrid.columns(rowIndex)" ng-init="columnIndex = $index">
-                <div>
+                <div name="gridForm.{[{'dynamicGridQuestion' + rowIndex + '_' + columnIndex}]}" ng-form="">
                     <div class="input-group">
                         <select required name="columns" class="form-control"
                                 data-ng-model="hybridGrid.selectedQuestions.dynamicGridQuestion[rowIndex][columnIndex]"
@@ -153,6 +153,19 @@
                             <a href="#" data-ng-click="hybridGrid.addElement(rowIndex, columnIndex + 1)"><i
                                     class="glyphicon glyphicon-circle-arrow-right"></i></a>
                         </div>
+
+                        <div class="error-text"
+                             ng-show="gridForm.{[{'dynamicGridQuestion' + rowIndex + '_' + columnIndex}]}.columns.$invalid || gridFormErrors.formHasErrors">
+                            <p class="text-danger"
+                               ng-show="gridForm.{[{'dynamicGridQuestion' + rowIndex + '_' + columnIndex}]}.columns.$error.required">
+                                This field is required
+                            </p>
+
+                            <p class="text-danger" ng-repeat="error in gridFormErrors.backendErrors.columns">
+                                {[{ error }]}
+                            </p>
+                        </div>
+
                     </div>
                 </div>
             </td>

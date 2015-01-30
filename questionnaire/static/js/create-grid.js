@@ -5,7 +5,11 @@ if (typeof createGrid == 'undefined') {
 var gridModule = angular.module('gridModule', ['gridService']);
 
 gridModule.factory('hybridGridService', function () {
-    var hybridGrid = [[{}]];
+    var hybridGrid = [
+        [
+            {}
+        ]
+    ];
 
     var addElement = function (rowIndex) {
         hybridGrid[rowIndex].push({});
@@ -51,7 +55,9 @@ var createGridController = function ($scope, QuestionService, ThemeService, Grid
     $scope.hybridGrid = {
         selectedQuestions: {
             primaryQuestion: {},
-            dynamicGridQuestion: [[]]
+            dynamicGridQuestion: [
+                []
+            ]
         },
         rows: hybridGridService.rows,
         columns: hybridGridService.columns,
@@ -127,7 +133,7 @@ var createGridController = function ($scope, QuestionService, ThemeService, Grid
                         'type': $scope.grid.gridType && $scope.grid.gridType.value,
                         'primary_question': $scope.selectedQuestions.primary.pk,
                         'columns': columns,
-                        'subgroup': subGroupQuestions
+                        'subgroup': subGroupQuestions ? subGroupQuestions : []
                     }
                 }
             }
