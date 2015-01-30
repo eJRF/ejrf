@@ -38,3 +38,41 @@ gridService.factory('GridService', function ($http) {
         }
     };
 });
+
+
+gridService.factory('hybridGridService', function () {
+    var hybridGrid = [
+        [
+            {}
+        ]
+    ];
+
+    var addElement = function (rowIndex) {
+        hybridGrid[rowIndex].push({});
+    };
+
+    var addRow = function (rowIndex) {
+        hybridGrid[rowIndex] = [];
+        addElement(rowIndex, 0);
+    };
+
+    var rows = function () {
+        return hybridGrid
+    };
+
+    var columns = function (rowIndex) {
+        return hybridGrid[rowIndex];
+    };
+
+    var removeElement = function (rowIndex, columnIndex) {
+        hybridGrid[rowIndex].splice(columnIndex, 1);
+    };
+
+    return {
+        rows: rows,
+        columns: columns,
+        addElement: addElement,
+        addRow: addRow,
+        removeElement: removeElement
+    }
+});

@@ -4,73 +4,49 @@ if (typeof createGrid == 'undefined') {
 
 var gridModule = angular.module('gridModule', ['gridService']);
 
-gridModule.factory('hybridGridService', function () {
-    var hybridGrid = [
-        [
-            {}
-        ]
-    ];
-
-    var addElement = function (rowIndex) {
-        hybridGrid[rowIndex].push({});
-    };
-
-    var addRow = function (rowIndex) {
-        hybridGrid[rowIndex] = [];
-        addElement(rowIndex, 0);
-    };
-
-    var rows = function () {
-        return hybridGrid
-    };
-
-    var columns = function (rowIndex) {
-        return hybridGrid[rowIndex];
-    };
-
-    var removeElement = function (rowIndex, columnIndex) {
-        hybridGrid[rowIndex].splice(columnIndex, 1);
-    };
-
-    return {
-        rows: rows,
-        columns: columns,
-        addElement: addElement,
-        addRow: addRow,
-        removeElement: removeElement
-    }
-});
-
 var createGridController = function ($scope, QuestionService, ThemeService, GridService, hybridGridService) {
 
-    $scope.selectedQuestions =
-    {
-        primary: {},
-        otherColumns: [
-            {}
-        ]
-    };
-
-
-    $scope.hybridGrid = {
-        selectedQuestions: {
-            primaryQuestion: {},
-            dynamicGridQuestion: [
-                []
+    function resetScope() {
+        $scope.selectedQuestions =
+        {
+            primary: {},
+            otherColumns: [
+                {}
             ]
-        },
-        rows: hybridGridService.rows,
-        columns: hybridGridService.columns,
-        addElement: hybridGridService.addElement,
-        addRow: function (rowIndex) {
-            $scope.hybridGrid.selectedQuestions.dynamicGridQuestion[rowIndex] = [];
-            hybridGridService.addRow(rowIndex);
-        },
-        removeElement: function (rowIndex, columnIndex) {
-            $scope.hybridGrid.selectedQuestions.dynamicGridQuestion[rowIndex].splice(columnIndex, 1);
-            hybridGridService.removeElement(rowIndex, columnIndex);
-        }
-    };
+        };
+
+
+        $scope.hybridGrid = {
+            selectedQuestions: {
+                primaryQuestion: {},
+                dynamicGridQuestion: [
+                    []
+                ]
+            },
+            rows: hybridGridService.rows,
+            columns: hybridGridService.columns,
+            addElement: hybridGridService.addElement,
+            addRow: function (rowIndex) {
+                $scope.hybridGrid.selectedQuestions.dynamicGridQuestion[rowIndex] = [];
+                hybridGridService.addRow(rowIndex);
+            },
+            removeElement: function (rowIndex, columnIndex) {
+                $scope.hybridGrid.selectedQuestions.dynamicGridQuestion[rowIndex].splice(columnIndex, 1);
+                hybridGridService.removeElement(rowIndex, columnIndex);
+            }
+        };
+
+        $scope.gridForm = {};
+
+        $scope.gridFormErrors = {backendErrors: [], formHasErrors: false};
+        $scope.subsectionId = $scope.subsectionId || "";
+
+        $scope.error = '';
+        $scope.message = '';
+
+        $scope.grid.questionOptions = [];
+        $scope.grid.selectedTheme = '';
+    }
 
     $scope.grid = {
         questions: [],
@@ -80,10 +56,8 @@ var createGridController = function ($scope, QuestionService, ThemeService, Grid
         primaryQuestions: [],
         addGridRow: false
     };
-    $scope.gridForm = {};
 
-    $scope.gridFormErrors = {backendErrors: [], formHasErrors: false};
-    $scope.subsectionId = $scope.subsectionId || "";
+    resetScope();
 
     $scope.grid.addColumn = function () {
         $scope.selectedQuestions.otherColumns.push({});
@@ -111,7 +85,8 @@ var createGridController = function ($scope, QuestionService, ThemeService, Grid
                 hybrid: true,
                 addMore: true,
                 primary_questions_criteria: {is_primary: true},
-                payload: function (selectedQuestions) {
+                payload: function () {
+                    var selectedQuestions = $scope.hybridGrid.selectedQuestions;
                     var hybridNonPrimaryQuestionMatrix = selectedQuestions.dynamicGridQuestion;
 
                     function getIds(question) {
@@ -147,7 +122,8 @@ var createGridController = function ($scope, QuestionService, ThemeService, Grid
                 addMore: true,
                 hybrid: false,
                 primary_questions_criteria: {is_primary: true},
-                payload: function (selectedQuestions) {
+                payload: function () {
+                    var selectedQuestions = $scope.selectedQuestions;
                     var columnsIds = selectedQuestions.otherColumns.map(function (question) {
                         return question && question.pk;
                     });
@@ -171,7 +147,8 @@ var createGridController = function ($scope, QuestionService, ThemeService, Grid
                     is_primary: true,
                     answer_type: 'MultiChoice'
                 },
-                payload: function (selectedQuestions) {
+                payload: function () {
+                    var selectedQuestions = $scope.selectedQuestions;
                     var columnsIds = selectedQuestions.otherColumns.map(function (question) {
                         return question && question.pk;
                     });
@@ -195,8 +172,7 @@ var createGridController = function ($scope, QuestionService, ThemeService, Grid
             if ($scope.newGrid.$valid && validateDynamicForms($scope.gridForm)) {
                 $scope.error = '';
                 var gridType = $scope.grid.gridType;
-                var selectedQuestions = gridType.value == 'hybrid' ? $scope.hybridGrid.selectedQuestions : $scope.selectedQuestions;
-                GridService.create($scope.subsectionId, gridType && gridType.payload(selectedQuestions))
+                GridService.create($scope.subsectionId, gridType && gridType.payload())
                     .success(function (response) {
                         $scope.message = response[0].message;
                         $scope.gridFormErrors.formHasErrors = false;
@@ -225,6 +201,7 @@ var createGridController = function ($scope, QuestionService, ThemeService, Grid
 
     $scope.$watch('grid.gridType', function (type) {
         if (type) {
+            resetScope();
             $scope.grid.primaryQuestions = questionFilter($scope.grid.questions, type.primary_questions_criteria);
         }
     });
