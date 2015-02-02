@@ -1,6 +1,10 @@
 describe("create display all grid", function () {
 
-    beforeEach(module('gridModule'));
+    beforeEach(function () {
+            module('gridModule');
+            module('gridTypeFactories');
+        }
+    );
     var scope, httpMock,
         subsectionId = 3,
         questionnaireId = 1,
@@ -10,20 +14,38 @@ describe("create display all grid", function () {
                 value: 'display_all',
                 text: 'Display All',
                 displayAll: true,
-                primary_questions_criteria: {is_primary: true, answer_type: 'MultiChoice'}
+                primary_questions_criteria: {is_primary: true, answer_type: 'MultiChoice'},
+                initialSelectedQuestions: {
+                    primary: {},
+                    otherColumns: [
+                        {}
+                    ]
+                }
             },
             {
                 value: 'allow_multiples',
                 text: 'Add More',
                 addMore: true,
-                primary_questions_criteria: {is_primary: true}
+                primary_questions_criteria: {is_primary: true},
+                initialSelectedQuestions: {
+                    primary: {},
+                    otherColumns: [
+                        {}
+                    ]
+                }
             },
             {
                 value: 'hybrid',
                 text: 'Hybrid',
                 hybrid: true,
                 addMore: true,
-                primary_questions_criteria: {is_primary: true}
+                primary_questions_criteria: {is_primary: true},
+                initialSelectedQuestions: {
+                    primaryQuestion: {},
+                    dynamicGridQuestion: [
+                        []
+                    ]
+                }
             }
         ],
         stubQuestions = [
@@ -44,6 +66,7 @@ describe("create display all grid", function () {
 
     describe("CreateGridController", function () {
         var initController,
+            chooseGrid,
             themeStub = {
                 pk: 6,
                 model: "questionnaire.theme",
@@ -56,9 +79,10 @@ describe("create display all grid", function () {
                 }
             };
 
+
         beforeEach(function () {
 
-            inject(function ($controller, $rootScope, $httpBackend) {
+            inject(function ($controller, $rootScope, $httpBackend, AddMoreGridFactory, DisplayAllGridFactory, HybridGridFactory) {
                 scope = $rootScope.$new();
                 httpMock = $httpBackend;
 
@@ -68,16 +92,36 @@ describe("create display all grid", function () {
                     $controller('createGridController', {$scope: scope});
                 };
 
+                chooseGrid = function (type, real) {
+                    var isReal = real || false;
+                    var mapping_stubs = {displayAll: 0, addMore: 1, hybrid: 2};
+                    var mapping_reals = {displayAll: DisplayAllGridFactory, addMore: AddMoreGridFactory, hybrid: HybridGridFactory};
+
+                    if (isReal){
+                        scope.grid.gridType = mapping_reals[type].create();
+                    }else{
+                        scope.grid.gridType = availableGridTypes[mapping_stubs[type]];
+                    }
+                    scope.$apply();
+                };
+
             });
         });
 
-        it('should ensure there are empty initial primary and non-primary questions', function () {
+        it('should ensure  initial selected questions are set when grid type is chosen', function () {
 
+            var url = '/api/v1/questions/?questionnaire=' + questionnaireId + '&unused=true';
+            httpMock.expectGET(url).respond(stubQuestions);
             initController();
-            expect(scope.selectedQuestions.primary).toEqual({});
-            expect(scope.selectedQuestions.otherColumns).toEqual([
-                {}
-            ]);
+
+            var displayAll = availableGridTypes[0];
+            var fakeSelctedQuestions = {};
+            displayAll.initialSelectedQuestions = fakeSelctedQuestions;
+
+            scope.grid.gridType = displayAll;
+            scope.$apply();
+
+            expect(scope.selectedQuestions).toEqual(fakeSelctedQuestions);
         });
 
         it('should ensure there are empty initial grid attributes', function () {
@@ -97,6 +141,7 @@ describe("create display all grid", function () {
 
         it('should add new non-primary question column', function () {
             initController();
+            chooseGrid('addMore');
             scope.grid.addColumn();
             expect(scope.selectedQuestions.otherColumns).toEqual([
                 {},
@@ -106,10 +151,13 @@ describe("create display all grid", function () {
 
         it('should remove non-primary question column', function () {
             initController();
+            chooseGrid('displayAll');
             scope.selectedQuestions.otherColumns = [
                 {},
                 {}
             ];
+
+            scope.$apply();
 
             scope.grid.removeColumn(1);
             expect(scope.selectedQuestions.otherColumns).toEqual([
@@ -184,20 +232,6 @@ describe("create display all grid", function () {
         it('should post new grid', function () {
             initController();
 
-            stubQuestions = [
-                {
-                    pk: 186,
-                    model: "questionnaire.question",
-                    fields: {
-                        UID: "C00097",
-                        created: "2014-12-17T12:31:19.231Z",
-                        text: "PAB (protection at birth)",
-                        theme: 6,
-                        answer_type: "MultiChoice",
-                        is_primary: true
-                    }
-                }
-            ];
             var url = '/api/v1/questions/?questionnaire=' + questionnaireId + '&unused=true';
             scope.createGridModal(questionnaireId, subsectionId);
 
@@ -224,6 +258,8 @@ describe("create display all grid", function () {
                     {message: errorMessage, form_errors: [backendError]}
                 ]);
                 initController();
+                chooseGrid('displayAll', true);
+
                 scope.subsectionId = subsectionId;
 
                 scope.newGrid = {$valid: true};
@@ -244,6 +280,8 @@ describe("create display all grid", function () {
                     {message: successMessage}
                 ]);
                 initController();
+                chooseGrid('displayAll', true);
+
                 scope.subsectionId = subsectionId;
 
                 scope.newGrid = {$valid: true};
