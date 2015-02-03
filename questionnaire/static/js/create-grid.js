@@ -8,7 +8,6 @@ var createGridController = function ($scope, QuestionService, ThemeService, Grid
 
     function resetScope() {
         $scope.gridForm = {};
-
         $scope.gridFormErrors = {backendErrors: [], formHasErrors: false};
         $scope.subsectionId = $scope.subsectionId || "";
 
@@ -19,19 +18,6 @@ var createGridController = function ($scope, QuestionService, ThemeService, Grid
         $scope.grid.selectedTheme = '';
     }
 
-    $scope.hybridGrid = {
-        rows: hybridGridService.rows,
-        columns: hybridGridService.columns,
-        addElement: hybridGridService.addElement,
-        addRow: function (rowIndex) {
-            $scope.selectedQuestions.dynamicGridQuestion[rowIndex] = [];
-            hybridGridService.addRow(rowIndex);
-        },
-        removeElement: function (rowIndex, columnIndex) {
-            $scope.selectedQuestions.dynamicGridQuestion[rowIndex].splice(columnIndex, 1);
-            hybridGridService.removeElement(rowIndex, columnIndex);
-        }
-    };
 
     $scope.grid = {
         questions: [],
@@ -105,8 +91,13 @@ var createGridController = function ($scope, QuestionService, ThemeService, Grid
             resetScope();
             $scope.selectedQuestions = type.initialSelectedQuestions;
             $scope.grid.primaryQuestions = questionFilter($scope.grid.questions, type.primary_questions_criteria);
+            type.hybrid && initialize('hybridGrid', hybridGridService.get($scope.selectedQuestions.dynamicGridQuestion));
         }
     });
+
+    function initialize(type, value) {
+        $scope[type] = value;
+    }
 
     $scope.$watch('selectedQuestions.primary', function (selectedPrimary) {
         if (selectedPrimary) {
@@ -194,16 +185,19 @@ var notSelectedFilter = function () {
 gridModule.filter('notSelected', notSelectedFilter);
 
 gridModule.filter('notInHybridGrid', function () {
-    return function (questions, otherColumnMatrix, rowIndex, columnIndex) {
+    return function (questions, otherColumnMatrix, selectedQuestion) {
+        function extractQuestion(wrappedQuestion) {
+            return wrappedQuestion.question;
+        }
+
         var otherColumnQuestions = otherColumnMatrix.reduce(function (prev, curr) {
             return prev.concat(curr);
-        });
+        }).map(extractQuestion);
 
         return questions.filter(function (question) {
             var indexInMatrix = otherColumnQuestions.indexOf(question);
 
-            var questionIndex = otherColumnMatrix[rowIndex].indexOf(question);
-            return indexInMatrix == -1 || questionIndex == columnIndex;
+            return indexInMatrix == -1 || question == selectedQuestion;
         });
     }
 });

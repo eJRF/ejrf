@@ -140,32 +140,32 @@
             </td>
         </tr>
 
-        <tr ng-repeat="row in hybridGrid.rows()" ng-init="rowIndex = $index">
-            <td>{[{ rowIndex + 2}]}</td>
-            <td ng-mouseleave="grid.addGridRow[rowIndex][columnIndex]=false"
-                ng-mouseenter="grid.addGridRow[rowIndex][columnIndex]=true"
-                ng-repeat="column in hybridGrid.columns(rowIndex)" ng-init="columnIndex = $index">
-                <div name="gridForm.{[{'dynamicGridQuestion' + rowIndex + '_' + columnIndex}]}" ng-form="">
+        <tr ng-repeat="row in selectedQuestions.dynamicGridQuestion">
+            <td>{[{ $index + 2}]}</td>
+            <td ng-mouseleave="grid.addGridRow[$parent.$index][$index]=false"
+                ng-mouseenter="grid.addGridRow[$parent.$index][$index]=true"
+                ng-repeat="column in row">
+                <div name="gridForm.{[{'dynamicGridQuestion' + $parent.$index + '_' + $index}]}" ng-form="">
                     <div class="input-group">
                         <select required name="columns" class="form-control"
-                                data-ng-model="selectedQuestions.dynamicGridQuestion[rowIndex][columnIndex]"
-                                data-ng-options="question.fields.export_label for question in grid.questions | filter: {fields:{is_primary: 'false'}} | filter: { fields: {theme: grid.selectedTheme.pk}} | filter: isNotMultiChoice | notInHybridGrid:selectedQuestions.dynamicGridQuestion:rowIndex:columnIndex track by question.pk">
+                                data-ng-model="column['question']"
+                                data-ng-options="question.fields.export_label for question in grid.questions | filter: {fields:{is_primary: 'false'}} | filter: { fields: {theme: grid.selectedTheme.pk}} | filter: isNotMultiChoice | notInHybridGrid:selectedQuestions.dynamicGridQuestion:column['question'] track by question.pk">
                             <option value="">Question</option>
                         </select>
 
-                        <div class="input-group-addon" ng-show="grid.addGridRow[rowIndex][columnIndex]">
-                            <a href="#" data-ng-click="hybridGrid.removeElement(rowIndex, columnIndex)"><i
+                        <div class="input-group-addon" ng-show="grid.addGridRow[$parent.$index][$index]">
+                            <a href="#" data-ng-click="hybridGrid.removeElement($parent.$index, $index)"><i
                                     class="glyphicon glyphicon-trash"></i></a>
-                            <a href="#" data-ng-click="hybridGrid.addRow(rowIndex + 1)"><i
+                            <a href="#" data-ng-click="$parent.$index=hybridGrid.addRow($parent.$index + 1)"><i
                                     class="glyphicon glyphicon-circle-arrow-down"></i></a>
-                            <a href="#" data-ng-click="hybridGrid.addElement(rowIndex, columnIndex + 1)"><i
+                            <a href="#" data-ng-click="hybridGrid.addElement($parent.$index, $index + 1)"><i
                                     class="glyphicon glyphicon-circle-arrow-right"></i></a>
                         </div>
 
                         <div class="error-text"
-                             ng-show="gridForm.{[{'dynamicGridQuestion' + rowIndex + '_' + columnIndex}]}.columns.$invalid || gridFormErrors.formHasErrors">
+                             ng-show="gridForm.{[{'dynamicGridQuestion' + $parent.$index + '_' + $index}]}.columns.$invalid || gridFormErrors.formHasErrors">
                             <p class="text-danger"
-                               ng-show="gridForm.{[{'dynamicGridQuestion' + rowIndex + '_' + columnIndex}]}.columns.$error.required">
+                               ng-show="gridForm.{[{'dynamicGridQuestion' + $parent.$index + '_' + $index}]}.columns.$error.required">
                                 This field is required
                             </p>
 

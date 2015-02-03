@@ -68,8 +68,8 @@ gridTypeFactories.factory('HybridGridFactory', function () {
         var self = this;
         var hybridNonPrimaryQuestionMatrix = selectedQuestions.dynamicGridQuestion;
 
-        function getIds(question) {
-            return question.pk;
+        function getIds(wrappedQuestion) {
+            return wrappedQuestion.question.pk;
         }
 
         var columns = hybridNonPrimaryQuestionMatrix.reduce(function (prev, curr) {
@@ -92,10 +92,8 @@ gridTypeFactories.factory('HybridGridFactory', function () {
     }
 
     var initialSelectedQuestions = {
-        primaryQuestion: {},
-        dynamicGridQuestion: [
-            []
-        ]
+        primary: {},
+        dynamicGridQuestion: [[{}]]
     };
 
     var HybridGrid = function () {

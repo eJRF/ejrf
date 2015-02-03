@@ -1,4 +1,3 @@
-
 var gridService = angular.module('gridService', []);
 
 gridService.factory('QuestionService', function ($http) {
@@ -41,38 +40,43 @@ gridService.factory('GridService', function ($http) {
 
 
 gridService.factory('hybridGridService', function () {
-    var hybridGrid = [
-        [
-            {}
-        ]
-    ];
+    var service = function (grid) {
 
-    var addElement = function (rowIndex) {
-        hybridGrid[rowIndex].push({});
-    };
+        var hybridGrid = grid;
 
-    var addRow = function (rowIndex) {
-        hybridGrid[rowIndex] = [];
-        addElement(rowIndex, 0);
-    };
+        var addElement = function (rowIndex, columnIndex) {
+            hybridGrid[rowIndex].splice(columnIndex, 0, {});
+        };
 
-    var rows = function () {
-        return hybridGrid
-    };
+        var addRow = function (rowIndex) {
+            hybridGrid.splice(rowIndex, 0, [{}]);
+            return rowIndex;
+        };
 
-    var columns = function (rowIndex) {
-        return hybridGrid[rowIndex];
-    };
+        var rows = function () {
+            return hybridGrid
+        };
 
-    var removeElement = function (rowIndex, columnIndex) {
-        hybridGrid[rowIndex].splice(columnIndex, 1);
+        var columns = function (rowIndex) {
+            return hybridGrid[rowIndex];
+        };
+
+        var removeElement = function (rowIndex, columnIndex) {
+            hybridGrid[rowIndex].splice(columnIndex, 1);
+        };
+
+        return {
+            rows: rows,
+            columns: columns,
+            addElement: addElement,
+            addRow: addRow,
+            removeElement: removeElement
+        };
     };
 
     return {
-        rows: rows,
-        columns: columns,
-        addElement: addElement,
-        addRow: addRow,
-        removeElement: removeElement
+        get: function (hybridGrid) {
+            return new service(hybridGrid);
+        }
     }
 });
