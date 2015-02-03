@@ -107,7 +107,7 @@
                 1
             </td>
             <td>
-                <input type="text"/>
+                <primary-question-input />
             </td>
             <td ng-repeat="q in selectedQuestions.otherColumns">
                 <question-input index="{[{$index}]}"/>
@@ -154,11 +154,11 @@
                         </select>
 
                         <div class="input-group-addon" ng-show="grid.addGridRow[$parent.$index][$index]">
-                            <a href="#" data-ng-click="hybridGrid.removeElement($parent.$index, $index)"><i
+                            <a href="#" data-ng-click="selectedQuestions.removeElement($parent.$index, $index)"><i
                                     class="glyphicon glyphicon-trash"></i></a>
-                            <a href="#" data-ng-click="$parent.$index=hybridGrid.addRow($parent.$index + 1)"><i
+                            <a href="#" data-ng-click="$parent.$index=selectedQuestions.addRow($parent.$index + 1)"><i
                                     class="glyphicon glyphicon-circle-arrow-down"></i></a>
-                            <a href="#" data-ng-click="hybridGrid.addElement($parent.$index, $index + 1)"><i
+                            <a href="#" data-ng-click="selectedQuestions.addElement($parent.$index, $index + 1)"><i
                                     class="glyphicon glyphicon-circle-arrow-right"></i></a>
                         </div>
 

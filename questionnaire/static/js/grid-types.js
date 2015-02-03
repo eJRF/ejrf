@@ -1,14 +1,14 @@
 var gridTypeFactories = angular.module('gridTypeFactories', []);
 
 gridTypeFactories.factory('NonHybridPayload', function () {
-    var generatePayload = function (selectedQuestions) {
+    var generatePayload = function () {
         var self = this;
-        var columnsIds = selectedQuestions.otherColumns.map(function (question) {
+        var columnsIds = this.initialSelectedQuestions.otherColumns.map(function (question) {
             return question.pk;
         });
         return {
             'type': self.value,
-            'primary_question': selectedQuestions.primary.pk,
+            'primary_question': this.initialSelectedQuestions.primary.pk,
             'columns': columnsIds,
             'csrfmiddlewaretoken': window.csrfToken
         };
@@ -63,10 +63,10 @@ gridTypeFactories.factory('DisplayAllGridFactory', function (NonHybridPayload) {
         }};
 });
 
-gridTypeFactories.factory('HybridGridFactory', function () {
-    function generatePayload(selectedQuestions) {
+gridTypeFactories.factory('HybridGridFactory', function (hybridGridQuestionSelection) {
+    function generatePayload() {
         var self = this;
-        var hybridNonPrimaryQuestionMatrix = selectedQuestions.dynamicGridQuestion;
+        var hybridNonPrimaryQuestionMatrix = this.initialSelectedQuestions.dynamicGridQuestion;
 
         function getIds(wrappedQuestion) {
             return wrappedQuestion.question.pk;
@@ -85,16 +85,11 @@ gridTypeFactories.factory('HybridGridFactory', function () {
         return {
             'csrfmiddlewaretoken': window.csrfToken,
             'type': self.value,
-            'primary_question': selectedQuestions.primary.pk,
+            'primary_question': this.initialSelectedQuestions.primary.pk,
             'columns': columns,
             'subgroup': subGroupQuestions || []
         }
     }
-
-    var initialSelectedQuestions = {
-        primary: {},
-        dynamicGridQuestion: [[{}]]
-    };
 
     var HybridGrid = function () {
         return {
@@ -104,11 +99,38 @@ gridTypeFactories.factory('HybridGridFactory', function () {
             addMore: true,
             primary_questions_criteria: {is_primary: true},
             payload: generatePayload,
-            initialSelectedQuestions: initialSelectedQuestions
+            initialSelectedQuestions: hybridGridQuestionSelection
         }
     };
     return {
         create: function () {
             return new HybridGrid();
         }};
+});
+
+
+gridTypeFactories.factory('hybridGridQuestionSelection', function () {
+
+        var addElement = function (rowIndex, columnIndex) {
+            this.dynamicGridQuestion[rowIndex].splice(columnIndex, 0, {});
+        };
+
+        var addRow = function (rowIndex) {
+            this.dynamicGridQuestion.splice(rowIndex, 0, [
+                {}
+            ]);
+            return rowIndex;
+        };
+
+        var removeElement = function (rowIndex, columnIndex) {
+            this.dynamicGridQuestion[rowIndex].splice(columnIndex, 1);
+        };
+
+        return {
+            primary: {},
+            dynamicGridQuestion: [[{}]],
+            addElement: addElement,
+            addRow: addRow,
+            removeElement: removeElement
+        };
 });

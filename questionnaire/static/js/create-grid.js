@@ -4,7 +4,7 @@ if (typeof createGrid == 'undefined') {
 
 var gridModule = angular.module('gridModule', ['gridService', 'gridTypeFactories']);
 
-var createGridController = function ($scope, QuestionService, ThemeService, GridService, hybridGridService, DisplayAllGridFactory, AddMoreGridFactory, HybridGridFactory) {
+var createGridController = function ($scope, QuestionService, ThemeService, GridService, DisplayAllGridFactory, AddMoreGridFactory, HybridGridFactory) {
 
     function resetScope() {
         $scope.gridForm = {};
@@ -59,7 +59,7 @@ var createGridController = function ($scope, QuestionService, ThemeService, Grid
                 $scope.error = '';
                 var gridType = $scope.grid.gridType;
 
-                GridService.create($scope.subsectionId, gridType.payload($scope.selectedQuestions))
+                GridService.create($scope.subsectionId, gridType.payload())
                     .success(function (response) {
                         $scope.message = response[0].message;
                         $scope.gridFormErrors.formHasErrors = false;
@@ -91,7 +91,6 @@ var createGridController = function ($scope, QuestionService, ThemeService, Grid
             resetScope();
             $scope.selectedQuestions = type.initialSelectedQuestions;
             $scope.grid.primaryQuestions = questionFilter($scope.grid.questions, type.primary_questions_criteria);
-            type.hybrid && initialize('hybridGrid', hybridGridService.get($scope.selectedQuestions.dynamicGridQuestion));
         }
     });
 
@@ -115,43 +114,10 @@ var createGridController = function ($scope, QuestionService, ThemeService, Grid
 };
 
 gridModule.controller('CreateGridController', ['$scope', 'QuestionService',
-    'ThemeService', 'GridService', 'hybridGridService', 'AddMoreGridFactory',
+    'ThemeService', 'GridService', 'AddMoreGridFactory',
     'DisplayAllGridFactory', 'HybridGridFactory', createGridController]);
 
-gridModule.directive('questionInput', function (QuestionService, $q) {
-
-    var answerInput = function (question) {
-        var generateSelect = function (question) {
-
-            return QuestionService.options(question).then(function (response) {
-                var questionOptions = response.data,
-                    initialValue = '<select><option>Choose One</option>',
-                    closingTag = '</select>';
-
-                return questionOptions.reduce(function (prev, curr) {
-                        return prev + '<option>' + curr.fields.text + '</option>'
-                    }, initialValue)
-                    + closingTag;
-            });
-        };
-
-        var textInput = function (klass) {
-            var aklass = klass || '';
-            var deferred = $q.defer();
-            deferred.resolve('<input type="text" class="' + aklass + '"/>');
-            return deferred.promise
-        };
-
-        var answerInputMap = {
-            number: textInput(),
-            text: textInput(),
-            date: textInput("datetimepicker"),
-            multichoice: generateSelect(question),
-            multipleresponse: generateSelect(question)
-        };
-        return answerInputMap[question.fields.answer_type.toLowerCase()]
-    };
-
+gridModule.directive('questionInput', function (AnswerInput) {
     return {
         restrict: 'E',
         scope: false,
@@ -161,13 +127,19 @@ gridModule.directive('questionInput', function (QuestionService, $q) {
             };
 
             $scope.$watch(correspondingColumnQuestion, function (newVal) {
-                newVal && newVal.fields && answerInput(newVal).then(function (inputField) {
-                    elem.replaceWith(inputField);
-                    (newVal.fields.answer_type.toLowerCase() == 'date') && $('.datetimepicker').datepicker({
-                        pickTime: false,
-                        autoclose: false
-                    });
-                })
+                AnswerInput.render(newVal, elem);
+                });
+        }
+    }
+});
+
+gridModule.directive('primaryQuestionInput', function (AnswerInput) {
+    return {
+        restrict: 'E',
+        scope: false,
+        link: function ($scope, elem) {
+            $scope.$watch('selectedQuestions.primary', function(newVal){
+                AnswerInput.render(newVal, elem);
             });
         }
     }

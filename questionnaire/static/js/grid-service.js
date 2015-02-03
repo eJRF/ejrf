@@ -39,44 +39,50 @@ gridService.factory('GridService', function ($http) {
 });
 
 
-gridService.factory('hybridGridService', function () {
-    var service = function (grid) {
+gridService.factory('AnswerInput', function (QuestionService, $q) {
 
-        var hybridGrid = grid;
+    var answerInput = function (question) {
+        var generateSelect = function (question) {
 
-        var addElement = function (rowIndex, columnIndex) {
-            hybridGrid[rowIndex].splice(columnIndex, 0, {});
+            return QuestionService.options(question).then(function (response) {
+                var questionOptions = response.data,
+                    initialValue = '<select><option>Choose One</option>',
+                    closingTag = '</select>';
+
+                return questionOptions.reduce(function (prev, curr) {
+                        return prev + '<option>' + curr.fields.text + '</option>'
+                    }, initialValue)
+                    + closingTag;
+            });
         };
 
-        var addRow = function (rowIndex) {
-            hybridGrid.splice(rowIndex, 0, [{}]);
-            return rowIndex;
+        var textInput = function (klass) {
+            var aklass = klass || '';
+            var deferred = $q.defer();
+            deferred.resolve('<input type="text" class="' + aklass + '"/>');
+            return deferred.promise
         };
 
-        var rows = function () {
-            return hybridGrid
+        var answerInputMap = {
+            number: textInput(),
+            text: textInput(),
+            date: textInput("datetimepicker"),
+            multichoice: generateSelect(question),
+            multipleresponse: generateSelect(question)
         };
-
-        var columns = function (rowIndex) {
-            return hybridGrid[rowIndex];
-        };
-
-        var removeElement = function (rowIndex, columnIndex) {
-            hybridGrid[rowIndex].splice(columnIndex, 1);
-        };
-
-        return {
-            rows: rows,
-            columns: columns,
-            addElement: addElement,
-            addRow: addRow,
-            removeElement: removeElement
-        };
+        return answerInputMap[question.fields.answer_type.toLowerCase()]
     };
 
-    return {
-        get: function (hybridGrid) {
-            return new service(hybridGrid);
-        }
-    }
+    var renderDirective = function (newVal, elem) {
+                newVal && newVal.fields && answerInput(newVal).then(function (inputField) {
+                    elem.replaceWith(inputField);
+                    (newVal.fields.answer_type.toLowerCase() == 'date') && $('.datetimepicker').datepicker({
+                        pickTime: false,
+                        autoclose: false
+                    })
+                })
+        };
+
+    return {render: renderDirective};
+
 });
