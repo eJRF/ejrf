@@ -13,18 +13,31 @@ gridTypeFactories.factory('NonHybridPayload', function () {
             'csrfmiddlewaretoken': window.csrfToken
         };
     };
-    return {
-        payload: generatePayload,
-        selectedQuestions: {
-            primary: {},
-            otherColumns: [
-                {}
-            ]
-        }};
+    return {payload: generatePayload};
 
 });
 
-gridTypeFactories.factory('AddMoreGridFactory', function (NonHybridPayload) {
+gridTypeFactories.factory('NonHybridQuestionSelection', function () {
+    var addColumn = function () {
+        this.otherColumns.push({});
+    };
+
+    var removeColumn = function (index) {
+        this.otherColumns.splice(index, 1);
+    };
+
+    return {
+        primary: {},
+        otherColumns: [
+            {}
+        ],
+        addColumn: addColumn,
+        removeColumn: removeColumn
+    };
+
+});
+
+gridTypeFactories.factory('AddMoreGridFactory', function (NonHybridPayload, NonHybridQuestionSelection) {
     var addMoreGrid = function () {
         return {
             value: 'allow_multiples',
@@ -33,7 +46,7 @@ gridTypeFactories.factory('AddMoreGridFactory', function (NonHybridPayload) {
             hybrid: false,
             primary_questions_criteria: {is_primary: true},
             payload: NonHybridPayload.payload,
-            initialSelectedQuestions: NonHybridPayload.selectedQuestions
+            initialSelectedQuestions: NonHybridQuestionSelection
         }
     };
     return {
@@ -42,7 +55,7 @@ gridTypeFactories.factory('AddMoreGridFactory', function (NonHybridPayload) {
         }}
 });
 
-gridTypeFactories.factory('DisplayAllGridFactory', function (NonHybridPayload) {
+gridTypeFactories.factory('DisplayAllGridFactory', function (NonHybridPayload, NonHybridQuestionSelection) {
     var DisplayAllGrid = function () {
         return {
             value: 'display_all',
@@ -54,7 +67,7 @@ gridTypeFactories.factory('DisplayAllGridFactory', function (NonHybridPayload) {
                 answer_type: 'MultiChoice'
             },
             payload: NonHybridPayload.payload,
-            initialSelectedQuestions: NonHybridPayload.selectedQuestions
+            initialSelectedQuestions: NonHybridQuestionSelection
         }
     };
     return {
@@ -111,26 +124,30 @@ gridTypeFactories.factory('HybridGridFactory', function (hybridGridQuestionSelec
 
 gridTypeFactories.factory('hybridGridQuestionSelection', function () {
 
-        var addElement = function (rowIndex, columnIndex) {
-            this.dynamicGridQuestion[rowIndex].splice(columnIndex, 0, {});
-        };
+    var addElement = function (rowIndex, columnIndex) {
+        this.dynamicGridQuestion[rowIndex].splice(columnIndex, 0, {});
+    };
 
-        var addRow = function (rowIndex) {
-            this.dynamicGridQuestion.splice(rowIndex, 0, [
+    var addRow = function (rowIndex) {
+        this.dynamicGridQuestion.splice(rowIndex, 0, [
+            {}
+        ]);
+        return rowIndex;
+    };
+
+    var removeElement = function (rowIndex, columnIndex) {
+        this.dynamicGridQuestion[rowIndex].splice(columnIndex, 1);
+    };
+
+    return {
+        primary: {},
+        dynamicGridQuestion: [
+            [
                 {}
-            ]);
-            return rowIndex;
-        };
-
-        var removeElement = function (rowIndex, columnIndex) {
-            this.dynamicGridQuestion[rowIndex].splice(columnIndex, 1);
-        };
-
-        return {
-            primary: {},
-            dynamicGridQuestion: [[{}]],
-            addElement: addElement,
-            addRow: addRow,
-            removeElement: removeElement
-        };
+            ]
+        ],
+        addElement: addElement,
+        addRow: addRow,
+        removeElement: removeElement
+    };
 });

@@ -30,14 +30,6 @@ var createGridController = function ($scope, QuestionService, ThemeService, Grid
 
     resetScope();
 
-    $scope.grid.addColumn = function () {
-        $scope.selectedQuestions.otherColumns.push({});
-    };
-
-    $scope.grid.removeColumn = function (index) {
-        $scope.selectedQuestions.otherColumns.splice(index, 1);
-    };
-
     $scope.createGridModal = function (questionnaireId, subsectionId) {
         $scope.subsectionId = subsectionId;
         QuestionService.filter({questionnaire: questionnaireId, unused: true})
@@ -54,28 +46,24 @@ var createGridController = function ($scope, QuestionService, ThemeService, Grid
     };
 
     $scope.postNewGrid = function () {
-        function createNewGrid() {
-            if ($scope.newGrid.$valid && validateDynamicForms($scope.gridForm)) {
-                $scope.error = '';
-                var gridType = $scope.grid.gridType;
+        if ($scope.newGrid.$valid && validateDynamicForms($scope.gridForm)) {
+            $scope.error = '';
+            var gridType = $scope.grid.gridType;
 
-                GridService.create($scope.subsectionId, gridType.payload())
-                    .success(function (response) {
-                        $scope.message = response[0].message;
-                        $scope.gridFormErrors.formHasErrors = false;
-                    }).error(function (response) {
-                        $scope.error = response[0].message;
-                        $scope.gridFormErrors.formHasErrors = true;
-                        $scope.gridFormErrors.backendErrors = response[0].form_errors;
-                    });
-            } else {
-                $scope.gridFormErrors.formHasErrors = true;
-                $scope.error = 'The are errors in the form. Please fix them and submit again.';
-                $scope.message = '';
-            }
+            GridService.create($scope.subsectionId, gridType.payload())
+                .success(function (response) {
+                    $scope.message = response[0].message;
+                    $scope.gridFormErrors.formHasErrors = false;
+                }).error(function (response) {
+                    $scope.error = response[0].message;
+                    $scope.gridFormErrors.formHasErrors = true;
+                    $scope.gridFormErrors.backendErrors = response[0].form_errors;
+                });
+        } else {
+            $scope.gridFormErrors.formHasErrors = true;
+            $scope.error = 'The are errors in the form. Please fix them and submit again.';
+            $scope.message = '';
         }
-
-        createNewGrid();
     };
 
     $scope.isNotMultiChoice = function (question) {
@@ -93,10 +81,6 @@ var createGridController = function ($scope, QuestionService, ThemeService, Grid
             $scope.grid.primaryQuestions = questionFilter($scope.grid.questions, type.primary_questions_criteria);
         }
     });
-
-    function initialize(type, value) {
-        $scope[type] = value;
-    }
 
     $scope.$watch('selectedQuestions.primary', function (selectedPrimary) {
         if (selectedPrimary) {
@@ -128,7 +112,7 @@ gridModule.directive('questionInput', function (AnswerInput) {
 
             $scope.$watch(correspondingColumnQuestion, function (newVal) {
                 AnswerInput.render(newVal, elem);
-                });
+            });
         }
     }
 });
@@ -138,7 +122,7 @@ gridModule.directive('primaryQuestionInput', function (AnswerInput) {
         restrict: 'E',
         scope: false,
         link: function ($scope, elem) {
-            $scope.$watch('selectedQuestions.primary', function(newVal){
+            $scope.$watch('selectedQuestions.primary', function (newVal) {
                 AnswerInput.render(newVal, elem);
             });
         }

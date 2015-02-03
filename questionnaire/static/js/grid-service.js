@@ -79,8 +79,8 @@ gridService.factory('AnswerInput', function (QuestionService, $q) {
                     (newVal.fields.answer_type.toLowerCase() == 'date') && $('.datetimepicker').datepicker({
                         pickTime: false,
                         autoclose: false
-                    })
-                })
+                    });
+                });
         };
 
     return {render: renderDirective};

@@ -141,8 +141,8 @@ describe("create display all grid", function () {
 
         it('should add new non-primary question column', function () {
             initController();
-            chooseGrid('addMore');
-            scope.grid.addColumn();
+            chooseGrid('addMore', true);
+            scope.selectedQuestions.addColumn();
             expect(scope.selectedQuestions.otherColumns).toEqual([
                 {},
                 {}
@@ -151,7 +151,7 @@ describe("create display all grid", function () {
 
         it('should remove non-primary question column', function () {
             initController();
-            chooseGrid('displayAll');
+            chooseGrid('displayAll', true);
             scope.selectedQuestions.otherColumns = [
                 {},
                 {}
@@ -159,7 +159,7 @@ describe("create display all grid", function () {
 
             scope.$apply();
 
-            scope.grid.removeColumn(1);
+            scope.selectedQuestions.removeColumn(1);
             expect(scope.selectedQuestions.otherColumns).toEqual([
                 {}
             ]);
@@ -170,7 +170,7 @@ describe("create display all grid", function () {
                 {two: 2}
             ];
 
-            scope.grid.removeColumn(2);
+            scope.selectedQuestions.removeColumn(2);
             expect(scope.selectedQuestions.otherColumns).toEqual([
                 {},
                 {one: 1}

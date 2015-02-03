@@ -61,10 +61,10 @@
                 ng-mouseleave="editTable=false" id="td-{[{  $index }]}">
                 <div>
                     <div ng-show="editTable" class="pull-right grid-btn-group">
-                        <a href="#" id='add-column-{[{ $index }]}' data-ng-click="grid.addColumn()">
+                        <a href="#" id='add-column-{[{ $index }]}' data-ng-click="selectedQuestions.addColumn()">
                             <i class="glyphicon glyphicon-plus-sign"></i>
                         </a>
-                        <a href="#" class="" data-ng-click="grid.removeColumn($index)" id='remove-column-{[{ $index }]}'
+                        <a href="#" class="" data-ng-click="selectedQuestions.removeColumn($index)" id='remove-column-{[{ $index }]}'
                            ng-show="selectedQuestions.otherColumns.length > 1">
                             <i class="glyphicon glyphicon-trash"></i>
                         </a>
