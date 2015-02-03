@@ -1,8 +1,16 @@
 var validateDynamicForms = function (dynamicForm) {
     var formKeys = Object.keys(dynamicForm);
-    return formKeys.filter(function (key) {
-        return dynamicForm[key] && !dynamicForm[key].$valid
-    }).length == 0;
+    var invalidFormsKeys = formKeys.filter(function (key) {
+        return dynamicForm[key] && (!dynamicForm[key].$valid || dynamicForm[key].columns && !dynamicForm[key].columns.$viewValue.pk)
+    })
+
+    invalidFormsKeys.forEach(function(key) {
+        if(dynamicForm[key].columns){
+            dynamicForm[key].columns.$error.required = true
+        }
+    })
+
+    return invalidFormsKeys.length == 0;
 };
 
 var transformRequestHelper = function (obj) {
