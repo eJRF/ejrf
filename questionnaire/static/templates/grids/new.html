@@ -99,7 +99,7 @@
                 {[{ option.fields.text }]}
             </td>
             <td ng-repeat="q in selectedQuestions.otherColumns">
-                <input type="text"/>
+                <question-input index="{[{$index}]}"/>
             </td>
         </tr>
         <tr ng-show="grid.gridType.addMore">
@@ -110,13 +110,7 @@
                 <input type="text"/>
             </td>
             <td ng-repeat="q in selectedQuestions.otherColumns">
-                <input type="text"/>
-            </td>
-        </tr>
-        <tr ng-show="grid.gridType.addMore">
-            <td colspan="6">
-                <button type="button" href="#" class="btn btn-default"><span class="cyan bold"><i
-                        class="glyphicon glyphicon-plus"></i> Add More</span></button>
+                <question-input index="{[{$index}]}"/>
             </td>
         </tr>
     </table>

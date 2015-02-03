@@ -71,7 +71,7 @@
         $('.add-skip-rule-btn').addClass('disabled');
         window.location.reload()
     });
-    createGridModal.on('hide.bs.modal', function () {
+    createGridModal.on('hidden.bs.modal', function (e) {
         window.location.reload();
     });
     createSkipRuleForm.on('show.bs.modal', function (e) {
