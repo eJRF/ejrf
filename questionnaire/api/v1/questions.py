@@ -21,8 +21,7 @@ class QuestionAPIView(PermissionRequiredMixin, View):
         excluded_params = self._excluded_params()
         QUESTION_FIELDS_MAPPING = {'answer_type': 'answer_type__iexact'}
         query_params = {value: self.request.GET.get(key) for key, value in QUESTION_FIELDS_MAPPING.items() if self.request.GET.get(key)}
-        questions = Question.objects.filter(region=self.request.user.user_profile.region, **query_params).exclude(**excluded_params)
-        return questions.exclude(answer_type=AnswerTypes.MULTIPLE_RESPONSE)
+        return Question.objects.filter(region=self.request.user.user_profile.region, **query_params).exclude(**excluded_params)
 
     def _excluded_params(self):
         questionnaire = Questionnaire.objects.filter(id=self.request.GET.get('questionnaire'))
