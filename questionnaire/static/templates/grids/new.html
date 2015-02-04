@@ -120,7 +120,7 @@
     <table class="table">
         <tr>
             <td>1</td>
-            <td>
+            <td colspan="{[{ selectedQuestions.maxColumns() }]}">
                 <select required name="primary_question" id="primary_question" class="form-control"
                         data-ng-model="selectedQuestions.primary"
                         data-ng-options="question.fields.export_label for question in grid.primaryQuestions | filter: {fields:{is_primary: 'true'}} | filter: { fields: {theme: grid.selectedTheme.pk}} track by question.pk">

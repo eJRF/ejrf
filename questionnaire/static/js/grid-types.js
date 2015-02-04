@@ -37,8 +37,8 @@ gridTypeFactories.factory('NonHybridQuestionSelection', function () {
 
 gridTypeFactories.factory('AddMoreGridFactory', function (NonHybridPayload, NonHybridQuestionSelection) {
     var addMoreGrid = function () {
-        var thePayload = function(){
-          return   NonHybridPayload.payload(this.initialSelectedQuestions, this.value);
+        var thePayload = function () {
+            return   NonHybridPayload.payload(this.initialSelectedQuestions, this.value);
         };
         return {
             value: 'allow_multiples',
@@ -58,8 +58,8 @@ gridTypeFactories.factory('AddMoreGridFactory', function (NonHybridPayload, NonH
 
 gridTypeFactories.factory('DisplayAllGridFactory', function (NonHybridPayload, NonHybridQuestionSelection) {
     var DisplayAllGrid = function () {
-        var thePayload = function(){
-          return   NonHybridPayload.payload(this.initialSelectedQuestions, this.value);
+        var thePayload = function () {
+            return   NonHybridPayload.payload(this.initialSelectedQuestions, this.value);
         };
 
         return {
@@ -85,6 +85,7 @@ gridTypeFactories.factory('HybridGridFactory', function (hybridGridQuestionSelec
     function generatePayload() {
         var self = this;
         var hybridNonPrimaryQuestionMatrix = this.initialSelectedQuestions.dynamicGridQuestion;
+
         function getIds(wrappedQuestion) {
             return wrappedQuestion.question.pk;
         }
@@ -127,9 +128,17 @@ gridTypeFactories.factory('HybridGridFactory', function (hybridGridQuestionSelec
 
 
 gridTypeFactories.factory('hybridGridQuestionSelection', function () {
+    var maxColumns = function () {
+        var questions = this.dynamicGridQuestion;
+        var rowLengths = questions.map(function (questionRows) {
+            return questionRows.length;
+        });
+        return Math.max.apply(Math, rowLengths);
+    };
+
     var allowAddColumn = function (rowIndex) {
         var questions = this.dynamicGridQuestion;
-        var rowWithColumns = questions.filter(function(questionRows){
+        var rowWithColumns = questions.filter(function (questionRows) {
             return questionRows.length > 1;
         });
         return (rowWithColumns.length == 0) || (questions.indexOf(rowWithColumns[0]) == rowIndex);
@@ -148,7 +157,7 @@ gridTypeFactories.factory('hybridGridQuestionSelection', function () {
     var removeElement = function (rowIndex, columnIndex) {
         var dynamicGridQuestion = this.dynamicGridQuestion[rowIndex];
         dynamicGridQuestion.splice(columnIndex, 1);
-        if (!dynamicGridQuestion.length){
+        if (!dynamicGridQuestion.length) {
             this.dynamicGridQuestion.splice(rowIndex, 1);
         }
     };
@@ -160,9 +169,13 @@ gridTypeFactories.factory('hybridGridQuestionSelection', function () {
                 {}
             ]
         ],
+        maxColumns: function () {
+
+        },
         addElement: addElement,
         addRow: addRow,
         allowAddColumn: allowAddColumn,
-        removeElement: removeElement
+        removeElement: removeElement,
+        maxColumns: maxColumns
     };
 });

@@ -73,6 +73,13 @@ describe("grid Type Factories", function () {
             expect(selectedQuestions.dynamicGridQuestion).toEqual([[{}],[{'row2': 'column0'},{'row2': 'column2'}]]);
         });
 
+        it('should return max columns length', function () {
+            selectedQuestions.dynamicGridQuestion[1] = [{'row1': 'column0'}];
+            selectedQuestions.dynamicGridQuestion[2] = [{'row2': 'column0'},{'row2': 'column2'}];
+
+            expect(selectedQuestions.maxColumns()).toEqual(2);
+        });
+
         it('should allow adding columns if no rows has columns yet', function () {
             selectedQuestions.dynamicGridQuestion[1] = [{'row1': 'column0'}];
             expect(selectedQuestions.allowAddColumn(1)).toBeTruthy();
