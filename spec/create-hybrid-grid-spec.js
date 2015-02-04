@@ -61,21 +61,16 @@ describe("grid Type Factories", function () {
         });
 
         it('should remove element given row and column', function () {
-            selectedQuestions.dynamicGridQuestion[1] = [
-                {'row1': 'column0'},
-                {'row1': 'column1'},
-                {'row1': 'column2'}
-            ];
+            selectedQuestions.dynamicGridQuestion[1] = [{'row1': 'column0'},{'row1': 'column1'},{'row1': 'column2'}];
             selectedQuestions.removeElement(1, 1);
-            expect(selectedQuestions.dynamicGridQuestion).toEqual([
-                [
-                    {}
-                ],
-                [
-                    {'row1': 'column0'},
-                    {'row1': 'column2'}
-                ]
-            ]);
+            expect(selectedQuestions.dynamicGridQuestion).toEqual([[{}],[{'row1': 'column0'},{'row1': 'column2'}]]);
+        });
+
+        it('should remove entire row if empty after removing element in the row', function () {
+            selectedQuestions.dynamicGridQuestion[1] = [{'row1': 'column0'}];
+            selectedQuestions.dynamicGridQuestion[2] = [{'row2': 'column0'},{'row2': 'column2'}];
+            selectedQuestions.removeElement(1, 0);
+            expect(selectedQuestions.dynamicGridQuestion).toEqual([[{}],[{'row2': 'column0'},{'row2': 'column2'}]]);
         });
 
         it('should allow adding columns if no rows has columns yet', function () {

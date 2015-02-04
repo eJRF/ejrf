@@ -146,7 +146,11 @@ gridTypeFactories.factory('hybridGridQuestionSelection', function () {
     };
 
     var removeElement = function (rowIndex, columnIndex) {
-        this.dynamicGridQuestion[rowIndex].splice(columnIndex, 1);
+        var dynamicGridQuestion = this.dynamicGridQuestion[rowIndex];
+        dynamicGridQuestion.splice(columnIndex, 1);
+        if (!dynamicGridQuestion.length){
+            this.dynamicGridQuestion.splice(rowIndex, 1);
+        }
     };
 
     return {
