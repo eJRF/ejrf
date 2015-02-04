@@ -19,6 +19,7 @@ module.exports = function(config) {
       'questionnaire/static/js/lib/*.js',
       'questionnaire/static/js/create_skip_rule.js',
       'questionnaire/static/js/**/*.js',
+      'questionnaire/static/bootstrap-datetimepicker/bootstrapdatepicker.js',
       'spec/*.js'
     ],
 

@@ -42,47 +42,53 @@ gridService.factory('GridService', function ($http) {
 gridService.factory('AnswerInput', function (QuestionService, $q) {
 
     var answerInput = function (question) {
+        var createSelectOptionsFrom = function (questionOptions) {
+            var initialValue = '<select><option>Choose One</option>',
+                closingTag = '</select>';
+            return questionOptions.reduce(function (prev, curr) {
+                return prev + '<option>' + curr.fields.text + '</option>'
+            }, initialValue)
+                + closingTag;
+        };
+
         var generateSelect = function (question) {
-
             return QuestionService.options(question).then(function (response) {
-                var questionOptions = response.data,
-                    initialValue = '<select><option>Choose One</option>',
-                    closingTag = '</select>';
-
-                return questionOptions.reduce(function (prev, curr) {
-                        return prev + '<option>' + curr.fields.text + '</option>'
-                    }, initialValue)
-                    + closingTag;
+                return createSelectOptionsFrom(response.data);
             });
         };
 
-        var textInput = function (klass) {
-            var aklass = klass || '';
+        var textInput = function (question) {
+            var aklass = isDate(question) ? "datetimepicker" : "";
+
             var deferred = $q.defer();
             deferred.resolve('<input type="text" class="' + aklass + '"/>');
             return deferred.promise
         };
 
         var answerInputMap = {
-            number: textInput(),
-            text: textInput(),
-            date: textInput("datetimepicker"),
-            multichoice: generateSelect(question),
-            multipleresponse: generateSelect(question)
+            number: textInput,
+            text: textInput,
+            date: textInput,
+            multichoice: generateSelect,
+            multipleresponse: generateSelect
         };
-        return answerInputMap[question.fields.answer_type.toLowerCase()]
+        var answerInputFor = answerInputMap[question.fields.answer_type.toLowerCase()];
+        return answerInputFor(question);
     };
 
+    function isDate(question) {
+        return (question.fields.answer_type.toLowerCase() == 'date')
+    }
+
     var renderDirective = function (newVal, elem) {
-                newVal && newVal.fields && answerInput(newVal).then(function (inputField) {
-                    elem.replaceWith(inputField);
-                    (newVal.fields.answer_type.toLowerCase() == 'date') && $('.datetimepicker').datepicker({
-                        pickTime: false,
-                        autoclose: false
-                    });
-                });
-        };
+        newVal && newVal.fields && answerInput(newVal).then(function (inputField) {
+            elem.replaceWith(inputField);
+            isDate(newVal) && $('.datetimepicker').datepicker({
+                pickTime: false,
+                autoclose: false
+            });
+        });
+    };
 
     return {render: renderDirective};
-
 });

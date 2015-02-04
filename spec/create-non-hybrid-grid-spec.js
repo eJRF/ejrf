@@ -1,10 +1,4 @@
 describe("create display all grid", function () {
-
-    beforeEach(function () {
-            module('gridModule');
-            module('gridTypeFactories');
-        }
-    );
     var scope, httpMock,
         subsectionId = 3,
         questionnaireId = 1,
@@ -63,6 +57,13 @@ describe("create display all grid", function () {
             }
         ];
 
+    beforeEach(function () {
+            module('gridModule');
+            module('gridTypeFactories');
+            module('gridService');
+        }
+    );
+
 
     describe("CreateGridController", function () {
         var initController,
@@ -97,9 +98,9 @@ describe("create display all grid", function () {
                     var mapping_stubs = {displayAll: 0, addMore: 1, hybrid: 2};
                     var mapping_reals = {displayAll: DisplayAllGridFactory, addMore: AddMoreGridFactory, hybrid: HybridGridFactory};
 
-                    if (isReal){
+                    if (isReal) {
                         scope.grid.gridType = mapping_reals[type].create();
-                    }else{
+                    } else {
                         scope.grid.gridType = availableGridTypes[mapping_stubs[type]];
                     }
                     scope.$apply();
@@ -385,5 +386,62 @@ describe("create display all grid", function () {
             expect(unselectedQuestionsFilter(allQuestions, selectedQuestions, 0)).toEqual([11, 22, 44, 55]);
         });
     });
+
+    describe("QuestionInput directive", function () {
+
+        var answerInput, element, scope,
+            initElement,
+            ngElement,
+            html;
+
+        beforeEach(function () {
+            module(function ($provide) {
+                answerInput = jasmine.createSpyObj('AnswerInput', ['render']);
+                $provide.value('AnswerInput', answerInput);
+            });
+
+
+            inject(function ($httpBackend, $compile, $rootScope) {
+                scope = $rootScope;
+                initElement = function (aHtml) {
+                    ngElement = angular.element(aHtml);
+                    element = $compile(ngElement)(scope);
+                    scope.$digest();
+                };
+            });
+        });
+
+        describe("primaryQuestionInput", function () {
+            beforeEach(function () {
+                html = "<primary-question-input/>";
+            });
+
+            it('should call the rendering service', function () {
+                var stubbedQuestion = {pk: 666, fields: {answer_type: 'text'}};
+                scope.selectedQuestions = {primary: stubbedQuestion};
+                initElement(html);
+                expect(answerInput.render).toHaveBeenCalledWith(stubbedQuestion, element);
+            });
+
+        });
+
+        describe("questionInput", function () {
+            beforeEach(function () {
+                html = "<question-input/>";
+            });
+
+            it('should call the rendering service', function () {
+                var stubbedQuestion = {pk: 666, fields: {answer_type: 'text'}};
+                scope.selectedQuestions = {otherColumns: [stubbedQuestion]};
+                scope.$index = 0;
+                initElement(html);
+                expect(answerInput.render).toHaveBeenCalledWith(stubbedQuestion, element);
+            });
+
+        });
+
+
+    });
+
 
 });
