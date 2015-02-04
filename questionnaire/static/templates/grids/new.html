@@ -159,7 +159,7 @@
                             <a id="addRow_{[{$parent.$index+'_'+$index}]}"href="#" data-ng-click="$parent.$index=selectedQuestions.addRow($parent.$index + 1)"><i
                                     class="glyphicon glyphicon-circle-arrow-down"></i></a>
                             <a id="addElement_{[{$parent.$index+'_'+$index}]}" href="#" data-ng-click="selectedQuestions.addElement($parent.$index, $index + 1)"><i
-                                    class="glyphicon glyphicon-circle-arrow-right"></i></a>
+                                   ng-show="selectedQuestions.allowAddColumn($parent.$index)" class="glyphicon glyphicon-circle-arrow-right"></i></a>
                         </div>
 
                         <div class="error-text"

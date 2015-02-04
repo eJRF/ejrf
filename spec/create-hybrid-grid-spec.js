@@ -77,6 +77,22 @@ describe("grid Type Factories", function () {
                 ]
             ]);
         });
+
+        it('should allow adding columns if no rows has columns yet', function () {
+            selectedQuestions.dynamicGridQuestion[1] = [{'row1': 'column0'}];
+            expect(selectedQuestions.allowAddColumn(1)).toBeTruthy();
+        });
+
+        it('should allow adding columns if on row that already has columns', function () {
+            selectedQuestions.dynamicGridQuestion[1] = [{'row1': 'column0'}, {'row1': 'column1'}, {'row1': 'column2'}];
+            expect(selectedQuestions.allowAddColumn(1)).toBeTruthy();
+        });
+
+        it('should not allow adding columns if not on row that already has columns', function () {
+            selectedQuestions.dynamicGridQuestion[1] = [{'row1': 'column0'}, {'row1': 'column1'}, {'row1': 'column2'}];
+            selectedQuestions.dynamicGridQuestion[2] = [{'row2': 'column0'}];
+            expect(selectedQuestions.allowAddColumn(2)).toBeFalsy();
+        });
     });
 
     describe("NonHybridQuestionSelection", function () {
