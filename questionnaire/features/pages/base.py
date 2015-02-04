@@ -79,6 +79,9 @@ class PageObject(object):
     def select(self, name, value):
         self.browser.select(name, value)
 
+    def select_by_id(self, id, value):
+        self.browser.find_by_xpath('//select[@id="%s"]/option[@value="%s"]' % (id, value)).first._element.click()
+
     def choose(self, name, value):
         self.browser.choose(name, value)
 

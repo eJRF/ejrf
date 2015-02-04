@@ -1,5 +1,6 @@
 from time import sleep
 from lettuce import world, step
+from nose.tools import assert_true
 from questionnaire.features.pages.questionnaires import QuestionnairePage
 from questionnaire.models import Question, QuestionOption, Theme
 
@@ -14,16 +15,19 @@ def and_i_have_both_simple_and_primary_questions_in_my_question_bank(step):
     QuestionOption.objects.create(text='Option B', question=world.grid_question1)
     QuestionOption.objects.create(text='Option C', question=world.grid_question1)
 
-    world.grid_question2 = Question.objects.create(text='First Column Question',
-                                                   export_label='First Column Question', UID='C00022', answer_type='Number',
+    world.grid_question2 = Question.objects.create(text='First Column Question - Q2',
+                                                   export_label='First Column Question - Q2', UID='C00022', answer_type='Number',
                                                    theme=world.theme)
-    world.grid_question3 = Question.objects.create(text='Second Column Question', export_label='Second Column Question', UID='C00023', answer_type='Number',
+    world.grid_question3 = Question.objects.create(text='Second Column Question - Q3', export_label='Second Column Question - Q3', UID='C00023', answer_type='Number',
                                                    theme=world.theme)
-    world.grid_question4 = Question.objects.create(text='Third Column Question',
-                                                   export_label='Third Column Question', UID='C00024', answer_type='Number',
+    world.grid_question4 = Question.objects.create(text='Third Column Question - Q4',
+                                                   export_label='Third Column Question - Q4', UID='C00024', answer_type='Number',
                                                    theme=world.theme)
-    world.grid_question5 = Question.objects.create(text='Fourth Column Question',
-                                                   export_label='Fourth Column Question', UID='C00025', answer_type='Number',
+    world.grid_question5 = Question.objects.create(text='Fourth Column Question - Q5',
+                                                   export_label='Fourth Column Question - Q5', UID='C00025', answer_type='Number',
+                                                   theme=world.theme)
+    world.grid_question6 = Question.objects.create(text='Sixth Column Question - Q6',
+                                                   export_label='Sixth Column Question - Q6', UID='C00026', answer_type='Number',
                                                    theme=world.theme)
 
 
@@ -62,21 +66,11 @@ def when_i_choose_to_create_an_add_more_type_of_grid(step):
 def when_i_choose_to_create_a_hybrid_type_of_grid(step):
     world.page.select('type', 'hybrid')
 
-
-@step(u'Then I should see options to select hybrid primary questions and the columns')
-def then_i_should_see_options_to_select_hybrid_primary_questions_and_the_columns(step):
-    world.page.is_text_present('Primary question')
-    world.page.is_text_present('Row 1')
-    world.page.is_text_present('Row 2')
-    world.page.is_text_present('Column 1')
-    world.page.is_text_present('Mid-Table Columns on Row 2')
-
-
 @step(u'When I select the primary questions and columns for the all options grid')
 def when_i_select_the_primary_questions_and_columns(step):
-    # def choose_this_value_in_this_select_order_by_this_name(self, value, select_order, name):
     world.page.select('primary_question', world.grid_question1.id)
-    world.browser.find_by_id('column-0').select(world.grid_question2.id)
+    world.page.select_by_id('column-0', world.grid_question2.id)
+    sleep(1)
     world.browser.find_by_id('td-0').mouse_over()
     world.page.click_by_id('add-column-0')
     world.browser.find_by_id('td-1').mouse_over()
@@ -85,15 +79,6 @@ def when_i_select_the_primary_questions_and_columns(step):
 @step(u'When I select the primary questions and columns for the add-more grid')
 def when_i_select_the_primary_questions_and_columns_for_the_add_more_grid(step):
     when_i_select_the_primary_questions_and_columns(step)
-
-@step(u'When I select the primary questions and columns for the hybrid grid')
-def when_i_select_the_primary_questions_and_columns_for_the_hybrid_grid(step):
-    world.page.select('primary_question', world.grid_question1.id)
-    world.page.choose_this_value_in_this_select_order_by_this_name(world.grid_question2.id, 1, 'columns')
-    world.page.choose_this_value_in_this_select_order_by_this_name(world.grid_question3.id, 2, 'columns')
-    world.page.choose_this_value_in_this_select_order_by_this_name(world.grid_question4.id, 3, 'columns')
-    world.page.browser.find_by_css('.add-column')[1].click()
-
 
 @step(u'And I save my grid')
 def and_i_save_my_grid(step):
@@ -127,10 +112,11 @@ def then_i_should_see_the_grid_with_add_more_created(step):
 
 @step(u'Then I should see the hybrid grid created')
 def then_i_should_see_the_hybrid_grid_created(step):
-    assert world.page.is_element_present_by_id('delete-grid-%d' % world.grid.id)
+    assert_true(world.page.is_element_present_by_id('delete-grid-%d' % world.grid.id))
     world.page.is_text_present('Add More')
     for option in world.grid_question1.options.all():
         world.page.select('MultiChoice-0-response', option.id)
+
     for i in range(1, 5):
         world.page.is_text_present(eval("world.grid_question%d" % i).text)
 
@@ -158,10 +144,47 @@ def then_i_should_see_a_message_that_the_grid_was_successfully_removed(step):
 
 @step(u'And I should not see the grid in the questionnaire I am editing')
 def and_i_should_not_see_the_grid_in_the_questionnaire_i_am_editing(step):
-    assert world.page.is_element_not_present_by_id('delete-grid-%d' % world.grid.id)
+    assert_true(world.page.is_element_not_present_by_id('delete-grid-%d' % world.grid.id))
+
     for i in range(1, 4):
         world.page.is_text_present(eval("world.grid_question%d" % i).text, status=False)
 
 @step(u'When I choose a theme')
 def when_i_select_a_theme(step):
     world.page.select('theme', world.theme.id)
+
+@step(u'When I select the hybrid primary question')
+def when_i_select_the_primary_question(step):
+    world.page.select('primary_question', world.grid_question1.id)
+
+@step(u'And I select the non-primary question at row "([^"]*)" column "([^"]*)"')
+def and_i_select_the_non_primary_question_at_row_group1_column_group1(step, row, column):
+    world.hybrid_grid_questions = [[world.grid_question2],
+                                   [world.grid_question3, world.grid_question4],
+                                   [world.grid_question5]]
+
+    world.page.select_by_id('column_%s_%s'%(row, column), world.hybrid_grid_questions[int(row)][int(column)].id)
+
+@step(u'And I add a new element on the right of row "([^"]*)" column "([^"]*)"')
+def and_i_add_a_new_element_on_the_right_of_row_group1_column_group2(step, row, column):
+    row_column = (int(row), int(column))
+    world.browser.find_by_id('column_%s_%s' % row_column).mouse_over()
+    world.page.click_by_id('addElement_%s_%s' % row_column)
+
+@step(u'Then I should not see the same element at row "([^"]*)" column "([^"]*)"')
+def then_i_should_not_see_the_same_element_at_row_group1_column_group1(step, row, column):
+    world.page.is_element_not_present_by_id('column_%s_%s'%(row, column))
+
+@step(u'And I add a new row from row "([^"]*)" column "([^"]*)"')
+def and_i_add_a_new_row_at_group1(step, row, column):
+    row_column = (int(row), int(column))
+    world.browser.find_by_id('column_%s_%s' % row_column).mouse_over()
+    world.page.click_by_id('addRow_%s_%s' % row_column)
+
+@step(u'And I delete the element at row "([^"]*)" column "([^"]*)"')
+def and_i_delete_the_element_at_row_group1_column_group1(step, row, column):
+    world.page.click_by_id('remove_%s_%s' % (row, column))
+
+@step(u'Then I should not see the element at row "([^"]*)" column "([^"]*)"')
+def then_i_should_not_see_the_element_at_row_group1_column_group1(step, row, column):
+    world.page.is_element_not_present_by_id('column_%s_%s' % (row, column))

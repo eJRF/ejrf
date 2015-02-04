@@ -30,10 +30,21 @@ Feature: Grid Creation
     When I close the modal
     Then I should see add-more grid created
 
-  @WIP
   Scenario: Create hybrid grid
     When I choose to create a hybrid type of grid
-    Then I should see options to select hybrid primary questions and the columns
-    When I select the primary questions and columns for the hybrid grid
+    When I choose a theme
+    When I select the hybrid primary question
+    And I select the non-primary question at row "0" column "0"
+    And I add a new row from row "0" column "0"
+    And I select the non-primary question at row "1" column "0"
+    And I add a new element on the right of row "1" column "0"
+    And I select the non-primary question at row "1" column "1"
+    And I add a new element on the right of row "1" column "1"
+    And I delete the element at row "1" column "1"
+    Then I should not see the same element at row "1" column "1"
+    And I select the non-primary question at row "1" column "1"
+    And I add a new row from row "1" column "1"
+    And I select the non-primary question at row "2" column "0"
     And I save my grid
+    When I close the modal
     Then I should see the hybrid grid created
