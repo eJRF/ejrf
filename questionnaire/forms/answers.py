@@ -21,7 +21,6 @@ class AnswerForm(ModelForm):
         self.question_group = self._initial['group'] if self._initial else None
         self.fields['response'].widget.attrs.update({'class': 'input-question-id-%s' % self.question.id})
 
-
     def _set_initial(self, kwargs):
         initial = kwargs['initial'] if 'initial' in kwargs else {}
         if self.data and 'response' and self.data.keys():
@@ -108,6 +107,7 @@ class DateAnswerForm(AnswerForm):
             return forms.DateInput(attrs={'class': 'form-control date-time-picker input-question-id-%s' % self.question.id, 'data-date-format': 'dd/mm/yyyy',
                                           'data-date-option': 'dd'})
 
+
 class MultiChoiceAnswerForm(AnswerForm):
     response = ModelChoiceField(queryset=None, widget=forms.Select(), required=False)
     specified_option = forms.CharField(max_length=50, widget=forms.HiddenInput(), required=False)
@@ -133,7 +133,7 @@ class MultiChoiceAnswerForm(AnswerForm):
 
     def widget_is_radio_button(self, query_set):
         group = self._initial['group']
-        if group.grid and not group.hybrid:
+        if group.grid:
             return False
         return query_set.count() == 2 or query_set.filter(text='Yes').exists() or query_set.filter(text='Male').exists()
 
