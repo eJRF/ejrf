@@ -169,9 +169,6 @@ gridTypeFactories.factory('hybridGridQuestionSelection', function () {
                 {}
             ]
         ],
-        maxColumns: function () {
-
-        },
         addElement: addElement,
         addRow: addRow,
         allowAddColumn: allowAddColumn,
