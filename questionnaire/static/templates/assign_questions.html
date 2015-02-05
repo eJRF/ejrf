@@ -1,0 +1,44 @@
+<div class="row">
+    <div class="col-md-10">
+        <div class="input-group">
+            <label for="selected-theme">Theme</label>
+            <select id="selected-theme" ng-model="selectedTheme"
+                    ng-options="theme.fields.name for theme in allThemes track by theme.pk" class="form-control">
+                <option value="">Choose One</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <input type="text" class="form-control" id="filter-text" placeholder="Search" ng-model="searchInput">
+            <span class="input-group-btn"></span>
+        </div>
+    </div>
+<div>
+
+    <table si-table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Assign</th>
+            <th sort-by="question.fields.UID">UID</th>
+            <th sort-by="question.fields.export_label">Export Label (Detail)</th>
+            <th sort-by="question.fields.answer_type">Response Type</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="wrappedQuestion in allQuestions | byTheme: selectedTheme | filter: searchInput">
+            <td>
+                <input type="checkbox" value="{[{ wrappedQuestion.question.pk }]}" name="questions"/>
+            </td>
+            <td>{[{ wrappedQuestion.question.fields.UID }]}</td>
+            <td id="text-td">{[{ wrappedQuestion.question.fields.export_label }]}</td>
+            <td>{[{ wrappedQuestion.question.fields.answer_type }]}</td>
+        </tr>
+        </tbody>
+        <tfoot>
+        <tr>
+            <td colspan="4">
+                <si-table-pagination limit="20" indices="4"/>
+            </td>
+        </tr>
+        </tfoot>
+    </table>
+</div>

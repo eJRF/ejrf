@@ -36,7 +36,7 @@
                         </div>
 
                         {% csrf_token %}
-                        <div  ng-include="'/static/templates/grids/new.html'"></div>
+                        <div ng-include="'/static/templates/grids/new.html'"></div>
 
                     </div>
                     <div class="modal-footer">
@@ -53,6 +53,37 @@
         </div>
     </div>
 
+
+    <div class="modal fade assign-questions" id="id-assign-questions-modal" tabindex="-1" role="dialog"
+         aria-labelledby="assign-questions" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" data-ng-controller="AssignQuestionController" id="assign-question-controller">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title cyan" id="id-assign-questions-modal"> Assign Questions to
+                        Subsection: {{ subsection.title }}</h4>
+                </div>
+                <form action="" method="post"
+                      accept-charset="utf-8" class="form-horizontal">
+                    <div class="modal-body">
+                        {% csrf_token %}
+                        <div ng-include="'/static/templates/assign_questions.html'"></div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-default" id="submit_assign_button"><span
+                                class="green bold"><i class="glyphicon glyphicon-ok"></i> Done</span></button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">
+                            <span class="red bold">
+                                <i class="glyphicon glyphicon-remove"></i> Cancel
+                            </span>
+                        </button>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
 </div>
 

@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.db.models import Q, Count
+from django.db.models import Count
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import View
@@ -7,7 +7,6 @@ from django.views.generic import View
 from questionnaire.forms.assign_question import AssignQuestionForm
 from questionnaire.mixins import RegionAndPermissionRequiredMixin
 from questionnaire.models import SubSection, Question, QuestionGroup
-from questionnaire.models.skip_rule import SkipQuestion
 from questionnaire.utils.model_utils import reindex_orders_in
 
 
@@ -22,7 +21,7 @@ class AssignQuestion(RegionAndPermissionRequiredMixin, View):
         active_questions = subsection.section.questionnaire.get_all_questions()
         questions = form.fields['questions'].queryset.filter(child=None)
         if 'hide' in request.GET:
-            questions = questions.exclude(id__in=[question.id for question in active_questions])
+            questions = questions.exclude(id__in=active_questions.values_list('id', flat=True))
         context = {'assign_question_form': form, 'active_questions': active_questions,
                    'btn_label': 'Done', 'questions': questions, 'subsection': subsection}
         return render(request, self.template_name, context)

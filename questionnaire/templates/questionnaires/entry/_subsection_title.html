@@ -1,53 +1,56 @@
 <div class="button-padding">
     <h4>
-    {% if section.has_at_least_two_subsections and subsection.title %}
-    {{ section.order }}.{{ subsection.order }}.
-    {% endif %}
-    {% if subsection.region and not subsection.is_core %}{{ subsection.region.name }} - {% endif %} {{ subsection.title |  default_if_none:'' }}
+        {% if section.has_at_least_two_subsections and subsection.title %}
+            {{ section.order }}.{{ subsection.order }}.
+        {% endif %}
+        {% if subsection.region and not subsection.is_core %}{{ subsection.region.name }}
+            - {% endif %} {{ subsection.title |  default_if_none:'' }}
     </h4>
     {% if perms.auth.can_edit_questionnaire and user.user_profile.region == questionnaire.region and not preview %}
-    <div class="btn-group pull-right">
+        <div class="btn-group pull-right">
 
-        <a href="" id="id-change-position-{{ subsection.id }}" class="btn btn-sm btn-default" data-toggle="modal"
-           data-target="#change-position" onClick="subsectionPositions.getSubSections({{ subsection.order }})">
+            <a href="" id="id-change-position-{{ subsection.id }}" class="btn btn-sm btn-default" data-toggle="modal"
+               data-target="#change-position" onClick="subsectionPositions.getSubSections({{ subsection.order }})">
                 <span class=" cyan"><span class="glyphicon glyphicon-move"></span> Change Position</span>
-        </a>
+            </a>
 
-        <a href="" id="id-create-skip-rule-{{ subsection.id }}" class="btn btn-sm btn-default disabled add-skip-rule-btn"
-           data-toggle="modal" data-target="#create-skip-rule"
-           onClick="skipRules.updateSubsection({{ subsection.id }})">
-            <span class="cyan"><span class="glyphicon glyphicon-plus-sign"></span> Add Skip Rule</span>
-        </a>
-        <a href="" id="id-create-grid-{{ subsection.id }}" class="btn btn-sm btn-default"
-           data-toggle="modal" data-target="#create-grid-modal"
-           onClick="createGrid.updateCreateGrid({{ questionnaire.id }}, {{ subsection.id }})">
-            <span class="cyan"><span class="glyphicon glyphicon-plus-sign"></span> Grid</span>
-        </a>
+            <a href="" id="id-create-skip-rule-{{ subsection.id }}"
+               class="btn btn-sm btn-default disabled add-skip-rule-btn"
+               data-toggle="modal" data-target="#create-skip-rule"
+               onClick="skipRules.updateSubsection({{ subsection.id }})">
+                <span class="cyan"><span class="glyphicon glyphicon-plus-sign"></span> Add Skip Rule</span>
+            </a>
+            <a href="" id="id-create-grid-{{ subsection.id }}" class="btn btn-sm btn-default"
+               data-toggle="modal" data-target="#create-grid-modal"
+               onClick="createGrid.updateCreateGrid({{ questionnaire.id }}, {{ subsection.id }})">
+                <span class="cyan"><span class="glyphicon glyphicon-plus-sign"></span> Grid</span>
+            </a>
 
-        <a href="" id="id-assign-{{ subsection.id }}" class="btn btn-sm btn-default"
-           data-toggle="modal" data-target="#assign-question-modal-{{ subsection.id }}">
-            <span class="cyan"><span class="glyphicon glyphicon-plus-sign"></span> Assign Question</span>
-        </a>
-        <a data-href="{% url 'reorder_page' subsection.id %}" id="reorder-{{ subsection.id }}-subsection" href="#"
-           class="btn btn-sm btn-default reorder-subsection">
-            <span class="cyan"><span class="glyphicon glyphicon-sort-by-order"></span> ReOrder</span>
-        </a>
+            <a href="" class="btn btn-sm btn-default"
+               data-toggle="modal" data-target="#id-assign-questions-modal"
+               onClick="assignQuestions.updateModal({{ questionnaire.id }}, {{ subsection.id }})">
+                <span class="cyan"><span class="glyphicon glyphicon-plus-sign"></span> Assign Question</span>
+            </a>
+            <a data-href="{% url 'reorder_page' subsection.id %}" id="reorder-{{ subsection.id }}-subsection" href="#"
+               class="btn btn-sm btn-default reorder-subsection">
+                <span class="cyan"><span class="glyphicon glyphicon-sort-by-order"></span> ReOrder</span>
+            </a>
 
-        {% if perms.auth.can_edit_questionnaire and user.user_profile in subsection.profiles_with_edit_permission %}
-        <a href="" id="edit-subsection-{{ subsection.id }}" class="btn btn-sm btn-default" data-toggle="modal"
-           data-target="#edit_subsection_{{ subsection.id }}"><span class="cyan"><span
-                class="glyphicon glyphicon-pencil"></span> Edit</span>
-        </a>
-        <a id="delete-subsection-{{ subsection.id }}" href="" class="btn btn-sm btn-default" data-toggle="modal"
-           data-target="#delete-subsection-modal-{{ subsection.id }}"><span class="cyan"><span
-                class="glyphicon glyphicon-trash"></span></span>
-        </a>
-        {% endif %}
-    </div>
+            {% if perms.auth.can_edit_questionnaire and user.user_profile in subsection.profiles_with_edit_permission %}
+                <a href="" id="edit-subsection-{{ subsection.id }}" class="btn btn-sm btn-default" data-toggle="modal"
+                   data-target="#edit_subsection_{{ subsection.id }}"><span class="cyan"><span
+                        class="glyphicon glyphicon-pencil"></span> Edit</span>
+                </a>
+                <a id="delete-subsection-{{ subsection.id }}" href="" class="btn btn-sm btn-default" data-toggle="modal"
+                   data-target="#delete-subsection-modal-{{ subsection.id }}"><span class="cyan"><span
+                        class="glyphicon glyphicon-trash"></span></span>
+                </a>
+            {% endif %}
+        </div>
     {% endif %}
 </div>
 {% if subsection.description %}
-<div class="">
-    {{ subsection.description| safe }}
-</div>
+    <div class="">
+        {{ subsection.description| safe }}
+    </div>
 {% endif %}

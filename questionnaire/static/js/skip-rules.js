@@ -69,12 +69,12 @@ var createScopedDisplayAllRules = function(scope) {
     var questionSelector = '.input-question-id-';
 
     var hideFn = function(val) {
-        var element = $(scope).find(questionSelector + val)
+        $(scope).find(questionSelector + val)
         .prop('disabled', true)
         .addClass('grayed-out');
     };
     var showFn = function(val) {
-        var element = $(scope).find(questionSelector + val)
+        $(scope).find(questionSelector + val)
         .prop('disabled', false)
         .removeClass('grayed-out');
     };
@@ -101,7 +101,7 @@ var createSkipQuestionRules = function() {
     gridInstanceRule.bindOnChangeEventListener();
     gridInstanceRule.hideQuestions();
     return gridInstanceRule;
-}
+};
 
 var createSkipSubsectionRules = function() {
     var scope = $('body');
@@ -117,7 +117,7 @@ var createSkipSubsectionRules = function() {
     gridInstanceRule.bindOnChangeEventListener();
     gridInstanceRule.hideQuestions();
     return gridInstanceRule;
-}
+};
 
 var applySkipRules = (function() {
 
@@ -138,11 +138,11 @@ var applySkipRules = (function() {
     });
     return {
         bindSkipRulesOn: function(gridInstance, showFn) {
-            showFn(gridInstance)
+            showFn(gridInstance);
             createScopedHybridRules(gridInstance);
         },
         bindAddMoreSkipRulesOn: function(tableRow, showFn) {
-            showFn(tableRow)
+            showFn(tableRow);
             createScopedDisplayAllRules(tableRow);
         }
     };
