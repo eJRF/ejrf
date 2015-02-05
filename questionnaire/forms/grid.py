@@ -23,7 +23,7 @@ class GridForm(forms.Form):
         self.subsection = kwargs.pop('subsection', None)
         self.region = kwargs.pop('region', None)
         super(GridForm, self).__init__(*args, **kwargs)
-        unused_regional_questions = self.unused_regional_questions().exclude(answer_type=AnswerTypes.MULTIPLE_RESPONSE)
+        unused_regional_questions = self.unused_regional_questions()
         self.fields['primary_question'].queryset = unused_regional_questions.filter(is_primary=True)
         non_primary_questions = unused_regional_questions.exclude(is_primary=True)
         self.fields['columns'].queryset = non_primary_questions
