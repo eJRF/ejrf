@@ -63,8 +63,7 @@
                     <h4 class="modal-title cyan" id="id-assign-questions-modal"> Assign Questions to
                         Subsection: {{ subsection.title }}</h4>
                 </div>
-                <form action="" method="post"
-                      accept-charset="utf-8" class="form-horizontal">
+                <form action="{[{  assignQuestionUrl }]}" method="post" accept-charset="utf-8" class="form-inline" novalidate ng-submit="submitQuestions($event)" >
                     <div class="modal-body">
                         {% csrf_token %}
                         <div ng-include="'/static/templates/assign_questions.html'"></div>
@@ -73,7 +72,7 @@
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-default" id="submit_assign_button"><span
                                 class="green bold"><i class="glyphicon glyphicon-ok"></i> Done</span></button>
-                        <button type="button" class="btn btn-default" data-dismiss="modal">
+                        <button type="submit" class="btn btn-default" data-dismiss="modal">
                             <span class="red bold">
                                 <i class="glyphicon glyphicon-remove"></i> Cancel
                             </span>

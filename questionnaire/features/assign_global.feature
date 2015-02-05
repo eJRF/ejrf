@@ -8,7 +8,6 @@ Feature: Global Admin Assigning Questions
     When I open that questionnaire for editing
 
   Scenario: Assign Questions to Questionnaire from within Questionnaire
-    Then I should see options to assign questions to sub-sections
     When I choose to assign a question to a sub-section
     Then I should see the question bank with both assigned and unassigned questions
     And I should see an option to hide already assigned questions

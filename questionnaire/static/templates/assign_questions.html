@@ -1,32 +1,35 @@
-<div class="row">
-    <div class="col-md-10">
-        <div class="input-group">
-            <label for="selected-theme">Theme</label>
-            <select id="selected-theme" ng-model="selectedTheme"
-                    ng-options="theme.fields.name for theme in allThemes track by theme.pk" class="form-control">
-                <option value="">Choose One</option>
-            </select>
-        </div>
-        <div class="input-group">
-            <input type="text" class="form-control" id="filter-text" placeholder="Search" ng-model="searchInput">
-            <span class="input-group-btn"></span>
-        </div>
+<div class="col-md-12">
+    <label for="selected-theme">Theme</label>
+    <select id="selected-theme" ng-model="selectedTheme"
+            ng-options="theme.fields.name for theme in allThemes track by theme.pk"
+            class="form-control">
+        <option value="">Choose One</option>
+    </select>
+    <div class="checkbox">
+        <label>
+            <input type="checkbox" value="{[{ true }]}" ng-model="used" id="hide-assigned-questions" name="hide-assigned-questions" /> Hide Used
+        </label>
     </div>
-<div>
 
+    <input type="text" class="form-control pull-right" id="filter-text" placeholder="Search" ng-model="searchInput">
+</div>
+
+<div class="table-responsive top-padding">
     <table si-table class="table table-bordered">
         <thead>
         <tr>
             <th>Assign</th>
             <th sort-by="question.fields.UID">UID</th>
-            <th sort-by="question.fields.export_label">Export Label (Detail)</th>
+            <th>Export Label (Detail)</th>
             <th sort-by="question.fields.answer_type">Response Type</th>
         </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="wrappedQuestion in allQuestions | byTheme: selectedTheme | filter: searchInput">
-            <td>
-                <input type="checkbox" value="{[{ wrappedQuestion.question.pk }]}" name="questions"/>
+        <tr ng-repeat="wrappedQuestion in allQuestions | byUsed: used | byTheme: selectedTheme | filter: searchInput"
+            ng-class="{'grey-bg': wrappedQuestion.used }">
+            <td id="id-question-{[{ wrappedQuestion.question.pk }]}">
+                <input type="checkbox" value="{[{ wrappedQuestion.question.pk }]}" name="questions"
+                       ng-disabled="{[{ wrappedQuestion.used }]}"/>
             </td>
             <td>{[{ wrappedQuestion.question.fields.UID }]}</td>
             <td id="text-td">{[{ wrappedQuestion.question.fields.export_label }]}</td>

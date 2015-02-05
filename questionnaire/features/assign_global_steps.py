@@ -2,6 +2,7 @@ from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from lettuce import step, world
 import time
+from nose.tools import assert_true
 from questionnaire.features.pages.manage import AssignModal, ManageJrfPage
 from questionnaire.features.pages.step_utils import create_global_admin_with_no_permissions, assign
 from questionnaire.features.pages.users import LoginPage
@@ -64,11 +65,6 @@ def when_i_open_that_questionnaire_for_editing(step):
     world.page.selectQuestionnaire(world.questionnaire)
 
 
-@step(u'Then I should see options to assign questions to sub-sections')
-def then_i_should_see_options_to_assign_questions_to_sub_sections(step):
-    world.page.is_text_present('Assign Question')
-
-
 @step(u'When I choose to assign a question to a sub-section')
 def when_i_choose_to_assign_a_question_to_a_sub_section(step):
     world.page.click_by_id('id-assign-%s' % world.sub_section.id)
@@ -87,19 +83,19 @@ def and_i_should_see_an_option_to_hide_already_assigned_questions(step):
 
 @step(u'When I select the option to hide already assigned questions')
 def when_i_select_the_option_to_hide_already_assigned_questions(step):
-    world.page.check('hide-assigned-questions')
+    world.page.check('true')
 
 
 @step(u'Then I should only see the unassigned questions in the question bank')
 def then_i_should_only_see_the_unassigned_questions_in_the_question_bank(step):
-    assert world.page.is_element_present_by_id('id-question-%s' % world.question1.id)
-    assert world.page.is_element_present_by_id('id-question-%s' % world.question2.id)
+    assert_true(world.page.is_element_present_by_id('id-question-%s' % world.question1.id))
+    assert_true(world.page.is_element_present_by_id('id-question-%s' % world.question2.id))
 
 
 @step(u'And I should not see the assigned questions in the question bank')
 def and_i_should_not_see_the_assigned_questions_in_the_question_bank(step):
-    assert world.page.is_element_not_present_by_id('id-question-%s' % world.question3.id)
-    assert world.page.is_element_not_present_by_id('id-question-%s' % world.question4.id)
+    assert_true(world.page.is_element_not_present_by_id('id-question-%s' % world.question3.id))
+    assert_true(world.page.is_element_not_present_by_id('id-question-%s' % world.question4.id))
 
 
 @step(u'When I select questions to assign to the questionnaire')

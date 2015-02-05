@@ -5,9 +5,17 @@ if (typeof assignQuestions == 'undefined') {
 var assignQuestionsModule = angular.module('assignQuestionsModule', ['gridService']);
 
 var assignQuestionController = function ($scope, QuestionService, ThemeService) {
-
     $scope.allThemes = [];
-    $scope.updateModal = function (questionnaireId, _) {
+    $scope.assignQuestionUrl = "";
+
+    $scope.updateModal = function (questionnaireId, subsectionId) {
+
+        $scope.assignQuestionUrl = "/subsection/" + subsectionId + "/assign_questions/";
+
+        $scope.submitQuestions = function($event){
+            $event.target.submit();
+        };
+
         ThemeService.all().then(function (response) {
             $scope.allThemes = response.data;
         });
@@ -32,7 +40,7 @@ assignQuestionsModule.controller('AssignQuestionController', ['$scope', 'Questio
 
 var filterByTheme = function () {
     return function (questions, selectedTheme) {
-        if (!selectedTheme){
+        if (!selectedTheme) {
             return questions;
         }
 
@@ -42,7 +50,19 @@ var filterByTheme = function () {
     };
 };
 
+var filterByUsed = function () {
+    return function (questions, used) {
+        if (!used) {
+            return questions;
+        }
+
+        return questions.filter(function (wrappedQuestion) {
+            return !wrappedQuestion.used;
+        });
+    };
+};
 assignQuestionsModule.filter('byTheme', filterByTheme);
+assignQuestionsModule.filter('byUsed', filterByUsed);
 
 assignQuestions.updateModal = function (questionnaireId, subsectionId) {
     angular.element(document.getElementById('assign-question-controller')).scope().updateModal(questionnaireId, subsectionId);

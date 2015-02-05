@@ -26,9 +26,8 @@
                 <span class="cyan"><span class="glyphicon glyphicon-plus-sign"></span> Grid</span>
             </a>
 
-            <a href="" class="btn btn-sm btn-default"
-               data-toggle="modal" data-target="#id-assign-questions-modal"
-               onClick="assignQuestions.updateModal({{ questionnaire.id }}, {{ subsection.id }})">
+            <a href="" class="btn btn-sm btn-default" data-toggle="modal" data-target="#id-assign-questions-modal"
+               onClick="assignQuestions.updateModal({{ questionnaire.id }}, {{ subsection.id }})" id="id-assign-{{ subsection.id }}">
                 <span class="cyan"><span class="glyphicon glyphicon-plus-sign"></span> Assign Question</span>
             </a>
             <a data-href="{% url 'reorder_page' subsection.id %}" id="reorder-{{ subsection.id }}-subsection" href="#"

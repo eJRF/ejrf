@@ -101,4 +101,19 @@ describe("assign questions", function () {
         });
     });
 
+    describe("byUsed", function () {
+        var wrappedunUsedStubQuestions = {'question': unUsedStubQuestions[0], used: false},
+            wrappedusedStubQuestions = {'question': usedStubQuestions[0], used: true},
+            wrappedAllQuestions = [wrappedusedStubQuestions, wrappedunUsedStubQuestions];
+
+        it('should return all questions when no theme selected', function () {
+            var byUsedFilter = filterByUsed();
+            expect(byUsedFilter(wrappedAllQuestions, undefined)).toEqual(wrappedAllQuestions);
+        });
+
+        it('should return questions with selected theme', function () {
+            var byUsedFilter = filterByUsed();
+            expect(byUsedFilter(wrappedAllQuestions, true)).toEqual([wrappedunUsedStubQuestions]);
+        });
+    });
 });
