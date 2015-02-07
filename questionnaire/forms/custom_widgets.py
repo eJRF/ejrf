@@ -1,5 +1,7 @@
 from itertools import chain
+
 from django import forms
+from django.forms import ModelMultipleChoiceField
 from django.forms.widgets import RadioFieldRenderer
 from django.utils.encoding import force_text
 from django.utils.html import format_html, format_html_join
@@ -7,22 +9,27 @@ from django.utils.safestring import mark_safe
 
 from questionnaire.models import Question, SkipRule
 from questionnaire.models.skip_rule import SkipQuestion, SkipSubsection
+from questionnaire.utils.questionnaire_entry_helpers import is_in_grid
 
 
 def get_rules(option_id, subsection):
-        all_rules = SkipRule.objects.filter(response_id=option_id, subsection=subsection)
-        question_rules = ''
-        subsection_rules = ''
-        hybrid_grid_rules = ''
-        if all_rules.exists():
-            rules_skipping_questions = filter(lambda rule: not rule.is_in_hybrid_grid(),SkipQuestion.objects.filter(subsection=subsection, response_id=option_id))
-            rules_skipping_questions_in_hybrid_grids = filter(lambda rule: rule.is_in_hybrid_grid(),SkipQuestion.objects.filter(subsection=subsection, response_id=option_id))
-            rules_skipping_subsections = SkipSubsection.objects.filter(subsection=subsection, response_id=option_id)
-            question_rules = ",".join(map(lambda rule: str(rule.skip_question.id), rules_skipping_questions))
-            hybrid_grid_rules = ",".join(map(lambda rule: str(rule.skip_question.id), rules_skipping_questions_in_hybrid_grids))
-            subsection_rules = ",".join(map(lambda rule: str(rule.skip_subsection.id), rules_skipping_subsections))
+    all_rules = SkipRule.objects.filter(response_id=option_id, subsection=subsection)
+    question_rules = ''
+    subsection_rules = ''
+    hybrid_grid_rules = ''
+    if all_rules.exists():
+        rules_skipping_questions = filter(lambda rule: not rule.is_in_hybrid_grid(),
+                                          SkipQuestion.objects.filter(subsection=subsection, response_id=option_id))
+        rules_skipping_questions_in_hybrid_grids = filter(lambda rule: rule.is_in_hybrid_grid(),
+                                                          SkipQuestion.objects.filter(subsection=subsection,
+                                                                                      response_id=option_id))
+        rules_skipping_subsections = SkipSubsection.objects.filter(subsection=subsection, response_id=option_id)
+        question_rules = ",".join(map(lambda rule: str(rule.skip_question.id), rules_skipping_questions))
+        hybrid_grid_rules = ",".join(
+            map(lambda rule: str(rule.skip_question.id), rules_skipping_questions_in_hybrid_grids))
+        subsection_rules = ",".join(map(lambda rule: str(rule.skip_subsection.id), rules_skipping_subsections))
 
-        return question_rules, subsection_rules, hybrid_grid_rules
+    return question_rules, subsection_rules, hybrid_grid_rules
 
 
 class MultiChoiceAnswerSelectWidget(forms.Select):
@@ -129,9 +136,17 @@ class SkipRuleRadioWidget(forms.RadioSelect):
     def get_renderer(self, name, value, attrs=None, choices=()):
         """Returns an instance of the renderer."""
         if value is None: value = ''
-        str_value = force_text(value) # Normalize to string.
+        str_value = force_text(value)  # Normalize to string.
         final_attrs = self.build_attrs(attrs)
         choices = list(chain(self.choices, choices))
         return self.renderer(name, str_value, final_attrs, choices, self.subsection)
 
 
+class MultipleResponseChoiceField(ModelMultipleChoiceField):
+    def clean(self, value):
+        return super(MultipleResponseChoiceField, self).clean(self._remove_group_data(value))
+
+    def _remove_group_data(self, value):
+        if value and is_in_grid(value[0]):
+            return value[1:]
+        return value

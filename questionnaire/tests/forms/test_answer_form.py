@@ -293,7 +293,7 @@ class MultipleResponseFormTest(BaseTest):
         self.male_option = QuestionOptionFactory(text='Male', question=self.question)
 
         self.form_data = {
-            'response': [self.female_option.id, self.male_option.id],
+            'response': [str(self.female_option.id), str(self.male_option.id)],
         }
 
         self.initial = {

@@ -1,11 +1,12 @@
 from django.core import serializers
 
 from questionnaire.forms.custom_widgets import MultiChoiceAnswerSelectWidget, MultiChoiceQuestionSelectWidget, \
-    SkipRuleRadioWidget, get_rules
+    SkipRuleRadioWidget, get_rules, MultipleResponseChoiceField
 from questionnaire.models import Question, QuestionOption, Theme
 from questionnaire.tests.base_test import BaseTest
 from questionnaire.tests.factories.question_factory import QuestionFactory
 from questionnaire.tests.factories.question_group_factory import QuestionGroupFactory
+from questionnaire.tests.factories.question_option_factory import QuestionOptionFactory
 from questionnaire.tests.factories.skip_rule_factory import SkipQuestionRuleFactory, SkipSubsectionRuleFactory
 from questionnaire.tests.factories.sub_section_factory import SubSectionFactory
 
@@ -149,4 +150,33 @@ class DataRuleTest(BaseTest):
         expected_rule = ("", str(skip_rule2.skip_subsection.id), str(skip_rule.skip_question.id))
 
         self.assertEqual(expected_rule, rules_for_option_1)
+
+
+class MultipleResponseChoiceFieldTest(BaseTest):
+    def setUp(self):
+        self.value_with_group_info = ['0,22', '3', '4', '5']
+        self.clean_values = ['3', '4', '5']
+        self.field = MultipleResponseChoiceField(queryset=None)
+
+    def test_removes_group_data(self):
+        cleaned_data = self.field._remove_group_data(self.value_with_group_info)
+        self.assertEqual(['3', '4', '5'], cleaned_data)
+
+        cleaned_data = self.field._remove_group_data(self.clean_values)
+        self.assertEqual(['3', '4', '5'], cleaned_data)
+
+    def test_clean_value(self):
+        option_1 = QuestionOptionFactory(text='Yes')
+        option_2 = QuestionOptionFactory(text='No')
+
+        values = [str(option_2.id), str(option_1.id)]
+
+        objects_all = QuestionOption.objects.all()
+
+        field = MultipleResponseChoiceField(queryset=objects_all)
+        cleaned_data = field.clean(values)
+
+        self.assertEqual(2, cleaned_data.count())
+        self.assertIn(option_1, cleaned_data)
+        self.assertIn(option_2, cleaned_data)
 

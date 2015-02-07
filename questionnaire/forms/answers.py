@@ -1,9 +1,10 @@
 import copy
+
 from django import forms
 from django.forms.util import ErrorDict
-from django.forms import ModelForm, ModelChoiceField, ModelMultipleChoiceField
+from django.forms import ModelForm, ModelChoiceField
 
-from questionnaire.forms.custom_widgets import MultiChoiceAnswerSelectWidget, SkipRuleRadioWidget
+from questionnaire.forms.custom_widgets import MultiChoiceAnswerSelectWidget, SkipRuleRadioWidget, MultipleResponseChoiceField
 from questionnaire.models import NumericalAnswer, TextAnswer, DateAnswer, MultiChoiceAnswer, QuestionOption
 from questionnaire.models.answers import MultipleResponseAnswer
 from questionnaire.utils.answer_type import AnswerTypes
@@ -173,7 +174,7 @@ class MultiChoiceAnswerForm(AnswerForm):
 
 
 class MultipleResponseForm(AnswerForm):
-    response = ModelMultipleChoiceField(queryset=None, widget=forms.CheckboxSelectMultiple(), required=False, )
+    response = MultipleResponseChoiceField(queryset=None, widget=forms.CheckboxSelectMultiple(), required=False, )
 
     def __init__(self, *args, **kwargs):
         super(MultipleResponseForm, self).__init__(*args, **kwargs)

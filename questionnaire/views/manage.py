@@ -8,7 +8,6 @@ from braces.views import MultiplePermissionsRequiredMixin, PermissionRequiredMix
 from questionnaire.forms.questionnaires import QuestionnaireFilterForm, EditQuestionnaireForm
 from questionnaire.mixins import RegionAndPermissionRequiredMixin
 from questionnaire.models import Questionnaire, Region
-from questionnaire.utils.form_utils import _set_year_choices
 
 
 class ManageJRF(MultiplePermissionsRequiredMixin, View):

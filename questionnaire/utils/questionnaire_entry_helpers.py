@@ -16,7 +16,23 @@ def same_group_data_keys(key, given_key, data, group_id):
     return key.startswith(given_key) and key.endswith('response') and __field_belong_group(data[key], group_id)
 
 
-def clean_list(dirty_list):
+def is_in_grid(first_value):
+    return ',' in str(first_value)
+
+
+def clean_multiple_response(dirty_list):
+    first_value = dirty_list[0]
+    if is_in_grid(first_value):
+        clean_data = first_value.split(',')
+        clean_data.append(dirty_list[1:])
+        return clean_data
+    return dirty_list
+
+
+def clean_list(key, dirty_list):
+    if key.startswith(AnswerTypes.MULTIPLE_RESPONSE):
+        return clean_multiple_response(dirty_list)
+
     if isinstance(dirty_list, list) and len(dirty_list) > 1:
         dirty_element = _get_first_element(dirty_list)
         old_dirty_list = dirty_list
@@ -28,10 +44,7 @@ def clean_list(dirty_list):
 def clean_data_dict(data):
     new_data = {}
     for key, value in data.items():
-        if key.startswith(AnswerTypes.MULTIPLE_RESPONSE):
-            new_data[key] = value
-        else:
-            new_data[key] = clean_list(value)
+        new_data[key] = clean_list(key, value)
     return new_data
 
 

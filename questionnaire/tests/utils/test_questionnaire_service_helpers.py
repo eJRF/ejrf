@@ -8,6 +8,9 @@ class QuestionnaireServiceHelperTest(BaseTest):
         data = {u'MultiChoice-MAX_NUM_FORMS': u'3', u'MultiChoice-TOTAL_FORMS': u'3',
                 u'MultiChoice-INITIAL_FORMS': u'3', u'MultiChoice-0-response': ['0,1', 1],
                 u'MultiChoice-1-response': ['1,1', 2, ], u'MultiChoice-2-response': ['2,1', 3, ],
+                u'MultipleResponse-MAX_NUM_FORMS': u'3', u'MultipleResponse-TOTAL_FORMS': u'3',
+                u'MultipleResponse-INITIAL_FORMS': u'3', u'MultipleResponse-0-response': ['0,1', '1', '2'],
+                u'MultipleResponse-1-response': ['1,1', '6', '7'], u'MultipleResponse-2-response': ['2,1', '3', '4'],
                 u'Number-MAX_NUM_FORMS': u'3', u'Number-TOTAL_FORMS': u'3',
                 u'Number-INITIAL_FORMS': u'3', u'Number-0-response': ['0,1', '22', ],
                 u'Number-1-response': ['1,1', '44', ], u'Number-2-response': ['2,1', '33', ],
@@ -16,7 +19,7 @@ class QuestionnaireServiceHelperTest(BaseTest):
                 u'Text-1-response': ['1,1', 'Hehe', ], u'Text-2-response': ['2,1', 'hehehe', ],
                 u'Date-MAX_NUM_FORMS': u'3', u'Date-TOTAL_FORMS': u'3',
                 u'Date-INITIAL_FORMS': u'3', u'Date-0-response': ['0,1', '2014-2-2', ],
-                u'Date-1-response': ['1,1', '2014-2-2', ], u'Date-2-response': ['2,1', '2014-2-2', ],
+                u'Date-1-response': ['1,1', '2014-2-2', ], u'Date-2-response': ['2,1', '2014-2-2', ]
         }
 
         data = clean_data_dict(dict(data))
@@ -25,6 +28,7 @@ class QuestionnaireServiceHelperTest(BaseTest):
         self.assertEqual(['0', '1', '2'], extra_rows(data, 'MultiChoice', 1))
         self.assertEqual(['0', '1', '2'], extra_rows(data, 'Date', 1))
         self.assertEqual(['0', '1', '2'], extra_rows(data, 'Text', 1))
+        self.assertEqual(['0', '1', '2'], extra_rows(data, 'MultipleResponse', 1))
 
     def test_get_number_of_extra_rows_supplied_for_an_answer_type_when_there_are_more_than_one_grid_of_the_same_type(
             self):
@@ -33,6 +37,11 @@ class QuestionnaireServiceHelperTest(BaseTest):
                 u'MultiChoice-1-response': ['1,1', 2, ], u'MultiChoice-2-response': ['2,1', 3, ],
                 u'MultiChoice-3-response': ['0,2', 5, ],
                 u'MultiChoice-4-response': ['1,2', 6, ], u'MultiChoice-5-response': [2],
+                u'MultipleResponse-MAX_NUM_FORMS': u'6', u'MultipleResponse-TOTAL_FORMS': u'6',
+                u'MultipleResponse-INITIAL_FORMS': u'6', u'MultipleResponse-0-response': ['0,1', '1', '2'],
+                u'MultipleResponse-1-response': ['1,1', '6', '7'], u'MultipleResponse-2-response': ['1,2', '6', '7'],
+                u'MultipleResponse-3-response': ['0,2', '3', '4'], u'MultipleResponse-4-response': ['1,2', '3', '4'],
+                u'MultipleResponse-5-response': ['32', '41'],
                 u'Number-MAX_NUM_FORMS': u'3', u'Number-TOTAL_FORMS': u'3',
                 u'Number-INITIAL_FORMS': u'3', u'Number-0-response': ['0,1', '22', ],
                 u'Number-1-response': ['1,1', '44', ], u'Number-2-response': ['2,1', '33', ],
@@ -53,6 +62,8 @@ class QuestionnaireServiceHelperTest(BaseTest):
         self.assertEqual(['0', '1', '2'], extra_rows(data, 'Date', 1))
         self.assertEqual(['0', '1', '2'], extra_rows(data, 'Text', 1))
         self.assertEqual(['0', '1'], extra_rows(data, 'Text', 2))
+        self.assertEqual(['0', '1'], extra_rows(data, 'MultipleResponse', 1))
+        self.assertEqual(['0', '1'], extra_rows(data, 'MultipleResponse', 2))
 
     def test_get_extra_rows_when_type_is_repeated_per_row(self):
         data = {u'Number-1-response': [u'0,181', u'2', ], u'MultiChoice-MAX_NUM_FORMS': [u'6'], u'redirect_url': [u''],
@@ -73,19 +84,24 @@ class QuestionnaireServiceHelperTest(BaseTest):
         self.assertEqual(['0', '1', '2'], extra_rows(data, "MultiChoice", group_id=181))
 
     def test_splits_stuff_to_a_valid_list(self):
-        self.assertEqual([u'0', u'181', u'2', ], clean_list([u'0,181', u'2', ]))
-        self.assertEqual([u'2'], clean_list([u'2']))
-        self.assertEqual('2', clean_list('2'))
-        self.assertEqual(2, clean_list(2))
+        self.assertEqual([u'0', u'181', u'2', ], clean_list('MultiChoice', [u'0,181', u'2', ]))
+        self.assertEqual([u'2'], clean_list('MultiChoice', [u'2']))
+        self.assertEqual('2', clean_list('MultiChoice', '2'))
+        self.assertEqual(2, clean_list('MultiChoice', 2))
+
+    def test_splits_multiple_responses_to_a_valid_list(self):
+        self.assertEqual([u'0', u'181', [u'2', u'3', u'4']], clean_list('MultipleResponse', [u'0,181', u'2', u'3', u'4', ]))
+        self.assertEqual([u'23', u'31', u'55'], clean_list('MultipleResponse', [u'23', u'31', u'55']))
 
     def test_clean_data_dict(self):
-        data = {'haha': [u'0,181', u'2', ], 'hoho': [u'0,181', u'2', ]}
-        self.assertEqual({'haha': [u'0', u'181', u'2', ], 'hoho': [u'0', u'181', u'2', ]}, clean_data_dict(data))
+        data = {'MultiChoice': [u'0,181', u'2', ], 'Text': [u'0,182', u'2', ], 'MultipleResponse': [u'0,181', u'2', u'3', u'4']}
+        self.assertEqual({'MultiChoice': [u'0', u'181', u'2', ], 'Text': [u'0', u'182', u'2', ],
+                          'MultipleResponse': [u'0', u'181', [u'2', u'3', u'4']]}, clean_data_dict(data))
 
-        string_data = {'haha': u'2'}
+        string_data = {'MultiChoice': u'2'}
         self.assertEqual(string_data, clean_data_dict(string_data))
 
-        int_data = {'haha': 2}
+        int_data = {'Number': 2}
         self.assertEqual(int_data, clean_data_dict(int_data))
 
     def test_gets_primary_answer_per_row_given_rows(self):
@@ -125,3 +141,4 @@ class QuestionnaireServiceHelperTest(BaseTest):
                          _get_primary_answer_in('0', ['Number-0-response', 'Number-1-response', 'Number-2-response'],
                                                 data))
         self.assertEqual(None, _get_primary_answer_in('4', ['Text-0-response'], data))
+
