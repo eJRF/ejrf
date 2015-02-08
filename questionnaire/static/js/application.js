@@ -28,8 +28,22 @@ $(document).ready(function () {
         }
     });
 
+    $('select[name=answer_type]').on('change', function () {
+        var selectedAnswerType = $(this).val(),
+            isPrimaryField = $('input[name=is_primary]');
+        setDisabled(isPrimaryField, selectedAnswerType);
+    });
+
 });
 
+function setDisabled(isPrimaryField, selectedAnswerType) {
+    if (selectedAnswerType.toLowerCase() === "multipleresponse") {
+        isPrimaryField.removeAttr('checked');
+        isPrimaryField.attr('disabled', 'disabled');
+    } else {
+        isPrimaryField.removeAttr('disabled');
+    }
+}
 
 function replaceAttributes($el, index) {
     return {'name': _replace($el, 'name', index),
@@ -172,7 +186,7 @@ $('input[type=radio]').on('click', function () {
     $redundant_hidden_radio.remove();
 });
 
-var showHybridRows = function(gridInstance){
+var showHybridRows = function (gridInstance) {
     $(gridInstance).find('div[class^="form-group form-group-question-"]').show();
     $(gridInstance).find('li[class^="form-group-question-"]').show();
 }
@@ -187,7 +201,7 @@ $('.add-more').on('click', function (event) {
     event.preventDefault();
 });
 
-var showAddMoreRows = function(tableRow){
+var showAddMoreRows = function (tableRow) {
     $(tableRow).find('input[class^="input-question-id-"]').prop('disabled', false).removeClass('grayed-out');
     $(tableRow).find('select[class^="input-question-id-"]').prop('disabled', false).removeClass('grayed-out');
 }

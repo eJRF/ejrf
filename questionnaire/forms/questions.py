@@ -51,7 +51,16 @@ class QuestionForm(ModelForm):
         self._clean_options()
         self._clean_export_label()
         self._clean_answer_sub_type()
+        self._clean_is_primary()
         return super(QuestionForm, self).clean()
+
+    def _clean_is_primary(self):
+        answer_type = self.cleaned_data.get('answer_type', None)
+        is_primary = self.cleaned_data.get('is_primary', None)
+        if answer_type == AnswerTypes.MULTIPLE_RESPONSE and is_primary:
+            message = "%s questions cannot be primary" % answer_type
+            self._errors['is_primary'] = self.error_class([message])
+            del self.cleaned_data['is_primary']
 
     def _clean_options(self):
         answer_type = self.cleaned_data.get('answer_type', None)
