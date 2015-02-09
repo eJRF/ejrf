@@ -2,6 +2,7 @@ import itertools
 
 
 class AnswerTypes(object):
+    TEXT = "Text"
     NUMBER = "Number"
     INTEGER = "Integer"
     DECIMAL = "Decimal"
@@ -20,7 +21,7 @@ class AnswerTypes(object):
             DECIMAL,
             INTEGER
         ],
-        "Text": []
+        TEXT: []
     }
 
     @classmethod
