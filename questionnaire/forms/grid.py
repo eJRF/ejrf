@@ -1,4 +1,5 @@
 from django import forms
+from django.db.models import Q
 
 from questionnaire.forms.custom_widgets import MultiChoiceQuestionSelectWidget
 from questionnaire.models import Question
@@ -22,6 +23,7 @@ class GridForm(forms.Form):
     def __init__(self, *args, **kwargs):
         self.subsection = kwargs.pop('subsection', None)
         self.region = kwargs.pop('region', None)
+        self.instance = kwargs.pop('instance', None)
         super(GridForm, self).__init__(*args, **kwargs)
         unused_regional_questions = self.unused_regional_questions()
         self.fields['primary_question'].queryset = unused_regional_questions.filter(is_primary=True)
@@ -84,13 +86,13 @@ class GridForm(forms.Form):
 
     def _create_parent_grid(self, primary_question, remaining_questions):
         attributes = self._get_grid_attributes()
-        grid_group = primary_question.question_group.create(**attributes)
+        grid_group = self.instance or primary_question.question_group.create(**attributes)
         grid_group.question.add(*remaining_questions)
         return grid_group
 
     def _get_grid_attributes(self):
         order = self.subsection.next_group_order() if self.subsection else 0
-        attributes = {'order': order, 'subsection': self.subsection, 'grid': True, 'is_core': not self.region }
+        attributes = {'order': order, 'subsection': self.subsection, 'grid': True, 'is_core': not self.region}
         type_ = self.cleaned_data.get('type')
         attributes[type_] = True
         if type_ == 'hybrid':
@@ -103,3 +105,23 @@ class GridForm(forms.Form):
         for index, question_id in enumerate(question_ids):
             question = filter(lambda question: question.id == int(question_id), non_primary_questions)
             grid_group.orders.create(order=index + 1, question=question[0])
+
+
+class EditGridForm(GridForm):
+
+    def save(self):
+        self.instance.orders.all().delete()
+        self.instance.sub_group.all().delete()
+        self.instance.question.clear()
+        return super(EditGridForm, self).save()
+
+    def unused_regional_questions(self):
+        questions = Question.objects.filter(region=self.region)
+        if self.subsection:
+            instance_question_ids = self.instance.question.values_list('id', flat=True)
+            questionnaire = self.subsection.section.questionnaire
+            questions = questions.exclude(Q(question_group__subsection__section__questionnaire=questionnaire),
+                                          ~Q(id__in=instance_question_ids)).distinct()
+
+            print instance_question_ids
+        return questions

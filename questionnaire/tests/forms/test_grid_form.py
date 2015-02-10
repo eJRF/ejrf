@@ -1,7 +1,14 @@
-from questionnaire.forms.grid import GridForm
-from questionnaire.models import Questionnaire, Section, SubSection, Question, QuestionOption, Region, Theme
+from questionnaire.forms.grid import GridForm, EditGridForm
+from questionnaire.models import Questionnaire, Section, SubSection, Question, QuestionOption, Region, Theme, \
+    QuestionGroupOrder
 from questionnaire.tests.base_test import BaseTest
 from questionnaire.tests.factories.question_factory import QuestionFactory
+from questionnaire.tests.factories.question_group_factory import QuestionGroupFactory
+from questionnaire.tests.factories.question_option_factory import QuestionOptionFactory
+from questionnaire.tests.factories.region_factory import RegionFactory
+from questionnaire.tests.factories.section_factory import SectionFactory
+from questionnaire.tests.factories.sub_section_factory import SubSectionFactory
+from questionnaire.tests.factories.theme_factory import ThemeFactory
 
 
 class GridFormTest(BaseTest):
@@ -140,7 +147,7 @@ class DisplayAllGridFormTest(BaseTest):
         }
 
     def test_valid_and_is_core_when_region_is_none(self):
-        user =self.create_user(org='WHO', group=self.GLOBAL_ADMIN)
+        user = self.create_user(org='WHO', group=self.GLOBAL_ADMIN)
         grid_form = GridForm(self.form_data, subsection=self.sub_section, region=user.user_profile.region)
 
         self.assertTrue(grid_form.is_valid())
@@ -150,9 +157,10 @@ class DisplayAllGridFormTest(BaseTest):
         self.assertTrue(new_grid.is_core)
 
     def test_valid_and_not_is_core_when_region_is_not_none(self):
-        user =self.create_user(username='username', org='WHO', group=self.REGIONAL_ADMIN, region='AFR')
+        user = self.create_user(username='username', org='WHO', group=self.REGIONAL_ADMIN, region='AFR')
 
-        question1 = QuestionFactory(region=user.user_profile.region, text='Some text 1', is_primary=True, answer_type='MultiChoice')
+        question1 = QuestionFactory(region=user.user_profile.region, text='Some text 1', is_primary=True,
+                                    answer_type='MultiChoice')
         question2 = QuestionFactory(region=user.user_profile.region, text='Some text 2', answer_type='Text')
         question3 = QuestionFactory(region=user.user_profile.region, text='Some text 3', answer_type='Text')
 
@@ -425,3 +433,62 @@ class HybridGridFormTest(BaseTest):
         self.assertEqual(1, group_orders.filter(question=self.question4, order=2).count())
         self.assertEqual(1, group_orders.filter(question=self.question5, order=3).count())
         self.assertEqual(1, group_orders.filter(question=self.question3, order=4).count())
+
+
+class EditGridFormTest(BaseTest):
+    def setUp(self):
+        self.section1 = SectionFactory(title="Reported Cases of Selected Vaccine", order=1,
+                                       name="Reported Cases")
+        self.region = RegionFactory(name="AFR")
+        self.sub_section = SubSectionFactory(title="subsection 1", order=1, section=self.section1, region=self.region)
+        self.sub_section2 = SubSection.objects.create(title="subsection 2", order=2, section=self.section1)
+        self.theme = ThemeFactory(name="Theme1", description="Our theme.")
+        self.question1 = QuestionFactory(text='Favorite beer 1', UID='C00001', answer_type='MultiChoice',
+                                         is_primary=True, theme=self.theme)
+        self.option1 = QuestionOptionFactory(text='tusker lager', question=self.question1)
+        self.option2 = QuestionOptionFactory(text='tusker lager1', question=self.question1)
+        self.option3 = QuestionOptionFactory(text='tusker lager2', question=self.question1)
+
+        self.question2 = QuestionFactory(text='question 2', instructions="instruction 2", theme=self.theme,
+                                         UID='C00002', answer_type='Text')
+        self.question3 = QuestionFactory(text='question 3', instructions="instruction 3",
+                                         UID='C00003', answer_type='Number', theme=self.theme)
+        self.question4 = QuestionFactory(text='question 4', instructions="instruction 2",
+                                         UID='C00005', answer_type='Date', theme=self.theme)
+
+        self.grid_question_group = QuestionGroupFactory(hybrid=False, display_all=True, grid=True)
+        self.grid_question_group.question.add(self.question1, self.question2, self.question3)
+        QuestionGroupOrder.objects.create(question=self.question1, order=1,
+                                          question_group=self.grid_question_group)
+        QuestionGroupOrder.objects.create(question=self.question2, order=2,
+                                          question_group=self.grid_question_group)
+        QuestionGroupOrder.objects.create(question=self.question3, order=3,
+                                          question_group=self.grid_question_group)
+        self.form_data = {
+            'type': 'display_all',
+            'primary_question': str(self.question1.id),
+            'columns': [str(self.question3.id), str(self.question2.id), str(self.question4.id)]
+        }
+
+    def test_given_instance_is_valid_choices_when_editing_grid(self):
+        form = EditGridForm(instance=self.grid_question_group, data=self.form_data)
+
+        self.assertTrue(form.is_valid())
+        self.assertIn(self.question1, form.fields['primary_question'].queryset)
+        self.assertIn(self.question2, form.fields['columns'].queryset)
+        self.assertIn(self.question3, form.fields['columns'].queryset)
+        self.assertIn(self.question4, form.fields['columns'].queryset)
+
+    def test_update_given_instance(self):
+        form = EditGridForm(instance=self.grid_question_group, data=self.form_data)
+
+        self.assertTrue(form.is_valid())
+
+        new_grid = form.save()
+        ordered_questions = new_grid.ordered_questions()
+
+        self.assertEqual(4, len(ordered_questions))
+        self.assertEqual(self.question1, ordered_questions[0])
+        self.assertEqual(self.question3, ordered_questions[1])
+        self.assertEqual(self.question2, ordered_questions[2])
+        self.assertEqual(self.question4, ordered_questions[3])

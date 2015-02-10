@@ -1,3 +1,4 @@
+import json
 from braces.views import PermissionRequiredMixin
 from django.http import HttpResponse
 from django.core import serializers

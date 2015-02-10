@@ -3,6 +3,7 @@ from braces.views import PermissionRequiredMixin
 from django.http import HttpResponse
 from django.core import serializers
 from django.views.generic import View
+from questionnaire.forms.grid import GridForm, EditGridForm
 
 from questionnaire.models import Theme, QuestionGroup
 
@@ -19,3 +20,14 @@ class GridAPIView(PermissionRequiredMixin, View):
         grid_response = json.loads(question_group_json)
         grid_response[0]['children'] = children
         return HttpResponse(json.dumps(grid_response), content_type="application/json")
+
+    def post(self, request, subsection_id, grid_id, *args, **kwargs):
+        grid = QuestionGroup.objects.get(id=grid_id)
+        form = EditGridForm(data=request.POST, instance=grid)
+        print request.POST
+        if form.is_valid():
+            form.save()
+            grid_response = [{'message': 'The grid was updated successfully.'}]
+            return HttpResponse(json.dumps(grid_response), content_type="application/json")
+        grid_response = [{'error': 'The grid could not be updated.', 'form_errors': form.errors}]
+        return HttpResponse(json.dumps(grid_response), content_type="application/json", status=400)
