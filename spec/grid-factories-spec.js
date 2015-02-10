@@ -141,6 +141,63 @@ describe("grid Type Factories", function () {
                 {'row1': 'column2'}
             ]);
         });
+
+        it('should move question to the left given index', function () {
+            selectedQuestions.otherColumns = [
+                {'row1': 'column0'},
+                {'row1': 'column1'},
+                {'row1': 'column2'},
+                {'row1': 'column3'}
+            ];
+            selectedQuestions.moveLeft(2);
+            expect(selectedQuestions.otherColumns).toEqual([
+                {'row1': 'column0'},
+                {'row1': 'column2'},
+                {'row1': 'column1'},
+                {'row1': 'column3'}
+            ]);
+        });
+        it('should move question to the right given index', function () {
+            selectedQuestions.otherColumns = [
+                {'row1': 'column0'},
+                {'row1': 'column1'},
+                {'row1': 'column2'},
+                {'row1': 'column3'}
+            ];
+            selectedQuestions.moveRight(1);
+            expect(selectedQuestions.otherColumns).toEqual([
+                {'row1': 'column0'},
+                {'row1': 'column2'},
+                {'row1': 'column1'},
+                {'row1': 'column3'}
+            ]);
+        });
+
+        it('should not move question to the left when index is 0', function () {
+            selectedQuestions.otherColumns = [
+                {'row1': 'column0'},
+                {'row1': 'column1'}
+            ];
+            selectedQuestions.moveLeft(0);
+
+            expect(selectedQuestions.otherColumns).toEqual([
+                {'row1': 'column0'},
+                {'row1': 'column1'}
+            ]);
+        });
+
+        it('should not move question to the right when its index is last in the array', function () {
+            selectedQuestions.otherColumns = [
+                {'row1': 'column0'},
+                {'row1': 'column1'}
+            ];
+            selectedQuestions.moveRight(1);
+            expect(selectedQuestions.otherColumns).toEqual([
+                {'row1': 'column0'},
+                {'row1': 'column1'}
+            ]);
+        });
+
     });
 
     describe("NonHybridPayload", function () {

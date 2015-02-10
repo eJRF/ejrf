@@ -21,10 +21,15 @@
            data-target="#" onClick="skipRules.updateGrid({{ subsection.id }}, {{ group.id }})" id="grid-question-{{ group.id}}">
             <span class="cyan"><span class="glyphicon glyphicon-plus-sign"></span>Add Grid Rules</span>
         </a>
+        <a href="" class="btn btn-default btn-sm" data-toggle="modal"
+           data-target="#edit-grid-modal"
+           id="edit-grid-{{ group.id }}" onClick="editGrid.updateEditGridScope( {{ questionnaire.id }}, {{ subsection.id }}, {{ group.id }})">
+            <span class="cyan"><span class="glyphicon glyphicon-pencil"></span> Edit</span>
+        </a>
         <a href="" class="delete-grid btn btn-default btn-sm" data-toggle="modal"
            data-target="#delete-grid-modal-{{ group.id }}"
            id="delete-grid-{{ group.id }}">
-            <span class="cyan"><span class="glyphicon glyphicon-trash"></span>Delete Grid</span>
+            <span class="cyan"><span class="glyphicon glyphicon-trash"></span> Delete</span>
         </a>
         {% endif %}
     </form>

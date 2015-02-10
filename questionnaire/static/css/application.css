@@ -595,14 +595,20 @@ select.hide {
 .fontastic-fonts {
     font-size: 13px !important;
 }
-
-.grid-btn-group {
+.grid-btn {
     border: 1px solid #ccc;
     margin-top: -9px;
     margin-right: -9px;
     padding: 1px 3px;
-    border-radius: 0 0 0 13px;
     background: #EFEFEF;
+}
+
+.grid-btn-group-right {
+    border-radius: 0 0 0 13px;
+}
+
+.grid-btn-group-left {
+    border-radius: 0 0 13px 0;
 }
 
 .newgrid-filter{

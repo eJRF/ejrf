@@ -1,0 +1,75 @@
+<div>
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <tr ng-model="selectedQuestions.otherColumns">
+                <td>
+                    QNO.
+                </td>
+                <td>
+                    <div class="form-inline">
+                        <select required name="primary_question" id="primary_question" class="form-control"
+                                data-ng-model="selectedQuestions.primary"
+                                data-ng-options="question.fields.export_label for question in grid.questions | filter: {fields:{is_primary: 'true'}} | filter: { fields: {theme: grid.selectedTheme}} track by question.pk">
+                            <option value="">Primary Question</option>
+                        </select>
+                    </div>
+                </td>
+                <td ng-repeat="q in selectedQuestions.otherColumns" ng-mouseenter="editTable=true"
+                    ng-mouseleave="editTable=false" id="td-{[{  $index }]}">
+                        <div ng-show="editTable" class="pull-right grid-btn grid-btn-group-right">
+                            <a href="#" id='add-column-{[{ $index }]}'
+                               data-ng-click="selectedQuestions.addColumn($index + 1)">
+                                <i class="glyphicon glyphicon-plus-sign"></i>
+                            </a>
+                            <a href="#" class="" data-ng-click="selectedQuestions.removeColumn($index)"
+                               id='remove-column-{[{ $index }]}'
+                               ng-show="selectedQuestions.otherColumns.length > 1">
+                                <i class="glyphicon glyphicon-trash"></i>
+                            </a>
+                        </div>
+                        <div class="pull-left grid-btn grid-btn-group-left" ng-show="editTable">
+                            <a href="#" data-ng-click="selectedQuestions.moveLeft($index)"
+                               id='remove-column-{[{ $index }]}'
+                               ng-show="$index > 0">
+                                <i class="glyphicon glyphicon-backward"></i>
+                            </a>
+                            <a href="#" ng-show="$index < selectedQuestions.otherColumns.length - 1" id='add-column-{[{ $index }]}'
+                               data-ng-click="selectedQuestions.moveRight($index)">
+                                <i class="glyphicon glyphicon-forward"></i>
+                            </a>
+                        </div>
+
+                        <div name="gridForm.{[{ 'dynamicQuestion'+ $index }]}" ng-form="">
+                            <select required name="columns" class="form-control" id="column-{[{ $index }]}"
+                                    data-ng-model="selectedQuestions.otherColumns[$index]"
+                                    data-ng-options="question.fields.export_label for question in grid.questions | filter: {fields:{is_primary: 'false'}} | filter: { fields: {theme: grid.selectedTheme}}  track by question.pk">
+                                <option value="">Question</option>
+                            </select>
+                        </div>
+                </td>
+            </tr>
+            <tr ng-show="grid.gridType.displayAll" ng-repeat="option in grid.questionOptions">
+                <td>
+                    {[{ $index + 1 }]}
+                </td>
+                <td>
+                    {[{ option.fields.text }]}
+                </td>
+                <td ng-repeat="q in selectedQuestions.otherColumns">
+                    <question-input/>
+                </td>
+            </tr>
+            <tr ng-show="grid.gridType.addMore">
+                <td>
+                    1
+                </td>
+                <td>
+                    <primary-question-input/>
+                </td>
+                <td ng-repeat="q in selectedQuestions.otherColumns">
+                    <question-input/>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>

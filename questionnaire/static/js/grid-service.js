@@ -34,6 +34,19 @@ gridService.factory('GridService', function ($http) {
                 transformRequest: transformRequestHelper,
                 data: payload
             });
+        },
+        fetch: function (subsectionId, gridId) {
+            return $http.get('/api/v1/subsection/' + subsectionId + '/grid/' + gridId + '/')
+        },
+        update: function (subsectionId, gridId, payload) {
+            var url = '/api/v1/subsection/' + subsectionId + '/grid/' + gridId + '/';
+            return $http({
+                method: 'POST',
+                url: url,
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                transformRequest: transformRequestHelper,
+                data: payload
+            });
         }
     };
 });
@@ -46,8 +59,8 @@ gridService.factory('AnswerInput', function (QuestionService, $q) {
             var initialValue = '<select><option>Choose One</option>',
                 closingTag = '</select>';
             return questionOptions.reduce(function (prev, curr) {
-                return prev + '<option>' + curr.fields.text + '</option>'
-            }, initialValue)
+                    return prev + '<option>' + curr.fields.text + '</option>'
+                }, initialValue)
                 + closingTag;
         };
 

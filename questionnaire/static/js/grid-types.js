@@ -23,6 +23,19 @@ gridTypeFactories.factory('NonHybridQuestionSelection', function () {
     var removeColumn = function (index) {
         this.otherColumns.splice(index, 1);
     };
+    var moveRight = function (index) {
+        var otherColumns = this.otherColumns;
+        if (!(index == otherColumns.length - 1)) {
+            this.otherColumns.splice(index, 2, otherColumns[index + 1], otherColumns[index]);
+        }
+    };
+    var moveLeft = function (index) {
+        var otherColumns = this.otherColumns;
+        if(index > 0) {
+            var toIndex = index - 1;
+            this.otherColumns.splice(toIndex, 2, otherColumns[index], otherColumns[toIndex]);
+        }
+    };
 
     return {
         primary: {},
@@ -30,7 +43,9 @@ gridTypeFactories.factory('NonHybridQuestionSelection', function () {
             {}
         ],
         addColumn: addColumn,
-        removeColumn: removeColumn
+        removeColumn: removeColumn,
+        moveLeft: moveLeft,
+        moveRight: moveRight
     };
 
 });
@@ -38,7 +53,7 @@ gridTypeFactories.factory('NonHybridQuestionSelection', function () {
 gridTypeFactories.factory('AddMoreGridFactory', function (NonHybridPayload, NonHybridQuestionSelection) {
     var addMoreGrid = function () {
         var thePayload = function () {
-            return   NonHybridPayload.payload(this.initialSelectedQuestions, this.value);
+            return NonHybridPayload.payload(this.initialSelectedQuestions, this.value);
         };
         return {
             value: 'allow_multiples',
@@ -53,13 +68,14 @@ gridTypeFactories.factory('AddMoreGridFactory', function (NonHybridPayload, NonH
     return {
         create: function () {
             return new addMoreGrid();
-        }}
+        }
+    }
 });
 
 gridTypeFactories.factory('DisplayAllGridFactory', function (NonHybridPayload, NonHybridQuestionSelection) {
     var DisplayAllGrid = function () {
         var thePayload = function () {
-            return   NonHybridPayload.payload(this.initialSelectedQuestions, this.value);
+            return NonHybridPayload.payload(this.initialSelectedQuestions, this.value);
         };
 
         return {
@@ -78,7 +94,8 @@ gridTypeFactories.factory('DisplayAllGridFactory', function (NonHybridPayload, N
     return {
         create: function () {
             return new DisplayAllGrid();
-        }};
+        }
+    };
 });
 
 gridTypeFactories.factory('HybridGridFactory', function (hybridGridQuestionSelection) {
@@ -123,7 +140,8 @@ gridTypeFactories.factory('HybridGridFactory', function (hybridGridQuestionSelec
     return {
         create: function () {
             return new HybridGrid();
-        }};
+        }
+    };
 });
 
 

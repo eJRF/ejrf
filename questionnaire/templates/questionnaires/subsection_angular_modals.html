@@ -52,6 +52,31 @@
             </div>
         </div>
     </div>
+    <div class="modal fade edit-grid" id="edit-grid-modal" tabindex="-1" role="dialog"
+         aria-labelledby="preview_modal_label" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" data-ng-controller="EditGridController" id="edit-grid-controller">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+                <form class="form-horizontal" name="EditGrid" id="create-grid-form" novalidate ng-submit="">
+                    <div class="modal-body">
+                        {% csrf_token %}
+                        <div ng-include="'/static/templates/grids/edit.html'"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-default" id="save_grid_button"><span
+                                class="green bold"><i class="glyphicon glyphicon-ok"></i> Update</span></button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal" id="close-create-grid-modal">
+                    <span class="red bold">
+                        <i class="glyphicon glyphicon-remove"></i> Cancel
+                    </span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
 
     <div class="modal fade assign-questions" id="id-assign-questions-modal" tabindex="-1" role="dialog"
