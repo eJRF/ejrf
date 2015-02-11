@@ -43,6 +43,27 @@ describe("create display all grid", function () {
                 is_primary: false
             }
         },
+        questionUsedInAnotherGroup =
+        {
+            pk: 189,
+            fields: {
+                text: "A used Question",
+                theme: 6,
+                answer_type: "MultiChoice",
+                is_primary: false
+            }
+        },
+        unUsedQuestion =
+        {
+            pk: 190,
+            fields: {
+                text: "An  unused Question",
+                theme: 6,
+                answer_type: "MultiChoice",
+                is_primary: false
+            }
+        },
+
         grid = [{
             pk: 12,
             fields: {
@@ -77,11 +98,12 @@ describe("create display all grid", function () {
 
 
         it('should grid data as initial', function () {
-            var expectedQuestion = [primary, question1, question2];
+            var expectedQuestions = [primary, question1, question2, questionUsedInAnotherGroup, unUsedQuestion];
             initController();
 
             httpMock.expectGET('/api/v1/grids/' + gridId + '/').respond(grid);
-            httpMock.expectGET('/api/v1/questions/').respond(expectedQuestion);
+            httpMock.expectGET('/api/v1/questions/').respond(expectedQuestions);
+            httpMock.expectGET('/api/v1/questions/?questionnaire=' + questionnaireId + '&unused=true').respond([unUsedQuestion]);
             httpMock.expectGET('/api/v1/question/' + primary.pk + '/options/').respond(options);
 
             scope.updateScope(questionnaireId, subsectionId, gridId);
@@ -92,6 +114,8 @@ describe("create display all grid", function () {
             expect(scope.selectedQuestions.primary).toEqual(primary);
             expect(scope.selectedQuestions.otherColumns).toEqual([question1, question2]);
             expect(scope.grid.questionOptions).toEqual(options);
+            expect(scope.grid.questions.length).toEqual(4);
+            expect(scope.grid.questions).toEqual([primary, question1, question2, unUsedQuestion]);
         });
         it('should update grid details', function () {
             var expectedGrid = {
@@ -116,13 +140,55 @@ describe("create display all grid", function () {
             scope.grid = {gridType: expectedGrid};
             scope.gridId = gridId;
             scope.subsectionId = subsectionId;
+            scope.editGridForm = {$valid: true};
+            scope.gridForm = {columns: {$valid: true, $viewValue: {pk: 2}}};
 
-            var successMessage = {message: 'Grid has been updated successfully!'};
-            httpMock.expectPOST('/api/v1/grids/' + gridId + '/').respond([successMessage]);
+            var successMessage = 'Grid has been updated successfully.';
+
+            httpMock.expectPOST('/api/v1/grids/' + gridId + '/').respond(200, [
+                {message: successMessage}
+            ]);
 
             scope.postUpdateGrid();
             httpMock.flush();
-            expect(scope.message).toEqual(successMessage.message);
+            expect(scope.message).toEqual(successMessage);
+            expect(scope.gridFormErrors.formHasErrors).toBeFalsy();
+        });
+
+        it('should show errors when grid details are invalid', function () {
+            var expectedGrid = {
+                value: 'display_all',
+                text: 'Display All',
+                displayAll: true,
+                initialSelectedQuestions: {
+                    primary: primary,
+                    otherColumns: stubQuestions
+                },
+                payload: function () {
+                    return {
+                        pk: gridId,
+                        primary: 188,
+                        columns: [186, 187],
+                        type: 'hybrid'
+                    }
+                }
+            };
+
+            initController();
+
+            scope.grid = {gridType: expectedGrid};
+            scope.gridId = gridId;
+            scope.subsectionId = subsectionId;
+            scope.editGridForm = {$valid: false};
+            scope.gridForm = {columns: {$valid: true, $viewValue: {pk: undefined}}};
+
+            var errorMessage = 'The are errors in the form. Please fix them and submit again.';
+
+            scope.postUpdateGrid();
+
+            expect(scope.error).toEqual(errorMessage);
+            expect(scope.gridFormErrors.formHasErrors).toBeTruthy();
+            expect(scope.message).toEqual('');
         });
     })
 });

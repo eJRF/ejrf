@@ -230,7 +230,7 @@ describe("create display all grid", function () {
             expect(scope.grid.questionOptions).toEqual([]);
         });
 
-        it('should post new grid', function () {
+        it('should get new grid', function () {
             initController();
 
             var url = '/api/v1/questions/?questionnaire=' + questionnaireId + '&unused=true';

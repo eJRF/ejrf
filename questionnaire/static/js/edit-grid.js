@@ -10,8 +10,12 @@ var editGridController = function ($scope, GridService, QuestionService, Display
         gridType: {},
         questions: []
     };
-
+    $scope.allQuestions = [];
     $scope.gridFormErrors = {};
+    $scope.editGridForm = {};
+    $scope.gridForm = {};
+
+
     $scope.updateScope = function (questionnaireId, subsectionId, gridId) {
         $scope.gridId = gridId;
         $scope.selectedQuestions = {
@@ -19,25 +23,34 @@ var editGridController = function ($scope, GridService, QuestionService, Display
             otherColumns: []
         };
 
-        var primaryQuestionIn = function (questionIds) {
-            return $scope.grid.questions.filter(function (qn) {
+        var gridQuestionsFrom = function (allQuestions, gridQuestionIds) {
+            return allQuestions.filter(function (qn) {
+                var qnIndex = gridQuestionIds.indexOf(qn.pk);
+                return qnIndex != -1;
+            })
+        };
+
+        var primaryQuestionIn = function (gridQuestions, questionIds) {
+            return gridQuestions.filter(function (qn) {
                 var qnIndex = questionIds.indexOf(qn.pk);
                 return qnIndex != -1 && qn.fields.is_primary;
             })[0]
         };
 
-        var getSelectedQuestions = function (question) {
+        var getSelectedQuestions = function (allQuestions, questionIds) {
+            var gridQuestions = gridQuestionsFrom(allQuestions, questionIds);
+
             return {
-                primary: primaryQuestionIn(question),
-                otherColumns: $scope.grid.questions.filter(function (qn) {
-                    var qnIndex = question.indexOf(qn.pk);
+                primary: primaryQuestionIn(gridQuestions, questionIds),
+                otherColumns: gridQuestions.filter(function (qn) {
+                    var qnIndex = questionIds.indexOf(qn.pk);
                     return qnIndex != -1 && !qn.fields.is_primary;
                 })
             }
         };
 
-        function getTheme(grid) {
-            var primaryQuestion = primaryQuestionIn(grid.fields.question);
+        function getTheme(gridQuestions, gridQuestionIds) {
+            var primaryQuestion = primaryQuestionIn(gridQuestions, gridQuestionIds);
             return primaryQuestion.fields.theme;
         }
 
@@ -54,21 +67,28 @@ var editGridController = function ($scope, GridService, QuestionService, Display
 
 
         GridService.fetch(gridId).then(function (gridResponse) {
-            var gridData = gridResponse.data;
-            QuestionService.all().then(function (response) {
-                $scope.grid.questions = response.data;
-                var grid = gridData[0],
-                    type = getType(grid),
-                    selectedQuestionsFromGrid = getSelectedQuestions(grid.fields.question);
+            var gridData = gridResponse.data,
+                grid = gridData[0];
+            var gridQuestionIds = grid.fields.question;
 
-                $scope.grid.selectedTheme = getTheme(grid);
-                $scope.grid.gridType = type;
-                $scope.selectedQuestions = type.initialSelectedQuestions;
+            QuestionService.all().then(function (allQuestionsResponse) {
+                var allQuestions = allQuestionsResponse.data;
+                var gridQuestions = gridQuestionsFrom(allQuestions, gridQuestionIds);
+                QuestionService.filter({questionnaire: questionnaireId, unused: true}).then(function (response) {
+                    $scope.grid.questions = gridQuestions.concat(response.data);
 
-                $scope.selectedQuestions.primary = selectedQuestionsFromGrid.primary;
-                $scope.selectedQuestions.otherColumns = selectedQuestionsFromGrid.otherColumns;
-                QuestionService.options(selectedQuestionsFromGrid.primary).then(function (response) {
-                    $scope.grid.questionOptions = response.data;
+                    var type = getType(grid),
+                        selectedQuestionsFromGrid = getSelectedQuestions(gridQuestions, gridQuestionIds);
+
+                    $scope.grid.selectedTheme = getTheme(gridQuestions, gridQuestionIds);
+                    $scope.grid.gridType = type;
+                    $scope.selectedQuestions = type.initialSelectedQuestions;
+
+                    $scope.selectedQuestions.primary = selectedQuestionsFromGrid.primary;
+                    $scope.selectedQuestions.otherColumns = selectedQuestionsFromGrid.otherColumns;
+                    QuestionService.options(selectedQuestionsFromGrid.primary).then(function (response) {
+                        $scope.grid.questionOptions = response.data;
+                    });
                 });
             });
 
@@ -78,16 +98,23 @@ var editGridController = function ($scope, GridService, QuestionService, Display
 
     $scope.postUpdateGrid = function () {
         var gridType = $scope.grid.gridType;
+        if ($scope.editGridForm.$valid && validateDynamicForms($scope.gridForm)) {
+            $scope.error = '';
 
-        GridService.update($scope.gridId, gridType.payload())
-            .success(function (response) {
-                $scope.message = response[0].message;
-                $scope.gridFormErrors.formHasErrors = false;
-            }).error(function (response) {
-                $scope.error = response[0].message;
-                $scope.gridFormErrors.formHasErrors = true;
-                $scope.gridFormErrors.backendErrors = response[0].form_errors;
-            });
+            GridService.update($scope.gridId, gridType.payload())
+                .success(function (response) {
+                    $scope.message = response[0].message;
+                    $scope.gridFormErrors.formHasErrors = false;
+                }).error(function (response) {
+                    $scope.error = response[0].error;
+                    $scope.gridFormErrors.formHasErrors = true;
+                    $scope.gridFormErrors.backendErrors = response[0].form_errors;
+                });
+        } else {
+            $scope.gridFormErrors.formHasErrors = true;
+            $scope.error = 'The are errors in the form. Please fix them and submit again.';
+            $scope.message = '';
+        }
     };
 };
 
