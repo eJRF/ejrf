@@ -17,7 +17,7 @@
         </div>
     </div>
 
-    <div class="modal fade create-grid" id="create-grid-modal" tabindex="-1" role="dialog"
+    <div class="modal fade grid-modal" id="create-grid-modal" tabindex="-1" role="dialog"
          aria-labelledby="preview_modal_label" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content" data-ng-controller="CreateGridController" id="create-grid-controller">
@@ -52,7 +52,7 @@
             </div>
         </div>
     </div>
-    <div class="modal fade edit-grid" id="edit-grid-modal" tabindex="-1" role="dialog"
+    <div class="modal fade grid-modal" id="edit-grid-modal" tabindex="-1" role="dialog"
          aria-labelledby="preview_modal_label" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content" data-ng-controller="EditGridController" id="edit-grid-controller">
@@ -72,9 +72,9 @@
                         <div ng-include="'/static/templates/grids/edit.html'"></div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-default" id="save_grid_button"><span
+                        <button type="submit" class="btn btn-default" id="update_grid_button"><span
                                 class="green bold"><i class="glyphicon glyphicon-ok"></i> Update</span></button>
-                        <button type="button" class="btn btn-default" data-dismiss="modal" id="close-create-grid-modal">
+                        <button type="button" class="btn btn-default" data-dismiss="modal" id="close-edit-grid-modal">
                     <span class="red bold">
                         <i class="glyphicon glyphicon-remove"></i> Cancel
                     </span>
@@ -127,13 +127,13 @@
     var url = "{% url 'skip_rules' %}";
     var sectionId = "{{ section.id }}",
             createSkipRuleForm = $('#create-skip-rule'),
-            createGridModal = $('#create-grid-modal');
+            gridModal = $('.grid-modal');
 
     createSkipRuleForm.on('hide.bs.modal', function (e) {
         $('.add-skip-rule-btn').addClass('disabled');
         window.location.reload()
     });
-    createGridModal.on('hidden.bs.modal', function (e) {
+    gridModal.on('hidden.bs.modal', function (e) {
         window.location.reload();
     });
     createSkipRuleForm.on('show.bs.modal', function (e) {

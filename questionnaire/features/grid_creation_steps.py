@@ -2,7 +2,9 @@ from time import sleep
 from lettuce import world, step
 from nose.tools import assert_true
 from questionnaire.features.pages.questionnaires import QuestionnairePage
-from questionnaire.models import Question, QuestionOption, Theme
+from questionnaire.models import Question, QuestionOption, Theme, QuestionGroupOrder
+from questionnaire.tests.factories.question_factory import QuestionFactory
+from questionnaire.tests.factories.question_group_factory import QuestionGroupFactory
 
 
 @step(u'And I have both simple and primary questions in my Question Bank')
@@ -188,3 +190,63 @@ def and_i_delete_the_element_at_row_group1_column_group1(step, row, column):
 @step(u'Then I should not see the element at row "([^"]*)" column "([^"]*)"')
 def then_i_should_not_see_the_element_at_row_group1_column_group1(step, row, column):
     world.page.is_element_not_present_by_id('column_%s_%s' % (row, column))
+
+@step(u'When I have a display all grid')
+def when_i_have_a_display_all_grid(step):
+    world.display_all_group = QuestionGroupFactory(grid=True, display_all=True,
+                                                   subsection=world.sub_section, order=1)
+    world.primary_question = QuestionFactory(is_primary=True, text='Primary Question',
+                                             export_label='Primary Question', instructions='')
+    world.non_question1 = QuestionFactory(text='Question 1', export_label='Question 1', instructions='')
+    world.non_question2 = QuestionFactory(text='Question 2', export_label='Question 2', instructions='')
+    world.unassigned_question2 = QuestionFactory(text='Question 3', export_label='Question 3', instructions='')
+
+    world.display_all_group.question.add(world.non_question1, world.primary_question, world.non_question2)
+    QuestionGroupOrder.objects.create(order=1, question=world.primary_question, question_group=world.display_all_group)
+    world.display_all_group.orders.create(order=2, question=world.non_question1)
+    world.display_all_group.orders.create(order=3, question=world.non_question2)
+
+@step(u'When I click edit the display all hybrid grid')
+def when_i_click_edit_the_display_all_hybrid_grid(step):
+    world.page.click_by_id('edit-grid-%s' % world.display_all_group.id)
+
+@step(u'And I click move first question to the right')
+def and_i_click_column_move_group1_question_to_the_left(step):
+    world.browser.find_by_id('column-0').mouse_over()
+    sleep(0.5)
+    world.page.click_by_id('move-question-%s-right' % world.non_question1.id)
+    sleep(1)
+
+@step(u'And I choose to move the same question to the left')
+def and_i_choose_to_move_the_same_question_further_left(step):
+    world.browser.find_by_id('column-1').mouse_over()
+    sleep(0.5)
+    world.page.click_by_id('move-question-%s-left' % world.non_question1.id)
+    sleep(1)
+
+@step(u'And I click update the grid')
+def and_i_click_update_the_grid(step):
+    world.page.click_by_id('update_grid_button')
+
+@step(u'Then I should see that the grid was updated successfully')
+def then_i_should_see_that_the_grid_was_updated_successfully(step):
+    world.page.is_text_present('The grid was updated successfully.')
+
+@step(u'Then I should see it moved to the right')
+def then_i_should_see_it_moved_to_the_left(step):
+    world.page.assert_questions_ordered_in_edit_modal([world.non_question2, world.non_question1])
+
+
+@step(u'Then I should see it moved back')
+def then_i_should_see_it_moved_back(step):
+    world.page.assert_questions_ordered_in_edit_modal([world.non_question1, world.non_question2])
+
+@step(u'When I close the edit grid modal')
+def when_i_close_the_edit_grid_modal(step):
+    world.page.click_by_id('close-edit-grid-modal')
+    sleep(3)
+
+@step(u'Then I should see the grid questions in their new order')
+def then_i_should_see_the_grid_questions_in_their_new_order(step):
+    assert world.page.is_element_present_by_id('delete-grid-%d' % world.display_all_group.id)
+    world.page.assert_questions_ordered_in_entry([world.non_question2, world.non_question1], world.display_all_group)

@@ -1,5 +1,5 @@
 from questionnaire.features.pages.base import PageObject
-from nose.tools import assert_true
+from nose.tools import assert_true, assert_equals, assert_in
 
 
 class QuestionnairePage(PageObject):
@@ -61,3 +61,14 @@ class QuestionnairePage(PageObject):
         subsection_title_with_numbering = "%s %s" % (subsection_numbering, subsection.title)
         subsection_element_id = "subsection-%s-content" % subsection.id
         self.is_text_present_in_element_by_id(subsection_title_with_numbering, subsection_element_id)
+
+    def assert_questions_ordered_in_entry(self, questions_in_order, group):
+        grid_table = self.browser.find_by_id('grid-table-%s' % group.id)
+        table_headers = grid_table.find_by_css('th')
+        for index, header in enumerate(table_headers[2:]):
+            assert_true(header.text, questions_in_order[index].text)
+
+    def assert_questions_ordered_in_edit_modal(self, questions_in_order):
+        for index, question in enumerate(questions_in_order):
+            selected = self.browser.find_by_id('column-%d' % index)
+            assert_equals(selected.value, str(question.id))

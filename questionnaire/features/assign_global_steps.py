@@ -26,11 +26,11 @@ def and_i_have_a_questionnaire_with_sections_and_with_subsections(step):
     world.section1 = Section.objects.create(order=1,
                                             title="WHO/UNICEF Joint Reporting Form on Immunization for the Period January-December, 2013",
                                             description="""If a question is not relevant, enter "NR" (not relevant)""",
-                                            questionnaire=world.questionnaire, name="Cover page")
+                                            questionnaire=world.questionnaire, name="Section 1")
     world.section2 = Section.objects.create(order=2,
                                             title="Another title",
                                             description="This is just another one of them",
-                                            questionnaire=world.questionnaire, name="Cover page")
+                                            questionnaire=world.questionnaire, name="Section 2")
     world.sub_section = SubSection.objects.create(order=1, section=world.section1)
 
 

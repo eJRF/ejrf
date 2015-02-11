@@ -29,12 +29,12 @@
                     </div>
                     <div class="pull-left grid-btn grid-btn-group-left" ng-show="editTable">
                         <a href="#" data-ng-click="selectedQuestions.moveLeft($index)"
-                           id='remove-column-{[{ $index }]}'
+                           id='move-question-{[{ q.pk }]}-left'
                            ng-show="$index > 0">
                             <i class="glyphicon glyphicon-backward"></i>
                         </a>
                         <a href="#" ng-show="$index < selectedQuestions.otherColumns.length - 1"
-                           id='add-column-{[{ $index }]}'
+                           id='move-question-{[{ q.pk }]}-right'
                            data-ng-click="selectedQuestions.moveRight($index)">
                             <i class="glyphicon glyphicon-forward"></i>
                         </a>
