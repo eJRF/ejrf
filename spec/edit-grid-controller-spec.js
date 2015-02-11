@@ -80,7 +80,7 @@ describe("create display all grid", function () {
             var expectedQuestion = [primary, question1, question2];
             initController();
 
-            httpMock.expectGET('/api/v1/subsection/' + subsectionId + '/grid/' + gridId + '/').respond(grid);
+            httpMock.expectGET('/api/v1/grids/' + gridId + '/').respond(grid);
             httpMock.expectGET('/api/v1/questions/').respond(expectedQuestion);
             httpMock.expectGET('/api/v1/question/' + primary.pk + '/options/').respond(options);
 
@@ -118,7 +118,7 @@ describe("create display all grid", function () {
             scope.subsectionId = subsectionId;
 
             var successMessage = {message: 'Grid has been updated successfully!'};
-            httpMock.expectPOST('/api/v1/subsection/' + subsectionId + '/grid/' + gridId + '/').respond([successMessage]);
+            httpMock.expectPOST('/api/v1/grids/' + gridId + '/').respond([successMessage]);
 
             scope.postUpdateGrid();
             httpMock.flush();

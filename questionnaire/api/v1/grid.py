@@ -13,7 +13,7 @@ class GridAPIView(PermissionRequiredMixin, View):
     template_name = 'questions/index.html'
     model = Theme
 
-    def get(self, request, subsection_id, grid_id, *args, **kwargs):
+    def get(self, request, grid_id, *args, **kwargs):
         question_group = QuestionGroup.objects.get(id=grid_id)
         question_group_json = serializers.serialize("json", [question_group])
         children = serializers.serialize("json", question_group.sub_group.all())
@@ -21,7 +21,7 @@ class GridAPIView(PermissionRequiredMixin, View):
         grid_response[0]['children'] = children
         return HttpResponse(json.dumps(grid_response), content_type="application/json")
 
-    def post(self, request, subsection_id, grid_id, *args, **kwargs):
+    def post(self, request, grid_id, *args, **kwargs):
         grid = QuestionGroup.objects.get(id=grid_id)
         form = EditGridForm(data=request.POST, instance=grid)
         if form.is_valid():

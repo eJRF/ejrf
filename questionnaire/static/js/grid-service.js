@@ -35,14 +35,15 @@ gridService.factory('GridService', function ($http) {
                 data: payload
             });
         },
-        fetch: function (subsectionId, gridId) {
-            return $http.get('/api/v1/subsection/' + subsectionId + '/grid/' + gridId + '/')
+        fetch: function (gridId) {
+        var gridUrl = '/api/v1/grids/' + gridId + '/';
+            return $http.get(gridUrl)
         },
-        update: function (subsectionId, gridId, payload) {
-            var url = '/api/v1/subsection/' + subsectionId + '/grid/' + gridId + '/';
+        update: function (gridId, payload) {
+            var gridUrl = '/api/v1/grids/' + gridId + '/';
             return $http({
                 method: 'POST',
-                url: url,
+                url: gridUrl,
                 headers: {'Content-Type': 'application/x-www-form-urlencoded'},
                 transformRequest: transformRequestHelper,
                 data: payload

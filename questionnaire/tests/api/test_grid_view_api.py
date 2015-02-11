@@ -22,7 +22,7 @@ class GridAPIViewTest(BaseTest):
         self.subsection = SubSectionFactory()
         self.grid_question_group = QuestionGroupFactory(grid=True, allow_multiples=True,
                                                         subsection=self.subsection)
-        self.url = '/api/v1/subsection/%s/grid/%s/' % (self.subsection.id, self.grid_question_group.id)
+        self.url = '/api/v1/grids/%s/' % self.grid_question_group.id
 
         self.primary_question = QuestionFactory(is_primary=True, text='Some primary question',
                                                 answer_type=AnswerTypes.MULTI_CHOICE, theme=self.theme1)

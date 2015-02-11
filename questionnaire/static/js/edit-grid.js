@@ -10,6 +10,7 @@ var editGridController = function ($scope, GridService, QuestionService, Display
         gridType: {},
         questions: []
     };
+
     $scope.gridFormErrors = {};
     $scope.updateScope = function (questionnaireId, subsectionId, gridId) {
         $scope.gridId = gridId;
@@ -52,7 +53,7 @@ var editGridController = function ($scope, GridService, QuestionService, Display
         }
 
 
-        GridService.fetch(subsectionId, gridId).then(function (gridResponse) {
+        GridService.fetch(gridId).then(function (gridResponse) {
             var gridData = gridResponse.data;
             QuestionService.all().then(function (response) {
                 $scope.grid.questions = response.data;
@@ -78,7 +79,7 @@ var editGridController = function ($scope, GridService, QuestionService, Display
     $scope.postUpdateGrid = function () {
         var gridType = $scope.grid.gridType;
 
-        GridService.update($scope.subsectionId, $scope.gridId, gridType.payload())
+        GridService.update($scope.gridId, gridType.payload())
             .success(function (response) {
                 $scope.message = response[0].message;
                 $scope.gridFormErrors.formHasErrors = false;
