@@ -2,8 +2,7 @@ from django import forms
 from django.db.models import Q
 
 from questionnaire.forms.custom_widgets import MultiChoiceQuestionSelectWidget
-from questionnaire.models import Question
-from questionnaire.utils.answer_type import AnswerTypes
+from questionnaire.models import Question, QuestionGroup
 
 
 GRID_TYPES = (('', 'Choose One'),
@@ -86,7 +85,9 @@ class GridForm(forms.Form):
 
     def _create_parent_grid(self, primary_question, remaining_questions):
         attributes = self._get_grid_attributes()
-        grid_group = self.instance or primary_question.question_group.create(**attributes)
+        grid_group = self.instance or QuestionGroup.objects.create(**attributes)
+
+        grid_group.question.add(primary_question)
         grid_group.question.add(*remaining_questions)
         return grid_group
 

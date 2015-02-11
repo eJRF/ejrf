@@ -78,7 +78,6 @@ var editGridController = function ($scope, GridService, QuestionService, Display
     $scope.postUpdateGrid = function () {
         var gridType = $scope.grid.gridType;
 
-
         GridService.update($scope.subsectionId, $scope.gridId, gridType.payload())
             .success(function (response) {
                 $scope.message = response[0].message;

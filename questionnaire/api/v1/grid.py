@@ -24,7 +24,6 @@ class GridAPIView(PermissionRequiredMixin, View):
     def post(self, request, subsection_id, grid_id, *args, **kwargs):
         grid = QuestionGroup.objects.get(id=grid_id)
         form = EditGridForm(data=request.POST, instance=grid)
-        print request.POST
         if form.is_valid():
             form.save()
             grid_response = [{'message': 'The grid was updated successfully.'}]
