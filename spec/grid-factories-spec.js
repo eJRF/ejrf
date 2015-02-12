@@ -61,21 +61,21 @@ describe("grid Type Factories", function () {
         });
 
         it('should remove element given row and column', function () {
-            selectedQuestions.dynamicGridQuestion[1] = [{'row1': 'column0'},{'row1': 'column1'},{'row1': 'column2'}];
+            selectedQuestions.dynamicGridQuestion[1] = [{'row1': 'column0'}, {'row1': 'column1'}, {'row1': 'column2'}];
             selectedQuestions.removeElement(1, 1);
-            expect(selectedQuestions.dynamicGridQuestion).toEqual([[{}],[{'row1': 'column0'},{'row1': 'column2'}]]);
+            expect(selectedQuestions.dynamicGridQuestion).toEqual([[{}], [{'row1': 'column0'}, {'row1': 'column2'}]]);
         });
 
         it('should remove entire row if empty after removing element in the row', function () {
             selectedQuestions.dynamicGridQuestion[1] = [{'row1': 'column0'}];
-            selectedQuestions.dynamicGridQuestion[2] = [{'row2': 'column0'},{'row2': 'column2'}];
+            selectedQuestions.dynamicGridQuestion[2] = [{'row2': 'column0'}, {'row2': 'column2'}];
             selectedQuestions.removeElement(1, 0);
-            expect(selectedQuestions.dynamicGridQuestion).toEqual([[{}],[{'row2': 'column0'},{'row2': 'column2'}]]);
+            expect(selectedQuestions.dynamicGridQuestion).toEqual([[{}], [{'row2': 'column0'}, {'row2': 'column2'}]]);
         });
 
         it('should return max columns length', function () {
             selectedQuestions.dynamicGridQuestion[1] = [{'row1': 'column0'}];
-            selectedQuestions.dynamicGridQuestion[2] = [{'row2': 'column0'},{'row2': 'column2'}];
+            selectedQuestions.dynamicGridQuestion[2] = [{'row2': 'column0'}, {'row2': 'column2'}];
 
             expect(selectedQuestions.maxColumns()).toEqual(2);
         });
@@ -101,7 +101,7 @@ describe("grid Type Factories", function () {
         var selectedQuestions;
 
         beforeEach(inject(function (NonHybridQuestionSelection) {
-                selectedQuestions = NonHybridQuestionSelection;
+                selectedQuestions = new NonHybridQuestionSelection([], []);
             })
         );
 
@@ -206,11 +206,14 @@ describe("grid Type Factories", function () {
             primaryQuestionPk = 666;
 
         beforeEach(function () {
-            selectedQuestions.primary = {pk: primaryQuestionPk, fields: { text: "FAKE devil ", answer_type: "Text", is_primary: true}};
+            selectedQuestions.primary = {
+                pk: primaryQuestionPk,
+                fields: {text: "FAKE devil ", answer_type: "Text", is_primary: true}
+            };
             selectedQuestions.otherColumns = [
-                {pk: 224, fields: {text: "q4", answer_type: "Date" }},
-                {pk: 225, fields: {text: "q5", answer_type: "Text" }},
-                {pk: 142, fields: {text: "q6", answer_type: "Number" }}
+                {pk: 224, fields: {text: "q4", answer_type: "Date"}},
+                {pk: 225, fields: {text: "q5", answer_type: "Text"}},
+                {pk: 142, fields: {text: "q6", answer_type: "Number"}}
             ];
 
             inject(function (NonHybridPayload) {
@@ -241,14 +244,17 @@ describe("grid Type Factories", function () {
         beforeEach(function () {
 
             module(function ($provide) {
-                selectedQuestions.primary = {pk: primaryQuestionPk, fields: { text: "FAKE devil ", answer_type: "Text", is_primary: true}};
+                selectedQuestions.primary = {
+                    pk: primaryQuestionPk,
+                    fields: {text: "FAKE devil ", answer_type: "Text", is_primary: true}
+                };
                 selectedQuestions.dynamicGridQuestion = [
                     [
-                        {question: {pk: 149, fields: {text: "Name of person", answer_type: "Text" }}}
+                        {question: {pk: 149, fields: {text: "Name of person", answer_type: "Text"}}}
                     ],
                     [
                         {question: {pk: 224, fields: {text: "q4", answer_type: "Date"}}},
-                        {question: {pk: 225, fields: {text: "q5", answer_type: "Text" }}}
+                        {question: {pk: 225, fields: {text: "q5", answer_type: "Text"}}}
                     ],
                     [
                         {question: {pk: 142, fields: {text: "Total Cases", answer_type: "Number"}}}
@@ -288,6 +294,61 @@ describe("grid Type Factories", function () {
                 };
 
             expect(grid.payload()).toEqual(expectedPayload);
+        });
+    });
+
+    describe("QuestionInitializer", function () {
+        var question1 =
+            {
+                pk: 186,
+                fields: {
+                    text: "PAB (protection at birth)",
+                    theme: 6,
+                    is_primary: false
+                }
+            },
+            question2 =
+            {
+                pk: 187,
+                fields: {
+                    text: "Another Question",
+                    theme: 6,
+                    is_primary: false
+                }
+            },
+            primary = {
+                pk: 188,
+                fields: {
+                    text: "PAB (protection at birth)",
+                    theme: 6,
+                    answer_type: "MultiChoice",
+                    is_primary: true
+                }
+            },
+            questionInitializer;
+
+        beforeEach
+        (inject(function (QuestionInitializer) {
+                questionInitializer = QuestionInitializer;
+            })
+        );
+
+        it('should have initial primary question an empty object and other columns as an array of objects', function () {
+            var allQuestions = [],
+                gridQuestionIds = [];
+
+            var initial = questionInitializer.init(allQuestions, gridQuestionIds);
+            expect(initial.primary).toEqual({});
+            expect(initial.otherColumns).toEqual([{}]);
+        });
+
+        it('should set the primary question from questions given gridIds', function () {
+            var allQuestions = [question1, question2, primary],
+                gridQuestionIds = [question1.pk, question2.pk, primary.pk];
+
+            var initial = questionInitializer.init(allQuestions, gridQuestionIds);
+            expect(initial.primary).toEqual(primary);
+            expect(initial.otherColumns).toEqual([question1, question2]);
         });
     });
 });

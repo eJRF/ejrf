@@ -23,46 +23,18 @@ var editGridController = function ($scope, GridService, QuestionService, Display
             otherColumns: []
         };
 
-        var gridQuestionsFrom = function (allQuestions, gridQuestionIds) {
-            return allQuestions.filter(function (qn) {
-                var qnIndex = gridQuestionIds.indexOf(qn.pk);
-                return qnIndex != -1;
-            })
-        };
-
-        var primaryQuestionIn = function (gridQuestions, questionIds) {
-            return gridQuestions.filter(function (qn) {
-                var qnIndex = questionIds.indexOf(qn.pk);
-                return qnIndex != -1 && qn.fields.is_primary;
-            })[0]
-        };
-
-        var getSelectedQuestions = function (allQuestions, questionIds) {
-            var gridQuestions = gridQuestionsFrom(allQuestions, questionIds);
-
-            return {
-                primary: primaryQuestionIn(gridQuestions, questionIds),
-                otherColumns: gridQuestions.filter(function (qn) {
-                    var qnIndex = questionIds.indexOf(qn.pk);
-                    return qnIndex != -1 && !qn.fields.is_primary;
-                })
-            }
-        };
-
-        function getTheme(gridQuestions, gridQuestionIds) {
-            var primaryQuestion = primaryQuestionIn(gridQuestions, gridQuestionIds);
+        function getTheme(primaryQuestion) {
             return primaryQuestion.fields.theme;
         }
 
-        function getType(grid) {
+        function initializeType(grid,  allQuestions, gridQuestionIds) {
             if (grid.fields.hybrid) {
-                return HybridGridFactory.create();
+                return HybridGridFactory.create(allQuestions, gridQuestionIds);
             }
             if (grid.fields.allow_multiples) {
-                return AddMoreGridFactory.create();
+                return AddMoreGridFactory.create( allQuestions, gridQuestionIds);
             }
-            return DisplayAllGridFactory
-                .create();
+            return DisplayAllGridFactory.create( allQuestions, gridQuestionIds);
         }
 
 
@@ -73,20 +45,20 @@ var editGridController = function ($scope, GridService, QuestionService, Display
 
             QuestionService.all().then(function (allQuestionsResponse) {
                 var allQuestions = allQuestionsResponse.data;
-                var gridQuestions = gridQuestionsFrom(allQuestions, gridQuestionIds);
                 QuestionService.filter({questionnaire: questionnaireId, unused: true}).then(function (response) {
-                    $scope.grid.questions = gridQuestions.concat(response.data);
+                    var type = initializeType(grid, allQuestions, gridQuestionIds),
+                        unUsedQuestions = response.data;
 
-                    var type = getType(grid),
-                        selectedQuestionsFromGrid = getSelectedQuestions(gridQuestions, gridQuestionIds);
-
-                    $scope.grid.selectedTheme = getTheme(gridQuestions, gridQuestionIds);
-                    $scope.grid.gridType = type;
                     $scope.selectedQuestions = type.initialSelectedQuestions;
 
-                    $scope.selectedQuestions.primary = selectedQuestionsFromGrid.primary;
-                    $scope.selectedQuestions.otherColumns = selectedQuestionsFromGrid.otherColumns;
-                    QuestionService.options(selectedQuestionsFromGrid.primary).then(function (response) {
+                    var usedQuestions = $scope.selectedQuestions.questions;
+                    $scope.grid.questions = usedQuestions.concat(unUsedQuestions);
+
+                    var primaryQuestion = $scope.selectedQuestions.primary;
+                    $scope.grid.selectedTheme = getTheme(primaryQuestion);
+                    $scope.grid.gridType = type;
+
+                    QuestionService.options(primaryQuestion).then(function (response) {
                         $scope.grid.questionOptions = response.data;
                     });
                 });

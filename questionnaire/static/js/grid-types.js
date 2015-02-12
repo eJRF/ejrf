@@ -15,7 +15,42 @@ gridTypeFactories.factory('NonHybridPayload', function () {
     return {payload: generatePayload};
 });
 
-gridTypeFactories.factory('NonHybridQuestionSelection', function () {
+gridTypeFactories.factory('QuestionInitializer', function () {
+    var gridQuestionsFrom = function (allQuestions, gridQuestionIds) {
+        return allQuestions.filter(function (qn) {
+            var qnIndex = gridQuestionIds.indexOf(qn.pk);
+            return qnIndex != -1;
+        })
+    };
+
+    var primaryQuestionIn = function (gridQuestions, questionIds) {
+        return gridQuestions.filter(function (qn) {
+            var qnIndex = questionIds.indexOf(qn.pk);
+            return qnIndex != -1 && qn.fields.is_primary;
+        })[0]
+    };
+
+    var init = function (allQuestions, questionIds) {
+        var gridQuestions = gridQuestionsFrom(allQuestions, questionIds);
+
+        var primary = primaryQuestionIn(gridQuestions, questionIds);
+        var otherColumns = gridQuestions.filter(function (qn) {
+            var qnIndex = questionIds.indexOf(qn.pk);
+            return qnIndex != -1 && !qn.fields.is_primary;
+        });
+
+        return {
+            primary: primary || {},
+            otherColumns: otherColumns.length && otherColumns || [{}],
+            questions: gridQuestions.length && gridQuestions || []
+        }
+    };
+    return {
+        init: init
+    }
+});
+
+gridTypeFactories.factory('NonHybridQuestionSelection', function (QuestionInitializer) {
     var addColumn = function (index) {
         this.otherColumns.splice(index, 0, {});
     };
@@ -31,27 +66,30 @@ gridTypeFactories.factory('NonHybridQuestionSelection', function () {
     };
     var moveLeft = function (index) {
         var otherColumns = this.otherColumns;
-        if(index > 0) {
+        if (index > 0) {
             var toIndex = index - 1;
             this.otherColumns.splice(toIndex, 2, otherColumns[index], otherColumns[toIndex]);
         }
     };
 
-    return {
-        primary: {},
-        otherColumns: [
-            {}
-        ],
-        addColumn: addColumn,
-        removeColumn: removeColumn,
-        moveLeft: moveLeft,
-        moveRight: moveRight
-    };
+    return function (allQuestions, questionIds) {
+        var questions = allQuestions || [], gridQuestionIds = questionIds || [];
+        var initial = QuestionInitializer.init(questions, gridQuestionIds);
 
+        return {
+            addColumn: addColumn,
+            removeColumn: removeColumn,
+            moveLeft: moveLeft,
+            moveRight: moveRight,
+            primary: initial.primary,
+            otherColumns: initial.otherColumns,
+            questions: initial.questions
+        };
+    };
 });
 
 gridTypeFactories.factory('AddMoreGridFactory', function (NonHybridPayload, NonHybridQuestionSelection) {
-    var addMoreGrid = function () {
+    var addMoreGrid = function (allQuestions, questionIds) {
         var thePayload = function () {
             return NonHybridPayload.payload(this.initialSelectedQuestions, this.value);
         };
@@ -62,18 +100,18 @@ gridTypeFactories.factory('AddMoreGridFactory', function (NonHybridPayload, NonH
             hybrid: false,
             primary_questions_criteria: {is_primary: true},
             payload: thePayload,
-            initialSelectedQuestions: NonHybridQuestionSelection
+            initialSelectedQuestions: new NonHybridQuestionSelection(allQuestions, questionIds)
         }
     };
     return {
-        create: function () {
-            return new addMoreGrid();
+        create: function (allQuestions, questionIds) {
+            return new addMoreGrid(allQuestions, questionIds);
         }
     }
 });
 
 gridTypeFactories.factory('DisplayAllGridFactory', function (NonHybridPayload, NonHybridQuestionSelection) {
-    var DisplayAllGrid = function () {
+    var DisplayAllGrid = function (allQuestions, questionIds) {
         var thePayload = function () {
             return NonHybridPayload.payload(this.initialSelectedQuestions, this.value);
         };
@@ -88,12 +126,12 @@ gridTypeFactories.factory('DisplayAllGridFactory', function (NonHybridPayload, N
                 answer_type: 'MultiChoice'
             },
             payload: thePayload,
-            initialSelectedQuestions: NonHybridQuestionSelection
+            initialSelectedQuestions: new NonHybridQuestionSelection(allQuestions, questionIds)
         }
     };
     return {
-        create: function () {
-            return new DisplayAllGrid();
+        create: function (allQuestions, questionIds) {
+            return new DisplayAllGrid(allQuestions, questionIds);
         }
     };
 });

@@ -1,4 +1,4 @@
-<div>
+<div ng-if="!grid.gridType.hybrid">
     <div class="table-responsive">
         <table class="table table-bordered">
             <tr ng-model="selectedQuestions.otherColumns">
@@ -62,7 +62,7 @@
 
                 </td>
             </tr>
-            <tr ng-show="grid.gridType.displayAll" ng-repeat="option in grid.questionOptions">
+            <tr ng-if="grid.gridType.displayAll" ng-repeat="option in grid.questionOptions">
                 <td>
                     {[{ $index + 1 }]}
                 </td>
@@ -73,7 +73,7 @@
                     <question-input/>
                 </td>
             </tr>
-            <tr ng-show="grid.gridType.addMore">
+            <tr ng-if="grid.gridType.addMore">
                 <td>
                     1
                 </td>
@@ -86,4 +86,69 @@
             </tr>
         </table>
     </div>
+</div>
+
+<div class="table-responsive" ng-if="grid.gridType.hybrid">
+    <table class="table">
+        <tr>
+            <td>1</td>
+            <td colspan="{[{ selectedQuestions.maxColumns() }]}">
+                <select required name="primary_question" id="primary_question" class="form-control"
+                        data-ng-model="selectedQuestions.primary"
+                        data-ng-options="question.fields.export_label for question in grid.primaryQuestions | filter: {fields:{is_primary: 'true'}} | filter: { fields: {theme: grid.selectedTheme.pk}} track by question.pk">
+                    <option value="">Primary Question</option>
+                </select>
+
+                <div class="error-text" ng-show="newGrid.primary_question.$invalid || gridFormErrors.formHasErrors">
+                    <p class="text-danger" ng-show="newGrid.primary_question.$error.required">
+                        This field is required
+                    </p>
+
+                    <p class="text-danger" ng-repeat="error in gridFormErrors.backendErrors.primary_question">
+                        {[{ error }]}
+                    </p>
+                </div>
+
+            </td>
+        </tr>
+
+        <tr ng-repeat="row in selectedQuestions.dynamicGridQuestion">
+            <td>{[{ $index + 2}]}</td>
+            <td ng-mouseleave="grid.addGridRow[$parent.$index][$index]=false"
+                ng-mouseenter="grid.addGridRow[$parent.$index][$index]=true"
+                ng-repeat="column in row">
+                <div name="gridForm.{[{'dynamicGridQuestion' + $parent.$index + '_' + $index}]}" ng-form="">
+                    <div class="input-group">
+                        <select required id="column_{[{$parent.$index+'_'+$index}]}" name="columns" class="form-control"
+                                data-ng-model="column['question']"
+                                data-ng-options="question.fields.export_label for question in grid.questions | filter: {fields:{is_primary: 'false'}} | filter: { fields: {theme: grid.selectedTheme.pk}} | notInHybridGrid:selectedQuestions.dynamicGridQuestion:column['question'] track by question.pk">
+                            <option value="">Question</option>
+                        </select>
+
+                        <div class="input-group-addon" ng-show="grid.addGridRow[$parent.$index][$index]">
+                            <a ng-show="selectedQuestions.dynamicGridQuestion.length > 1" id="remove_{[{$parent.$index+'_'+$index}]}" href="#" data-ng-click="selectedQuestions.removeElement($parent.$index, $index)"><i
+                                    class="glyphicon glyphicon-trash"></i></a>
+                            <a id="addRow_{[{$parent.$index+'_'+$index}]}"href="#" data-ng-click="$parent.$index=selectedQuestions.addRow($parent.$index + 1)"><i
+                                    class="glyphicon glyphicon-circle-arrow-down"></i></a>
+                            <a id="addElement_{[{$parent.$index+'_'+$index}]}" href="#" data-ng-click="selectedQuestions.addElement($parent.$index, $index + 1)"><i
+                                   ng-show="selectedQuestions.allowAddColumn($parent.$index)" class="glyphicon glyphicon-circle-arrow-right"></i></a>
+                        </div>
+
+                        <div class="error-text"
+                             ng-show="gridForm.{[{'dynamicGridQuestion' + $parent.$index + '_' + $index}]}.columns.$invalid || gridFormErrors.formHasErrors">
+                            <p class="text-danger"
+                               ng-show="gridForm.{[{'dynamicGridQuestion' + $parent.$index + '_' + $index}]}.columns.$error.required">
+                                This field is required
+                            </p>
+
+                            <p class="text-danger" ng-repeat="error in gridFormErrors.backendErrors.columns">
+                                {[{ error }]}
+                            </p>
+                        </div>
+
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
 </div>
