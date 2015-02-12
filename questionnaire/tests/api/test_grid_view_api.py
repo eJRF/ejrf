@@ -149,3 +149,48 @@ class GridAPIViewTest(BaseTest):
         self.assertEqual([required_error], response_data['form_errors']['type'])
         self.assertEqual([primary_invalid_choices], response_data['form_errors']['primary_question'])
         self.assertEqual([column_invalid_choices], response_data['form_errors']['columns'])
+
+
+class GridQuestionOrdersAPIViewTest(BaseTest):
+    def setUp(self):
+        self.client = Client()
+        self.user = self.create_user(group=self.GLOBAL_ADMIN, org="WHO")
+        self.assign('can_edit_questionnaire', self.user)
+        self.client.login(username=self.user.username, password='pass')
+
+        self.theme1 = ThemeFactory()
+        self.subsection = SubSectionFactory()
+        self.grid_question_group = QuestionGroupFactory(grid=True, allow_multiples=True,
+                                                        subsection=self.subsection)
+        self.url = '/api/v1/grids/%s/orders/' % self.grid_question_group.id
+
+        self.primary_question = QuestionFactory(is_primary=True, text='Some primary question',
+                                                answer_type=AnswerTypes.MULTI_CHOICE, theme=self.theme1)
+        self.column_1_question = QuestionFactory(text='Question 1', answer_type=AnswerTypes.DATE, theme=self.theme1)
+        self.column_2_question = QuestionFactory(text='Question 2', answer_type=AnswerTypes.TEXT, theme=self.theme1)
+        self.column_3_question = QuestionFactory(text='Question 3', answer_type=AnswerTypes.TEXT, theme=self.theme1)
+        self.order_1 = QuestionGroupOrder.objects.create(question=self.primary_question, order=1,
+                                                         question_group=self.grid_question_group)
+        self.order_2 = QuestionGroupOrder.objects.create(question=self.column_1_question, order=2,
+                                                         question_group=self.grid_question_group)
+        self.order_3 = QuestionGroupOrder.objects.create(question=self.column_2_question, order=3,
+                                                         question_group=self.grid_question_group)
+
+        self.sub_group_1 = QuestionGroupFactory(subsection=self.subsection, parent=self.grid_question_group)
+        self.sub_group_1.question.add(self.column_3_question)
+        self.order_4 = QuestionGroupOrder.objects.create(question=self.column_3_question, order=4,
+                                                         question_group=self.grid_question_group)
+
+    def test_get_orders(self):
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code)
+
+        json_response = json.loads(response.content)
+        grid_question_orders = [self.order_1, self.order_2, self.order_3, self.order_4]
+
+        question_orders = map(lambda question_order: question_order['pk'], json_response)
+        self.assertEqual(4, len(question_orders))
+
+        for order in grid_question_orders:
+            self.assertIn(order.id, question_orders)

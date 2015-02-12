@@ -5,13 +5,13 @@ from django.core import serializers
 from django.views.generic import View
 from questionnaire.forms.grid import GridForm, EditGridForm
 
-from questionnaire.models import Theme, QuestionGroup
+from questionnaire.models import Theme, QuestionGroup, QuestionGroupOrder
 
 
 class GridAPIView(PermissionRequiredMixin, View):
     permission_required = 'auth.can_edit_questionnaire'
     template_name = 'questions/index.html'
-    model = Theme
+    model = QuestionGroup
 
     def get(self, request, grid_id, *args, **kwargs):
         question_group = QuestionGroup.objects.get(id=grid_id)
@@ -30,3 +30,14 @@ class GridAPIView(PermissionRequiredMixin, View):
             return HttpResponse(json.dumps(grid_response), content_type="application/json")
         grid_response = [{'error': 'The grid could not be updated.', 'form_errors': form.errors}]
         return HttpResponse(json.dumps(grid_response), content_type="application/json", status=400)
+
+
+class GridQuestionOrdersAPIView(PermissionRequiredMixin, View):
+    permission_required = 'auth.can_edit_questionnaire'
+    template_name = 'questions/index.html'
+    model = QuestionGroupOrder
+
+    def get(self, *args, **kwargs):
+        question_group = QuestionGroup.objects.get(id=kwargs['grid_id'])
+        orders = serializers.serialize("json", question_group.orders.all())
+        return HttpResponse(orders, content_type="application/json")
