@@ -7,7 +7,7 @@ describe("grid Type Factories", function () {
 
         beforeEach(
             inject(function (hybridGridQuestionSelection) {
-                selectedQuestions = hybridGridQuestionSelection;
+                selectedQuestions = new hybridGridQuestionSelection({}, []);
             })
         );
 
@@ -237,30 +237,33 @@ describe("grid Type Factories", function () {
     });
 
     describe("HybridGridFactory", function () {
-        var selectedQuestions = {},
+        var selectedQuestions,
             hybridGrid,
             primaryQuestionPk = 666;
 
         beforeEach(function () {
 
             module(function ($provide) {
-                selectedQuestions.primary = {
-                    pk: primaryQuestionPk,
-                    fields: {text: "FAKE devil ", answer_type: "Text", is_primary: true}
+                selectedQuestions = function () {
+                    return {
+                        primary: {
+                            pk: primaryQuestionPk,
+                            fields: {text: "FAKE devil ", answer_type: "Text", is_primary: true}
+                        },
+                        dynamicGridQuestion: [
+                            [
+                                {question: {pk: 149, fields: {text: "Name of person", answer_type: "Text"}}}
+                            ],
+                            [
+                                {question: {pk: 224, fields: {text: "q4", answer_type: "Date"}}},
+                                {question: {pk: 225, fields: {text: "q5", answer_type: "Text"}}}
+                            ],
+                            [
+                                {question: {pk: 142, fields: {text: "Total Cases", answer_type: "Number"}}}
+                            ]
+                        ]
+                    };
                 };
-                selectedQuestions.dynamicGridQuestion = [
-                    [
-                        {question: {pk: 149, fields: {text: "Name of person", answer_type: "Text"}}}
-                    ],
-                    [
-                        {question: {pk: 224, fields: {text: "q4", answer_type: "Date"}}},
-                        {question: {pk: 225, fields: {text: "q5", answer_type: "Text"}}}
-                    ],
-                    [
-                        {question: {pk: 142, fields: {text: "Total Cases", answer_type: "Number"}}}
-                    ]
-                ];
-
                 $provide.value('hybridGridQuestionSelection', selectedQuestions);
             });
 
@@ -278,7 +281,7 @@ describe("grid Type Factories", function () {
             expect(grid.hybrid).toEqual(true);
             expect(grid.addMore).toEqual(true);
             expect(grid.primary_questions_criteria).toEqual({is_primary: true});
-            expect(grid.initialSelectedQuestions).toEqual(selectedQuestions);
+            expect(grid.initialSelectedQuestions).toEqual(selectedQuestions());
         });
 
         it('should generate payload', function () {
@@ -335,20 +338,83 @@ describe("grid Type Factories", function () {
 
         it('should have initial primary question an empty object and other columns as an array of objects', function () {
             var allQuestions = [],
-                gridQuestionIds = [];
+                grid = {};
 
-            var initial = questionInitializer.init(allQuestions, gridQuestionIds);
+            var initial = questionInitializer.init(grid, allQuestions);
             expect(initial.primary).toEqual({});
             expect(initial.otherColumns).toEqual([{}]);
         });
 
         it('should set the primary question from questions given gridIds', function () {
             var allQuestions = [question1, question2, primary],
-                gridQuestionIds = [question1.pk, question2.pk, primary.pk];
+                gridQuestionIds = [question1.pk, question2.pk, primary.pk],
+                grid = {fields: {question: gridQuestionIds}};
 
-            var initial = questionInitializer.init(allQuestions, gridQuestionIds);
+
+            var initial = questionInitializer.init(grid, allQuestions);
             expect(initial.primary).toEqual(primary);
             expect(initial.otherColumns).toEqual([question1, question2]);
+        });
+    });
+
+    describe("HybridQuestionInitializer", function () {
+        var question1 =
+            {
+                pk: 186,
+                fields: {
+                    text: "PAB (protection at birth)",
+                    theme: 6,
+                    is_primary: false
+                }
+            },
+            question2 =
+            {
+                pk: 187,
+                fields: {
+                    text: "Another Question",
+                    theme: 6,
+                    is_primary: false
+                }
+            },
+            primary = {
+                pk: 188,
+                fields: {
+                    text: "PAB (protection at birth)",
+                    theme: 6,
+                    answer_type: "MultiChoice",
+                    is_primary: true
+                }
+            },
+            questionInitializer;
+
+        beforeEach(inject(function (hybridGridQuestionInitializer) {
+                questionInitializer = hybridGridQuestionInitializer;
+            })
+        );
+
+        it('should have initial primary question an empty object and other columns as an array of objects', function () {
+            var allQuestions = [],
+                orders = [],
+                grid = {};
+
+            var initial = questionInitializer.init(grid, allQuestions, orders);
+            expect(initial.primary).toEqual({});
+            expect(initial.dynamicGridQuestion).toEqual([[{}]]);
+        });
+
+        it('should set the primary question from questions given gridIds', function () {
+            var allQuestions = [question1, question2, primary],
+                orders = [{fields: {order: 1, question: primary.pk}},
+                    {fields: {order: 0, question: primary.pk}},
+                    {fields: {order: 1, question: question1.pk}},
+                    {fields: {order: 2, question: question2.pk}}],
+
+                gridQuestionIds = [question1.pk, question2.pk, primary.pk],
+                grid = {fields: {question: gridQuestionIds}, children: []};
+
+            var initial = questionInitializer.init(grid, allQuestions, orders);
+            expect(initial.primary).toEqual(primary);
+            expect(initial.dynamicGridQuestion).toEqual([[{question: question1}], [{question: question2}]]);
         });
     });
 });

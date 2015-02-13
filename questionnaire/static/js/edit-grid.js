@@ -4,7 +4,7 @@ if (typeof editGrid == 'undefined') {
 
 var editGridModule = angular.module('editGridModule', ['gridService', 'gridTypeFactories']);
 
-var editGridController = function ($scope, GridService, QuestionService, DisplayAllGridFactory, AddMoreGridFactory, HybridGridFactory) {
+var editGridController = function ($scope, $q, GridService, QuestionService, DisplayAllGridFactory, AddMoreGridFactory, HybridGridFactory) {
     $scope.grid = {
         selectedTheme: {},
         gridType: {},
@@ -27,39 +27,43 @@ var editGridController = function ($scope, GridService, QuestionService, Display
             return primaryQuestion.fields.theme;
         }
 
-        function initializeType(grid,  allQuestions, gridQuestionIds) {
+        function initializeType(grid, allQuestions) {
+            var deferred = $q.defer();
             if (grid.fields.hybrid) {
-                return HybridGridFactory.create(allQuestions, gridQuestionIds);
+                return GridService.orders(grid.pk).then(function (response) {
+                    return response.data;
+                }).then(function (orders) {
+                    return HybridGridFactory.create(grid, allQuestions, orders);
+                });
             }
             if (grid.fields.allow_multiples) {
-                return AddMoreGridFactory.create( allQuestions, gridQuestionIds);
+                deferred.resolve(AddMoreGridFactory.create(grid, allQuestions));
+                return deferred.promise;
             }
-            return DisplayAllGridFactory.create( allQuestions, gridQuestionIds);
+            deferred.resolve(DisplayAllGridFactory.create(grid, allQuestions));
+            return deferred.promise;
         }
-
 
         GridService.fetch(gridId).then(function (gridResponse) {
             var gridData = gridResponse.data,
                 grid = gridData[0];
-            var gridQuestionIds = grid.fields.question;
 
             QuestionService.all().then(function (allQuestionsResponse) {
                 var allQuestions = allQuestionsResponse.data;
                 QuestionService.filter({questionnaire: questionnaireId, unused: true}).then(function (response) {
-                    var type = initializeType(grid, allQuestions, gridQuestionIds),
-                        unUsedQuestions = response.data;
+                    initializeType(grid, allQuestions).then(function (type) {
+                        var unUsedQuestions = response.data;
+                        $scope.selectedQuestions = type.initialSelectedQuestions;
+                        var usedQuestions = $scope.selectedQuestions.questions;
+                        $scope.grid.questions = usedQuestions.concat(unUsedQuestions);
 
-                    $scope.selectedQuestions = type.initialSelectedQuestions;
+                        var primaryQuestion = $scope.selectedQuestions.primary;
+                        $scope.grid.selectedTheme = getTheme(primaryQuestion);
+                        $scope.grid.gridType = type;
 
-                    var usedQuestions = $scope.selectedQuestions.questions;
-                    $scope.grid.questions = usedQuestions.concat(unUsedQuestions);
-
-                    var primaryQuestion = $scope.selectedQuestions.primary;
-                    $scope.grid.selectedTheme = getTheme(primaryQuestion);
-                    $scope.grid.gridType = type;
-
-                    QuestionService.options(primaryQuestion).then(function (response) {
-                        $scope.grid.questionOptions = response.data;
+                        QuestionService.options(primaryQuestion).then(function (response) {
+                            $scope.grid.questionOptions = response.data;
+                        });
                     });
                 });
             });

@@ -36,7 +36,7 @@ gridService.factory('GridService', function ($http) {
             });
         },
         fetch: function (gridId) {
-        var gridUrl = '/api/v1/grids/' + gridId + '/';
+            var gridUrl = '/api/v1/grids/' + gridId + '/';
             return $http.get(gridUrl)
         },
         update: function (gridId, payload) {
@@ -48,6 +48,10 @@ gridService.factory('GridService', function ($http) {
                 transformRequest: transformRequestHelper,
                 data: payload
             });
+        },
+        orders: function (gridId) {
+            var url = '/api/v1/grids/' + gridId + '/orders/';
+            return $http.get(url);
         }
     };
 });

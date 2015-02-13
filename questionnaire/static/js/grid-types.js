@@ -30,15 +30,15 @@ gridTypeFactories.factory('QuestionInitializer', function () {
         })[0]
     };
 
-    var init = function (allQuestions, questionIds) {
-        var gridQuestions = gridQuestionsFrom(allQuestions, questionIds);
+    var init = function (grid, allQuestions) {
+        var gridQuestionIds = grid.fields && grid.fields.question || [];
+        var gridQuestions = gridQuestionsFrom(allQuestions, gridQuestionIds);
 
-        var primary = primaryQuestionIn(gridQuestions, questionIds);
+        var primary = primaryQuestionIn(gridQuestions, gridQuestionIds);
         var otherColumns = gridQuestions.filter(function (qn) {
-            var qnIndex = questionIds.indexOf(qn.pk);
+            var qnIndex = gridQuestionIds.indexOf(qn.pk);
             return qnIndex != -1 && !qn.fields.is_primary;
         });
-
         return {
             primary: primary || {},
             otherColumns: otherColumns.length && otherColumns || [{}],
@@ -72,9 +72,10 @@ gridTypeFactories.factory('NonHybridQuestionSelection', function (QuestionInitia
         }
     };
 
-    return function (allQuestions, questionIds) {
-        var questions = allQuestions || [], gridQuestionIds = questionIds || [];
-        var initial = QuestionInitializer.init(questions, gridQuestionIds);
+    return function (grid, allQuestions) {
+        var theGrid = grid || {};
+        var questions = allQuestions || [];
+        var initial = QuestionInitializer.init(theGrid, questions);
 
         return {
             addColumn: addColumn,
@@ -89,7 +90,7 @@ gridTypeFactories.factory('NonHybridQuestionSelection', function (QuestionInitia
 });
 
 gridTypeFactories.factory('AddMoreGridFactory', function (NonHybridPayload, NonHybridQuestionSelection) {
-    var addMoreGrid = function (allQuestions, questionIds) {
+    var addMoreGrid = function (grid, allQuestions) {
         var thePayload = function () {
             return NonHybridPayload.payload(this.initialSelectedQuestions, this.value);
         };
@@ -100,18 +101,18 @@ gridTypeFactories.factory('AddMoreGridFactory', function (NonHybridPayload, NonH
             hybrid: false,
             primary_questions_criteria: {is_primary: true},
             payload: thePayload,
-            initialSelectedQuestions: new NonHybridQuestionSelection(allQuestions, questionIds)
+            initialSelectedQuestions: new NonHybridQuestionSelection(grid, allQuestions)
         }
     };
     return {
-        create: function (allQuestions, questionIds) {
-            return new addMoreGrid(allQuestions, questionIds);
+        create: function (grid, allQuestions) {
+            return new addMoreGrid(grid, allQuestions);
         }
     }
 });
 
 gridTypeFactories.factory('DisplayAllGridFactory', function (NonHybridPayload, NonHybridQuestionSelection) {
-    var DisplayAllGrid = function (allQuestions, questionIds) {
+    var DisplayAllGrid = function (grid, allQuestions) {
         var thePayload = function () {
             return NonHybridPayload.payload(this.initialSelectedQuestions, this.value);
         };
@@ -126,12 +127,12 @@ gridTypeFactories.factory('DisplayAllGridFactory', function (NonHybridPayload, N
                 answer_type: 'MultiChoice'
             },
             payload: thePayload,
-            initialSelectedQuestions: new NonHybridQuestionSelection(allQuestions, questionIds)
+            initialSelectedQuestions: new NonHybridQuestionSelection(grid, allQuestions)
         }
     };
     return {
-        create: function (allQuestions, questionIds) {
-            return new DisplayAllGrid(allQuestions, questionIds);
+        create: function (grid, allQuestions) {
+            return new DisplayAllGrid(grid, allQuestions);
         }
     };
 });
@@ -164,7 +165,7 @@ gridTypeFactories.factory('HybridGridFactory', function (hybridGridQuestionSelec
         }
     }
 
-    var HybridGrid = function () {
+    var HybridGrid = function (grid, allQuestions, orders) {
         return {
             value: 'hybrid',
             text: 'Hybrid',
@@ -172,18 +173,79 @@ gridTypeFactories.factory('HybridGridFactory', function (hybridGridQuestionSelec
             addMore: true,
             primary_questions_criteria: {is_primary: true},
             payload: generatePayload,
-            initialSelectedQuestions: hybridGridQuestionSelection
+            initialSelectedQuestions: new hybridGridQuestionSelection(grid, allQuestions, orders)
         }
     };
+
     return {
-        create: function () {
-            return new HybridGrid();
+        create: function (grid, allQuestions, orders) {
+            return new HybridGrid(grid, allQuestions, orders);
         }
     };
 });
 
+gridTypeFactories.factory('hybridGridQuestionInitializer', function () {
+    var gridQuestionsFrom = function (gridQuestionIds, allQuestions) {
+        return allQuestions.filter(function (qn) {
+            var qnIndex = gridQuestionIds.indexOf(qn.pk);
+            return qnIndex != -1;
+        })
+    };
 
-gridTypeFactories.factory('hybridGridQuestionSelection', function () {
+    var primaryQuestionIn = function (gridQuestions, questionIds) {
+        return gridQuestions.filter(function (qn) {
+            var qnIndex = questionIds.indexOf(qn.pk);
+            return qnIndex != -1 && qn.fields.is_primary;
+        })[0]
+    };
+
+    var init = function (grid, allQuestions, orders) {
+        var dynamicColumns = [[{}]],
+            hasAddedSubgroup = false,
+            primary = {},
+            gridQuestions = [];
+
+        if (grid && grid.fields) {
+            var gridQuestionIds = grid.fields.question || [],
+                childGrid = grid.children.length && grid.children[0],
+                parentGridQuestions = gridQuestionsFrom(gridQuestionIds, allQuestions),
+                childGridQuestions = childGrid && gridQuestionsFrom(childGrid.fields.question, allQuestions) || [];
+
+            dynamicColumns = [];
+            gridQuestions = parentGridQuestions.concat(childGridQuestions);
+            primary = primaryQuestionIn(parentGridQuestions, gridQuestionIds);
+            var nonPrimaryQuestionOrders = orders.filter(function (order) {
+                return order.fields.question != primary.pk
+            });
+
+            nonPrimaryQuestionOrders.forEach(function (order) {
+                var gridQuestionIndex = gridQuestionIds.indexOf(order.fields.question);
+                if (gridQuestionIndex != -1) {
+                    var singleQuestionRow = parentGridQuestions.filter(function (question) {
+                        return question.pk == order.fields.question;
+                    });
+                    dynamicColumns.push([{'question': singleQuestionRow[0]}]);
+                } else if (!hasAddedSubgroup) {
+                    hasAddedSubgroup = true;
+                    dynamicColumns.push(childGridQuestions.map(function (question) {
+                        return {'question': question};
+                    }));
+                }
+            });
+        }
+        return {
+            primary: primary,
+            dynamicGridQuestion: dynamicColumns,
+            questions: gridQuestions.length && gridQuestions || []
+        }
+    };
+
+    return {
+        init: init
+    }
+});
+
+gridTypeFactories.factory('hybridGridQuestionSelection', function (hybridGridQuestionInitializer) {
     var maxColumns = function () {
         var questions = this.dynamicGridQuestion;
         var rowLengths = questions.map(function (questionRows) {
@@ -218,17 +280,21 @@ gridTypeFactories.factory('hybridGridQuestionSelection', function () {
         }
     };
 
-    return {
-        primary: {},
-        dynamicGridQuestion: [
-            [
-                {}
-            ]
-        ],
-        addElement: addElement,
-        addRow: addRow,
-        allowAddColumn: allowAddColumn,
-        removeElement: removeElement,
-        maxColumns: maxColumns
-    };
+    return function (grid, allQuestions, orders) {
+        var theGrid = grid || {};
+        var questions = allQuestions || [];
+        var theOrders = orders || [];
+        var initial = hybridGridQuestionInitializer.init(theGrid, questions, theOrders);
+
+        return {
+            primary: initial.primary,
+            dynamicGridQuestion: initial.dynamicGridQuestion,
+            questions: initial.questions,
+            addElement: addElement,
+            addRow: addRow,
+            allowAddColumn: allowAddColumn,
+            removeElement: removeElement,
+            maxColumns: maxColumns
+        };
+    }
 });
