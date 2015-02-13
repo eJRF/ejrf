@@ -86,7 +86,6 @@ class GridForm(forms.Form):
     def _create_parent_grid(self, primary_question, remaining_questions):
         attributes = self._get_grid_attributes()
         grid_group = self.instance or QuestionGroup.objects.create(**attributes)
-
         grid_group.question.add(primary_question)
         grid_group.question.add(*remaining_questions)
         return grid_group
@@ -109,7 +108,6 @@ class GridForm(forms.Form):
 
 
 class EditGridForm(GridForm):
-
     def save(self):
         self.instance.orders.all().delete()
         self.instance.sub_group.all().delete()
@@ -119,10 +117,14 @@ class EditGridForm(GridForm):
     def unused_regional_questions(self):
         questions = Question.objects.filter(region=self.region)
         if self.subsection:
-            instance_question_ids = self.instance.question.values_list('id', flat=True)
-            questionnaire = self.subsection.section.questionnaire
-            questions = questions.exclude(Q(question_group__subsection__section__questionnaire=questionnaire),
-                                          ~Q(id__in=instance_question_ids)).distinct()
-
-            print instance_question_ids
+            questions = Question.objects.filter(id__in=self.question_allowed_question_ids(questions))
         return questions
+
+    def question_allowed_question_ids(self, questions):
+        questionnaire = self.subsection.section.questionnaire
+        instance_question_ids = self.instance.question_orders().values_list('question_id', flat=True)
+        question_ids = list(
+            questions.filter(~Q(question_group__subsection__section__questionnaire=questionnaire)).values_list('id',
+                                                                                                               flat=True).distinct())
+        question_ids.extend(instance_question_ids)
+        return question_ids

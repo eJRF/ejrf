@@ -121,7 +121,7 @@
                     <div class="input-group">
                         <select required id="column_{[{$parent.$index+'_'+$index}]}" name="columns" class="form-control"
                                 data-ng-model="column['question']"
-                                data-ng-options="question.fields.export_label for question in grid.questions | filter: {fields:{is_primary: 'false'}} ">
+                                data-ng-options="question.fields.export_label for question in grid.questions | filter: {fields:{is_primary: 'false'}} | filter: { fields: {theme: grid.selectedTheme}} | notInHybridGrid:selectedQuestions.dynamicGridQuestion:column['question'] track by question.pk ">
                             <option value="">Question</option>
                         </select>
 
