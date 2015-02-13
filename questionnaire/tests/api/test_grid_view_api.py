@@ -45,16 +45,14 @@ class GridAPIViewTest(BaseTest):
 
         self.assertEqual(200, response.status_code)
         json_response = json.loads(response.content)
-        self.assertEqual(1, len(json_response))
 
-        response_data = json_response[0]
-        self.assertEqual(self.grid_question_group.pk, response_data['pk'])
-        self.assertEqual(self.subsection.id, response_data['fields']['subsection'])
-        self.assertTrue(response_data['fields']['allow_multiples'])
+        self.assertEqual(self.grid_question_group.pk, json_response['pk'])
+        self.assertEqual(self.subsection.id, json_response['fields']['subsection'])
+        self.assertTrue(json_response['fields']['allow_multiples'])
 
-        self.assertIn(self.column_1_question.pk, response_data['fields']['question'])
-        self.assertIn(self.column_2_question.pk, response_data['fields']['question'])
-        self.assertIn(self.column_3_question.pk, response_data['fields']['question'])
+        self.assertIn(self.column_1_question.pk, json_response['fields']['question'])
+        self.assertIn(self.column_2_question.pk, json_response['fields']['question'])
+        self.assertIn(self.column_3_question.pk, json_response['fields']['question'])
 
     def test_get_grid_with_sub_groups(self):
         self.grid_question_group.question.add(self.column_1_question, self.column_2_question, self.column_3_question)
@@ -77,16 +75,13 @@ class GridAPIViewTest(BaseTest):
         response = self.client.get(self.url)
         self.assertEqual(200, response.status_code)
 
-        json_response = json.loads(response.content)[0]['children']
+        json_response = json.loads(response.content)['children']
 
-        children_data = json.loads(json_response)
-        self.assertEqual(1, len(children_data))
+        self.assertEqual(child_group.pk, json_response[0]['pk'])
+        self.assertEqual(self.subsection.id, json_response[0]['fields']['subsection'])
 
-        self.assertEqual(child_group.pk, children_data[0]['pk'])
-        self.assertEqual(self.subsection.id, children_data[0]['fields']['subsection'])
-
-        self.assertIn(child_2_question.pk, children_data[0]['fields']['question'])
-        self.assertIn(child_3_question.pk, children_data[0]['fields']['question'])
+        self.assertIn(child_2_question.pk, json_response[0]['fields']['question'])
+        self.assertIn(child_3_question.pk, json_response[0]['fields']['question'])
 
     def test_permission_required_for_create_section(self):
         self.assert_permission_required(self.url)

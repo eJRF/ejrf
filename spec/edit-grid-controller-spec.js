@@ -64,14 +64,14 @@ describe("create display all grid", function () {
             }
         },
 
-        grid = [{
+        grid = {
             pk: 12,
             fields: {
                 theme: 6,
                 question: [186, 187, 188],
                 allow_multiples: true
             }
-        }],
+        },
         stubQuestions = [question1, question2];
 
     beforeEach(function () {

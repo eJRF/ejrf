@@ -45,13 +45,12 @@ var editGridController = function ($scope, $q, GridService, QuestionService, Dis
         }
 
         GridService.fetch(gridId).then(function (gridResponse) {
-            var gridData = gridResponse.data,
-                grid = gridData[0];
+            var gridData = gridResponse.data;
 
             QuestionService.all().then(function (allQuestionsResponse) {
                 var allQuestions = allQuestionsResponse.data;
                 QuestionService.filter({questionnaire: questionnaireId, unused: true}).then(function (response) {
-                    initializeType(grid, allQuestions).then(function (type) {
+                    initializeType(gridData, allQuestions).then(function (type) {
                         var unUsedQuestions = response.data;
                         $scope.selectedQuestions = type.initialSelectedQuestions;
                         var usedQuestions = $scope.selectedQuestions.questions;

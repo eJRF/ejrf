@@ -17,8 +17,9 @@ class GridAPIView(PermissionRequiredMixin, View):
         question_group = QuestionGroup.objects.get(id=grid_id)
         question_group_json = serializers.serialize("json", [question_group])
         children = serializers.serialize("json", question_group.sub_group.all())
-        grid_response = json.loads(question_group_json)
-        grid_response[0]['children'] = children
+
+        grid_response = json.loads(question_group_json)[0]
+        grid_response['children'] = json.loads(children)
         return HttpResponse(json.dumps(grid_response), content_type="application/json")
 
     def post(self, request, grid_id, *args, **kwargs):
