@@ -66,7 +66,14 @@ class QuestionnairePage(PageObject):
         grid_table = self.browser.find_by_id('grid-table-%s' % group.id)
         table_headers = grid_table.find_by_css('th')
         for index, header in enumerate(table_headers[2:]):
-            assert_true(header.text, questions_in_order[index].text)
+            assert_equals(header.text, questions_in_order[index].text)
+
+    def assert_questions_ordered_in_hybrid_grid_entry(self, questions_in_order, group):
+        grid_table = self.browser.find_by_css('.hybrid-group-%s' % group.id)
+        question_text_divs = grid_table.find_by_css('.question-text')
+        question_text = [element.text for element in question_text_divs]
+        for index, elem in enumerate(question_text):
+            assert_equals(elem, questions_in_order[index].text)
 
     def assert_questions_ordered_in_edit_modal(self, questions_in_order):
         for index, question in enumerate(questions_in_order):

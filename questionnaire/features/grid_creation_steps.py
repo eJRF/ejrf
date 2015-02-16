@@ -164,7 +164,6 @@ def and_i_select_the_non_primary_question_at_row_group1_column_group1(step, row,
     world.hybrid_grid_questions = [[world.grid_question2],
                                    [world.grid_question3, world.grid_question4],
                                    [world.grid_question5]]
-
     world.page.select_by_id('column_%s_%s'%(row, column), world.hybrid_grid_questions[int(row)][int(column)].id)
 
 @step(u'And I add a new element on the right of row "([^"]*)" column "([^"]*)"')
@@ -180,11 +179,15 @@ def then_i_should_not_see_the_same_element_at_row_group1_column_group1(step, row
 @step(u'And I add a new row from row "([^"]*)" column "([^"]*)"')
 def and_i_add_a_new_row_at_group1(step, row, column):
     row_column = (int(row), int(column))
+    sleep(1)
     world.browser.find_by_id('column_%s_%s' % row_column).mouse_over()
     world.page.click_by_id('addRow_%s_%s' % row_column)
 
 @step(u'And I delete the element at row "([^"]*)" column "([^"]*)"')
 def and_i_delete_the_element_at_row_group1_column_group1(step, row, column):
+    row_column = (int(row), int(column))
+    sleep(1)
+    world.browser.find_by_id('column_%s_%s' % row_column).mouse_over()
     world.page.click_by_id('remove_%s_%s' % (row, column))
 
 @step(u'Then I should not see the element at row "([^"]*)" column "([^"]*)"')
@@ -206,16 +209,15 @@ def when_i_have_a_display_all_grid(step):
     world.display_all_group.orders.create(order=2, question=world.non_question1)
     world.display_all_group.orders.create(order=3, question=world.non_question2)
 
-@step(u'When I click edit the display all hybrid grid')
+@step(u'When I click edit the display all grid')
 def when_i_click_edit_the_display_all_hybrid_grid(step):
     world.page.click_by_id('edit-grid-%s' % world.display_all_group.id)
 
 @step(u'And I click move first question to the right')
 def and_i_click_column_move_group1_question_to_the_left(step):
-    world.browser.find_by_id('column-0').mouse_over()
-    sleep(0.5)
-    world.page.click_by_id('move-question-%s-right' % world.non_question1.id)
     sleep(1)
+    world.browser.find_by_id('column-0').mouse_over()
+    world.page.click_by_id('move-question-%s-right' % world.non_question1.id)
 
 @step(u'And I choose to move the same question to the left')
 def and_i_choose_to_move_the_same_question_further_left(step):
@@ -250,3 +252,24 @@ def when_i_close_the_edit_grid_modal(step):
 def then_i_should_see_the_grid_questions_in_their_new_order(step):
     assert world.page.is_element_present_by_id('delete-grid-%d' % world.display_all_group.id)
     world.page.assert_questions_ordered_in_entry([world.non_question2, world.non_question1], world.display_all_group)
+
+@step(u'When I have a hybrid grid in that questionnaire')
+def when_i_have_a_hybrid_all_grid(step):
+    world.hybrid_group = QuestionGroupFactory(grid=True, allow_multiples=True, hybrid=True,
+                                              subsection=world.sub_section, order=1)
+    world.hybrid_group.question.add(world.grid_question1,  world.grid_question2,  world.grid_question6)
+    world.hybrid_group.orders.create(order=1, question=world.grid_question1)
+    world.hybrid_group.orders.create(order=2, question=world.grid_question2)
+    world.hybrid_group.orders.create(order=3, question=world.grid_question6)
+
+@step(u'When I choose to edit the hybrid grid')
+def when_i_click_edit_the_hybrid_grid(step):
+    world.page.click_by_id('edit-grid-%s' % world.hybrid_group.id)
+
+
+@step(u'Then I should see the hybrid grid with its questions in their new order')
+def then_i_should_see_the_hybrid_grid_with_its_questions_in_their_new_order(step):
+    assert world.page.is_element_present_by_id('delete-grid-%d' % world.hybrid_group.id)
+    world.page.assert_questions_ordered_in_hybrid_grid_entry([world.grid_question1, world.grid_question2,
+                                                              world.grid_question3, world.grid_question6],
+                                                             world.hybrid_group)

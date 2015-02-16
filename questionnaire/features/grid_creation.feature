@@ -55,7 +55,7 @@ Feature: Grid Creation
   Scenario: Re-Order columns in a non hybrid grid
     When I have a display all grid
     And I am editing that questionnaire
-    When I click edit the display all hybrid grid
+    When I click edit the display all grid
     And I click move first question to the right
     Then I should see it moved to the right
     And I choose to move the same question to the left
@@ -65,3 +65,19 @@ Feature: Grid Creation
     Then I should see that the grid was updated successfully
     When I close the edit grid modal
     Then I should see the grid questions in their new order
+
+  Scenario: Edit a hybrid question
+    When I have a hybrid grid in that questionnaire
+    And I am editing that questionnaire
+    When I choose to edit the hybrid grid
+    And I add a new row from row "0" column "0"
+    And I select the non-primary question at row "1" column "0"
+    And I delete the element at row "1" column "0"
+    Then I should not see the same element at row "1" column "0"
+    And I select the non-primary question at row "0" column "0"
+    And I add a new row from row "0" column "0"
+    And I select the non-primary question at row "1" column "0"
+    And I click update the grid
+    Then I should see that the grid was updated successfully
+    When I close the edit grid modal
+    Then I should see the hybrid grid with its questions in their new order
