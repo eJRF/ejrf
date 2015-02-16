@@ -45,6 +45,7 @@ var editGridController = function ($scope, $q, GridService, QuestionService, Dis
         }
 
         GridService.fetch(gridId).then(function (gridResponse) {
+            $scope.loading = true;
             var gridData = gridResponse.data;
 
             QuestionService.all().then(function (allQuestionsResponse) {
@@ -59,16 +60,14 @@ var editGridController = function ($scope, $q, GridService, QuestionService, Dis
                         var primaryQuestion = $scope.selectedQuestions.primary;
                         $scope.grid.selectedTheme = getTheme(primaryQuestion);
                         $scope.grid.gridType = type;
-
+                        $scope.loading = false;
                         QuestionService.options(primaryQuestion).then(function (response) {
                             $scope.grid.questionOptions = response.data;
                         });
                     });
                 });
             });
-
         });
-
     };
 
     $scope.postUpdateGrid = function () {

@@ -69,7 +69,13 @@
                         </div>
 
                         {% csrf_token %}
-                        <div ng-include="'/static/templates/grids/edit.html'"></div>
+                        <div ng-show="loading" class="spinner-loading">
+                            <img src="{{ STATIC_URL }}img/spinner.gif">
+                            <p>Loading, please wait...</p>
+                        </div>
+                        <div ng-show="!loading">
+                            <div ng-include="'/static/templates/grids/edit.html'"></div>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-default" id="update_grid_button"><span

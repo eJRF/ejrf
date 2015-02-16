@@ -622,3 +622,11 @@ select.hide {
 .newgrid-filter-element label{
     width: 50px;
 }
+.spinner-loading {
+    width: 200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.spinner-loading img {
+    margin-left: 50px;
+}

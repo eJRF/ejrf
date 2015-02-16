@@ -53,6 +53,7 @@
                                ng-show="gridForm['dynamicQuestion' + $index].columns.$error.required">
                                 This field is required
                             </p>
+
                             <p class="text-danger" ng-repeat="error in gridFormErrors.backendErrors.columns">
                                 {[{ error }]}
                             </p>
@@ -126,12 +127,17 @@
                         </select>
 
                         <div class="input-group-addon" ng-show="grid.addGridRow[$parent.$index][$index]">
-                            <a ng-show="selectedQuestions.dynamicGridQuestion.length > 1" id="remove_{[{$parent.$index+'_'+$index}]}" href="#" data-ng-click="selectedQuestions.removeElement($parent.$index, $index)"><i
+                            <a ng-show="selectedQuestions.dynamicGridQuestion.length > 1"
+                               id="remove_{[{$parent.$index+'_'+$index}]}" href="#"
+                               data-ng-click="selectedQuestions.removeElement($parent.$index, $index)"><i
                                     class="glyphicon glyphicon-trash"></i></a>
-                            <a id="addRow_{[{$parent.$index+'_'+$index}]}" href="#" data-ng-click="$parent.$index=selectedQuestions.addRow($parent.$index + 1)"><i
+                            <a id="addRow_{[{$parent.$index+'_'+$index}]}" href="#"
+                               data-ng-click="$parent.$index=selectedQuestions.addRow($parent.$index + 1)"><i
                                     class="glyphicon glyphicon-circle-arrow-down"></i></a>
-                            <a id="addElement_{[{$parent.$index+'_'+$index}]}" href="#" data-ng-click="selectedQuestions.addElement($parent.$index, $index + 1)"><i
-                                   ng-show="selectedQuestions.allowAddColumn($parent.$index)" class="glyphicon glyphicon-circle-arrow-right"></i></a>
+                            <a id="addElement_{[{$parent.$index+'_'+$index}]}" href="#"
+                               data-ng-click="selectedQuestions.addElement($parent.$index, $index + 1)"><i
+                                    ng-show="selectedQuestions.allowAddColumn($parent.$index)"
+                                    class="glyphicon glyphicon-circle-arrow-right"></i></a>
                         </div>
 
                         <div class="error-text"
