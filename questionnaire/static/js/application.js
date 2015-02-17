@@ -43,14 +43,171 @@ $(document).ready(function () {
         fullscreenable: false,
         autogrow: true,
         btns: [
-           'formatting',
-           '|', btnsGrps.design,
-           '|', 'link',
-           '|', btnsGrps.justify,
-           '|', 'insertHorizontalRule']
+            'formatting',
+            '|', btnsGrps.design,
+            '|', 'link',
+            '|', btnsGrps.justify,
+            '|', 'insertHorizontalRule']
     });
 
+    $("input[type=checkbox][name=regions]").on('click', function () {
+        var regions = [];
+        $("input[type=checkbox][name=regions]:checked").each(function () {
+            regions.push($(this).val());
+        });
+
+        getCountriesFor(regions, function (data) {
+            $('#extract-countries').html('');
+            for (var index = 0; index < data.length; index++) {
+                $('#extract-countries').append("<li class='countries-extract'>" +
+                '<input type="checkbox" name="countries" value="' + data[index].id + '" id="' + data[index].name + '"/>' +
+                '<label for="' + data[index].name + '">' + data[index].name + '</label></li>');
+            }
+        });
+    });
+
+    $('.add-row').on('click', function (event) {
+        var $el = $(this);
+        var $newRow = addRowOn($el, 'tr', 'table');
+        applySkipRules.bindAddMoreSkipRulesOn($newRow, showAddMoreRows)
+        event.preventDefault();
+    });
+
+
+    $('.reorder-subsection').on('click', function () {
+        var $element = $(this),
+            $modal = getModalWithSubSectionQuestions($element);
+        removeButtons($modal, ['.add-more', '.btn-group', '.unassign-question']);
+        highlightOnHover($modal);
+        activateSortable($modal);
+        disableInputFields(false);
+        $modal.modal('show');
+        return false;
+    });
+
+    $('#export-section').on('click', function (event) {
+        $(this).toggleClass('active');
+        var filename = "";
+        $.ajax({
+            type: "GET",
+            async: false,
+            url: "/export-section",
+            success: function (data) {
+                var obj = JSON.parse(data);
+                filename = obj['filename']
+            }
+        });
+
+        setTimeout(function () {
+            $('#export-section').toggleClass('active');
+            return_file(filename)
+        }, 8000);
+        event.preventDefault();
+    });
+
+    $('#id-older-jrf').on('click', function (event) {
+        $('.hide').toggleClass('show');
+        $(this).html($(this).html() === "More" ? "Less" : "More");
+        event.preventDefault()
+    });
+
+    $('input[type=radio]').on('click', function () {
+        var $el = $(this),
+            name = $el.attr('name'),
+            $redundant_hidden_radio = $el.parents('.form-group').find('input[name=' + name + '][exclude=true]');
+        $redundant_hidden_radio.remove();
+    });
+
+    $('.add-more').on('click', function (event) {
+        var $el = $(this);
+        var $new_row = addRowOn($el, '.hybrid-group-row', '.question-group');
+        showSeparator($new_row);
+
+        //applySkipRules.bindSkipRulesOn is exported by skip-rules.js
+        applySkipRules.bindSkipRulesOn($new_row, showHybridRows);
+        event.preventDefault();
+    });
+
+    $('.unassign-question').hover(function () {
+        var parent_question = $(this).parents('div[class^="form-group"]');
+        $(parent_question).toggleClass('question-form');
+    });
+
+    $('.remove-table-row').on('click', function (evt) {
+        var $row = $(this).parents('tr'),
+            $table = $row.parents('table'),
+            $grid_rows = $table.find('tr.grid_row');
+        deleteRow($row, $table, $grid_rows, 1);
+        evt.preventDefault();
+    });
+
+    $('.remove-hybrid-row').on('click', function (evt) {
+        var $row = $(this).parents('.hybrid-group-row'),
+            $table = $row.parents('.question-group'),
+            $grid_rows = $table.find('.hybrid-group-row');
+        deleteRow($row, $table, $grid_rows, 2);
+        evt.preventDefault();
+    });
+
+    $("a[post=true]").each(function () {
+        $(this).on('click', function (e) {
+            e.preventDefault();
+            makePostRequest(
+                $(this).attr('phref'),
+                JSON.parse($(this).attr('pdata'))
+            );
+        });
+    });
+
+    $('#new-themes-modal-form,form[id^=edit-theme]').each(function () {
+        $(this).validate({rules: {'name': 'required'}});
+    });
+
+    $('#duplicate-questionnaire-form').validate({
+        rules: {'questionnaire': 'required', 'year': 'required', 'name': 'required'}
+    });
+
+    var elementID = '#duplicate-questionnaire-form #id_questionnaire',
+        selectQuestionnaireElement = $(elementID),
+        questionnaireNameElement = $('#id_name');
+
+    selectQuestionnaireElement.on('change', function () {
+        questionnaireNameElement.val($(elementID + ' option:selected').text());
+    });
+
+    $('#id_year').on('change', function () {
+        $.ajax({
+            type: 'get',
+            url: '/questionnaire/validate/',
+            data: {year: $(this).val()},
+            success: function (data) {
+                var htmlContent = data.status && '<div class="alert ' + data.status + '">' + data.message + '</div>';
+                $('#notification').html(htmlContent);
+            }
+        });
+    })
 });
+
+function makePostRequest(url, data) {
+    var jForm = $('<form></form>');
+    jForm.attr('action', url);
+    jForm.attr('method', 'post');
+    for (name in data) {
+        var jInput = $("<input/>");
+        jInput.attr({'name': name, 'value': data[name], 'type': 'hidden'});
+        jForm.append(jInput);
+    }
+    var button = $("<input type='submit' style='display: none'/>");
+    jForm.append(button);
+    $("body").append(jForm);
+    button.trigger('click');
+}
+
+function getCountriesFor(regions, callback) {
+    var url = "/locations/countries/",
+        data = $.param({'regions': regions}, true);
+    $.get(url, data, callback);
+}
 
 function setDisabled(isPrimaryField, selectedAnswerType) {
     if (selectedAnswerType.toLowerCase() === "multipleresponse") {
@@ -102,18 +259,6 @@ function reIndexFieldNames() {
         $('#id_' + type + '-INITIAL_FORMS').val(total + 1);
         $('#id_' + type + '-TOTAL_FORMS').val(total + 1);
     }
-}
-
-function removeUsedOptions(new_row, $table) {
-    var new_row_primary_select = new_row.find('select').first();
-    $table.find('tbody tr').each(function () {
-        var used_option = $(this).find("td:eq(1)").find("select").find("option:selected");
-        new_row_primary_select.find('option[value=' + used_option.val() + ']').remove();
-    });
-    new_row_primary_select.append('<option value="">Choose One</option>');
-    new_row.find(':input[type!=hidden]').each(function () {
-        $(this).val('');
-    });
 }
 
 function prependHiddenColumnFields(newElement) {
@@ -197,97 +342,26 @@ function addRowOn($el, row_selector, table_selector) {
     return $new_row;
 }
 
-$('input[type=radio]').on('click', function () {
-    var $el = $(this),
-        name = $el.attr('name'),
-        $redundant_hidden_radio = $el.parents('.form-group').find('input[name=' + name + '][exclude=true]');
-    $redundant_hidden_radio.remove();
-});
-
 var showHybridRows = function (gridInstance) {
     $(gridInstance).find('div[class^="form-group form-group-question-"]').show();
     $(gridInstance).find('li[class^="form-group-question-"]').show();
-}
-
-$('.add-more').on('click', function (event) {
-    var $el = $(this);
-    var $new_row = addRowOn($el, '.hybrid-group-row', '.question-group');
-    showSeparator($new_row);
-
-    //applySkipRules.bindSkipRulesOn is exported by skip-rules.js
-    applySkipRules.bindSkipRulesOn($new_row, showHybridRows);
-    event.preventDefault();
-});
+};
 
 var showAddMoreRows = function (tableRow) {
     $(tableRow).find('input[class^="input-question-id-"]').prop('disabled', false).removeClass('grayed-out');
     $(tableRow).find('select[class^="input-question-id-"]').prop('disabled', false).removeClass('grayed-out');
-}
+};
 
-$('.add-row').on('click', function (event) {
-    var $el = $(this);
-    var $newRow = addRowOn($el, 'tr', 'table');
-    applySkipRules.bindAddMoreSkipRulesOn($newRow, showAddMoreRows)
-    event.preventDefault();
-});
-
-$('#export-section').on('click', function (event) {
-    $(this).toggleClass('active');
-    var filename = "";
-    $.ajax({
-        type: "GET",
-        async: false,
-        url: "/export-section",
-        success: function (data) {
-            var obj = JSON.parse(data);
-            filename = obj['filename']
-        }
-    });
-
-    setTimeout(function () {
-        $('#export-section').toggleClass('active');
-        return_file(filename)
-    }, 8000);
-    event.preventDefault();
-});
 
 function return_file(filename) {
     window.location = "/export-section/" + filename;
 }
-
-$('#id-older-jrf').on('click', function (event) {
-    $('.hide').toggleClass('show');
-    $(this).html($(this).html() === "More" ? "Less" : "More");
-    event.preventDefault()
-});
-
 function disableInputFields(status) {
     $(this).find(":input").each(function () {
         $(this).prop('disabled', status);
     });
     $('.add-more').prop('disabled', status);
 }
-
-$('.unassign-question').hover(function () {
-    var parent_question = $(this).parents('div[class^="form-group"]');
-    $(parent_question).toggleClass('question-form');
-});
-
-$('.remove-table-row').on('click', function (evt) {
-    var $row = $(this).parents('tr'),
-        $table = $row.parents('table'),
-        $grid_rows = $table.find('tr.grid_row');
-    deleteRow($row, $table, $grid_rows, 1);
-    evt.preventDefault();
-});
-
-$('.remove-hybrid-row').on('click', function (evt) {
-    var $row = $(this).parents('.hybrid-group-row'),
-        $table = $row.parents('.question-group'),
-        $grid_rows = $table.find('.hybrid-group-row');
-    deleteRow($row, $table, $grid_rows, 2);
-    evt.preventDefault();
-});
 
 function deleteRow($row, $table, $grid_rows, min_number_of_rows) {
     if ($grid_rows.length > min_number_of_rows) {
@@ -309,19 +383,6 @@ function deleteRowFromServer($row, $table) {
         });
     }
 }
-
-
-$('.reorder-subsection').on('click', function () {
-    var $element = $(this),
-        $modal = getModalWithSubSectionQuestions($element);
-    removeButtons($modal, ['.add-more', '.btn-group', '.unassign-question']);
-    highlightOnHover($modal);
-    activateSortable($modal);
-    disableInputFields(false);
-    $modal.modal('show');
-    return false;
-});
-
 
 function getTableRow($questionForm, $index) {
     if ($($questionForm).hasClass('group-hr')) {
