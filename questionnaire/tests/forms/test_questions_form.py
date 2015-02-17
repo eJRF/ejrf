@@ -1,4 +1,4 @@
-from questionnaire.forms.questions import QuestionForm
+from questionnaire.forms.questions import QuestionForm, QuestionOptionForm
 from questionnaire.models import Question, QuestionOption, Questionnaire, Section, SubSection, QuestionGroup, Region, \
     Theme
 from questionnaire.tests.base_test import BaseTest
@@ -378,9 +378,9 @@ class QuestionHistoryTest(BaseTest):
     def test_edit_removes_deleted_options_from_the_question(self):
         question = QuestionFactory(text='whats up?', answer_type=AnswerTypes.MULTI_CHOICE)
 
-        option1 = QuestionOptionFactory(question=question, text='Yes', order=1)
-        option2 = QuestionOptionFactory(question=question, text='NR', order=2)
-        option3 = QuestionOptionFactory(question=question, text='No', order=3)
+        QuestionOptionFactory(question=question, text='Yes', order=1)
+        QuestionOptionFactory(question=question, text='NR', order=2)
+        QuestionOptionFactory(question=question, text='No', order=3)
 
         changed_options = ['Yes', 'No', 'Maybe']
 
@@ -401,3 +401,35 @@ class QuestionHistoryTest(BaseTest):
         self.assertEqual(3, question1_options.count())
         [self.assertIn(question_option.text, changed_options) for question_option in question1_options]
 
+
+class TestQuestionOptionForm(BaseTest):
+
+    def setUp(self):
+        self.question = QuestionFactory(text='whats up?', answer_type=AnswerTypes.MULTI_CHOICE)
+        self.option1 = QuestionOptionFactory(question=self.question, text='Yes', order=1)
+        self.option2 = QuestionOptionFactory(question=self.question, text='NR', order=2)
+        self.option3 = QuestionOptionFactory(question=self.question, text='No', order=3)
+
+    def test_invalid(self):
+        some_random_id = 22
+        data = {'options': [some_random_id, self.option3.id, self.option2.id]}
+        history_form = QuestionOptionForm(data=data, question=self.question)
+
+        self.assertFalse(history_form.is_valid())
+        error = 'Select a valid choice. %s is not one of the available choices.' % some_random_id
+        self.assertEqual(1, len(history_form.errors))
+        self.assertEqual(error, history_form.errors['options'][0])
+
+    def test_update_question_options(self):
+        data = {'options': [self.option1.id, self.option3.id, self.option2.id]}
+        history_form = QuestionOptionForm(data=data, question=self.question)
+
+        self.assertTrue(history_form.is_valid())
+        edited_question = history_form.save()
+
+        question1_options = edited_question.options.all()
+
+        self.assertEqual(3, question1_options.count())
+
+        for index, option in enumerate([self.option1, self.option3, self.option2]):
+            self.assertEqual(option, question1_options[index])

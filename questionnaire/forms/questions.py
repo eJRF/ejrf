@@ -1,6 +1,7 @@
 from django.forms import ModelForm
 from django import forms
 from django.forms.models import model_to_dict
+from django.forms.util import ErrorList
 
 from questionnaire.models import Question, QuestionOption, Questionnaire
 from questionnaire.utils.answer_type import AnswerTypes
@@ -150,3 +151,24 @@ class QuestionForm(ModelForm):
         choices = self.fields['answer_type'].choices
         choices[0] = ('', 'Response type', )
         return choices
+
+
+class QuestionOptionForm(forms.Form):
+    options = forms.ModelMultipleChoiceField(queryset=None)
+
+    def __init__(self, *args, **kwargs):
+        self.question = kwargs.pop('question')
+        super(QuestionOptionForm, self).__init__(*args, **kwargs)
+        self.fields['options'].queryset = self._set_choices()
+
+    def _set_choices(self):
+        return self.question.options.all()
+
+    def save(self):
+        options = dict(self.data).get('options', [])
+        if options and AnswerTypes.is_mutlichoice_or_multiple(self.question.answer_type):
+            for index, option in enumerate(options):
+                option = QuestionOption.objects.get(id=option, question=self.question)
+                option.order = index
+                option.save()
+        return self.question
