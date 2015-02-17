@@ -16,10 +16,9 @@ def then_i_should_see_a_new_subsection_modal(step):
 
 @step(u'When i fill in the subsection data')
 def when_i_fill_in_the_subsection_data(step):
-    data = {'title': '',
-            'description': 'some description'}
-
+    data = {'title': ''}
     world.page.fill_this_form('#new-subsection-modal', data)
+    world.page.fill_trumbowyg_editor('#new-subsection-modal', 'some description')
     sleep(3)
 
 @step(u'And I save the subsection')
@@ -42,9 +41,11 @@ def then_i_should_see_an_edit_subsection_modal(step):
 
 @step(u'When I update the subsection details')
 def when_i_update_the_subsection_details(step):
-    world.data = {'title': 'New SubSection Name',
-                  'description': 'New SubSection description'}
-    world.page.fill_this_form('#edit_subsection_%s_modal_form' % world.sub_section.id, world.data)
+    world.data = {'title': 'New SubSection Name'}
+    form_id = '#edit_subsection_%s_modal_form' % world.sub_section.id
+    world.page.fill_this_form(form_id, world.data)
+    world.page.fill_trumbowyg_editor(form_id, 'New SubSection description')
+    sleep(2)
 
 @step(u'And I save the changes to the subsection')
 def and_i_save_the_changes_to_the_subsection(step):

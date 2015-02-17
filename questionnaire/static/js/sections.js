@@ -27,6 +27,22 @@ function loadAjaxEditModal(objectId, url, objectToEdit){
             $( "#edit_"+ objectToEdit +"_"+objectId+"_ajax_content").html(content);
 
             $('textarea').autosize();
-            tinymce.init({selector:"#edit_"+ objectToEdit +"_"+objectId+"_ajax_content textarea"});
+            var btnsGrps = jQuery.trumbowyg.btnsGrps;
+
+            $("#edit_"+ objectToEdit +"_"+objectId+"_ajax_content textarea").trumbowyg({
+                lang: 'en',
+                semantic: true,
+                resetCss: true,
+                autoAjustHeight: true,
+                fullscreenable: false,
+                autogrow: true,
+                btns: [
+                   'formatting',
+                   '|', btnsGrps.design,
+                   '|', 'link',
+                   '|', btnsGrps.justify,
+                   '|', 'insertHorizontalRule']
+            });
+
         });
 }

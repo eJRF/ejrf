@@ -59,6 +59,11 @@ class PageObject(object):
     def fill_form(self, data):
         self.browser.fill_form(data)
 
+    def fill_trumbowyg_editor(self, form_id, value):
+        script = "$('.trumbowyg-editor').text('%s')" % value
+        self.browser.execute_script(script)
+        self.browser.find_by_css('%s .trumbowyg-editor' % form_id).first.click()
+
     def fill_this_form(self, form_css, data):
         for name, value in data.items():
             the_form_element = self.browser.find_by_css('%s #id_%s' % (form_css, name))

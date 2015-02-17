@@ -12,7 +12,7 @@ var assignQuestionController = function ($scope, QuestionService, ThemeService) 
 
         $scope.assignQuestionUrl = "/subsection/" + subsectionId + "/assign_questions/";
 
-        $scope.submitQuestions = function($event){
+        $scope.submitQuestions = function ($event) {
             $event.target.submit();
         };
 

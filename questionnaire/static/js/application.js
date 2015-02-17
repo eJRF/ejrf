@@ -8,7 +8,7 @@ $(document).ready(function () {
     groupRolesBootstrap();
     $('p:empty').remove();
 
-    $('.datetimepicker').datepicker({ pickTime: false, autoclose: true });
+    $('.datetimepicker').datepicker({pickTime: false, autoclose: true});
     $('textarea').autosize();
 
     $('.grid-error').hover(function () {
@@ -33,6 +33,22 @@ $(document).ready(function () {
             isPrimaryField = $('input[name=is_primary]');
         setDisabled(isPrimaryField, selectedAnswerType);
     });
+    var btnsGrps = jQuery.trumbowyg.btnsGrps;
+
+    $('.wysiwyg').trumbowyg({
+        lang: 'en',
+        semantic: true,
+        resetCss: true,
+        autoAjustHeight: true,
+        fullscreenable: false,
+        autogrow: true,
+        btns: [
+           'formatting',
+           '|', btnsGrps.design,
+           '|', 'link',
+           '|', btnsGrps.justify,
+           '|', 'insertHorizontalRule']
+    });
 
 });
 
@@ -46,8 +62,10 @@ function setDisabled(isPrimaryField, selectedAnswerType) {
 }
 
 function replaceAttributes($el, index) {
-    return {'name': _replace($el, 'name', index),
-        'id': _replace($el, 'id', index)};
+    return {
+        'name': _replace($el, 'name', index),
+        'id': _replace($el, 'id', index)
+    };
 }
 
 function _replace($el, attr, index) {
@@ -148,7 +166,7 @@ function resetDatePicker(newElement) {
     newElement.find('.datetimepicker').each(function () {
         var $this = $(this);
         $this.removeData('datepicker').unbind();
-        $this.datepicker({ pickTime: false, autoclose: true });
+        $this.datepicker({pickTime: false, autoclose: true});
     });
 }
 
@@ -385,7 +403,7 @@ function activateSortable($modal) {
 
 function getQuestionsInSubsection($element) {
     var $subsectionContainer = $element.parents('div .subsection-content');
-    return   $subsectionContainer.find('.form-group, .group-hr, .grid-group');
+    return $subsectionContainer.find('.form-group, .group-hr, .grid-group');
 }
 
 

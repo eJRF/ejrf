@@ -40,9 +40,9 @@ def when_i_fill_in_the_section_data(step):
     sleep(2)
     world.page.fill_form({'title': 'Some title'})
     sleep(2)
-    world.page.fill_form({'description': 'some description'})
-    sleep(2)
 
+    world.page.fill_trumbowyg_editor('#new-section-modal-form', 'New SubSection description')
+    sleep(2)
 
 @step(u'Then I should see the section I created')
 def then_i_should_see_the_section_i_created(step):
@@ -60,8 +60,7 @@ def and_i_save_the_section(step):
 @step(u'And I fill in invalid data')
 def and_i_fill_in_invalid_data(step):
     data = {'name': '',
-            'title': '',
-            'description': 'some description'}
+            'title': ''}
     world.page = CreateSectionPage(world.browser, world.questionnaire)
     world.page.fill_form(data)
 

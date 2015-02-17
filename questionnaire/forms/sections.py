@@ -18,7 +18,7 @@ class SectionForm(ModelForm):
         model = Section
         fields = ['questionnaire', 'name', 'title', 'description', 'order']
         widgets = {'questionnaire': forms.HiddenInput(),
-                   'description': forms.Textarea(attrs={"rows": 4, "cols": 40})}
+                   'description': forms.Textarea(attrs={"rows": 4, "cols": 40, 'class': 'wysiwyg'})}
 
     def _get_options(self):
         questionnaire = self.initial['questionnaire']
@@ -64,4 +64,4 @@ class SubSectionForm(ModelForm):
     class Meta:
         model = SubSection
         fields = ['title', 'description']
-        widgets = {'description': forms.Textarea(attrs={"rows": 4, "cols": 50})}
+        widgets = {'description': forms.Textarea(attrs={"rows": 4, "cols": 50, 'class': 'wysiwyg'})}
