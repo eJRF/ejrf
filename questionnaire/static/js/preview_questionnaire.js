@@ -89,13 +89,13 @@ function fillModalWithAjaxContent(questionnaire_preview_url){
         enableFields();
     });
     form_has_changed = false;
-};
+}
 
 function disable_modal_input_fields(editable){
     $('.tab-content :input').each(function() {
        $(this).prop('disabled', editable);
     });
-};
+}
 
 function disableInputFields(status) {
     $('.form-content :input').each(function () {

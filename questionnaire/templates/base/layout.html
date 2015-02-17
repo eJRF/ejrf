@@ -62,9 +62,11 @@
 <script src="{{ STATIC_URL }}js/lib/jquery.tablesorter.widgets.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}trumblwyg/trumbowyg.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}js/application.js" type="text/javascript" charset="utf-8"></script>
+
 {% if perms.auth.can_edit_questionnaire %}
-    <script src="{{ STATIC_URL }}js/admin_only.js" type="text/javascript" charset="utf-8"></script>
-    <script src="{{ STATIC_URL }}js/hide_inactive_questions.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript">
+        editable = true;
+    </script>
 {% else %}
     <script src="{{ STATIC_URL }}js/save-draft.js" type="text/javascript" charset="utf-8"></script>
 {% endif %}
@@ -77,9 +79,10 @@
 <script src="{{ STATIC_URL }}js/theme.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}js/extract.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}js/question-sorter.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}js/skip-rules.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}js/ng-client/skip-rules.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}js/change_subsection_position.js" type="text/javascript" charset="utf-8"></script>
 {% block javascripts %}
 {% endblock %}
+
 </body>
 </html>

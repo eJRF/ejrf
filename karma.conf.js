@@ -18,7 +18,7 @@ module.exports = function(config) {
       'spec/lib/angular-mocks.js',
       'questionnaire/static/js/lib/*.js',
       'questionnaire/static/js/create_skip_rule.js',
-      'questionnaire/static/js/**/*.js',
+      'questionnaire/static/js/ng-client/**/*.js',
       'questionnaire/static/bootstrap-datetimepicker/bootstrapdatepicker.js',
       'spec/*.js'
     ],
