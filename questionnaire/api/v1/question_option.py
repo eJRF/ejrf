@@ -20,8 +20,8 @@ class QuestionOptionAPIView(View):
         form = QuestionOptionForm(self.request.POST, question=question)
         if form.is_valid():
             form.save()
-            message_response = [{'message': 'The question options were reordered successfully.'}]
+            message_response = {'message': 'The question options were reordered successfully.'}
             return HttpResponse(json.dumps(message_response), content_type="application/json")
 
-        message = [{'message': 'The question options could not be reordered successfully.'}]
+        message = {'message': 'The question options could not be reordered successfully.'}
         return HttpResponse(json.dumps(message), content_type="application/json", status=400)

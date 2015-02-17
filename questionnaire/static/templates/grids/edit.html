@@ -1,7 +1,7 @@
 <div ng-if="!grid.gridType.hybrid">
     <div class="table-responsive">
-        <table class="table table-bordered">
-            <tr ng-model="selectedQuestions.otherColumns">
+        <table class="table table-bordered" dnd-table>
+            <tr>
                 <td>
                     QNO.
                 </td>
@@ -63,17 +63,19 @@
 
                 </td>
             </tr>
-            <tr ng-if="grid.gridType.displayAll" ng-repeat="option in grid.questionOptions">
-                <td>
-                    {[{ $index + 1 }]}
-                </td>
-                <td>
-                    {[{ option.fields.text }]}
-                </td>
-                <td ng-repeat="q in selectedQuestions.otherColumns">
-                    <question-input/>
-                </td>
-            </tr>
+            <tbody ng-if="grid.gridType.displayAll">
+                <tr ng-repeat="option in grid.questionOptions" data-option="{[{ option.pk }]}" style="cursor: move" class="tr-sortable">
+                    <td>
+                        {[{ $index + 1 }]}
+                    </td>
+                    <td ng-model="grid.questionOptions[$index]">
+                        {[{ option.fields.text }]}
+                    </td>
+                    <td ng-repeat="q in selectedQuestions.otherColumns">
+                        <question-input/>
+                    </td>
+                </tr>
+            </tbody>
             <tr ng-if="grid.gridType.addMore">
                 <td>
                     1

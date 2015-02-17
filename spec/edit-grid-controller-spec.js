@@ -137,7 +137,7 @@ describe("create display all grid", function () {
             };
 
             initController();
-            scope.grid = {gridType: expectedGrid};
+            scope.grid = {gridType: expectedGrid, reOrderedOptions: []};
             scope.gridId = gridId;
             scope.subsectionId = subsectionId;
             scope.editGridForm = {$valid: true};

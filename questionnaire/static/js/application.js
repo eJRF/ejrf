@@ -446,7 +446,7 @@ function reIndexOrderFields($item, container) {
     }
 }
 
-function activateSortable($modal) {
+var activateSortable = function($modal) {
     $modal.find('table').each(function () {
         $(this).sortable({
             containerSelector: 'table',
@@ -459,7 +459,7 @@ function activateSortable($modal) {
             }
         });
     })
-}
+};
 
 
 function getQuestionsInSubsection($element) {

@@ -11,7 +11,18 @@ gridService.factory('QuestionService', function ($http) {
         },
         options: function (question) {
             return $http.get('/api/v1/question/' + question.pk + '/options/')
+        },
+        updateOptions: function (question, payload) {
+            var gridUrl = '/api/v1/question/' + question.pk + '/options/';
+            return $http({
+                method: 'POST',
+                url: gridUrl,
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                transformRequest: transformRequestHelper,
+                data: payload
+            });
         }
+
     };
 });
 
