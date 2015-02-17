@@ -19,9 +19,9 @@
         <tbody>
         {% for theme in theme_list %}
         <tr>
-            <td>{{ theme.name }}</td>
-            <td>{{ theme.description }}</td>
-            <td>
+            <td class="col-md-4">{{ theme.name }}</td>
+            <td class="col-md-5">{{ theme.description }}</td>
+            <td class="col-md-3">
                 <div class="btn-group">
                     {% if theme.region == user.user_profile.region %}
                         <a data-target="#edit-theme-{{ theme.id }}-modal"  data-toggle="modal" id="edit-theme-{{ theme.id }}-btn" class="btn btn-sm btn-default cyan">
