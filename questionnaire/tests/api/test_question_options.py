@@ -34,7 +34,7 @@ class ThemesAPITest(BaseTest):
     def test_post_re_order_options_with_valid_form(self):
         response = self.client.post(self.url, {'options': [self.question_option1.id, self.question_option3.id, self.question_option2.id]})
         self.assertEqual(200, response.status_code)
-        json_response = json.loads(response.content)[0]
+        json_response = json.loads(response.content)
         self.assertEqual(1, len(json_response))
         self.assertEqual('The question options were reordered successfully.', json_response['message'])
 
@@ -42,6 +42,6 @@ class ThemesAPITest(BaseTest):
         un_known_option = 33
         response = self.client.post(self.url, {'options': [self.question_option1.id, self.question_option3.id, un_known_option]})
         self.assertEqual(400, response.status_code)
-        json_response = json.loads(response.content)[0]
+        json_response = json.loads(response.content)
         self.assertEqual(1, len(json_response))
         self.assertEqual('The question options could not be reordered successfully.', json_response['message'])
