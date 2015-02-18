@@ -110,7 +110,7 @@ class GridAPIViewTest(BaseTest):
         self.assertEqual(self.column_2_question, ordered_questions[3])
         self.assertEqual(column_4_question, ordered_questions[4])
 
-        response_data = json.loads(response.content)[0]
+        response_data = json.loads(response.content)
         self.assertEqual(response_data['message'], 'The grid was updated successfully.')
 
     def test_returns_json_errors_with_errors(self):
@@ -135,7 +135,7 @@ class GridAPIViewTest(BaseTest):
         self.assertEqual(self.column_2_question, ordered_questions[2])
         self.assertEqual(self.column_3_question, ordered_questions[3])
 
-        response_data = json.loads(response.content)[0]
+        response_data = json.loads(response.content)
 
         self.assertEqual(response_data['error'], 'The grid could not be updated.')
         required_error = 'This field is required.'

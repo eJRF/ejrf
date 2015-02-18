@@ -89,20 +89,17 @@ var editGridController = function ($scope, $q, GridService, QuestionService, Dis
 
             if ($scope.editGridForm.$valid && validateDynamicForms($scope.gridForm)) {
                 $scope.error = '';
-
                 GridService.update($scope.gridId, gridType.payload())
                     .success(function (response) {
-
                         if ($scope.grid.reOrderedOptions.length) {
                             updateQuestionOptionOrders();
                         }
-
-                        $scope.message = response[0].message;
+                        $scope.message = response.message;
                         $scope.gridFormErrors.formHasErrors = false;
                     }).error(function (response) {
-                        $scope.error = response[0].error;
+                        $scope.error = response.error;
                         $scope.gridFormErrors.formHasErrors = true;
-                        $scope.gridFormErrors.backendErrors = response[0].form_errors;
+                        $scope.gridFormErrors.backendErrors = response.form_errors;
                     });
             } else {
                 $scope.gridFormErrors.formHasErrors = true;

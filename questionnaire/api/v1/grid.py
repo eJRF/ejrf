@@ -27,9 +27,9 @@ class GridAPIView(PermissionRequiredMixin, View):
         form = EditGridForm(data=request.POST, instance=grid, subsection=grid.subsection)
         if form.is_valid():
             form.save()
-            grid_response = [{'message': 'The grid was updated successfully.'}]
+            grid_response = {'message': 'The grid was updated successfully.'}
             return HttpResponse(json.dumps(grid_response), content_type="application/json")
-        grid_response = [{'error': 'The grid could not be updated.', 'form_errors': form.errors}]
+        grid_response = {'error': 'The grid could not be updated.', 'form_errors': form.errors}
         return HttpResponse(json.dumps(grid_response), content_type="application/json", status=400)
 
 

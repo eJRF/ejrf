@@ -135,19 +135,24 @@ describe("create display all grid", function () {
                     }
                 }
             };
-
             initController();
-            scope.grid = {gridType: expectedGrid, reOrderedOptions: []};
+
+            scope.grid = {gridType: expectedGrid, reOrderedOptions: [1, 2]};
             scope.gridId = gridId;
             scope.subsectionId = subsectionId;
             scope.editGridForm = {$valid: true};
             scope.gridForm = {columns: {$valid: true, $viewValue: {pk: 2}}};
+            scope.selectedQuestions = expectedGrid.initialSelectedQuestions;
 
             var successMessage = 'Grid has been updated successfully.';
 
             httpMock.expectPOST('/api/v1/grids/' + gridId + '/').respond(200, [
                 {message: successMessage}
             ]);
+
+            httpMock.expectPOST('/api/v1/question/' + primary.pk + '/options/').respond(200,
+                {message: successMessage}
+            );
 
             scope.postUpdateGrid();
             httpMock.flush();
