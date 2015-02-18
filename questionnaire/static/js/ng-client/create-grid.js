@@ -145,7 +145,6 @@ gridModule.filter('notInHybridGrid', function () {
         function extractQuestion(wrappedQuestion) {
             return wrappedQuestion.question;
         }
-
         var otherColumnQuestions = otherColumnMatrix.reduce(function (prev, curr) {
             return prev.concat(curr);
         }).map(extractQuestion);

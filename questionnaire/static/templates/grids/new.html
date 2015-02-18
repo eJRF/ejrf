@@ -144,7 +144,7 @@
             <td>{[{ $index + 2}]}</td>
             <td ng-mouseleave="grid.addGridRow[$parent.$index][$index]=false"
                 ng-mouseenter="grid.addGridRow[$parent.$index][$index]=true"
-                ng-repeat="column in row">
+                ng-repeat="column in row" colspan="{[{ selectedQuestions.colspan(row)}]}">
                 <div name="gridForm.{[{'dynamicGridQuestion' + $parent.$index + '_' + $index}]}" ng-form="">
                     <div class="input-group">
                         <select required id="column_{[{$parent.$index+'_'+$index}]}" name="columns" class="form-control"

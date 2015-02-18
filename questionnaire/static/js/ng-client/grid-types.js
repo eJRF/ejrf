@@ -246,12 +246,15 @@ gridTypeFactories.factory('hybridGridQuestionInitializer', function () {
 });
 
 gridTypeFactories.factory('hybridGridQuestionSelection', function (hybridGridQuestionInitializer) {
-    var maxColumns = function () {
-        var questions = this.dynamicGridQuestion;
+    var _maxColumns = function (questions) {
         var rowLengths = questions.map(function (questionRows) {
             return questionRows.length;
         });
         return Math.max.apply(Math, rowLengths);
+    };
+
+    var maxColumns = function () {
+        return _maxColumns(this.dynamicGridQuestion);
     };
 
     var allowAddColumn = function (rowIndex) {
@@ -280,6 +283,10 @@ gridTypeFactories.factory('hybridGridQuestionSelection', function (hybridGridQue
         }
     };
 
+    var colspan = function (row) {
+        return _maxColumns(this.dynamicGridQuestion) - row.length + 1;
+    };
+
     return function (grid, allQuestions, orders) {
         var theGrid = grid || {};
         var questions = allQuestions || [];
@@ -294,7 +301,8 @@ gridTypeFactories.factory('hybridGridQuestionSelection', function (hybridGridQue
             addRow: addRow,
             allowAddColumn: allowAddColumn,
             removeElement: removeElement,
-            maxColumns: maxColumns
+            maxColumns: maxColumns,
+            colspan: colspan
         };
     }
 });

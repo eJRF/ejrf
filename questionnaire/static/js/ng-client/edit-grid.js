@@ -119,6 +119,17 @@ function reArrange(elem) {
     });
 }
 
+function reorderedQuestionRows(elem) {
+    var tableRow = $(elem).find('tbody tr');
+    return $.map(tableRow, function (row) {
+        return $(row).find('td.drag');
+    }).map(function (td) {
+        return $(td).data('option');
+    }).filter(function (row) {
+        return row;
+    });
+}
+
 editGridModule.directive('dndTable', function () {
     return {
         restrict: 'A',
@@ -130,6 +141,25 @@ editGridModule.directive('dndTable', function () {
                 itemSelector: '.tr-sortable',
                 onDrop: function ($item, _, _super) {
                     $scope.grid.reOrderedOptions = reArrange(elem, $item);
+                    callOnDropSuper($item);
+                }
+            });
+        }
+    }
+});
+
+editGridModule.directive('hybridDndTable', function () {
+    return {
+        restrict: 'A',
+        scope: false,
+        link: function ($scope, elem) {
+            $(elem).sortable({
+                containerSelector: 'table',
+                itemPath: '>tbody',
+                itemSelector: '.tr-sortable',
+                handle: '.drag',
+                onDrop: function ($item, _, _super) {
+                    $scope.selectedQuestions.dynamicGridQuestion = reorderedQuestionRows(elem);
                     callOnDropSuper($item);
                 }
             });
