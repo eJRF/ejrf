@@ -41,3 +41,21 @@ var questionFilter = function (questions, filterCriteria) {
         return questionFilterCriteria(question.fields, filterCriteria);
     });
 };
+
+function reArrange(elem) {
+    var tableRow = $(elem).find('tbody tr');
+    return $.map(tableRow, function (row) {
+        return $(row).data('option');
+    });
+}
+
+function reorderedQuestionRows(elem) {
+    var tableRow = $(elem).find('tbody tr');
+    return $.map(tableRow, function (row) {
+        return $(row).find('td.drag');
+    }).map(function (td) {
+        return $(td).data('option');
+    }).filter(function (row) {
+        return row;
+    });
+}
