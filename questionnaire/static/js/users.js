@@ -2,9 +2,6 @@ $(document).ready(function () {
     $('#id_organization').on('change', function () {
         getRegionsFor($(this), '#id_region');
     });
-    $("#cancel_button").on('click', function(){
-        window.history.go(-1);
-    });
 });
 
 $(document).on('change', '#organization', function () {
@@ -71,6 +68,7 @@ function groupRolesBootstrap() {
 
     $('#id-reset-password-form').validate();
     $('#create-user-form').validate();
+    $('#edit-user-form').validate();
     $region_element.html('<option value>Choose a Region</option>');
 
     hideElements([$organization_element.parent(), $region_element.parent(),

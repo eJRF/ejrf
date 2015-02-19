@@ -103,6 +103,7 @@ class EditUser(PermissionRequiredMixin, UpdateView):
         context['btn_label'] = "SAVE"
         context['cancel_url'] = reverse("list_users_page")
         context['title'] = "Edit User"
+        context['id'] = "edit-user-form"
         return context
 
     def form_valid(self, form):

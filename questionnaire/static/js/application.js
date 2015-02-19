@@ -185,7 +185,11 @@ $(document).ready(function () {
                 $('#notification').html(htmlContent);
             }
         });
-    })
+    });
+
+    $("#cancel_button").on('click', function(){
+        window.history.go(-1);
+    });
 });
 
 function makePostRequest(url, data) {
