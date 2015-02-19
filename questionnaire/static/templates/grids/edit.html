@@ -65,11 +65,11 @@
             </tr>
             <tbody ng-if="grid.gridType.displayAll">
             <tr ng-repeat="option in grid.questionOptions" data-option="{[{ option.pk }]}" style="cursor: move"
-                class="tr-sortable">
+                class="tr-sortable" id="sortable-row-{[{ $index }]}">
                 <td>
                     {[{ $index + 1 }]}
                 </td>
-                <td ng-model="grid.questionOptions[$index]">
+                <td ng-model="grid.questionOptions[$index]" class="option-text">
                     {[{ option.fields.text }]}
                 </td>
                 <td ng-repeat="q in selectedQuestions.otherColumns">
@@ -117,7 +117,7 @@
         </tr>
         <tbody>
         <tr ng-repeat="row in selectedQuestions.dynamicGridQuestion" class="tr-sortable">
-            <td class="drag" style="cursor: move" data-option="{[{ row }]}">{[{ $index + 2}]}</td>
+            <td class="drag" id="drag-row-{[{ $index }]}" style="cursor: move" data-option="{[{ row }]}">{[{ $index + 2}]}</td>
             <td ng-mouseleave="grid.addGridRow[$parent.$index][$index]=false"
                 ng-mouseenter="grid.addGridRow[$parent.$index][$index]=true"
                 ng-repeat="column in row" colspan="{[{ selectedQuestions.colspan(row)}]}">

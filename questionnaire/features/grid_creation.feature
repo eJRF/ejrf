@@ -81,3 +81,27 @@ Feature: Grid Creation
     Then I should see that the grid was updated successfully
     When I close the edit grid modal
     Then I should see the hybrid grid with its questions in their new order
+
+
+  Scenario: Re-Order rows in a non hybrid grid
+    When I have a display all grid
+    And I am editing that questionnaire
+    When I click edit the display all grid
+    And I drag the first row to the second row
+    And I choose to drag the same row to the third row
+    And I click update the grid
+    Then I should see that the grid was updated successfully
+    When I close the edit grid modal
+    Then I should see the grid rows in their new order
+
+
+  Scenario: Re-Order rows in a hybrid grid
+    When I have a hybrid grid in that questionnaire
+    And I am editing that questionnaire
+    When I choose to edit the hybrid grid
+    And I drag the first hybrid row to the second hybrid row
+    And I drag the same hybrid row to the third hybrid row
+    And I click update the grid
+    Then I should see that the grid was updated successfully
+    When I close the edit grid modal
+    Then I should see the hybrid grid rows in their new order

@@ -1,9 +1,8 @@
 from time import sleep
 from lettuce import world, step
-from nose.tools import assert_true
+from nose.tools import assert_true, assert_equals
 from questionnaire.features.pages.questionnaires import QuestionnairePage
 from questionnaire.models import Question, QuestionOption, Theme, QuestionGroupOrder
-from questionnaire.tests.factories.question_factory import QuestionFactory
 from questionnaire.tests.factories.question_group_factory import QuestionGroupFactory
 
 
@@ -13,9 +12,9 @@ def and_i_have_both_simple_and_primary_questions_in_my_question_bank(step):
 
     world.grid_question1 = Question.objects.create(text='Primary Option', UID='C00021', answer_type='MultiChoice',
                                                    is_primary=True, theme=world.theme)
-    QuestionOption.objects.create(text='Option A', question=world.grid_question1)
-    QuestionOption.objects.create(text='Option B', question=world.grid_question1)
-    QuestionOption.objects.create(text='Option C', question=world.grid_question1)
+    world.option1 = QuestionOption.objects.create(text='Option A', question=world.grid_question1)
+    world.option2 = QuestionOption.objects.create(text='Option B', question=world.grid_question1)
+    world.option3 = QuestionOption.objects.create(text='Option C', question=world.grid_question1)
 
     world.grid_question2 = Question.objects.create(text='First Column Question - Q2',
                                                    export_label='First Column Question - Q2', UID='C00022', answer_type='Number',
@@ -198,16 +197,11 @@ def then_i_should_not_see_the_element_at_row_group1_column_group1(step, row, col
 def when_i_have_a_display_all_grid(step):
     world.display_all_group = QuestionGroupFactory(grid=True, display_all=True,
                                                    subsection=world.sub_section, order=1)
-    world.primary_question = QuestionFactory(is_primary=True, text='Primary Question',
-                                             export_label='Primary Question', instructions='')
-    world.non_question1 = QuestionFactory(text='Question 1', export_label='Question 1', instructions='')
-    world.non_question2 = QuestionFactory(text='Question 2', export_label='Question 2', instructions='')
-    world.unassigned_question2 = QuestionFactory(text='Question 3', export_label='Question 3', instructions='')
 
-    world.display_all_group.question.add(world.non_question1, world.primary_question, world.non_question2)
-    QuestionGroupOrder.objects.create(order=1, question=world.primary_question, question_group=world.display_all_group)
-    world.display_all_group.orders.create(order=2, question=world.non_question1)
-    world.display_all_group.orders.create(order=3, question=world.non_question2)
+    world.display_all_group.question.add(world.grid_question1, world.grid_question2, world.grid_question3)
+    QuestionGroupOrder.objects.create(order=1, question=world.grid_question1, question_group=world.display_all_group)
+    world.display_all_group.orders.create(order=2, question=world.grid_question2)
+    world.display_all_group.orders.create(order=3, question=world.grid_question3)
 
 @step(u'When I click edit the display all grid')
 def when_i_click_edit_the_display_all_hybrid_grid(step):
@@ -217,13 +211,13 @@ def when_i_click_edit_the_display_all_hybrid_grid(step):
 def and_i_click_column_move_group1_question_to_the_left(step):
     sleep(1)
     world.browser.find_by_id('column-0').mouse_over()
-    world.page.click_by_id('move-question-%s-right' % world.non_question1.id)
+    world.page.click_by_id('move-question-%s-right' % world.grid_question2.id)
 
 @step(u'And I choose to move the same question to the left')
 def and_i_choose_to_move_the_same_question_further_left(step):
     world.browser.find_by_id('column-1').mouse_over()
     sleep(0.5)
-    world.page.click_by_id('move-question-%s-left' % world.non_question1.id)
+    world.page.click_by_id('move-question-%s-left' % world.grid_question2.id)
     sleep(1)
 
 @step(u'And I click update the grid')
@@ -236,12 +230,12 @@ def then_i_should_see_that_the_grid_was_updated_successfully(step):
 
 @step(u'Then I should see it moved to the right')
 def then_i_should_see_it_moved_to_the_left(step):
-    world.page.assert_questions_ordered_in_edit_modal([world.non_question2, world.non_question1])
+    world.page.assert_questions_ordered_in_edit_modal([world.grid_question3, world.grid_question2])
 
 
 @step(u'Then I should see it moved back')
 def then_i_should_see_it_moved_back(step):
-    world.page.assert_questions_ordered_in_edit_modal([world.non_question1, world.non_question2])
+    world.page.assert_questions_ordered_in_edit_modal([world.grid_question2, world.grid_question3])
 
 @step(u'When I close the edit grid modal')
 def when_i_close_the_edit_grid_modal(step):
@@ -251,7 +245,7 @@ def when_i_close_the_edit_grid_modal(step):
 @step(u'Then I should see the grid questions in their new order')
 def then_i_should_see_the_grid_questions_in_their_new_order(step):
     assert world.page.is_element_present_by_id('delete-grid-%d' % world.display_all_group.id)
-    world.page.assert_questions_ordered_in_entry([world.non_question2, world.non_question1], world.display_all_group)
+    world.page.assert_questions_ordered_in_entry([world.grid_question3, world.grid_question2], world.display_all_group)
 
 @step(u'When I have a hybrid grid in that questionnaire')
 def when_i_have_a_hybrid_all_grid(step):
@@ -273,3 +267,46 @@ def then_i_should_see_the_hybrid_grid_with_its_questions_in_their_new_order(step
     world.page.assert_questions_ordered_in_hybrid_grid_entry([world.grid_question1, world.grid_question2,
                                                               world.grid_question3, world.grid_question6],
                                                              world.hybrid_group)
+
+@step(u'And I drag the first row to the second row')
+def and_i_drag_the_first_row_to_the_second_row(step):
+    world.page.move_draggable_id_by_this_number_of_steps('sortable-row-0', 0)
+    sleep(3)
+
+@step(u'Then I should see it moved to the second row')
+def then_i_should_see_it_moved_to_the_second_row(step):
+    sleep(4)
+    world.page.assert_row_moved_to(position=1)
+
+@step(u'And I choose to drag the same row to the third row')
+def and_i_choose_to_drag_the_same_row_to_the_third_row(step):
+    world.page.move_draggable_id_by_this_number_of_steps('sortable-row-1', 2)
+    sleep(1)
+
+@step(u'Then I should see it moved to the third row')
+def then_i_should_see_it_moved_to_the_third_row(step):
+    world.page.assert_row_moved_to(position=2)
+
+@step(u'Then I should see the grid rows in their new order')
+def then_i_should_see_the_grid_rows_in_their_new_order(step):
+    grid_options = world.browser.find_by_css('.grid-option')
+    expected_order_of_options = [world.option1.text, world.option3.text, world.option2.text]
+    grid_options_text = map(lambda opt: opt.text, grid_options)
+    assert_equals(expected_order_of_options, grid_options_text)
+
+@step(u'And I drag the first hybrid row to the second hybrid row')
+def and_i_drag_the_first_hybrid_row_to_the_second_hybrid_row(step):
+    world.page.move_draggable_id_by_this_number_of_steps('drag-row-0', 1)
+    sleep(3)
+
+@step(u'And I drag the same hybrid row to the third hybrid row')
+def and_i_drag_the_first_hybrid_row_to_the_second_hybrid_row(step):
+    world.page.move_draggable_id_by_this_number_of_steps('drag-row-0', 1)
+    sleep(3)
+
+@step(u'Then I should see the hybrid grid rows in their new order')
+def then_i_should_see_the_hybrid_grid_rows_in_their_new_order(step):
+    question_texts = world.browser.find_by_css('.question-text')
+    expected_order_of_options = [world.grid_question1.text, world.grid_question6.text, world.grid_question2.text]
+    grid_question_text = map(lambda opt: opt.text, question_texts)
+    assert_equals(expected_order_of_options, grid_question_text)
