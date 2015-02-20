@@ -2,11 +2,15 @@
      aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 id="preview_modal_label" class="modal-title cyan">Drag to Reorder the Questions</h4>
+            </div>
+
             <form action="" method="post" accept-charset="utf-8" class="form-horizontal re-order-form"
                   id="re-order-questions-form">
                 <div class="modal-body">
                     {% csrf_token %}
-                    <h4 id="preview_modal_label" class="modal-title cyan">Drag to Reorder the Questions</h4></br>
                     <table id="reorder-content-table">
 
                     </table>
