@@ -138,13 +138,24 @@ var notSelectedFilter = function () {
     };
 };
 
+
 gridModule.filter('notSelected', notSelectedFilter);
+
+var filterByCriteria = function () {
+    return function (questions, field, value) {
+        return questions.filter(function (question) {
+            return question.fields[field] == value;
+        });
+    };
+};
+gridModule.filter('satisfy', filterByCriteria);
 
 gridModule.filter('notInHybridGrid', function () {
     return function (questions, otherColumnMatrix, selectedQuestion) {
         function extractQuestion(wrappedQuestion) {
             return wrappedQuestion.question;
         }
+
         var otherColumnQuestions = otherColumnMatrix.reduce(function (prev, curr) {
             return prev.concat(curr);
         }).map(extractQuestion);

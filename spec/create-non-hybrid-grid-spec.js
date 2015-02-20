@@ -45,10 +45,7 @@ describe("create display all grid", function () {
         stubQuestions = [
             {
                 pk: 186,
-                model: "questionnaire.question",
                 fields: {
-                    UID: "C00097",
-                    created: "2014-12-17T12:31:19.231Z",
                     text: "PAB (protection at birth)",
                     theme: 6,
                     answer_type: "MultiChoice",
@@ -368,6 +365,7 @@ describe("create display all grid", function () {
         });
 
     });
+
     describe("notSelectedFilter", function () {
         it('should return unselected questions', function () {
             var allQuestions = [11, 22, 33, 44, 55],
@@ -384,6 +382,36 @@ describe("create display all grid", function () {
             var unselectedQuestionsFilter = notSelectedFilter();
             expect(unselectedQuestionsFilter(allQuestions, selectedQuestions, 1)).toEqual([11, 33, 44, 55]);
             expect(unselectedQuestionsFilter(allQuestions, selectedQuestions, 0)).toEqual([11, 22, 44, 55]);
+        });
+    });
+
+    describe("satisfy filter", function () {
+        it('should return question even if selected', function () {
+            var question1 = {
+                pk: 186,
+                fields: {
+                    theme: 6,
+                    answer_type: "MultiChoice",
+                    is_primary: true
+                }
+                },
+                question2 = {
+                    pk: 187,
+                    fields: {
+                        theme: 6,
+                        answer_type: "Text",
+                        is_primary: false
+                    }
+                };
+
+            var questions = [question1, question2];
+            var satisfyFilter = filterByCriteria();
+
+            expect(satisfyFilter(questions, 'is_primary', false)).toEqual([question2]);
+            expect(satisfyFilter(questions, 'is_primary', true)).toEqual([question1]);
+            expect(satisfyFilter(questions, 'theme', 6)).toEqual(questions);
+            expect(satisfyFilter(questions, 'answer_type', 'Text')).toEqual([question2]);
+            expect(satisfyFilter(questions, 'answer_type', 'MultiChoice')).toEqual([question1]);
         });
     });
 
