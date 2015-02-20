@@ -117,6 +117,14 @@ describe("create display all grid", function () {
             expect(scope.grid.questions.length).toEqual(4);
             expect(scope.grid.questions).toEqual([primary, question1, question2, unUsedQuestion]);
         });
+
+        it('should return toggle class', function () {
+            initController();
+
+            expect(scope.questionForm(true)).toEqual('question-form');
+            expect(scope.questionForm(false)).toEqual('');
+        });
+
         it('should update grid details', function () {
             var expectedGrid = {
                 value: 'display_all',

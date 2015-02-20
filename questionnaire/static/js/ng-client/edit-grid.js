@@ -16,6 +16,9 @@ var editGridController = function ($scope, $q, GridService, QuestionService, Dis
         $scope.editGridForm = {};
         $scope.gridForm = {};
 
+        $scope.questionForm = function (status) {
+            return status ? 'question-form' : ''
+        };
 
         $scope.updateScope = function (questionnaireId, subsectionId, gridId) {
             $scope.gridId = gridId;

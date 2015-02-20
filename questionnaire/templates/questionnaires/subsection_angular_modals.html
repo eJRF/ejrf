@@ -58,6 +58,7 @@
             <div class="modal-content" data-ng-controller="EditGridController" id="edit-grid-controller">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title cyan">Edit Grid</h4>
                 </div>
                 <form class="form-horizontal" name="editGridForm" id="create-grid-form" novalidate ng-submit="postUpdateGrid()">
                     <div class="modal-body">
@@ -158,9 +159,5 @@
                 'skip_subsection': 'required'
             }
         });
-    });
-
-    $('#edit-grid-modal').on('shown.bs.modal', function(){
-        highlightOnHover($(this));
     });
 </script>

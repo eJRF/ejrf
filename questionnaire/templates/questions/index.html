@@ -14,7 +14,7 @@
            id="id-add-new-question-link">
             <span class="cyan"><i class="glyphicon glyphicon-plus-sign"></i> New Question</span></a>
         <br/>
-        {% include 'users/filter_form.html' with a_form=filter_form btn_label='Filter' form_method='get' form_id='question-filter-form' %}
+        {% include 'users/_get_filter_form.html' with a_form=filter_form btn_label='Filter' form_method='get' form_id='question-filter-form' %}
         <br/>
     </div>
     <div class="table-responsive">
