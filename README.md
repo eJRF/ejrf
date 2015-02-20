@@ -25,7 +25,7 @@ Installation
 * To run locally with data run after following the above steps
 
 ```
-./manage loaddata questionnaire_core_2013.json
+./manage loaddata questionnaire/fixtures/2013-core-jrf.json
 ./manage runserver
 ```
 
