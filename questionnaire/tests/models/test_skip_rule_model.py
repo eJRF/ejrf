@@ -25,6 +25,24 @@ class SkipQuestionRuleTest(BaseTest):
         skip_question = SkipQuestionRuleFactory(root_question=root_question, subsection=group.subsection)
         self.assertTrue(skip_question.is_in_hybrid_grid())
 
+    def test_skip_question_rule_to_dictionary(self):
+        root_question = QuestionFactory()
+        group = QuestionGroupFactory(grid=True, hybrid=True)
+        group.question.add(root_question)
+        skip_question = SkipQuestionRuleFactory(root_question=root_question, subsection=group.subsection)
+
+        user = self.create_user(username='global_user', org='WHO')
+        group_id = skip_question.subsection.question_group.all()[0].id
+        expected_dictionary = {'id': skip_question.id,
+                               'skip_question': skip_question.skip_question.text,
+                               'root_question': skip_question.root_question.text,
+                               'response': skip_question.response.text,
+                               'is_in_grid': True,
+                               'group_id': group_id,
+                               'can_delete': True
+        }
+        self.assertEqual(skip_question.to_dictionary(user), expected_dictionary)
+
 
 class SkipSubsectionRuleTest(BaseTest):
     def test_skip_rules_fields(self):
@@ -38,3 +56,16 @@ class SkipSubsectionRuleTest(BaseTest):
     def test_skip_subsection_rule_stores(self):
         skip_subsection = SkipSubsectionRuleFactory()
         self.failUnless(skip_subsection.id)
+
+    def test_skip_subsection_rule_to_dictionary(self):
+        skip_subsection = SkipSubsectionRuleFactory()
+        user = self.create_user(username='global_user', org='WHO')
+        expected_dictionary = {'id': skip_subsection.id,
+                               'skip_subsection': (" %s. %s" % (skip_subsection.skip_subsection.order,
+                                                                skip_subsection.skip_subsection.title)),
+                               'root_question': skip_subsection.root_question.text,
+                               'response': skip_subsection.response.text,
+                               'can_delete': True
+        }
+
+        self.assertEqual(skip_subsection.to_dictionary(user), expected_dictionary)
