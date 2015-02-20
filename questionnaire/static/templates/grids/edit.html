@@ -1,7 +1,8 @@
 <div ng-if="!grid.gridType.hybrid">
     <div class="table-responsive">
         <table class="table table-bordered" dnd-table>
-            <tr>
+            <thead>
+                <tr>
                 <td>
                     QNO.
                 </td>
@@ -63,6 +64,7 @@
 
                 </td>
             </tr>
+            </thead>
             <tbody ng-if="grid.gridType.displayAll">
             <tr ng-repeat="option in grid.questionOptions" data-option="{[{ option.pk }]}" style="cursor: move"
                 class="tr-sortable" id="sortable-row-{[{ $index }]}">
@@ -76,7 +78,7 @@
                     <question-input/>
                 </td>
             </tr>
-            </tbody>
+
             <tr ng-if="grid.gridType.addMore">
                 <td>
                     1
@@ -88,6 +90,7 @@
                     <question-input/>
                 </td>
             </tr>
+            </tbody>
         </table>
     </div>
 </div>

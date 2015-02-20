@@ -139,6 +139,7 @@
         $('.add-skip-rule-btn').addClass('disabled');
         window.location.reload()
     });
+
     gridModal.on('hidden.bs.modal', function (e) {
         window.location.reload();
     });
@@ -157,5 +158,9 @@
                 'skip_subsection': 'required'
             }
         });
+    });
+
+    $('#edit-grid-modal').on('shown.bs.modal', function(){
+        highlightOnHover($(this));
     });
 </script>

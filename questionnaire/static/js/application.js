@@ -421,7 +421,7 @@ function removeButtons($modal, btnClasses) {
 }
 
 function highlightOnHover($modal) {
-    $modal.find('table tr').each(function () {
+    $modal.find('tr').each(function () {
         $(this).hover(function () {
             $(this).toggleClass('question-form');
         });
