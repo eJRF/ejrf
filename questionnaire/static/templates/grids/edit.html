@@ -66,9 +66,9 @@
             </tr>
             </thead>
             <tbody ng-if="grid.gridType.displayAll">
-            <tr ng-repeat="option in grid.questionOptions" data-option="{[{ option.pk }]}" style="cursor: move"
-                class="tr-sortable" id="sortable-row-{[{ $index }]}" ng-mouseenter="hovered=true" ng-mouseleave="hovered=false" ng-class="questionForm(hovered)">
-                <td>
+            <tr ng-repeat="option in grid.questionOptions" data-option="{[{ option.pk }]}"
+                class="tr-sortable" ng-mouseenter="hovered=true" ng-mouseleave="hovered=false" ng-class="questionForm(hovered)">
+                <td class="drag" style="cursor: move" id="sortable-row-{[{ $index }]}">
                     {[{ $index + 1 }]}
                 </td>
                 <td ng-model="grid.questionOptions[$index]" class="option-text">
@@ -80,7 +80,7 @@
             </tr>
 
             <tr ng-if="grid.gridType.addMore" ng-mouseenter="hovered=true" ng-mouseleave="hovered=false" ng-class="questionForm(hovered)">
-                <td>
+                <td class="drag">
                     1
                 </td>
                 <td>

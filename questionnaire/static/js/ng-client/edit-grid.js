@@ -124,6 +124,7 @@ editGridModule.directive('dndTable', function () {
                 containerSelector: 'table',
                 itemPath: '>tbody',
                 itemSelector: '.tr-sortable',
+                handle: '.drag',
                 onDrop: function ($item, _, _super) {
                     $scope.grid.reOrderedOptions = reArrange(elem, $item);
                     callOnDropSuper($item);
