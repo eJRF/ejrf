@@ -1,6 +1,5 @@
 Feature: Manage JRF
 
-  @WIP
   Scenario: Global admin viewing and Editing Questionnaires (Names)
     Given I am logged in as a global admin
     Then I should see manage JRF, users, question bank, extract links

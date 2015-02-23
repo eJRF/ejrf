@@ -85,7 +85,6 @@ Feature: Skip Rules
     Then I should see the rule disappear and a message that the skip rule was successfully deleted
     Then I should see '1' existing skip rules
 
-  @WIP
   Scenario: Skip rules are deleted when questions are unassigned
     Given I have a questionnaire with sections and subsections
     And I have questions and responses in the correct section
@@ -108,10 +107,10 @@ Feature: Skip Rules
     And I click to add a skip rule
     Then I should see '0' existing skip rules"
 
-  @WIP
   Scenario: Turn off cells in display all grid
     Given I am logged in as a global admin
     And I have a questionnaire with a grid
+    And I am editing that questionnaire
     Then I should see the option to add skip rules to the grid
     When I select the option to add skip rules to the grid
     And I choose to see existing skip rules

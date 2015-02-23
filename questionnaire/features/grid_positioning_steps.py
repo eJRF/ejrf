@@ -7,13 +7,7 @@ from questionnaire.models import Question, QuestionGroup, QuestionGroupOrder
 def and_i_have_a_questionnaire_with_a_grid(step):
     step.given('And I have both simple and primary questions in my Question Bank')
     step.given('And I have a questionnaire with sections and with subsections')
-    step.given('And I am editing that questionnaire')
-    step.given('When I choose to create a new grid question for a particular subsection')
-    sleep(1)
-    step.given('When I choose to create a grid with all options shown')
-    step.given('When I select the primary questions and columns for the all options grid')
-    step.given('And I save my grid')
-
+    step.given('When I have a display all grid')
 
 @step(u'Then I should see options to move the grid position up or down')
 def then_i_should_see_options_to_move_the_grid_position_up_or_down(step):

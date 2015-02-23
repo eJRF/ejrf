@@ -264,9 +264,9 @@ def when_i_un_assign_a_question_with_a_skip_rule(step):
 @step(u'When I un-assign the root question to a skip rule')
 def when_i_un_assign_the_root_question_to_a_skip_rule(step):
     step.given('And I visit that questionnaires section page')
-    world.page.click_by_id('unassign-question-%s' % world.question_to_skip.id)
+    world.page.click_by_id('unassign-question-%s' % world.root_question.id)
     time.sleep(1)
-    world.page.click_by_id('confirm-unassign-question-%s' % world.question_to_skip.id)
+    world.page.click_by_id('confirm-unassign-question-%s' % world.root_question.id)
 
 @step(u'When I delete a subsection with a skip rule')
 def when_i_delete_a_subsection_with_a_skip_rule(step):
@@ -294,4 +294,4 @@ def when_i_specify_a_cell_to_skip_in_the_grid(step):
 def and_that_cell_should_be_disabled(step):
     world.page.click_by_id('close-skip-rule-button')
     time.sleep(1)
-    assert world.browser.find_by_css('.form-control').first['Disabled']
+    world.page.assert_one_cell_disabled()

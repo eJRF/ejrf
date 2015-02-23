@@ -161,3 +161,8 @@ class PageObject(object):
 
     def assert_page_html_contains(self, html_to_check_for):
         assert_in(html_to_check_for, self.browser.html)
+
+    def assert_one_cell_disabled(self):
+        cells = self.browser.find_by_css('.form-control')
+        disabled = [cell['disabled'] for cell in cells]
+        assert disabled.count('true') > 0
