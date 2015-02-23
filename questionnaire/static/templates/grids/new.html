@@ -123,7 +123,7 @@
             <td colspan="{[{ selectedQuestions.maxColumns() }]}">
                 <select required name="primary_question" id="primary_question" class="form-control"
                         data-ng-model="selectedQuestions.primary"
-                        data-ng-options="question.fields.export_label for question in grid.primaryQuestions | filter: {fields:{is_primary: 'true'}} | filter: { fields: {theme: grid.selectedTheme.pk}} track by question.pk">
+                        data-ng-options="question.fields.export_label for question in grid.primaryQuestions | satisfy:'theme':grid.selectedTheme.pk track by question.pk">
                     <option value="">Primary Question</option>
                 </select>
 
@@ -149,7 +149,7 @@
                     <div class="input-group">
                         <select required id="column_{[{$parent.$index+'_'+$index}]}" name="columns" class="form-control"
                                 data-ng-model="column['question']"
-                                data-ng-options="question.fields.export_label for question in grid.questions | filter: {fields:{is_primary: 'false'}} | filter: { fields: {theme: grid.selectedTheme.pk}} | notInHybridGrid:selectedQuestions.dynamicGridQuestion:column['question'] track by question.pk">
+                                data-ng-options="question.fields.export_label for question in grid.questions | satisfy:'is_primary': false | satisfy:'theme':grid.selectedTheme.pk | notInHybridGrid:selectedQuestions.dynamicGridQuestion:column['question'] track by question.pk">
                             <option value="">Question</option>
                         </select>
 
