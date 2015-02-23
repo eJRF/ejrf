@@ -116,6 +116,7 @@ describe("create display all grid", function () {
             expect(scope.grid.questionOptions).toEqual(options);
             expect(scope.grid.questions.length).toEqual(4);
             expect(scope.grid.questions).toEqual([primary, question1, question2, unUsedQuestion]);
+            expect(scope.grid.primaryQuestions).toEqual([primary]);
         });
 
         it('should return toggle class', function () {

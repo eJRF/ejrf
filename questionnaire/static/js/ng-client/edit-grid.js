@@ -9,6 +9,7 @@ var editGridController = function ($scope, $q, GridService, QuestionService, Dis
             selectedTheme: {},
             gridType: {},
             questions: [],
+            primaryQuestions: [],
             reOrderedOptions: []
         };
         $scope.allQuestions = [];
@@ -60,6 +61,7 @@ var editGridController = function ($scope, $q, GridService, QuestionService, Dis
                             $scope.selectedQuestions = type.initialSelectedQuestions;
                             var usedQuestions = $scope.selectedQuestions.questions;
                             $scope.grid.questions = usedQuestions.concat(unUsedQuestions);
+                            $scope.grid.primaryQuestions = questionFilter($scope.grid.questions, type.primary_questions_criteria);
 
                             var primaryQuestion = $scope.selectedQuestions.primary;
                             $scope.grid.selectedTheme = getTheme(primaryQuestion);
