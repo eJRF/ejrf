@@ -1,5 +1,5 @@
 {% load generic_tags %}
-{% if perms.auth.can_edit_questionnaire and user.user_profile.region == questionnaire.region %}
+{% if not preview and perms.auth.can_edit_questionnaire and user.user_profile.region == questionnaire.region %}
     {% for subsection_ in section.sub_sections.all %}
         {% include 'base/modals/ajax_modal.html' with action_url=subsection_.id|get_url_with_ids:"edit_subsection_page" object=subsection_  action="edit_subsection" modal_title="Edit SubSection"  btn_label="SAVE" class="edit_subsection" %}
         {% include 'base/modals/_delete.html' with object_type='Subsection' title='Confirm Delete Subsection' action="delete" url=subsection_.id|get_url_with_ids:"delete_subsection_page" object=subsection_ confirm='Yes' %}

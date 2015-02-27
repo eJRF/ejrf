@@ -5,7 +5,7 @@
             <td>
                 <div class="question-number">
                     {% spaceless %}
-                        {% if order.question.region %}<span>{{ order.question.region.name }} - </span>{% endif %}
+                        {% if question.region %}<span>{{ question.region.name }} - </span>{% endif %}
                         <span>{{ section.order }}</span>
                         {% if section.has_at_least_two_subsections %}
                             <span>.{{ subsection.order }}</span>{% endif %}
@@ -17,7 +17,7 @@
                     {% endspaceless %}
                 </div>
             </td>
-            {% for field in order.question|get_form:formsets %}
+            {% for field in question|get_form:formsets %}
                 <td class="primary-question" data-primary-question="{{ field.form.instance.id}}">
                     <input type="hidden" id="id_{{field.html_name }}" name="{{ field.html_name}}" value="{{ row_number }},{{ a_group.id }}" />
                     {{ field }}

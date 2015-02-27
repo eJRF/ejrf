@@ -61,7 +61,7 @@ class QuestionnaireEntryFormService(object):
         question_group = order.question_group
         initial = {'question': question, 'group': question_group, 'country': self.country,
                    'questionnaire': self.questionnaire}
-        answer = None
+        answer = Answer.objects.none()
         if option:
             primary_answer = Answer.from_response(response=option, version=self.version, country=self.country,
                                                   questionnaire=self.questionnaire)
@@ -80,7 +80,7 @@ class QuestionnaireEntryFormService(object):
             answer = question.answers.filter(answergroup__grouped_question=question_group, country=self.country,
                                              version=self.version,
                                              questionnaire=self.questionnaire).select_subclasses()
-        if answer:
+        if answer.exists():
             self._append(answer, initial)
         return dict(self.initial.items() + initial.items())
 

@@ -1,5 +1,6 @@
 from model_utils.managers import InheritanceManager
 from django.db import models
+from django.db.models import Q
 
 from questionnaire.models.questions import Question, QuestionOption
 from questionnaire.models.base import BaseModel
@@ -29,9 +30,14 @@ class Answer(BaseModel):
     @classmethod
     def from_response(cls, response, **kwargs):
         answers = cls.objects.filter(**kwargs).select_subclasses()
-        answer = filter(lambda ans: ans.response == response or str(ans.response) == response, answers)
-        answer_ids = map(lambda ans: ans.id, answer)
-        return answers.filter(id__in=answer_ids).distinct()
+        response_query = cls._response_query(response)
+        return answers.filter(response_query).distinct()
+
+    @classmethod
+    def _response_query(cls, response):
+        if isinstance(response, QuestionOption):
+            return Q(multichoiceanswer__response=response) | Q(multipleresponseanswer__response=response)
+        return Q(dateanswer__response=response) | Q(textanswer__response=response) | Q(numericalanswer__response=response)
 
     def can_be_deleted(self, group, country):
         return group.grid and self.country == country

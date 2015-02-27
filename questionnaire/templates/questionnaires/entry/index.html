@@ -1,15 +1,18 @@
 {% extends 'base/layout.html' %}
 {% block javascripts %}
 {% include 'questionnaires/entry/_extra_js.html' %}
-<script src="{{ STATIC_URL }}js/lib/angular.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}js/lib/si-table.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}js/ng-client/helpers.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}js/ng-client/grid-types.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}js/ng-client/grid-service.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}js/ng-client/create_skip_rule.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}js/ng-client/create-grid.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}js/ng-client/edit-grid.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}js/ng-client/assign-questions.js" type="text/javascript" charset="utf-8"></script>
+
+{% if not preview and perms.auth.can_edit_questionnaire %}
+    <script src="{{ STATIC_URL }}js/lib/angular.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="{{ STATIC_URL }}js/lib/si-table.js" type="text/javascript" charset="utf-8"></script>
+    <script src="{{ STATIC_URL }}js/ng-client/helpers.js" type="text/javascript" charset="utf-8"></script>
+    <script src="{{ STATIC_URL }}js/ng-client/grid-types.js" type="text/javascript" charset="utf-8"></script>
+    <script src="{{ STATIC_URL }}js/ng-client/grid-service.js" type="text/javascript" charset="utf-8"></script>
+    <script src="{{ STATIC_URL }}js/ng-client/create_skip_rule.js" type="text/javascript" charset="utf-8"></script>
+    <script src="{{ STATIC_URL }}js/ng-client/create-grid.js" type="text/javascript" charset="utf-8"></script>
+    <script src="{{ STATIC_URL }}js/ng-client/edit-grid.js" type="text/javascript" charset="utf-8"></script>
+    <script src="{{ STATIC_URL }}js/ng-client/assign-questions.js" type="text/javascript" charset="utf-8"></script>
+{% endif %}
 
 {% endblock %}
 {% block extra_css %}
@@ -59,15 +62,15 @@
                     <div class="grid-group">
                         {% include 'questionnaires/entry/_grid_buttons.html' %}
                         {% if group.hybrid %}
-                        {% include 'questionnaires/entry/hybrid.html' %}
+                            {% include 'questionnaires/entry/hybrid.html' %}
                         {% else %}
-                        {% include 'questionnaires/entry/grid.html' with a_group=group section=section sub_section=subsection %}
+                          {% include 'questionnaires/entry/grid.html' with a_group=group %}
                         {% endif %}
                     </div>
                     {% else %}
                     <div class="question-group indent">
                         {% for order in group.question_orders %}
-                        {% include 'questionnaires/entry/_questions_n_answers_fields.html' %}
+                            {% include 'questionnaires/entry/_questions_n_answers_fields.html' %}
                         {% endfor %}
                     </div>
                     {% endif %}
@@ -87,4 +90,4 @@
 
 {% include 'questionnaires/entry/_outside_loop_modals.html' %}
 {% include 'base/modals/_reorder_questions.html' %}
-{% endblock %}
+ {% endblock %}

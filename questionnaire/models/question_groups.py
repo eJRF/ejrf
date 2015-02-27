@@ -110,9 +110,11 @@ class QuestionGroup(BaseModel):
         return [order.question for order in self.question_orders()]
 
     def question_orders(self):
+        related = ['question']
+        query = self.orders.order_by('order')
         if self.parent:
-            return self.parent.orders.order_by('order').filter(question__in=self.all_questions()).select_related()
-        return self.orders.order_by('order').select_related()
+            query = self.parent.orders.order_by('order').filter(question__in=self.all_questions())
+        return query.select_related(*related)
 
     def has_at_least_two_questions(self):
         return self.question.count() > 1
@@ -121,7 +123,7 @@ class QuestionGroup(BaseModel):
         by_attribute = self.question.filter(is_primary=True)
         if by_attribute.exists():
             return by_attribute[0]
-        by_order = self.orders.order_by('order')
+        by_order = self.orders.order_by('order').select_related('question')
         if by_order.exists():
             return by_order[0].question
         return None
@@ -141,7 +143,7 @@ class QuestionGroup(BaseModel):
         return 0
 
     def map_orders_with_answer_type(self, mapped_orders):
-        orders = self.orders.order_by('order').select_related()
+        orders = self.orders.order_by('order').select_related('question')
         if self.primary_question() and self.grid and self.display_all:
             for option in self.primary_question().options.all():
                 map_question_type_with(orders, mapped_orders, option)

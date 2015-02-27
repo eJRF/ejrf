@@ -1,8 +1,8 @@
-{% if order.question.instructions %}
+{% if question.instructions %}
     <a class="indent instructions" data-toggle="popover"
        data-html="true"
        data-placement="bottom" data-trigger="hover"
-       data-content="{{ order.question.instructions }}"
-       id="question-{{ order.question.id }}-instructions"><i
+       data-content="{{ question.instructions }}"
+       id="question-{{ question.id }}-instructions"><i
             class="glyphicon glyphicon-info-sign cyan"></i> instructions</a>
 {% endif %}

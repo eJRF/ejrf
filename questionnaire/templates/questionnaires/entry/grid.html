@@ -1,59 +1,69 @@
 {% load questionnaire_entry_tags %}
 <div class="table-responsive">
     <table class="table table-hover table-striped table-bordered grid" id="grid-table-{{ a_group.id }}" data-group-id="{{ a_group.id }}">
-        <thead>
-        {% if a_group.has_subgroups %}
-            <tr>
-                <th rowspan="2" class="qn-no">Q NO</th>
-                {% for order in a_group.question_orders %}
-                    {% if order.question.is_in_subgroup and order.question.is_first_in_group %}
-                        <th colspan="{{ order.question.group.all_questions.count }}">
-                            {{ order.question.group.name }}
-                            {% if order.question.group.instructions %}
-                                <a class="indent" data-toggle="popover" data-html="true" data-placement="bottom"
-                                   data-trigger="hover"
-                                   data-content="{{ order.question.group.instructions | safe }}">
-                                    <i class="glyphicon glyphicon-info-sign cyan"></i> instructions</a>
-                            {% endif %}
-                        </th>
-                    {% endif %}
-                    {% if not order.question.is_in_subgroup %}
-                        <th rowspan="2">{{ order.question.text }}
-                        {% include 'questionnaires/entry/_question_instructions.html' %}
-                        </th>
-                    {% endif %}
-                {% endfor %}
-            </tr>
-            <tr>
-                {% for order in a_group.question_orders %}
-                    {% if  order.question.is_in_subgroup %}
-                        <th>{{ order.question.text }}
-                            {% include 'questionnaires/entry/_question_instructions.html' %}
-                        </th>
-                    {% endif %}
-                {% endfor %}
-            </tr>
-        {% else %}
-            <tr>
-                <th rowspan="2">Q NO</th>
-                {% for order in a_group.question_orders %}
-                    <th>{{ order.question.text }}
-                        {% include 'questionnaires/entry/_question_instructions.html' %}
-                    </th>
-                {% endfor %}
-            </tr>
-        {% endif %}
-        </thead>
+        {% with  a_group.question_orders as question_orders %}
+            <thead>
+                {% if a_group.has_subgroups %}
+                    <tr>
+                        <th rowspan="2" class="qn-no">Q NO</th>
+                        {% for order in question_orders %}
+                            {%  with order.question as question %}
+                                {% if question.is_in_subgroup and question.is_first_in_group %}
+                                    <th colspan="{{ question.group.all_questions.count }}">
+                                        {{ question.group.name }}
+                                        {% if question.group.instructions %}
+                                            <a class="indent" data-toggle="popover" data-html="true" data-placement="bottom"
+                                               data-trigger="hover"
+                                               data-content="{{ question.group.instructions | safe }}">
+                                                <i class="glyphicon glyphicon-info-sign cyan"></i> instructions</a>
+                                        {% endif %}
+                                    </th>
+                                {% endif %}
+                                {% if not question.is_in_subgroup %}
+                                    <th rowspan="2">{{ question.text }}
+                                    {% include 'questionnaires/entry/_question_instructions.html' %}
+                                    </th>
+                                {% endif %}
+                            {% endwith %}
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        {% for order in question_orders %}
+                            {%  with order.question as question %}
+                                {% if  question.is_in_subgroup %}
+                                    <th>{{ question.text }}
+                                        {% include 'questionnaires/entry/_question_instructions.html' %}
+                                    </th>
+                                {% endif %}
+                            {% endwith %}
+                        {% endfor %}
+                    </tr>
+                {% else %}
+                    <tr>
+                        <th rowspan="2">Q NO</th>
+                        {% for order in question_orders %}
+                            {%  with order.question as question %}
+                                <th>{{ question.text }}
+                                    {% include 'questionnaires/entry/_question_instructions.html' %}
+                                </th>
+                            {%  endwith %}
+                        {% endfor %}
+                    </tr>
+                {% endif %}
+            </thead>
 
-        <tbody {% if a_group.allow_multiples%}class="grid"{% endif %}>
-        {% for order in a_group.question_orders %}
-            {% if  order.question.is_primary and a_group.display_all%}
-                {% include 'questionnaires/entry/_grid_display_all.html' %}
-            {% endif %}
-            {% if  order.question.is_primary and a_group.allow_multiples%}
-                {% include 'questionnaires/entry/_grid_allow_multiples.html' %}
-            {% endif %}
-        {% endfor %}
-        </tbody>
+            <tbody {% if a_group.allow_multiples%}class="grid"{% endif %}>
+                {% for order in question_orders %}
+                    {%  with order.question as question %}
+                        {% if  question.is_primary and a_group.display_all%}
+                            {% include 'questionnaires/entry/_grid_display_all.html' %}
+                        {% endif %}
+                        {% if  question.is_primary and a_group.allow_multiples%}
+                            {% include 'questionnaires/entry/_grid_allow_multiples.html' %}
+                        {% endif %}
+                    {% endwith %}
+                {% endfor %}
+            </tbody>
+        {% endwith %}
     </table>
 </div>

@@ -1,9 +1,9 @@
 {% load questionnaire_entry_tags %}
-{% for option in order.question.options.all %}
+{% for option in question.options.all %}
     <tr>
         <td>
             <div class="question-number">
-                {% if order.question.region %}<span>{{ order.question.region.name }} - </span>{% endif %}
+                {% if question.region %}<span>{{ question.region.name }} - </span>{% endif %}
                 {% spaceless %}
                     <span>{{ section.order }}</span>
                     {% if section.has_at_least_two_subsections %}
@@ -16,7 +16,7 @@
                 {% endspaceless %}
             </div>
         </td>
-        {% for field in order.question|get_form:formsets %}
+        {% for field in question|get_form:formsets %}
             <td class="grid-option">{{ field }}
                 {{ option.text }}
             </td>
