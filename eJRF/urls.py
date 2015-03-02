@@ -9,3 +9,6 @@ admin.autodiscover()
 urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
 ) + questionnaire_urls + questionnaire_api_urls
+
+handler404 = 'questionnaire.views.errors.serve_404'
+handler500 = 'questionnaire.views.errors.serve_500'

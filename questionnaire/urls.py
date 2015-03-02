@@ -20,7 +20,6 @@ from questionnaire.views.upload_document import UploadDocument, DownloadDocument
 from questionnaire.views.users import UsersList, CreateUser, EditUser, ResetPassword
 from questionnaire.validators.questionnaires import ValidateQuestionnaireFields
 
-
 urlpatterns = patterns('',
                        url(r'^$', Home.as_view(), name="home_page"),
                        url(r'^accounts/login/$', 'django.contrib.auth.views.login',

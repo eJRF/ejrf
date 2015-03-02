@@ -2,6 +2,7 @@
 - hosts: all
   vars:
     version: "{{ lookup('env','SNAP_COMMIT') }}"
+    stage: "{{ lookup('env','STAGE') }}"
   sudo: true
   roles:
      - app

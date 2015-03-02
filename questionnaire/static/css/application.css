@@ -444,6 +444,10 @@ table th {
     text-align: center;
 }
 
+.center {
+    text-align: center;
+}
+
 .unassign-question-div {
     display: inline-block;
     float: none;
