@@ -21,7 +21,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 SECRET_KEY = 'fwcsq!p9i1m6@%us!hh%8k8o_5ccycphkz0)0wv*^+72)4s-4y'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-STAGE_NAME = os.environ['STAGE']
+STAGE_NAME = os.environ.get('STAGE')
 
 DEBUG = (False if STAGE_NAME == 'PRODUCTION' else True)
 
