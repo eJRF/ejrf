@@ -13,7 +13,6 @@ Feature: Skip Rules
     When I select to add skip rules for skipping subsections
     Then I should see the subsections in that section listed for skipping
 
-  @WIP
   Scenario: Create and view skip rule
     Given I am logged in as a global admin
     And I have a questionnaire with sections and subsections
