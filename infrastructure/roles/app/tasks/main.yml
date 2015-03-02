@@ -30,9 +30,7 @@
 - name: ejrf requirements
   pip: requirements=/srv/checkout/pip-requirements.txt virtualenv=/srv/checkout/ejrfvenv
 
-- name: export environment variable
-  sudo: yes
-  shell: export STAGE="{{ stage }}"
+- copy: src=/srv/checkout/eJRF/{{ stage_config }} dest=/srv/checkout/eJRF/localsettings.py
 
 - name: ejrf sync db
   script: sync-db.sh
