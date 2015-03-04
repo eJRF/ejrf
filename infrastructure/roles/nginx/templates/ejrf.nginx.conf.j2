@@ -10,10 +10,13 @@ server {
 
     listen 443 ssl;
 
+<<<<<<< HEAD
     #ssl on;
     #ssl_certificate /etc/nginx/ssl/e-jrf_org.crt;
     #ssl_certificate_key /etc/nginx/ssl/e-jrf_org.key;
 
+=======
+>>>>>>> update infrastructure code and add vagrant provisioning configuration.
     error_page 497 https://$host:$server_port$request_uri;
 =======
     listen 80;
@@ -31,11 +34,15 @@ server {
 
     location /static {
 <<<<<<< HEAD
+<<<<<<< HEAD
         alias   /srv/checkout/app/static/;
     }
 }
 =======
         alias   /srv/checkout/static/;
+=======
+        alias   /srv/checkout/app/static/;
+>>>>>>> update infrastructure code and add vagrant provisioning configuration.
 
     }
 
