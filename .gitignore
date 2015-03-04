@@ -4,7 +4,6 @@
 localsettings.py
 ghostdriver.log
 testsettings.py
-Vagrantfile
 .vagrant/
 screenshots/
 .ejrf-env
@@ -12,7 +11,6 @@ node_modules
 media/
 sample_file.zip
 data-backup.json
-e-jrf_org.crt
-e-jrf_org.csr
-e-jrf_org.key
+infrastructure/roles/nginx/files/
+hosts.ini
 *#*

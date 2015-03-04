@@ -1,37 +1,62 @@
-Installation
-------------
-* Postgres should be running and after cloning adjust localsettings.py accordingly for db setup 
+Installation on a developer box
+-----------------------
+* Postgres should be running and after cloning adjust localsettings.py accordingly for db setup
 
-##Git
+###Git
 
         git clone https://github.com/eJRF/ejrf.git
-
-        cd ejrf
-
-        mkvirtualenv ejrf
-
+### Setup the devlopment evironment
+        mkvirtualenv destination-path-for-the-virtualenv/ejrf
+        
+		 source path-to-virtualenv/bin/activate
+		  
         pip install -r pip-requirements.txt
+        
+        npm install #install javscript dependencies (mainly for js tests)
 
+### Run Tests
+        python manage.py test #unit tests
+        python manage.py harvest #functional tests
+        
+        ./test.js # javascript tests
+### Run The application
         python manage.py syncdb --noinput
 
         python manage.py migrate
+        python manage.py createsuperuser
+        
+		 ./manage.py loaddata questionnaire/fixtures/2013-core-jrf.json
 
         python manage.py runserver
-        
-==
 
-* run test and harvest
 
-* To run locally with data run after following the above steps
+Installation in a vagrant box.
+-----------------------------
+## Requirements
 
-```
-./manage loaddata questionnaire/fixtures/2013-core-jrf.json
-./manage runserver
-```
+   * [Ansible] (https://github.com/ansible/ansible)
+   * [Vagrant] (www.vagrantup.com/downloads.html)
+   * [ubuntu-14.box image](https://www.dropbox.com/s/gw89y2vcix5cnj9/ubuntu-14.04.box?dl=0)
+   * [Virtualbox] (https://www.virtualbox.org/wiki/Downloads)
+   * A stable internet conncetion.
 
-Done!! you're good to go :)
 
-Filenaming convention:
+## Steps
+		git clone https://github.com/eJRF/ejrf.git
+		cd ejrf
+		vagrant plugin install vagrant-cachier
+		vagrant up
+If you get any issues due to say an internet connection, you can resume the provisioning proccess by running:
+
+      vagrant provsion
+
+Now you can access the application at the private IP address of the vagrant box on port 80.
+
+       http://192.168.50.4
+
+
+
+###Filenaming convention:
 * for tests: test_[[OBJECT]]_[[ACTION]].py
 e.g: test_location_form.py, test_location_model.py, test_location_views.py
 
