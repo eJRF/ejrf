@@ -9,7 +9,7 @@
     - python-psycopg2
     - libpq-dev
 
-- postgresql_user: name=ejrf password=ejrf
+- postgresql_user: name={{ ejrf_db_name }} password={{ ejrf_db_password }}
   sudo_user: postgres
 
 - name: pg_hba.conf localhost md5

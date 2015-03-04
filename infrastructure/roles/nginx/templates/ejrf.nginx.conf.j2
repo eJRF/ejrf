@@ -1,13 +1,17 @@
 server {
-	listen          80 default_server;
-	server_name     localhost;
+    listen          80 default_server;
+    server_name     localhost;
 
     access_log /var/log/nginx/ejrf.access.log;
     error_log /var/log/nginx/ejrf.error.log;
 
-	client_max_body_size 75M;
+    client_max_body_size 75M;
 
     listen 443 ssl;
+
+    #ssl on;
+    #ssl_certificate /etc/nginx/ssl/e-jrf_org.crt;
+    #ssl_certificate_key /etc/nginx/ssl/e-jrf_org.key;
 
     error_page 497 https://$host:$server_port$request_uri;
 
@@ -18,7 +22,5 @@ server {
 
     location /static {
         alias   /srv/checkout/app/static/;
-
     }
-
 }

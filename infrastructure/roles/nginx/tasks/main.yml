@@ -6,7 +6,11 @@
   with_items:
     - nginx
 
-- template: src=ejrf.nginx.conf.j2 dest=/etc/nginx/sites-available/ejrf
+- template: src={{ item }} dest=/etc/nginx/sites-available/ejrf
+  with_first_found:
+    - files:
+        - ejrf.nginx.{{ server_stage }}.conf.j2
+        - ejrf.nginx.conf.j2
 
 - file: src=/etc/nginx/sites-available/ejrf dest=/etc/nginx/sites-enabled/ejrf state=link force=yes
 
@@ -15,3 +19,9 @@
 - file: path=/etc/nginx/sites-enabled/default state=absent
 
 - file: path=/etc/nginx/ssl owner=ubuntu  mode=0755 state=directory
+
+- copy: src={{ server_stage }}.crt dest=/etc/nginx/ssl/e-jrf_org.crt
+  when: install_certificate
+
+- copy: src={{ server_stage }}.key dest=/etc/nginx/ssl/e-jrf_org.key
+  when: install_certificate

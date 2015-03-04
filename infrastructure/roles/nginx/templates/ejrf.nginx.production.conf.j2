@@ -1,0 +1,30 @@
+server {
+    listen 80;
+    server_name www.e-jrf.org e-jrf.org www.ejrf.net ejrf.net www.ejrf.org ejrf.org www.ejrf.info ejrf.info www.e-jrf.com e-jrf.com www.e-jrf.net e-jrf.net www.e-jrf.info e-jrf.info;
+    return 301 https://e-jrf.org$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    charset utf-8;
+    server_name     e-jrf.org 54.72.95.141;
+    access_log /var/log/nginx/ejrf.access.log;
+    error_log /var/log/nginx/ejrf.error.log;
+
+    # max upload size
+    client_max_body_size 50M;   # adjust to taste
+
+    #listen 443 ssl;
+    ssl on;
+    ssl_certificate /etc/nginx/ssl/e-jrf_org.crt;
+    ssl_certificate_key /etc/nginx/ssl/e-jrf_org.key;
+
+    location / {
+        uwsgi_pass unix:///tmp/ejrf.sock;
+        include uwsgi_params;
+    }
+
+    location /static {
+        alias   /srv/checkout/app/static/;
+    }
+}
