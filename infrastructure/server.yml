@@ -5,6 +5,6 @@
   sudo: true
   roles:
      - postgres
-     - app
      - nginx
      - uwsgi
+     - app

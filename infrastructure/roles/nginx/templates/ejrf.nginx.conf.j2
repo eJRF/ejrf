@@ -9,10 +9,6 @@ server {
 
     listen 443 ssl;
 
-    ssl on;
-    ssl_certificate /etc/nginx/ssl/e-jrf_org.crt;
-    ssl_certificate_key /etc/nginx/ssl/e-jrf_org.key;
-
     error_page 497 https://$host:$server_port$request_uri;
 
     location / {
@@ -21,9 +17,8 @@ server {
     }
 
     location /static {
-        alias   /srv/checkout/static/;
+        alias   /srv/checkout/app/static/;
 
     }
-
 
 }

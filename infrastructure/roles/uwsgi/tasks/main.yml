@@ -9,6 +9,3 @@
 - template: src=ejrf.uwsgi.j2 dest=/etc/uwsgi/apps-available/ejrf.ini
 
 - file: src=/etc/uwsgi/apps-available/ejrf.ini dest=/etc/uwsgi/apps-enabled/ejrf.ini state=link force=yes
-
-- service: name=uwsgi state=restarted
-  sudo: yes

@@ -22,33 +22,33 @@
 
 - file: path=/srv/checkout owner=www-data  mode=0755 state=directory
 
-- file: path=/srv/checkout/export owner=www-data  mode=0755 state=directory
-
 - name: ejrf repo
-  git: repo=https://github.com/eJRF/ejrf.git dest=/srv/checkout version="{{ version }}"
+  git: repo=https://github.com/eJRF/ejrf.git dest=/srv/checkout/app version={{ version }}
+
+- file: path=/srv/checkout/app/export owner=www-data  mode=0755 state=directory
 
 - name: ejrf requirements
-  pip: requirements=/srv/checkout/pip-requirements.txt virtualenv=/srv/checkout/ejrfvenv
+  pip: requirements=/srv/checkout/app/pip-requirements.txt virtualenv=/srv/checkout/ejrfvenv
 
 - name: ejrf sync db
   script: sync-db.sh
   args:
-    chdir: /srv/checko/
+    chdir: /srv/checkout/app/
 
 - name: ejrf migrate d
   script: migrate-db.sh
   args:
-    chdir: /srv/checkout/
+    chdir: /srv/checkout/app/
 
 - name: ejrf collect static
   script: collect-static.sh
   args:
-    chdir: /srv/checkout/
+    chdir: /srv/checkout/app/
 
 - name: ejrf load fixtures
   script: load-fixtures.sh
   args:
-    chdir: /srv/checkout/
+    chdir: /srv/checkout/app/
 
 - service: name=nginx state=restarted
   sudo: yes
