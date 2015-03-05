@@ -3,3 +3,13 @@ DEBUG = False
 TEMPLATE_DEBUG = False
 
 ALLOWED_HOSTS = [ "{{ ansible_ssh_host }}"]
+
+DATABASES = {
+    'default': {
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": "{{ ejrf_db_name }}",
+        "USER": "{{ ejrf_db_name }}",
+        "PASSWORD": "{{ ejrf_db_password }}",
+        "HOST": "localhost",
+    }
+}

@@ -13,5 +13,5 @@ sample_file.zip
 data-backup.json
 infrastructure/roles/nginx/files/
 *.json
-hosts.ini
+*.ini
 *#*
