@@ -634,3 +634,7 @@ select.hide {
 .spinner-loading img {
     margin-left: 50px;
 }
+.extract-col {
+    padding-right: 0;
+    padding-left: 0;
+}
