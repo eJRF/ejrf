@@ -6,6 +6,8 @@
     - uwsgi
     - uwsgi-plugin-python
 
+- file: path=/var/log/uwsgi/app/ejrf.formatted.log owner=www-data  mode=0755 state=touch
+
 - template: src=ejrf.uwsgi.j2 dest=/etc/uwsgi/apps-available/ejrf.ini
 
 - file: src=/etc/uwsgi/apps-available/ejrf.ini dest=/etc/uwsgi/apps-enabled/ejrf.ini state=link force=yes

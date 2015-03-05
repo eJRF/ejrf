@@ -1,4 +1,5 @@
 from braces.views import AccessMixin, MultiplePermissionsRequiredMixin, PermissionRequiredMixin
+from django.http import Http404
 from django.contrib import messages
 from django.contrib.auth.views import redirect_to_login
 from django.http import HttpResponseRedirect
@@ -99,5 +100,5 @@ class DoesNotExistExceptionHandlerMixin(AccessMixin):
             response = super(DoesNotExistExceptionHandlerMixin, self).dispatch(request, *args, **kwargs)
         except self.model.DoesNotExist:
             messages.error(request, self.error_message)
-            return HttpResponseRedirect(self.does_not_exist_url)
+            raise Http404(self.error_message)
         return response

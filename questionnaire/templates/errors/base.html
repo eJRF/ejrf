@@ -1,15 +1,15 @@
 <!DOCTYPE HTML>
 <html>
+
 <head>
     <title>
         {% block title %}{% endblock %} | eJRF
     </title>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <script src="{{ STATIC_ROOT }}js/lib/jquery-1.10.2.min.js" type="text/javascript" charset="utf-8"></script>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.css" type="text/css" media="all">
-    <link rel="stylesheet" href="/static/css/application.css" type="text/css" media="all">
-    <link rel="stylesheet" href="/static/css/font-styles.css" type="text/css" media="all">
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.css" type="text/css" media="all"/>
+    <link rel="stylesheet" href="/static/css/application.css" type="text/css" media="all"/>
+    <link rel="stylesheet" href="/static/css/font-styles.css" type="text/css" media="all"/>
     <!--[if gte IE 8]>
     <link rel="stylesheet" href="{{ STATIC_ROOT }}css/application-ie.css" type="text/css" media="all">
     <![endif]-->
@@ -19,18 +19,19 @@
     <![endif]-->
 
 </head>
-    <body>
-        <div id="questionnaire" class="container boundary">
-            {% include 'errors/header.html' %}
-            <div id="content">
-                <div class="row">
-                    {% block content %}
-                    {% endblock %}
-                </div>
-                <div id="push"></div>
-            </div>
 
-            {% include 'base/footer.html' %}
+<body>
+    <div id="questionnaire" class="container boundary">
+        {% include 'errors/header.html' %}
+        <div id="content">
+            <div class="row">
+                {% block content %} {% endblock %}
+            </div>
+            <div id="push"></div>
         </div>
-    </body>
+
+        {% include 'base/footer.html' %}
+    </div>
+</body>
+
 </html>

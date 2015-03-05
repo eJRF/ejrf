@@ -608,7 +608,6 @@ class DeleteRegionalSubSectionsViewTest(BaseTest):
 
         url = '/subsection/%s/delete/' % subsection.id
         self.assert_permission_required(url)
-
         response = client.post(url)
         self.failUnless(SubSection.objects.filter(id=subsection.id))
         self.assertRedirects(response, expected_url='/accounts/login/?next=%s' % quote(url))
@@ -620,22 +619,19 @@ class DeleteRegionalSubSectionsViewTest(BaseTest):
         region = regional_admin_user.user_profile.region
         self.assign('can_edit_questionnaire', regional_admin_user)
         self.assign('can_edit_questionnaire', self.user)
-
         client.login(username=regional_admin_user.username, password='pass')
 
-        section = Section.objects.create(name="section", questionnaire=self.questionnaire, order=1, region=region,
+        questionnaire = QuestionnaireFactory(parent=self.questionnaire, region=region)
+        section = Section.objects.create(name="section", questionnaire=questionnaire, order=1, region=region,
                                          is_core=True)
         subsection = SubSection.objects.create(title="subsection 1", section=section, order=1, region=region,
                                                is_core=True)
 
         url = '/subsection/%s/delete/' % subsection.id
-
         self.assert_permission_required(url)
-
         response = client.post(url)
         self.failUnless(SubSection.objects.filter(id=subsection.id))
 
-        self.assertRedirects(response, expected_url=section.get_absolute_url(), target_status_code=302)
         message = 'You are not permitted to delete a core subsection'
         self.assertIn(message, response.cookies['messages'].value)
 

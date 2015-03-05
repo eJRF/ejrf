@@ -320,13 +320,15 @@ class DoesNotExistExceptionViewTest(BaseTest):
                           'answer_type': 'Text',
                           'theme': self.theme.id}
 
-    def test_get_regional_questions(self):
+    def test_get_does_not_exist_renders_404_page(self):
         unexisting_id_question = 123
         url = '/questions/%d/delete/' % unexisting_id_question
-        response = self.client.post(url)
-        message = "Sorry, You tried to delete a question does not exist"
-        self.assertRedirects(response, expected_url=reverse('list_questions_page'))
-        self.assertIn(message, response.cookies['messages'].value)
+        response = self.client.get(url)
+        message = "The page/resource you are looking for does not exist."
+
+        self.assertEqual(200, response.status_code)
+        self.assertIn(message, str(response.content))
+
 
 
 class EditQuestionViewTest(BaseTest):
