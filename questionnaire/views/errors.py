@@ -3,7 +3,6 @@ from django.contrib.auth.decorators import login_required
 
 
 def serve_500(request):
-    print '*' *50
     return render_to_response('errors/500.html')
 
 
