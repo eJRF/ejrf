@@ -5,6 +5,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.views.generic import FormView
 from django.views.generic import View
 from braces.views import MultiplePermissionsRequiredMixin, PermissionRequiredMixin
+from django.shortcuts import get_object_or_404
 
 from questionnaire.forms.questionnaires import QuestionnaireFilterForm, PublishQuestionnaireForm
 from questionnaire.forms.sections import SectionForm, SubSectionForm
@@ -37,9 +38,8 @@ class Entry(DoesNotExistExceptionHandlerMixin, AdvancedMultiplePermissionsRequir
                         'region__in': get_regions(request), 'status__in': get_questionnaire_status(request)}
         query_params = filter_empty_values(query_params)
         questionnaire = Questionnaire.objects.get(**query_params)
-        section = Section.objects.get(id=self.kwargs['section_id'])
+        section = get_object_or_404(questionnaire.sections.all(), pk=self.kwargs['section_id'])
         country = get_country(self.request)
-
         self.user_questionnaire_service = UserQuestionnaireService(country, questionnaire, request.GET.get("version"))
         get_version = self.user_questionnaire_service.GET_version
         initial = {'status': 'Draft', 'country': country,

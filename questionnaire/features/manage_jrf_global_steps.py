@@ -365,7 +365,7 @@ def when_i_click_group1_button_on_that_core_questionnaire(step, action):
 @step(u'When I confirm "([^"]*)" the questionnaire')
 def when_i_confirm_group1_the_questionnaire(step, action):
     world.page.click_by_id('confirm-%s-questionnaire-%s' % (action, world.finalised_core_questionnaire.id))
-
+    sleep(1)
 
 @step(u'Then I should see the questionnaire "([^"]*)"')
 def then_i_should_see_the_questionnaire_group1(step, status):
