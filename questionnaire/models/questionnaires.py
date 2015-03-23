@@ -80,7 +80,7 @@ class Questionnaire(BaseModel):
         return not (self._children_answers().exists() or self.answers.exists()) and not self.is_last_questionnaire()
 
     def is_last_questionnaire(self):
-        return Questionnaire.objects.count() == 1
+        return Questionnaire.objects.filter(region__isnull=True).count() == 1
 
     def archive(self):
         self.status = self.ARCHIVED

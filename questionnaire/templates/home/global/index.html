@@ -29,9 +29,11 @@
                                     <a href="" class="btn btn-xs btn-default" data-toggle="modal"
                                        data-target="#edit_questionnaire_name_{{ questionnaire.id }}" id="id-edit-questionnaire-{{ questionnaire.id }}"><span
                                             class="glyphicon glyphicon-pencil"></span> Edit</a>
-                                    <a href="#" data-target="#delete-questionnaire-modal-{{ questionnaire.id }}"
-                                        class="btn btn-default btn-xs" data-toggle="modal" id="id-delete-questionnaire-{{ questionnaire.id }}">
-                                            <span class="glyphicon glyphicon-trash"></span>Delete </a>
+                                    {% if questionnaire.is_deletable %}
+                                        <a href="#" data-target="#delete-questionnaire-modal-{{ questionnaire.id }}"
+                                            class="btn btn-default btn-xs" data-toggle="modal" id="id-delete-questionnaire-{{ questionnaire.id }}">
+                                                <span class="glyphicon glyphicon-trash"></span>Delete </a>
+                                    {% endif %}
                                     <a class="btn btn-xs btn-default" id="id-finalize-{{ questionnaire.id }}"
                                        post="true" phref="/questionnaire/{{ questionnaire.id }}/finalize/"
                                        pdata='{"questionnaire_id": {{ questionnaire.id }}, "csrfmiddlewaretoken": "{{ csrf_token }}"}'><span><img
